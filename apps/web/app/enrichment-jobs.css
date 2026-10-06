@@ -1,0 +1,23 @@
+.enrichment-job-panel{display:grid;gap:14px;margin:18px 0 24px;padding:17px;border:1px solid var(--line);border-radius:9px;background:#fbfcfd}
+.enrichment-job-panel h3{margin:2px 0 4px;font:700 1.05rem "Aptos Display","Segoe UI",sans-serif}
+.enrichment-job-panel>div:first-child>p:last-child{margin:0;color:var(--muted);font-size:.78rem;line-height:1.45}
+.enrichment-job-form{display:flex;align-items:end;flex-wrap:wrap;gap:9px}
+.enrichment-job-form label{display:grid;gap:5px;color:var(--muted);font-size:.7rem;font-weight:700}
+.enrichment-job-form input{width:130px;max-width:100%;border:1px solid #b8c8d2;border-radius:5px;background:#fff;padding:8px;color:var(--ink);font:inherit;font-size:.78rem}
+.enrichment-job-form input:focus-visible{outline:3px solid #66b4d0;outline-offset:2px}
+.enrichment-job-form button{border:1px solid var(--blue);border-radius:6px;background:var(--blue);color:#fff;padding:8px 12px;font-size:.74rem;font-weight:700}
+.enrichment-job-form button:disabled{opacity:.55;cursor:not-allowed}
+.enrichment-job-state{padding-top:12px;border-top:1px solid var(--line)}
+.enrichment-job-state .section-head{margin:0}
+.enrichment-job-history{display:flex;gap:7px;overflow:auto;padding:2px 0 5px}
+.enrichment-job-history button{flex:0 0 auto;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);padding:6px 9px;font-size:.68rem}
+.enrichment-job-history button[aria-pressed=true]{border-color:var(--blue);color:var(--blue);font-weight:700}
+.enrichment-job-history button:focus-visible{outline:3px solid #66b4d0;outline-offset:2px}
+.enrichment-job-state .review-metrics{margin:12px 0}
+.enrichment-job-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:7px;margin:0;padding:0;list-style:none}
+.enrichment-job-items li{display:grid;gap:4px;min-width:0;padding:9px 11px;border:1px solid var(--line);border-radius:6px;background:#fff;font-size:.74rem}
+.enrichment-job-items li span:first-child{font-weight:700}
+.enrichment-job-items li span:nth-child(2){color:var(--muted)}
+.enrichment-job-items li small{color:#963d35;line-height:1.4;overflow-wrap:anywhere}
+.enrichment-job-state .review-button:focus-visible,.enrichment-job-form button:focus-visible{outline:3px solid #66b4d0;outline-offset:2px}
+@media(max-width:620px){.enrichment-job-panel{padding:13px}.enrichment-job-form{display:grid;grid-template-columns:1fr 1fr}.enrichment-job-form label{min-width:0}.enrichment-job-form input{width:100%}.enrichment-job-form button{grid-column:1/-1;width:100%}.enrichment-job-state .section-head{align-items:flex-start}.enrichment-job-state .review-metrics div{padding:12px 9px}}

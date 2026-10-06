@@ -363,8 +363,95 @@ RegistryEnrichmentAudit.init({
   createdAt: { type: DataTypes.DATE, allowNull: false, field: "created_at" },
 }, { sequelize, tableName: "regon_enrichment_audits", timestamps: false });
 
+export type EnrichmentJobStatus = "queued" | "processing" | "completed" | "partial" | "failed" | "cancelled";
+export type EnrichmentJobItemStatus = "pending" | "processing" | "matched" | "not_found" | "ambiguous"
+  | "manual_review" | "excluded" | "failed" | "cancelled";
+
+export class EnrichmentJob extends Model {
+  declare jobId: string;
+  declare tenantId: string;
+  declare batchId: string;
+  declare actorUserId: string;
+  declare idempotencyKey: string;
+  declare selectionHash: string;
+  declare status: EnrichmentJobStatus;
+  declare selectedCount: number;
+  declare completedCount: number;
+  declare excludedCount: number;
+  declare failedCount: number;
+  declare cancelledCount: number;
+  declare version: number;
+  declare cancelRequested: boolean;
+  declare leaseOwner: string | null;
+  declare leaseExpiresAt: Date | null;
+  declare errorCode: string | null;
+  declare createdAt: Date;
+  declare updatedAt: Date;
+  declare finishedAt: Date | null;
+}
+
+EnrichmentJob.init({
+  jobId: { type: DataTypes.UUID, primaryKey: true, field: "job_id" },
+  tenantId: { type: DataTypes.UUID, allowNull: false, field: "tenant_id" },
+  batchId: { type: DataTypes.UUID, allowNull: false, field: "batch_id" },
+  actorUserId: { type: DataTypes.UUID, allowNull: false, field: "actor_user_id" },
+  idempotencyKey: { type: DataTypes.STRING(120), allowNull: false, field: "idempotency_key" },
+  selectionHash: { type: DataTypes.STRING(64), allowNull: false, field: "selection_hash" },
+  status: { type: DataTypes.STRING(20), allowNull: false },
+  selectedCount: { type: DataTypes.INTEGER, allowNull: false, field: "selected_count" },
+  completedCount: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0, field: "completed_count" },
+  excludedCount: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0, field: "excluded_count" },
+  failedCount: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0, field: "failed_count" },
+  cancelledCount: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0, field: "cancelled_count" },
+  version: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 },
+  cancelRequested: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false, field: "cancel_requested" },
+  leaseOwner: { type: DataTypes.UUID, allowNull: true, field: "lease_owner" },
+  leaseExpiresAt: { type: DataTypes.DATE, allowNull: true, field: "lease_expires_at" },
+  errorCode: { type: DataTypes.STRING(80), allowNull: true, field: "error_code" },
+  createdAt: { type: DataTypes.DATE, allowNull: false, field: "created_at" },
+  updatedAt: { type: DataTypes.DATE, allowNull: false, field: "updated_at" },
+  finishedAt: { type: DataTypes.DATE, allowNull: true, field: "finished_at" },
+}, { sequelize, tableName: "enrichment_jobs", timestamps: false });
+
+export class EnrichmentJobItem extends Model {
+  declare itemId: string;
+  declare jobId: string;
+  declare batchId: string;
+  declare sourceRowId: string;
+  declare rowNumber: number;
+  declare expectedRowVersion: number;
+  declare status: EnrichmentJobItemStatus;
+  declare reasonCode: string | null;
+  declare errorCode: string | null;
+  declare attemptCount: number;
+  declare nextAttemptAt: Date | null;
+  declare auditId: string | null;
+  declare createdAt: Date;
+  declare updatedAt: Date;
+  declare finishedAt: Date | null;
+}
+
+EnrichmentJobItem.init({
+  itemId: { type: DataTypes.UUID, primaryKey: true, field: "item_id" },
+  jobId: { type: DataTypes.UUID, allowNull: false, field: "job_id" },
+  batchId: { type: DataTypes.UUID, allowNull: false, field: "batch_id" },
+  sourceRowId: { type: DataTypes.UUID, allowNull: false, field: "source_row_id" },
+  rowNumber: { type: DataTypes.INTEGER, allowNull: false, field: "row_number" },
+  expectedRowVersion: { type: DataTypes.INTEGER, allowNull: false, field: "expected_row_version" },
+  status: { type: DataTypes.STRING(20), allowNull: false },
+  reasonCode: { type: DataTypes.STRING(80), allowNull: true, field: "reason_code" },
+  errorCode: { type: DataTypes.STRING(80), allowNull: true, field: "error_code" },
+  attemptCount: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0, field: "attempt_count" },
+  nextAttemptAt: { type: DataTypes.DATE, allowNull: true, field: "next_attempt_at" },
+  auditId: { type: DataTypes.UUID, allowNull: true, field: "audit_id" },
+  createdAt: { type: DataTypes.DATE, allowNull: false, field: "created_at" },
+  updatedAt: { type: DataTypes.DATE, allowNull: false, field: "updated_at" },
+  finishedAt: { type: DataTypes.DATE, allowNull: true, field: "finished_at" },
+}, { sequelize, tableName: "enrichment_job_items", timestamps: false });
+
 export class CanonicalEntity extends Model {
   declare canonicalEntityId: string;
+  declare tenantId: string;
   declare nipNormalized: string | null;
   declare regon: string | null;
   declare businessName: string;
@@ -374,6 +461,7 @@ export class CanonicalEntity extends Model {
 
 CanonicalEntity.init({
   canonicalEntityId: { type: DataTypes.UUID, primaryKey: true, field: "canonical_entity_id" },
+  tenantId: { type: DataTypes.UUID, allowNull: false, field: "tenant_id" },
   nipNormalized: { type: DataTypes.STRING(10), allowNull: true, field: "nip_normalized" },
   regon: { type: DataTypes.STRING(14), allowNull: true },
   businessName: { type: DataTypes.TEXT, allowNull: false, field: "business_name" },
@@ -383,6 +471,7 @@ CanonicalEntity.init({
 
 export class SourceEntityLink extends Model {
   declare sourceRowId: string;
+  declare tenantId: string;
   declare canonicalEntityId: string;
   declare matchMethod: "nip_regon_exact" | "registry_verified" | "identifier_and_name_exact" | "manual";
   declare linkedAt: Date;
@@ -390,6 +479,7 @@ export class SourceEntityLink extends Model {
 
 SourceEntityLink.init({
   sourceRowId: { type: DataTypes.UUID, primaryKey: true, field: "source_row_id" },
+  tenantId: { type: DataTypes.UUID, allowNull: false, field: "tenant_id" },
   canonicalEntityId: { type: DataTypes.UUID, allowNull: false, field: "canonical_entity_id" },
   matchMethod: { type: DataTypes.STRING(32), allowNull: false, field: "match_method" },
   linkedAt: { type: DataTypes.DATE, allowNull: false, field: "linked_at" },
@@ -824,6 +914,97 @@ RunDispatchOutbox.init({
   createdAt: { type: DataTypes.DATE, allowNull: false, field: "created_at" },
   updatedAt: { type: DataTypes.DATE, allowNull: false, field: "updated_at" },
 }, { sequelize, tableName: "run_dispatch_outbox", timestamps: false });
+
+export type RunSubmissionStatus = "queued" | "running" | "waiting_attention" | "completed" | "cancelled";
+export class RunSubmission extends Model {
+  declare submissionId: string;
+  declare importBatchId: string;
+  declare tenantId: string;
+  declare toolId: string;
+  declare actorUserId: string;
+  declare idempotencyKey: string;
+  declare requestHash: string;
+  declare referenceDate: string;
+  declare status: RunSubmissionStatus;
+  declare version: number;
+  declare createdAt: Date;
+  declare updatedAt: Date;
+}
+
+RunSubmission.init({
+  submissionId: { type: DataTypes.UUID, primaryKey: true, field: "submission_id" },
+  importBatchId: { type: DataTypes.UUID, allowNull: false, field: "import_batch_id" },
+  tenantId: { type: DataTypes.UUID, allowNull: false, field: "tenant_id" },
+  toolId: { type: DataTypes.STRING(80), allowNull: false, field: "tool_id" },
+  actorUserId: { type: DataTypes.UUID, allowNull: false, field: "actor_user_id" },
+  idempotencyKey: { type: DataTypes.STRING(128), allowNull: false, field: "idempotency_key" },
+  requestHash: { type: DataTypes.STRING(64), allowNull: false, field: "request_hash" },
+  referenceDate: { type: DataTypes.DATEONLY, allowNull: false, field: "reference_date" },
+  status: { type: DataTypes.STRING(24), allowNull: false, defaultValue: "queued" },
+  version: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 },
+  createdAt: { type: DataTypes.DATE, allowNull: false, field: "created_at" },
+  updatedAt: { type: DataTypes.DATE, allowNull: false, field: "updated_at" },
+}, { sequelize, tableName: "run_submissions", timestamps: false });
+
+export type RunSubmissionAdmissionState = "pending" | "leased" | "waiting_capacity" | "waiting_window" | "waiting_paused" | "accepted" | "blocked" | "cancelled";
+export class RunSubmissionGroup extends Model {
+  declare groupId: string;
+  declare submissionId: string;
+  declare tenantId: string;
+  declare canonicalEntityId: string;
+  declare leadIdentityKey: string;
+  declare runId: string | null;
+  declare admissionState: RunSubmissionAdmissionState;
+  declare reasonCode: string | null;
+  declare nextAttemptAt: Date | null;
+  declare leaseOwner: string | null;
+  declare leaseExpiresAt: Date | null;
+  declare version: number;
+  declare createdAt: Date;
+  declare updatedAt: Date;
+}
+
+RunSubmissionGroup.init({
+  groupId: { type: DataTypes.UUID, primaryKey: true, field: "group_id" },
+  submissionId: { type: DataTypes.UUID, allowNull: false, field: "submission_id" },
+  tenantId: { type: DataTypes.UUID, allowNull: false, field: "tenant_id" },
+  canonicalEntityId: { type: DataTypes.UUID, allowNull: false, field: "canonical_entity_id" },
+  leadIdentityKey: { type: DataTypes.STRING(64), allowNull: false, field: "lead_identity_key" },
+  runId: { type: DataTypes.UUID, allowNull: true, field: "run_id" },
+  admissionState: { type: DataTypes.STRING(24), allowNull: false, defaultValue: "pending", field: "admission_state" },
+  reasonCode: { type: DataTypes.STRING(80), allowNull: true, field: "reason_code" },
+  nextAttemptAt: { type: DataTypes.DATE, allowNull: true, field: "next_attempt_at" },
+  leaseOwner: { type: DataTypes.UUID, allowNull: true, field: "lease_owner" },
+  leaseExpiresAt: { type: DataTypes.DATE, allowNull: true, field: "lease_expires_at" },
+  version: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 },
+  createdAt: { type: DataTypes.DATE, allowNull: false, field: "created_at" },
+  updatedAt: { type: DataTypes.DATE, allowNull: false, field: "updated_at" },
+}, { sequelize, tableName: "run_submission_groups", timestamps: false });
+
+export type RunSubmissionPreparationState = "ready" | "review" | "excluded";
+export class RunSubmissionItem extends Model {
+  declare itemId: string;
+  declare submissionId: string;
+  declare importBatchId: string;
+  declare sourceRowId: string;
+  declare groupId: string | null;
+  declare expectedRowVersion: number;
+  declare preparationState: RunSubmissionPreparationState;
+  declare reasonCode: string | null;
+  declare createdAt: Date;
+}
+
+RunSubmissionItem.init({
+  itemId: { type: DataTypes.UUID, primaryKey: true, field: "item_id" },
+  submissionId: { type: DataTypes.UUID, allowNull: false, field: "submission_id" },
+  importBatchId: { type: DataTypes.UUID, allowNull: false, field: "import_batch_id" },
+  sourceRowId: { type: DataTypes.UUID, allowNull: false, field: "source_row_id" },
+  groupId: { type: DataTypes.UUID, allowNull: true, field: "group_id" },
+  expectedRowVersion: { type: DataTypes.INTEGER, allowNull: false, field: "expected_row_version" },
+  preparationState: { type: DataTypes.STRING(16), allowNull: false, field: "preparation_state" },
+  reasonCode: { type: DataTypes.STRING(80), allowNull: true, field: "reason_code" },
+  createdAt: { type: DataTypes.DATE, allowNull: false, field: "created_at" },
+}, { sequelize, tableName: "run_submission_items", timestamps: false });
 
 AutomationRun.hasOne(RunIdentity, { foreignKey: "runId", onDelete: "CASCADE" });
 RunIdentity.belongsTo(AutomationRun, { foreignKey: "runId" });

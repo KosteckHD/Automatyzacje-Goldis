@@ -3,7 +3,7 @@ import type { Request } from "express";
 import { canPerform, permissionScope, type AuthorizationContext, type PermissionAction } from "./authorization-policy";
 import { readSessionPrincipal, type SessionPrincipal } from "./session";
 
-export type ResourceSelector = "new-batch" | "route-batch" | "query-batch" | "body-batch" | "route-run" | "query-run" | "body-run" | "session-list" | "route-intervention" | "collection";
+export type ResourceSelector = "new-batch" | "route-batch" | "query-batch" | "body-batch" | "route-run" | "query-run" | "body-run" | "session-list" | "route-intervention" | "route-correction" | "route-conflict" | "route-enrichment-job" | "route-submission" | "collection";
 export type PermissionRequirement = Readonly<{ action: PermissionAction; resource: ResourceSelector }>;
 export type PermissionResourceResolver = (
   selector: ResourceSelector,
@@ -21,8 +21,14 @@ export function RequirePermission(action: PermissionAction, resource: ResourceSe
 function selectedId(selector: ResourceSelector, request: Request): string | null {
   switch (selector) {
     case "route-batch":
+      return typeof request.params.id === "string" ? request.params.id
+        : typeof request.params.batchId === "string" ? request.params.batchId : null;
     case "route-run":
     case "route-intervention":
+    case "route-correction":
+    case "route-conflict":
+    case "route-enrichment-job":
+    case "route-submission":
       return typeof request.params.id === "string" ? request.params.id : null;
     case "query-batch":
       return typeof request.query.batchId === "string" ? request.query.batchId : null;
@@ -72,11 +78,37 @@ export async function resolvePermissionResource(
     const { AutomationRun, ImportBatch, ManualIntervention } = await import("./db");
     let resolvedId = id;
     let resourceAssigneeId: string | null = null;
+    if (selector === "route-enrichment-job") {
+      const { EnrichmentJob } = await import("./db");
+      const job = await EnrichmentJob.findByPk(id, { attributes: ["batchId", "tenantId"] });
+      if (!job) return null;
+      const batch = await ImportBatch.findByPk(job.batchId, { attributes: ["tenantId", "ownerUserId", "toolId"] });
+      if (!batch || batch.tenantId !== job.tenantId) return null;
+      return { resourceTenantId: job.tenantId, resourceOwnerId: batch.ownerUserId, resourceToolId: batch.toolId };
+    }
+    if (selector === "route-submission") {
+      const { RunSubmission } = await import("./db");
+      const submission = await RunSubmission.findByPk(id, { attributes: ["importBatchId", "tenantId", "toolId"] });
+      if (!submission) return null;
+      const batch = await ImportBatch.findByPk(submission.importBatchId, { attributes: ["tenantId", "ownerUserId", "toolId"] });
+      if (!batch || batch.tenantId !== submission.tenantId || batch.toolId !== submission.toolId) return null;
+      return { resourceTenantId: submission.tenantId, resourceOwnerId: batch.ownerUserId, resourceToolId: batch.toolId };
+    }
     if (selector === "route-intervention") {
       const intervention = await ManualIntervention.findByPk(id, { attributes: ["runId", "assigneeUserId"] });
       resolvedId = intervention?.runId ?? "";
       resourceAssigneeId = intervention?.assigneeUserId ?? null;
       if (!resolvedId) return null;
+    }
+    if (selector === "route-correction" || selector === "route-conflict") {
+      const { RegonCorrection, EntityGroupingConflict, SourceRow } = await import("./db");
+      const record = selector === "route-correction"
+        ? await RegonCorrection.findByPk(id, { attributes: ["sourceRowId"] })
+        : await EntityGroupingConflict.findByPk(id, { attributes: ["sourceRowId"] });
+      if (!record) return null;
+      const source = await SourceRow.findByPk(record.sourceRowId, { attributes: ["batchId"] });
+      if (!source) return null;
+      resolvedId = source.batchId;
     }
     const isRun = selector === "route-run" || selector === "query-run" || selector === "body-run" || selector === "route-intervention";
     const run = isRun ? await AutomationRun.findByPk(resolvedId, { attributes: ["batchId", "toolId"] }) : null;

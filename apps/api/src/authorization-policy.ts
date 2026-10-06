@@ -16,6 +16,10 @@ export type PermissionAction =
   | "batch:create"
   | "batch:read"
   | "enrichment:read"
+  | "enrichment:start"
+  | "enrichment:cancel"
+  | "submission:read"
+  | "submission:cancel"
   | "run:create"
   | "run:read"
   | "run:cancel"
@@ -41,7 +45,7 @@ export type AuthorizationContext = Readonly<{
 }>;
 
 const adminActions: readonly PermissionAction[] = [
-  "batch:create", "batch:read", "enrichment:read", "run:create", "run:read", "run:cancel", "run:resume",
+  "batch:create", "batch:read", "enrichment:read", "enrichment:start", "enrichment:cancel", "submission:read", "submission:cancel", "run:create", "run:read", "run:cancel", "run:resume",
   "sms:submit", "correction:propose", "correction:review", "conflict:review", "audit:read",
   "artifact:download", "user:manage", "intervention:read", "intervention:mark_read", "run:manual_data",
 ];
@@ -52,6 +56,10 @@ const roleScopes: Readonly<Record<GoldisRole, Readonly<Partial<Record<Permission
     "batch:create": "tenant",
     "batch:read": "owned",
     "enrichment:read": "owned",
+    "enrichment:start": "owned",
+    "enrichment:cancel": "owned",
+    "submission:read": "owned",
+    "submission:cancel": "owned",
     "run:create": "owned",
     "run:read": "owned",
     "run:cancel": "owned",

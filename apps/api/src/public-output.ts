@@ -12,13 +12,26 @@ import type { Response } from "express";
 import { map, type Observable } from "rxjs";
 
 const peselLike = /(?<!\d)\d{11}(?!\d)/g;
+const uuidLike = /[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}/gi;
 const windowsAbsolutePath = /(^|[\s("'=])(?:[A-Za-z]:[\\/]|\\\\[^\\/\s]+\\[^\\/\s]+\\)[^\r\n"'<>]*/g;
 const posixAbsolutePath = /(^|[\s("'=])\/(?!\/)(?:[^\s/"'<>]+\/)*[^\s/"'<>]*/g;
 const privateField = /pesel|path|storagekey|artifactroot/i;
 
+function maskPeselsOutsideUuids(value: string): string {
+  let result = "";
+  let cursor = 0;
+  for (const match of value.matchAll(uuidLike)) {
+    const index = match.index;
+    if (index === undefined) continue;
+    result += value.slice(cursor, index).replace(peselLike, "[ukryto]");
+    result += match[0];
+    cursor = index + match[0].length;
+  }
+  return result + value.slice(cursor).replace(peselLike, "[ukryto]");
+}
+
 export function sanitizePublicText(value: string): string {
-  return value
-    .replace(peselLike, "[ukryto]")
+  return maskPeselsOutsideUuids(value)
     .replace(windowsAbsolutePath, (_match, prefix: string) => `${prefix}[ścieżka ukryta]`)
     .replace(posixAbsolutePath, (_match, prefix: string) => `${prefix}[ścieżka ukryta]`);
 }

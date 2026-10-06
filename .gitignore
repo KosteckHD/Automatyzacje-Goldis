@@ -10,6 +10,7 @@ node_modules/
 .docker-config/
 dist/
 coverage/
+*.log
 uploads/
 exports/
 worker-profiles/

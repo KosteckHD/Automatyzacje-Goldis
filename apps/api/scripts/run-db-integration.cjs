@@ -48,9 +48,15 @@ async function main() {
     return;
   }
   try {
-    await withDisposableDatabase(baseUrl, "users-empty");
-    await withDisposableDatabase(baseUrl, "users");
-    console.log("DB_INTEGRATION_PASS fresh_schema=true legacy_upgrade=true migrations=001-023 disposable_databases=dropped");
+    const allModes = ["users-empty", "users", "tenant-scope"];
+    const requestedModes = process.env.GOLDIS_TEST_DB_MODES
+      ? [...new Set(process.env.GOLDIS_TEST_DB_MODES.split(",").map((value) => value.trim()).filter(Boolean))]
+      : allModes;
+    if (!requestedModes.length || requestedModes.some((mode) => !allModes.includes(mode))) {
+      throw new Error("GOLDIS_TEST_DB_MODES_INVALID");
+    }
+    for (const mode of requestedModes) await withDisposableDatabase(baseUrl, mode);
+    console.log(`DB_INTEGRATION_PASS modes=${requestedModes.join(",")} migrations=001-027 disposable_databases=dropped`);
   } catch (error) {
     console.error("DB_INTEGRATION_FAILED", error instanceof Error ? error.message : "SMOKE_FAILED");
     process.exitCode = 1;

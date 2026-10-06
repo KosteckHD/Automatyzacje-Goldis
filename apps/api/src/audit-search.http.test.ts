@@ -94,18 +94,26 @@ test("audit API scopes roles, filters reviewer events to current grants and bind
     assert.match(reviewerSql.sql, /a\.action IN \('import\.created', 'run\.created'/);
     assert.match(reviewerSql.sql, /tool_grants tg/);
     assert.match(reviewerSql.sql, /tg\.user_id = :viewerUserId/);
+    assert.match(reviewerSql.sql, /'regon\.correction\.reviewed'/);
+    assert.match(reviewerSql.sql, /'entity\.conflict\.reviewed'/);
+    assert.match(reviewerSql.sql, /ec\.conflict_id::text = a\.resource_id/);
     assert.equal(reviewerSql.replacements.viewerUserId, userIds.reviewer);
 
     const reviewerToolFilter = await fetch(`${base + range}&toolId=oc-policy-verification`, { headers: { cookie: sessionCookie("reviewer") } });
     assert.equal(reviewerToolFilter.status, 200);
     const reviewerToolSql = sqlCalls.at(-1)!.sql;
     assert.match(reviewerToolSql, /rc\.correction_id::text = a\.resource_id AND b\.tool_id = :toolId/);
+    assert.match(reviewerToolSql, /ec\.conflict_id::text = a\.resource_id AND b\.tool_id = :toolId/);
     assert.match(reviewerToolSql, /e\.artifact_id::text = a\.resource_id OR e\.run_id::text = a\.resource_id/);
 
     const reviewerAccountAction = await fetch(`${base + range}&action=user.created`, { headers: { cookie: sessionCookie("reviewer") } });
     assert.equal(reviewerAccountAction.status, 400);
     const reviewerAccountResource = await fetch(`${base + range}&resourceType=settings`, { headers: { cookie: sessionCookie("reviewer") } });
     assert.equal(reviewerAccountResource.status, 400);
+    assert.equal((await fetch(`${base + range}&action=entity.conflict.reviewed`, { headers: { cookie: sessionCookie("reviewer") } })).status, 200);
+    assert.equal((await fetch(`${base + range}&resourceType=entity_conflict`, { headers: { cookie: sessionCookie("reviewer") } })).status, 200);
+    assert.equal((await fetch(`${base + range}&resourceType=enrichment_job&action=enrichment.job.created`, { headers: { cookie: sessionCookie("reviewer") } })).status, 200);
+    assert.match(sqlCalls.at(-1)?.sql ?? "", /FROM enrichment_jobs ej JOIN import_batches b ON b\.id = ej\.batch_id/);
 
     const nextPage = await fetch(`${base + range}&cursor=${encodeURIComponent(auditorPage.nextCursor!)}`, { headers: { cookie: sessionCookie("auditor") } });
     assert.equal(nextPage.status, 200);
@@ -116,7 +124,7 @@ test("audit API scopes roles, filters reviewer events to current grants and bind
 
     const operator = await fetch(base + range, { headers: { cookie: sessionCookie("operator") } });
     assert.equal(operator.status, 403);
-    assert.equal(sqlCalls.length, 4, "rejected role/action/resource/cursor requests must not reach SQL");
+    assert.equal(sqlCalls.length, 7, "rejected role/action/resource/cursor requests must not reach SQL");
   } finally {
     restoreQuery?.();
     await app?.close();

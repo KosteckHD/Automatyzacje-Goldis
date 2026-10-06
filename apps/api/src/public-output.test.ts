@@ -4,7 +4,7 @@ import type { AddressInfo } from "node:net";
 import { test } from "node:test";
 import { BadRequestException, Controller, Get, Module } from "@nestjs/common";
 import { APP_FILTER, APP_INTERCEPTOR, NestFactory } from "@nestjs/core";
-import { PublicExceptionFilter, PublicOutputInterceptor, sanitizePublicFileName, sanitizePublicOutput } from "./public-output";
+import { PublicExceptionFilter, PublicOutputInterceptor, sanitizePublicFileName, sanitizePublicOutput, sanitizePublicText } from "./public-output";
 
 const syntheticPesel = "12345678901";
 
@@ -52,6 +52,12 @@ test("public JSON usuwa PESEL i ścieżki oraz maskuje ich wystąpienia w tekśc
   assert.deepEqual(output.nested, { text: "Person [ukryto]" });
   assert.equal(output.unchanged, "Synthetic label");
   assert.equal(sanitizePublicFileName("C:\\temp\\12345678901.xlsx"), "[ukryto].xlsx");
+});
+
+test("maskowanie PESEL nie uszkadza UUID zawierającego jedenaście kolejnych cyfr", () => {
+  const id = "969c8581-9277-49c3-ab0f-12345678901a";
+  assert.equal(sanitizePublicText(`Zadanie ${id}, osoba ${syntheticPesel}`), `Zadanie ${id}, osoba [ukryto]`);
+  assert.equal(sanitizePublicOutput({ challengeId: id }).challengeId, id);
 });
 
 test("globalny interceptor i filter nie zwracają PESEL-i, ścieżek ani błędów wewnętrznych", async () => {

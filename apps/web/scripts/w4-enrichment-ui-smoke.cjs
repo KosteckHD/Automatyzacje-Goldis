@@ -47,6 +47,9 @@ async function main() {
     const reviewRequests = [];
     let correctionRequest = null;
     let correctionSaved = false;
+    let enrichmentJob = null;
+    let enrichmentJobRequest = null;
+    let enrichmentCancelRequest = null;
     page.on("pageerror", (error) => pageErrors.push(error.message));
     await page.route("**/api/**", async (route) => {
       const request = route.request();
@@ -58,6 +61,22 @@ async function main() {
         body = { role: "admin", csrfToken, tools: [{ toolId: "oc-policy-verification", canDiscover: true, canExecute: true, canViewResults: true, canDownloadResults: true }] };
       } else if (url.pathname === `/api/imports/${batchId}`) {
         body = { id: batchId, totalRows: 2, invalidRows: 0, readyRows: 2, sha256: "a".repeat(64) };
+      } else if (url.pathname === `/api/imports/${batchId}/enrichment-jobs` && method === "GET") {
+        body = { items: enrichmentJob ? [enrichmentJob] : [] };
+      } else if (url.pathname === `/api/imports/${batchId}/enrichment-jobs` && method === "POST") {
+        enrichmentJobRequest = { headers: request.headers(), body: request.postDataJSON() };
+        enrichmentJob = {
+          id: "synthetic-enrichment-job", batchId, status: "queued", selectedCount: 2,
+          completedCount: 0, excludedCount: 0, failedCount: 0, cancelledCount: 0,
+          version: 2, errorCode: null, createdAt: "2026-10-06T10:00:00.000Z", updatedAt: "2026-10-06T10:00:00.000Z", finishedAt: null,
+        };
+        body = enrichmentJob;
+      } else if (url.pathname === `/api/enrichment-jobs/synthetic-enrichment-job/items` && method === "GET") {
+        body = { items: [18001, 18002].map((rowNumber) => ({ rowNumber, status: "pending", reasonCode: null, errorCode: null, attemptCount: 0, nextAttemptAt: null })), nextCursor: null, hasMore: false, limit: 50 };
+      } else if (url.pathname === `/api/enrichment-jobs/synthetic-enrichment-job/cancel` && method === "POST") {
+        enrichmentCancelRequest = { headers: request.headers(), body: request.postDataJSON() };
+        enrichmentJob = { ...enrichmentJob, status: "cancelled", cancelledCount: 2, version: 3 };
+        body = enrichmentJob;
       } else if (url.pathname === `/api/imports/${batchId}/rows`) {
         body = [
           { rowNumber: 18001, companyName: "Firma syntetyczna Alfa", decisionMakerName: "Osoba testowa", regon: "", issues: [] },
@@ -128,12 +147,27 @@ async function main() {
     assert.ok(reviewRequests.length >= 2, "zapis odświeża źródła i stan korekty");
     assert.equal(await page.getByText("Osoba fizyczna", { exact: true }).count(), 0, "panel nie ujawnia danych osoby fizycznej");
 
+    const enrichmentPanel = page.locator(".enrichment-job-panel");
+    await enrichmentPanel.getByLabel("Od wiersza").fill("18001");
+    await enrichmentPanel.getByLabel("Do wiersza").fill("18002");
+    await enrichmentPanel.getByRole("button", { name: "Dodaj zadanie" }).click();
+    await page.getByText("Oczekuje na workera").waitFor({ state: "visible" });
+    assert.equal(enrichmentJobRequest?.headers["x-csrf-token"], csrfToken);
+    assert.deepEqual({ ...enrichmentJobRequest?.body, idempotencyKey: "synthetic" }, {
+      idempotencyKey: "synthetic", fromRow: 18001, toRow: 18002,
+    });
+    assert.match(enrichmentJobRequest?.body.idempotencyKey ?? "", /^[0-9a-f-]{36}$/i);
+    await page.getByRole("button", { name: "Anuluj zadanie" }).click();
+    await page.getByText("Anulowano", { exact: true }).waitFor({ state: "visible" });
+    assert.equal(enrichmentCancelRequest?.headers["x-csrf-token"], csrfToken);
+    assert.deepEqual(enrichmentCancelRequest?.body, { expectedVersion: 2 });
+
     await page.setViewportSize({ width: 390, height: 844 });
     const mobileOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
     assert.equal(mobileOverflow, false, "widok mobilny nie przewija całej strony poziomo");
     assert.deepEqual(pageErrors, [], "brak błędów JavaScript w przeglądarce");
 
-    console.log("W4_ENRICHMENT_UI_SMOKE_PASS provenance=true registryStatus=true conflictReason=true correctionCsrf=true expectedVersion=true refresh=true mobileNoPageOverflow=true syntheticOnly=true");
+    console.log("W4_ENRICHMENT_UI_SMOKE_PASS provenance=true registryStatus=true conflictReason=true correctionCsrf=true jobRange=true jobCsrf=true jobCancelCAS=true refresh=true mobileNoPageOverflow=true syntheticOnly=true");
   } finally {
     if (browser) await browser.close();
     if (server.exitCode === null) {

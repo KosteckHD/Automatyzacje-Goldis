@@ -11,10 +11,12 @@ const toolIdPattern = /^[a-z0-9][a-z0-9-]{1,79}$/;
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const reviewerAuditActions = new Set([
   "import.created", "run.created", "run.cancelled", "run.auth_resumed", "run.review_resumed",
-  "run.manual_data_corrected", "sms.submitted", "regon.correction.proposed", "artifact.downloaded",
+  "run.manual_data_corrected", "run.submission.created", "run.submission.cancelled", "run.submission.group_admitted",
+  "sms.submitted", "regon.correction.proposed", "regon.correction.reviewed",
+  "entity.conflict.reviewed", "enrichment.job.created", "enrichment.job.cancelled", "enrichment.job.completed", "artifact.downloaded",
   "intervention.assigned", "intervention.unassigned", "intervention.priority_changed", "intervention.resolved",
 ]);
-const reviewerAuditResourceTypes = new Set(["import", "run", "artifact", "intervention", "correction"]);
+const reviewerAuditResourceTypes = new Set(["import", "run", "run_submission", "artifact", "intervention", "correction", "entity_conflict", "enrichment_job"]);
 
 function actor(request: Request): SessionPrincipal {
   const current = readSessionPrincipal(request);
@@ -94,10 +96,31 @@ export async function auditQuery(input: {
              AND EXISTS (SELECT 1 FROM tool_grants tg WHERE tg.tenant_id = b.tenant_id AND tg.tool_id = b.tool_id
                AND tg.user_id = :viewerUserId AND (tg.can_view_results = TRUE OR tg.can_download_results = TRUE))
          ))
+         OR (a.resource_type = 'entity_conflict' AND EXISTS (
+           SELECT 1 FROM entity_grouping_conflicts ec JOIN source_rows sr ON sr.id = ec.source_row_id
+           JOIN import_batches b ON b.id = sr.batch_id
+           WHERE ec.conflict_id::text = a.resource_id AND b.tenant_id = :tenantId
+             AND EXISTS (SELECT 1 FROM tool_grants tg WHERE tg.tenant_id = b.tenant_id AND tg.tool_id = b.tool_id
+               AND tg.user_id = :viewerUserId AND (tg.can_view_results = TRUE OR tg.can_download_results = TRUE))
+         ))
+         OR (a.resource_type = 'enrichment_job' AND EXISTS (
+           SELECT 1 FROM enrichment_jobs ej JOIN import_batches b ON b.id = ej.batch_id
+           WHERE ej.job_id::text = a.resource_id AND b.tenant_id = :tenantId
+             AND EXISTS (SELECT 1 FROM tool_grants tg WHERE tg.tenant_id = b.tenant_id AND tg.tool_id = b.tool_id
+               AND tg.user_id = :viewerUserId AND (tg.can_view_results = TRUE OR tg.can_download_results = TRUE))
+         ))
+         OR (a.resource_type = 'run_submission' AND EXISTS (
+           SELECT 1 FROM run_submissions rs JOIN import_batches b ON b.id = rs.import_batch_id
+           WHERE rs.submission_id::text = a.resource_id AND b.tenant_id = :tenantId
+             AND EXISTS (SELECT 1 FROM tool_grants tg WHERE tg.tenant_id = b.tenant_id AND tg.tool_id = b.tool_id
+               AND tg.user_id = :viewerUserId AND (tg.can_view_results = TRUE OR tg.can_download_results = TRUE))
+         ))
        )`;
   const reviewerPolicy = input.principal.role === "reviewer"
     ? `AND a.action IN ('import.created', 'run.created', 'run.cancelled', 'run.auth_resumed', 'run.review_resumed',
-        'run.manual_data_corrected', 'sms.submitted', 'regon.correction.proposed', 'artifact.downloaded',
+        'run.manual_data_corrected', 'run.submission.created', 'run.submission.cancelled', 'run.submission.group_admitted',
+        'sms.submitted', 'regon.correction.proposed', 'regon.correction.reviewed',
+        'entity.conflict.reviewed', 'enrichment.job.created', 'enrichment.job.cancelled', 'enrichment.job.completed', 'artifact.downloaded',
         'intervention.assigned', 'intervention.unassigned', 'intervention.priority_changed', 'intervention.resolved')
        AND ${reviewerToolGrantScope}`
     : "";
@@ -125,6 +148,24 @@ export async function auditQuery(input: {
            SELECT 1 FROM automation_runs r JOIN import_batches b ON b.id = r.batch_id
            WHERE r.id::text = a.resource_id AND b.tool_id = :toolId
          ))
+         OR (a.resource_type = 'correction' AND EXISTS (
+           SELECT 1 FROM regon_corrections rc JOIN source_rows sr ON sr.id = rc.source_row_id
+           JOIN import_batches b ON b.id = sr.batch_id
+           WHERE rc.correction_id::text = a.resource_id AND b.tool_id = :toolId
+         ))
+         OR (a.resource_type = 'entity_conflict' AND EXISTS (
+           SELECT 1 FROM entity_grouping_conflicts ec JOIN source_rows sr ON sr.id = ec.source_row_id
+           JOIN import_batches b ON b.id = sr.batch_id
+           WHERE ec.conflict_id::text = a.resource_id AND b.tool_id = :toolId
+         ))
+         OR (a.resource_type = 'enrichment_job' AND EXISTS (
+           SELECT 1 FROM enrichment_jobs ej JOIN import_batches b ON b.id = ej.batch_id
+           WHERE ej.job_id::text = a.resource_id AND b.tool_id = :toolId
+         ))
+         OR (a.resource_type = 'run_submission' AND EXISTS (
+           SELECT 1 FROM run_submissions rs JOIN import_batches b ON b.id = rs.import_batch_id
+           WHERE rs.submission_id::text = a.resource_id AND b.tool_id = :toolId
+         ))
          OR (a.resource_type = 'artifact' AND EXISTS (
            SELECT 1 FROM export_artifacts e JOIN automation_runs r ON r.id = e.run_id
            JOIN import_batches b ON b.id = r.batch_id
@@ -134,11 +175,6 @@ export async function auditQuery(input: {
            SELECT 1 FROM manual_interventions i JOIN automation_runs r ON r.id = i.run_id
            JOIN import_batches b ON b.id = r.batch_id
            WHERE i.intervention_id::text = a.resource_id AND b.tool_id = :toolId
-         ))
-         OR (a.resource_type = 'correction' AND EXISTS (
-           SELECT 1 FROM regon_corrections rc JOIN source_rows sr ON sr.id = rc.source_row_id
-           JOIN import_batches b ON b.id = sr.batch_id
-           WHERE rc.correction_id::text = a.resource_id AND b.tool_id = :toolId
          ))
        ))
        ${reviewerPolicy}

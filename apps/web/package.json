@@ -11,7 +11,9 @@
     "test:admin-ui-smoke": "node scripts/admin-ui-smoke.cjs",
     "test:history-ui-smoke": "node scripts/history-ui-smoke.cjs",
     "test:tool-grants-ui-smoke": "node scripts/tool-grants-ui-smoke.cjs",
-    "test:audit-ui-smoke": "node scripts/audit-ui-smoke.cjs"
+    "test:audit-ui-smoke": "node scripts/audit-ui-smoke.cjs",
+    "test:review-ui-smoke": "node scripts/review-ui-smoke.cjs",
+    "test:run-submission-ui-smoke": "node scripts/run-submission-ui-smoke.cjs"
   },
   "dependencies": {
     "motion": "^12.43.0",

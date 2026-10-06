@@ -21,12 +21,16 @@ import { AdminController, AdminOnlyGuard, ToolCatalogController } from "./admin"
 import { resolveCurrentSessionRole } from "./session";
 import { AdminReportsController, AuditSearchController } from "./admin-reports";
 import { HistoryController, HistoryService } from "./history";
+import { ReviewController } from "./review";
+import { ReviewService } from "./review-service";
+import { EnrichmentJobController, EnrichmentJobService } from "./enrichment-jobs";
+import { RunSubmissionController, RunSubmissionService } from "./run-submissions";
 
 @Module({
-  controllers: [AuthController, HealthController, ImportController, RunController, HistoryController, AuthChallengeController, WorkerResultController, InterventionController, ManualDataController, AdminController, ToolCatalogController, AdminReportsController, AuditSearchController],
+  controllers: [AuthController, HealthController, ImportController, RunController, RunSubmissionController, HistoryController, ReviewController, EnrichmentJobController, AuthChallengeController, WorkerResultController, InterventionController, ManualDataController, AdminController, ToolCatalogController, AdminReportsController, AuditSearchController],
   providers: [
     SessionGuard, PermissionGuard, WorkerResultGuard, AdminOnlyGuard, ImportService, RunService, HistoryService, AuthChallengeService, WorkerCodeForwarder, InterventionService, ManualDataService,
-    RegistryEnrichmentService, EntityGroupingService, CanonicalRunService, BootstrapAdminService,
+    RegistryEnrichmentService, EntityGroupingService, CanonicalRunService, ReviewService, EnrichmentJobService, RunSubmissionService, BootstrapAdminService,
     LoginRateLimiter,
     { provide: APP_GUARD, useClass: RequestProtectionGuard },
     { provide: APP_INTERCEPTOR, useClass: PublicOutputInterceptor },

@@ -15,6 +15,14 @@ export type AuditedAction =
   | "run.manual_data_corrected"
   | "sms.submitted"
   | "regon.correction.proposed"
+  | "regon.correction.reviewed"
+  | "entity.conflict.reviewed"
+  | "enrichment.job.created"
+  | "enrichment.job.cancelled"
+  | "enrichment.job.completed"
+  | "run.submission.created"
+  | "run.submission.cancelled"
+  | "run.submission.group_admitted"
   | "artifact.downloaded"
   | "user.created"
   | "user.updated"
@@ -32,7 +40,7 @@ export type AuditEventInput = Readonly<{
   tenantId: string;
   actorUserId: string | null;
   action: AuditedAction;
-  resourceType: "import" | "run" | "challenge" | "correction" | "artifact" | "user" | "session" | "tool" | "intervention" | "settings";
+  resourceType: "import" | "run" | "challenge" | "correction" | "entity_conflict" | "enrichment_job" | "run_submission" | "artifact" | "user" | "session" | "tool" | "intervention" | "settings";
   resourceId: string | null;
   outcome: AuditOutcome;
   metadata?: Readonly<Record<string, string | number | boolean | null>>;

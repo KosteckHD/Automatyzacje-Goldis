@@ -8,6 +8,7 @@
     "dev": "npm run build -w @goldis/core && ts-node src/main.ts",
     "start": "node dist/main.js",
     "migrate": "node dist/migrate.js",
+    "start:enrichment-worker": "node dist/enrichment-worker.js",
     "test:migrations": "node scripts/migration-smoke.cjs",
     "test:login-rate-limit-redis-smoke": "node scripts/login-rate-limit-redis-smoke.cjs",
     "test:w3-sms-redis-smoke": "node scripts/w3-sms-redis-smoke.cjs",

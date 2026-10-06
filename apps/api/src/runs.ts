@@ -1,11 +1,12 @@
 import { BadRequestException, Body, ConflictException, Controller, ForbiddenException, Get, Injectable, NotFoundException, OnModuleDestroy, OnModuleInit, Param, Post, Query, Req, Res, ServiceUnavailableException, UseGuards } from "@nestjs/common";
+import { todayInWarsaw } from "@goldis/core";
 import { randomUUID } from "node:crypto";
 import { Queue } from "bullmq";
 import { Op } from "sequelize";
 import type { Request, Response } from "express";
 import { ArtifactDownloadError, getVerifiedArtifactDownload } from "./artifact-download";
 import { artifactDownloadHeaders } from "./artifact-download-headers";
-import { AuthChallenge, AutomationRun, CanonicalEntity, ExportArtifact, InterventionActivity, ManualIntervention, OcPolicyRecord, OcSnapshot, RunDispatchOutbox, RunEvent, RunManualDataOverride, sequelize, SourceRow } from "./db";
+import { AuthChallenge, AutomationRun, CanonicalEntity, ExportArtifact, ImportBatch, InterventionActivity, ManualIntervention, OcPolicyRecord, OcSnapshot, RunDispatchOutbox, RunEvent, RunManualDataOverride, sequelize, SourceRow, TenantMembership, Tool, ToolGrant, ToolSettings, User } from "./db";
 import { readSessionPrincipal, SessionGuard, verifyCsrfRequest } from "./session";
 import { createRunJob } from "./run-queue";
 import { WorkerCodeForwarder } from "./auth-challenges";
@@ -69,6 +70,10 @@ export class RunService implements OnModuleInit, OnModuleDestroy {
       nextAttemptAt: now, claimedAt: null, claimedBy: null, lastErrorCode: null,
       createdAt: now, updatedAt: now,
     }, { transaction });
+  }
+
+  async ensureDispatchForAdmission(runId: string, transaction: import("sequelize").Transaction) {
+    return this.ensureDispatch(runId, "create", transaction);
   }
 
   private async publishOutbox() {
@@ -230,38 +235,48 @@ export class RunService implements OnModuleInit, OnModuleDestroy {
 
   async create(batchId: string, rowNumber: number, actor: AuditActorContext) {
     if (!uuidPattern.test(batchId) || !Number.isInteger(rowNumber) || rowNumber < 2) throw new BadRequestException("Nieprawidłowy import lub numer wiersza");
-    const initial = await SourceRow.findOne({ where: { batchId, rowNumber } });
-    if (!initial) throw new NotFoundException("Nie znaleziono wiersza");
-    const grouping = await this.entityGrouping.resolveRelatedRows(batchId, rowNumber);
-    const groupConflicts = grouping.filter((result) => result.status === "conflict");
-    if (groupConflicts.length) throw new ConflictException("Rekordy powiązane wymagają rozstrzygnięcia przed uruchomieniem");
-    const linkedGrouping = grouping.filter((result) => result.status === "linked");
-    const selectedGroup = linkedGrouping.find((result) => result.rowNumber === rowNumber);
-    if (!selectedGroup) throw new ConflictException("Nie udało się przypisać wiersza do grupy podmiotu");
-
-    const canonical = await CanonicalEntity.findByPk(selectedGroup.canonicalEntityId);
-    if (!canonical) throw new ConflictException("Brak grupy kanonicznej dla wiersza");
-    const linkedIds = linkedGrouping.filter((result) => result.canonicalEntityId === canonical.canonicalEntityId)
-      .map((result) => result.sourceRowId);
-    const linkedRows = await SourceRow.findAll({ where: { id: linkedIds, batchId }, order: [["rowNumber", "ASC"]] });
-    const leadIdentityKey = createLeadIdentityKey(canonical.canonicalEntityId, initial.decisionMakerName);
-    const members = linkedRows.filter((row) => createLeadIdentityKey(canonical.canonicalEntityId, row.decisionMakerName) === leadIdentityKey);
-    if (!members.some((row) => row.id === initial.id)) throw new ConflictException("Wiersz nie należy do uruchamianej grupy osoby");
-    if (!canonical.regon || members.some((row) => !row.effectiveRegon || row.effectiveRegon !== canonical.regon || row.issues.length > 0)) {
-      throw new BadRequestException("Wszystkie wiersze grupy muszą mieć zgodny, sprawdzony REGON i komplet wymaganych danych");
-    }
-
-    const legacyActiveRun = await AutomationRun.findOne({
-      where: {
-        sourceRowId: members.map((row) => row.id),
-        canonicalEntityId: null,
+    const run = await sequelize.transaction(async (transaction) => {
+      // Keep single-row and batch admissions in the same lock order and share
+      // the ToolSettings row lock that protects the rolling run limit.
+      const settings = await ToolSettings.findOne({ where: { tenantId: actor.tenantId, toolId: "oc-policy-verification" }, transaction, lock: transaction.LOCK.UPDATE });
+      const user = await User.findByPk(actor.actorUserId, { transaction, lock: transaction.LOCK.UPDATE });
+      const membership = await TenantMembership.findOne({ where: { tenantId: actor.tenantId, userId: actor.actorUserId }, transaction, lock: transaction.LOCK.UPDATE });
+      const tool = await Tool.findByPk("oc-policy-verification", { transaction, lock: transaction.LOCK.UPDATE });
+      const grant = await ToolGrant.findOne({ where: { tenantId: actor.tenantId, userId: actor.actorUserId, toolId: "oc-policy-verification" }, transaction, lock: transaction.LOCK.UPDATE });
+      if (!settings || user?.status !== "active" || membership?.status !== "active" || !tool || tool.status !== "available"
+        || (membership.role !== "admin" && (membership.role !== "operator" || !grant?.canExecute))) {
+        throw new ForbiddenException("Konto lub prawo uruchomienia nie jest już aktywne");
+      }
+      const batch = await ImportBatch.findByPk(batchId, { transaction, lock: transaction.LOCK.UPDATE });
+      if (!batch || batch.tenantId !== actor.tenantId || batch.toolId !== tool.toolId
+        || (membership.role !== "admin" && batch.ownerUserId !== actor.actorUserId)) throw new NotFoundException("Nie znaleziono importu");
+      const grouping = await this.entityGrouping.resolveRelatedRows(batchId, rowNumber, transaction);
+      const groupConflicts = grouping.filter((result) => result.status === "conflict");
+      if (groupConflicts.length) throw new ConflictException("Rekordy powiązane wymagają rozstrzygnięcia przed uruchomieniem");
+      const linkedGrouping = grouping.filter((result) => result.status === "linked");
+      const selectedGroup = linkedGrouping.find((result) => result.rowNumber === rowNumber);
+      if (!selectedGroup) throw new ConflictException("Nie udało się przypisać wiersza do grupy podmiotu");
+      const initial = await SourceRow.findOne({ where: { batchId, rowNumber }, transaction });
+      if (!initial) throw new NotFoundException("Nie znaleziono wiersza");
+      const canonical = await CanonicalEntity.findOne({ where: { canonicalEntityId: selectedGroup.canonicalEntityId, tenantId: actor.tenantId }, transaction, lock: transaction.LOCK.UPDATE });
+      if (!canonical) throw new ConflictException("Brak grupy kanonicznej dla wiersza");
+      const linkedIds = linkedGrouping.filter((result) => result.canonicalEntityId === canonical.canonicalEntityId).map((result) => result.sourceRowId);
+      const linkedRows = await SourceRow.findAll({ where: { id: linkedIds, batchId }, order: [["rowNumber", "ASC"]], transaction, lock: transaction.LOCK.UPDATE });
+      const leadIdentityKey = createLeadIdentityKey(canonical.canonicalEntityId, initial.decisionMakerName);
+      const members = linkedRows.filter((row) => createLeadIdentityKey(canonical.canonicalEntityId, row.decisionMakerName) === leadIdentityKey);
+      if (!members.some((row) => row.id === initial.id)) throw new ConflictException("Wiersz nie należy do uruchamianej grupy osoby");
+      if (!canonical.regon || members.some((row) => !row.effectiveRegon || row.effectiveRegon !== canonical.regon || row.issues.length > 0)) {
+        throw new BadRequestException("Wszystkie wiersze grupy muszą mieć zgodny, sprawdzony REGON i komplet wymaganych danych");
+      }
+      const legacyActiveRun = await AutomationRun.findOne({ where: {
+        sourceRowId: members.map((row) => row.id), canonicalEntityId: null,
         status: { [Op.notIn]: ["completed", "failed", "no_matching_policies", "cancelled"] },
-      },
+      }, transaction, lock: transaction.LOCK.UPDATE });
+      if (legacyActiveRun) throw new ConflictException("Wiersz ma już aktywne zadanie ze starszej wersji systemu");
+      return this.canonicalRuns.createOrGet(batchId, canonical.canonicalEntityId, leadIdentityKey, members, actor,
+        async (queuedRun, tx) => { await this.ensureDispatch(queuedRun.id, "create", tx); },
+        { transaction, referenceDate: todayInWarsaw() });
     });
-    if (legacyActiveRun) throw new ConflictException("Wiersz ma już aktywne zadanie ze starszej wersji systemu");
-
-    const run = await this.canonicalRuns.createOrGet(batchId, canonical.canonicalEntityId, leadIdentityKey, members, actor,
-      async (queuedRun, transaction) => { await this.ensureDispatch(queuedRun.id, "create", transaction); });
     void this.publishOutbox();
     return this.summary(run);
   }

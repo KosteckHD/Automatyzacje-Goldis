@@ -8,6 +8,7 @@
     "test:preflight": "node --test scripts/preflight-contract.test.cjs",
     "test:db-integration": "node apps/api/scripts/run-db-integration.cjs",
     "test:automation-e2e": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Test-GoldisDatabase.ps1 -Automation",
+    "test:platform-e2e": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Test-GoldisDatabase.ps1 -Automation -PlatformOnly",
     "dev:web": "npm run dev -w @goldis/web",
     "dev:api": "npm run dev -w @goldis/api",
     "dev:worker": "npm run dev -w @goldis/worker",

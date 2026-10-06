@@ -1,9 +1,11 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { QueryTypes, type Transaction } from "sequelize";
 import { createHash, randomUUID } from "node:crypto";
 import { assessRegonEnrichmentEligibility } from "@goldis/core";
-import { RegonCorrection, RegistryEnrichmentAudit, sequelize, SourceRow } from "./db";
+import { ImportBatch, RegonCorrection, RegistryEnrichmentAudit, sequelize, SourceRow } from "./db";
 import { RegistryProviderResult } from "./registry-provider";
 import { assessRegistryResult } from "./registry-result";
+import { EntityGroupingService } from "./entity-grouping-service";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const registryCacheTtlMs = 24 * 60 * 60 * 1000;
@@ -44,7 +46,9 @@ function fingerprint(result: RegistryProviderResult): string {
 
 @Injectable()
 export class RegistryEnrichmentService {
-  async recordResult(batchId: string, rowNumber: number, expectedRowVersion: number, result: RegistryProviderResult) {
+  constructor(private readonly grouping: EntityGroupingService = new EntityGroupingService()) {}
+
+  async recordResult(batchId: string, rowNumber: number, expectedRowVersion: number, result: RegistryProviderResult, parentTransaction?: Transaction) {
     if (!uuidPattern.test(batchId) || !Number.isInteger(rowNumber) || rowNumber < 2
       || !Number.isSafeInteger(expectedRowVersion) || expectedRowVersion < 1) {
       throw new BadRequestException("Nieprawidłowy import, wiersz lub wersja danych");
@@ -54,7 +58,9 @@ export class RegistryEnrichmentService {
     const dataVersionLabel = result.dataVersion?.trim() || null;
     const dataVersionHash = hash(`${result.providerName}\0${result.providerVersion}\0${dataVersionLabel ?? "unversioned"}`);
 
-    return sequelize.transaction(async (transaction) => {
+    return sequelize.transaction(parentTransaction ? { transaction: parentTransaction } : {}, async (transaction) => {
+      const batch = await ImportBatch.findByPk(batchId, { transaction, lock: transaction.LOCK.UPDATE });
+      if (!batch) throw new NotFoundException("Nie znaleziono importu");
       const row = await SourceRow.findOne({
         where: { batchId, rowNumber }, transaction, lock: transaction.LOCK.UPDATE,
       });
@@ -76,6 +82,15 @@ export class RegistryEnrichmentService {
       if (!eligibility.eligible) {
         throw new ConflictException("Wiersz nie kwalifikuje się już do wzbogacenia NIP → REGON");
       }
+      const existingRuns = await sequelize.query<{ id: string }>(
+        `SELECT run.id FROM automation_runs AS run
+          WHERE run.batch_id = $1 AND (run.source_row_id = $2 OR EXISTS (
+            SELECT 1 FROM run_source_rows AS member WHERE member.run_id = run.id AND member.source_row_id = $2
+          ))
+          LIMIT 1 FOR UPDATE OF run`,
+        { bind: [batchId, row.id], transaction, type: QueryTypes.SELECT },
+      );
+      if (existingRuns.length > 0) throw new ConflictException("Wiersz należy już do zadania; nie można zmienić jego tożsamości");
 
       const decision = assessRegistryResult({
         expectedNip: eligibility.nipNormalized,
@@ -90,7 +105,10 @@ export class RegistryEnrichmentService {
       const rowVersionAfter = rowVersionBefore + 1;
       const now = new Date();
 
-      if (applied) row.effectiveRegon = decision.regon;
+      if (applied) {
+        row.effectiveRegon = decision.regon;
+        row.issues = row.issues.filter((issue) => issue !== "REGON_EMPTY");
+      }
       row.rowVersion = rowVersionAfter;
       await row.save({ transaction });
 
@@ -137,6 +155,8 @@ export class RegistryEnrichmentService {
           transaction,
         },
       );
+
+      if (applied) await this.grouping.resolveSourceRow(batchId, rowNumber, transaction, false);
 
       return {
         auditId: audit.auditId,

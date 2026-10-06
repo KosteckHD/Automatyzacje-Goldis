@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, HttpException, Injectable } from "@nestjs/common";
 import { createHash } from "node:crypto";
-import { Op, QueryTypes, UniqueConstraintError } from "sequelize";
+import { Op, QueryTypes, UniqueConstraintError, type Transaction } from "sequelize";
 import { todayInWarsaw } from "@goldis/core";
 import { normalizeBusinessName } from "./registry-result";
 import { AutomationRun, CanonicalEntity, ImportBatch, RunEvent, RunSourceRow, sequelize, SourceEntityLink, SourceRow, ToolSettings } from "./db";
@@ -8,8 +8,9 @@ import { recordAuditEvent, type AuditActorContext } from "./audit";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const terminalStatuses = ["completed", "failed", "no_matching_policies", "cancelled"];
+const legacyTenantId = "00000000-0000-4000-8000-000000000001";
 
-function isInsideRunWindow(now: Date, timezone: string, start: string | null, end: string | null): boolean {
+export function isInsideRunWindow(now: Date, timezone: string, start: string | null, end: string | null): boolean {
   if (!start || !end) return true;
   let parts: Record<string, string> = {};
   try {
@@ -42,29 +43,52 @@ export class CanonicalRunService {
     sourceRows: readonly SourceRow[],
     actor?: AuditActorContext,
     ensureQueuedDispatch?: (run: AutomationRun, transaction: import("sequelize").Transaction) => Promise<void>,
+    options: Readonly<{ transaction?: Transaction; referenceDate?: string }> = {},
   ) {
     if (!uuidPattern.test(batchId) || !uuidPattern.test(canonicalEntityId)
       || !/^[0-9a-f]{64}$/.test(leadIdentityKey) || sourceRows.length === 0
       || sourceRows.some((row) => row.batchId !== batchId || !row.effectiveRegon || row.issues.length > 0)) {
       throw new BadRequestException("Nieprawidłowa grupa źródłowa dla zadania");
     }
-    try {
-      return await sequelize.transaction(async (transaction) => {
+    const referenceDate = options.referenceDate ?? todayInWarsaw();
+    const parsedReferenceDate = new Date(`${referenceDate}T00:00:00.000Z`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(referenceDate) || !Number.isFinite(parsedReferenceDate.getTime())
+      || parsedReferenceDate.toISOString().slice(0, 10) !== referenceDate) {
+      throw new BadRequestException("Nieprawidłowa data odniesienia dla zadania");
+    }
+    const createWithin = async (transaction: Transaction) => {
+        // Every new-run path takes this lock first. It serializes single-row and
+        // submission admissions before they inspect the shared rolling limit.
+        const settings = actor ? await ToolSettings.findOne({
+          where: { tenantId: actor.tenantId, toolId: "oc-policy-verification" },
+          transaction, lock: transaction.LOCK.UPDATE,
+        }) : null;
+        if (actor && !settings) throw new ConflictException("Brak ustawień uruchomienia narzędzia");
         const requestedIds = [...new Set(sourceRows.map((row) => row.id))];
         if (requestedIds.length !== sourceRows.length) throw new BadRequestException("Lista wierszy grupy zawiera duplikaty");
+        const batch = await ImportBatch.findByPk(batchId, { transaction, lock: transaction.LOCK.UPDATE });
+        const tenantId = batch?.tenantId ?? legacyTenantId;
+        if (!batch || batch.toolId !== "oc-policy-verification") {
+          throw new BadRequestException("Nieprawidłowy import dla zadania");
+        }
+        if (actor && batch.tenantId !== actor.tenantId) {
+          throw new BadRequestException("Import nie należy do wskazanego narzędzia");
+        }
         const members = await SourceRow.findAll({
           where: { id: requestedIds, batchId }, order: [["rowNumber", "ASC"]],
           transaction, lock: transaction.LOCK.UPDATE,
         });
         if (members.length !== requestedIds.length) throw new BadRequestException("Wiersz grupy nie należy do tego importu");
-        const canonical = await CanonicalEntity.findByPk(canonicalEntityId, { transaction, lock: transaction.LOCK.UPDATE });
+        const canonical = await CanonicalEntity.findOne({
+          where: { canonicalEntityId, tenantId }, transaction, lock: transaction.LOCK.UPDATE,
+        });
         if (!canonical?.regon || members.some((row) => !row.effectiveRegon || row.effectiveRegon !== canonical.regon
           || row.issues.length > 0 || normalizeBusinessName(row.companyName) !== normalizeBusinessName(canonical.businessName)
           || createLeadIdentityKey(canonicalEntityId, row.decisionMakerName) !== leadIdentityKey)) {
           throw new BadRequestException("Wiersze nie mają zgodnej firmy, REGON-u i osoby decyzyjnej");
         }
         const links = await SourceEntityLink.findAll({
-          where: { sourceRowId: requestedIds }, transaction, lock: transaction.LOCK.UPDATE,
+          where: { sourceRowId: requestedIds, tenantId }, transaction, lock: transaction.LOCK.UPDATE,
         });
         if (links.length !== requestedIds.length || links.some((link) => link.canonicalEntityId !== canonicalEntityId)) {
           throw new BadRequestException("Wiersze nie są powiązane z tą samą grupą kanoniczną");
@@ -80,19 +104,23 @@ export class CanonicalRunService {
           lock: transaction.LOCK.UPDATE,
         });
         if (existing) {
+          if (existing.referenceDate !== referenceDate) {
+            throw new ConflictException("Istnieje aktywne zadanie z inną datą odniesienia; wymagany jest przegląd przed dołączeniem");
+          }
+          const attached = await RunSourceRow.findAll({
+            where: { runId: existing.id, sourceRowId: requestedIds },
+            attributes: ["sourceRowId"], transaction, lock: transaction.LOCK.UPDATE,
+          });
+          const attachedIds = new Set(attached.map((item) => item.sourceRowId));
+          const missing = members.filter((row) => !attachedIds.has(row.id));
+          if (missing.length) await RunSourceRow.bulkCreate(missing.map((row) => ({
+            runId: existing.id, sourceRowId: row.id, rowNumber: row.rowNumber, isPrimary: false, createdAt: new Date(),
+          })), { transaction });
           if (existing.status === "queued") await ensureQueuedDispatch?.(existing, transaction);
           return existing;
         }
 
         if (actor) {
-          const batch = await ImportBatch.findByPk(batchId, { transaction, lock: transaction.LOCK.UPDATE });
-          if (!batch || batch.tenantId !== actor.tenantId || batch.toolId !== "oc-policy-verification") {
-            throw new BadRequestException("Import nie należy do wskazanego narzędzia");
-          }
-          const settings = await ToolSettings.findOne({
-            where: { tenantId: actor.tenantId, toolId: batch.toolId },
-            transaction, lock: transaction.LOCK.UPDATE,
-          });
           if (!settings || !settings.enabledForNewRuns) {
             throw new ConflictException("Administrator wstrzymał nowe uruchomienia tego narzędzia");
           }
@@ -125,7 +153,7 @@ export class CanonicalRunService {
           toolId: "oc-policy-verification",
           status: "queued",
           currentStep: "queued",
-          referenceDate: todayInWarsaw(),
+          referenceDate,
           errorCode: null,
           createdAt: now,
           updatedAt: now,
@@ -148,8 +176,12 @@ export class CanonicalRunService {
         }
         await ensureQueuedDispatch?.(run, transaction);
         return run;
-      });
+    };
+    try {
+      if (options.transaction) return await createWithin(options.transaction);
+      return await sequelize.transaction(createWithin);
     } catch (error) {
+      if (options.transaction) throw error;
       if (!(error instanceof UniqueConstraintError)) throw error;
       const concurrent = await AutomationRun.findOne({
         where: {

@@ -9,9 +9,10 @@ const { SequelizeStorage, Umzug } = require("umzug");
 const mode = process.argv[2];
 const targetDatabase = process.argv[3];
 let smokeStage = "startup";
+let tenantScopeSeed = null;
 const templateUrl = process.env.DATABASE_URL;
-if (!templateUrl || !["empty", "from-006", "policies", "pesel", "snapshot", "evaluation", "artifacts", "export", "finalize", "download", "mfa", "registry", "corrections", "enrichment", "groups", "users", "users-empty"].includes(mode) || !/^goldis_migration_smoke_[a-z0-9_]+$/.test(targetDatabase ?? "")) {
-  console.error("MIGRATION_SMOKE_USAGE: mode empty|from-006|policies|pesel|snapshot|evaluation|artifacts|export|finalize|download|mfa|registry|corrections|enrichment|groups|users|users-empty and a disposable goldis_migration_smoke_* database name are required");
+if (!templateUrl || !["empty", "from-006", "policies", "pesel", "snapshot", "evaluation", "artifacts", "export", "finalize", "download", "mfa", "registry", "corrections", "enrichment", "groups", "users", "users-empty", "tenant-scope"].includes(mode) || !/^goldis_migration_smoke_[a-z0-9_]+$/.test(targetDatabase ?? "")) {
+  console.error("MIGRATION_SMOKE_USAGE: mode empty|from-006|policies|pesel|snapshot|evaluation|artifacts|export|finalize|download|mfa|registry|corrections|enrichment|groups|users|users-empty|tenant-scope and a disposable goldis_migration_smoke_* database name are required");
   process.exit(2);
 }
 
@@ -20,10 +21,19 @@ parsedUrl.pathname = `/${targetDatabase}`;
 const databaseUrl = parsedUrl.toString();
 process.env.DATABASE_URL = databaseUrl;
 const currentSourceModes = ["snapshot", "evaluation", "export", "finalize", "download", "mfa", "registry", "corrections"];
-const latestMigration = ["users", "users-empty"].includes(mode) ? 23 : mode === "groups" ? 14 : mode === "enrichment" ? 13 : currentSourceModes.includes(mode) ? 12 : ["empty", "artifacts"].includes(mode) ? 9 : ["policies", "pesel"].includes(mode) ? 8 : 7;
+const tenantScopeModes = ["registry", "corrections", "enrichment", "groups", "users", "users-empty", "tenant-scope"];
+const latestMigration = tenantScopeModes.includes(mode) ? 27 : currentSourceModes.includes(mode) ? 12 : ["empty", "artifacts"].includes(mode) ? 9 : ["policies", "pesel"].includes(mode) ? 8 : 7;
 
 const sequelize = new Sequelize(databaseUrl, { logging: false });
-const migrationPattern = latestMigration === 23
+const migrationPattern = latestMigration === 27
+  ? "0{0[1-9],1[0-9],2[0-7]}-*.js"
+  : latestMigration === 26
+  ? "0{0[1-9],1[0-9],2[0-6]}-*.js"
+  : latestMigration === 25
+  ? "0{0[1-9],1[0-9],2[0-5]}-*.js"
+  : latestMigration === 24
+  ? "0{0[1-9],1[0-9],2[0-4]}-*.js"
+  : latestMigration === 23
   ? "0{0[1-9],1[0-9],2[0-3]}-*.js"
   : latestMigration === 20
   ? "0{0[1-9],1[0-9],20}-*.js"
@@ -58,6 +68,26 @@ const umzug = new Umzug({
 async function upThrough(targetName) {
   const alreadyApplied = (await umzug.executed()).some((migration) => migration.name === targetName);
   if (!alreadyApplied) await umzug.up({ to: targetName });
+}
+
+async function assignSyntheticBatchToGoldis(batchId, username = "Synthetic.Scope.Admin") {
+  const models = require("../dist/db");
+  const tenant = await models.Tenant.findOne({ where: { slug: "goldis" } });
+  if (!tenant) throw new Error("TENANT_SCOPE_GOLDIS_TENANT_MISSING");
+  const now = new Date();
+  const userId = randomUUID();
+  await models.User.create({
+    userId, username, usernameNormalized: username.toLowerCase(), passwordHash: "synthetic-password-hash-0123456789abcdef",
+    status: "active", createdAt: now, updatedAt: now, lastLoginAt: null,
+  });
+  await models.TenantMembership.create({
+    tenantId: tenant.tenantId, userId, role: "admin", status: "active", createdAt: now, updatedAt: now,
+  });
+  await sequelize.query(
+    "UPDATE import_batches SET tenant_id = $1, owner_user_id = $2 WHERE id = $3",
+    { bind: [tenant.tenantId, userId, batchId] },
+  );
+  return { tenant, userId };
 }
 
 async function seedLegacyRun(status = "awaiting_portal_adapter", referenceDate = "2026-09-30", decisionMakerName = null) {
@@ -855,8 +885,8 @@ async function verifyRegistrySchema(seeded) {
       "lookup_id", "nip_normalized", "data_version", "status", "result_count", "response_fingerprint",
       "attempt_count", "error_code", "checked_at", "expires_at", "created_at", "updated_at",
     ],
-    canonical_entities: ["canonical_entity_id", "nip_normalized", "regon", "business_name", "created_at", "updated_at"],
-    source_entity_links: ["source_row_id", "canonical_entity_id", "match_method", "linked_at"],
+    canonical_entities: ["canonical_entity_id", "tenant_id", "nip_normalized", "regon", "business_name", "created_at", "updated_at"],
+    source_entity_links: ["source_row_id", "tenant_id", "canonical_entity_id", "match_method", "linked_at"],
   };
   const [columns] = await sequelize.query(
     `SELECT table_name, column_name FROM information_schema.columns
@@ -888,8 +918,9 @@ async function verifyRegistrySchema(seeded) {
   const expectedIndexes = [
     "source_rows_batch_effective_regon_idx", "regon_corrections_source_created_idx",
     "regon_corrections_one_pending_per_source_row", "registry_lookup_nip_version_unique",
-    "registry_lookup_status_expiry_idx", "canonical_entities_nip_unique",
-    "canonical_entities_regon_unique", "source_entity_links_entity_idx",
+    "registry_lookup_status_expiry_idx", "canonical_entities_tenant_nip_unique",
+    "canonical_entities_tenant_regon_unique", "source_entity_links_entity_idx",
+    "source_entity_links_tenant_entity_idx",
   ];
   if (expectedIndexes.some((name) => !indexes.some((index) => index.indexname === name))) {
     throw new Error("REGISTRY_SCHEMA_INDEX_MISSING");
@@ -957,12 +988,13 @@ async function verifyRegistrySchema(seeded) {
   }
   if (!duplicateLookupRejected) throw new Error("REGISTRY_DUPLICATE_NIP_VERSION_LOOKUP_ACCEPTED");
 
+  const tenant = await models.Tenant.findOne({ where: { slug: "goldis" } });
   const entity = await models.CanonicalEntity.create({
-    canonicalEntityId: randomUUID(), nipNormalized: "0123456789", regon: "012345678",
+    canonicalEntityId: randomUUID(), tenantId: tenant.tenantId, nipNormalized: "0123456789", regon: "012345678",
     businessName: "Synthetic Company", createdAt: now, updatedAt: now,
   });
   const link = await models.SourceEntityLink.create({
-    sourceRowId: seeded.sourceRowId, canonicalEntityId: entity.canonicalEntityId,
+    sourceRowId: seeded.sourceRowId, tenantId: tenant.tenantId, canonicalEntityId: entity.canonicalEntityId,
     matchMethod: "registry_verified", linkedAt: now,
   });
   if (link.canonicalEntityId !== entity.canonicalEntityId || link.sourceRowId !== seeded.sourceRowId) {
@@ -972,7 +1004,7 @@ async function verifyRegistrySchema(seeded) {
   let nipConflictRejected = false;
   try {
     await models.CanonicalEntity.create({
-      canonicalEntityId: randomUUID(), nipNormalized: "0123456789", regon: "987654321",
+      canonicalEntityId: randomUUID(), tenantId: tenant.tenantId, nipNormalized: "0123456789", regon: "987654321",
       businessName: "Synthetic Conflict", createdAt: new Date(), updatedAt: new Date(),
     });
   } catch (error) {
@@ -985,7 +1017,7 @@ async function verifyRegistrySchema(seeded) {
   let regonConflictRejected = false;
   try {
     await models.CanonicalEntity.create({
-      canonicalEntityId: randomUUID(), nipNormalized: "9876543210", regon: "012345678",
+      canonicalEntityId: randomUUID(), tenantId: tenant.tenantId, nipNormalized: "9876543210", regon: "012345678",
       businessName: "Synthetic Conflict", createdAt: new Date(), updatedAt: new Date(),
     });
   } catch (error) {
@@ -997,7 +1029,7 @@ async function verifyRegistrySchema(seeded) {
   let orphanLinkRejected = false;
   try {
     await models.SourceEntityLink.create({
-      sourceRowId: randomUUID(), canonicalEntityId: entity.canonicalEntityId,
+      sourceRowId: randomUUID(), tenantId: tenant.tenantId, canonicalEntityId: entity.canonicalEntityId,
       matchMethod: "manual", linkedAt: new Date(),
     });
   } catch (error) {
@@ -1064,22 +1096,18 @@ async function verifyRegistryEnrichment(seeded) {
   const models = require("../dist/db");
   const { RegistryEnrichmentService } = require("../dist/registry-enrichment");
   const service = new RegistryEnrichmentService();
-  await sequelize.query(
-    `UPDATE source_rows SET regon_raw = '', regon = NULL, effective_regon = NULL, row_version = 1
-     WHERE id = $1`,
-    { bind: [seeded.sourceRowId] },
-  );
   const createEmptyRow = async (rowNumber) => {
     const id = randomUUID();
     await sequelize.query(
       `INSERT INTO source_rows (
          id, batch_id, row_number, company_name, decision_maker_name, nip_raw, address,
          postal_code, city, regon_raw, regon, effective_regon, row_version, issues
-       ) VALUES ($1, $2, $3, 'Synthetic Company', NULL, '0000000000', 'Test 2', '00-000', 'Test City', '', NULL, NULL, 1, '[]'::jsonb)`,
+       ) VALUES ($1, $2, $3, 'Synthetic Company', NULL, '5260250995', 'Test 2', '00-000', 'Test City', '', NULL, NULL, 1, '[]'::jsonb)`,
       { bind: [id, seeded.batchId, rowNumber] },
     );
     return id;
   };
+  const matchingRowId = await createEmptyRow(18001);
   const ambiguousRowId = await createEmptyRow(18002);
   const mismatchRowId = await createEmptyRow(18003);
   const notFoundRowId = await createEmptyRow(18004);
@@ -1091,7 +1119,7 @@ async function verifyRegistryEnrichment(seeded) {
     fetchedAt: new Date("2026-01-15T12:00:00.000Z"),
     candidates,
   });
-  const matching = { nip: "0000000000", regon: "012345678", name: "Synthetic Company" };
+  const matching = { nip: "5260250995", regon: "012345678", name: "Synthetic Company" };
   const concurrent = await Promise.allSettled([
     service.recordResult(seeded.batchId, 18001, 1, result([matching])),
     service.recordResult(seeded.batchId, 18001, 1, result([matching])),
@@ -1101,8 +1129,8 @@ async function verifyRegistryEnrichment(seeded) {
   if (accepted.length !== 1 || rejected.length !== 1 || rejected[0].reason?.getStatus?.() !== 409) {
     throw new Error("REGON_ENRICHMENT_CONCURRENCY_NOT_SERIALIZED");
   }
-  const applied = await models.SourceRow.findByPk(seeded.sourceRowId);
-  const appliedAudits = await models.RegistryEnrichmentAudit.findAll({ where: { sourceRowId: seeded.sourceRowId } });
+  const applied = await models.SourceRow.findByPk(matchingRowId);
+  const appliedAudits = await models.RegistryEnrichmentAudit.findAll({ where: { sourceRowId: matchingRowId } });
   if (!applied || applied.regonRaw !== "" || applied.regon !== null || applied.effectiveRegon !== "012345678"
     || applied.rowVersion !== 2 || appliedAudits.length !== 1
     || appliedAudits[0].decisionStatus !== "matched" || !appliedAudits[0].applied
@@ -1120,7 +1148,7 @@ async function verifyRegistryEnrichment(seeded) {
   }
 
   const ambiguous = await service.recordResult(seeded.batchId, 18002, 1, result([
-    matching, { nip: "0000000000", regon: "00123456789012", name: "Synthetic Company", unitType: "LOCAL" },
+    matching, { nip: "5260250995", regon: "00123456789012", name: "Synthetic Company", unitType: "LOCAL" },
   ]));
   const mismatch = await service.recordResult(seeded.batchId, 18003, 1, result([
     { ...matching, nip: "0000000017" },
@@ -1132,7 +1160,7 @@ async function verifyRegistryEnrichment(seeded) {
     || reviewedRows.length !== 3 || reviewedRows.some((row) => row.effectiveRegon !== null || row.regonRaw !== "" || row.regon !== null || row.rowVersion !== 2)) {
     throw new Error("REGON_ENRICHMENT_REVIEW_DECISIONS_MUTATED_SOURCE");
   }
-  const cacheEntries = await models.RegistryLookupCache.findAll({ where: { nipNormalized: "0000000000" } });
+  const cacheEntries = await models.RegistryLookupCache.findAll({ where: { nipNormalized: "5260250995" } });
   if (cacheEntries.length !== 1 || cacheEntries[0].attemptCount !== 4 || cacheEntries[0].status !== "not_found"
     || cacheEntries[0].dataVersion.length !== 64 || cacheEntries[0].responseFingerprint.length !== 64) {
     throw new Error("REGON_ENRICHMENT_LOOKUP_CACHE_MISMATCH");
@@ -1804,7 +1832,7 @@ async function verifyUserSchema(seeded = null, queuedSeed = null, legacyGrantUse
       throw new Error("USER_MIGRATION_QUEUED_RUN_OUTBOX_BACKFILL_MISMATCH");
     }
   }
-  console.log(`USER_SCHEMA_SMOKE_PASS migration=023 existingBatchAdoptedByBootstrap=${Boolean(seeded)} bootstrapIdempotent=true ownershipPair=true membership=valid crossTenantOwner=blocked toolGrantBackfill=${Boolean(legacyGrantUsers)} newUserNoGrant=true dbLogin=valid sessionRegistry=true sessionRevoke=true temporaryPasswordGate=true roleFromMembership=true disabledPrincipal=blocked audit=nestedSensitiveMetadata=blocked actionRows=${savedEvents.length} transactionRollback=true outbox=queued-backfilled:${Boolean(queuedSeed)} lease=empty staging=metadata-only`);
+  console.log(`USER_SCHEMA_SMOKE_PASS migration=026 existingBatchAdoptedByBootstrap=${Boolean(seeded)} bootstrapIdempotent=true ownershipPair=true membership=valid crossTenantOwner=blocked toolGrantBackfill=${Boolean(legacyGrantUsers)} newUserNoGrant=true dbLogin=valid sessionRegistry=true sessionRevoke=true temporaryPasswordGate=true roleFromMembership=true disabledPrincipal=blocked audit=nestedSensitiveMetadata=blocked actionRows=${savedEvents.length} transactionRollback=true outbox=queued-backfilled:${Boolean(queuedSeed)} lease=empty staging=metadata-only`);
 }
 
 async function verifyOperationalSettingsAndRunControls() {
@@ -2371,6 +2399,734 @@ async function verifyArtifactDownload() {
   }
 }
 
+async function verifyCanonicalTenantMigration() {
+  smokeStage = "canonical_tenant_scope_migration_setup";
+  const models = require("../dist/db");
+  const { randomUUID } = require("node:crypto");
+  const goldis = await models.Tenant.findOne({ where: { slug: "goldis" } });
+  if (!goldis) throw new Error("CANONICAL_TENANT_GOLDIS_MISSING");
+  const otherTenantId = randomUUID();
+  const now = new Date();
+  await models.Tenant.create({
+    tenantId: otherTenantId, slug: "synthetic-canonical-other", displayName: "Synthetic Other", createdAt: now,
+  });
+  const otherUserId = randomUUID();
+  await models.User.create({
+    userId: otherUserId, username: "Synthetic.Canonical.Other", usernameNormalized: "synthetic.canonical.other",
+    passwordHash: "synthetic-password-hash-0123456789abcdef", status: "active", createdAt: now, updatedAt: now, lastLoginAt: null,
+  });
+  await models.TenantMembership.create({
+    tenantId: otherTenantId, userId: otherUserId, role: "admin", status: "active", createdAt: now, updatedAt: now,
+  });
+  await sequelize.query(
+    "UPDATE import_batches SET tenant_id = $1, owner_user_id = $2 WHERE id = $3",
+    { bind: [otherTenantId, otherUserId, tenantScopeSeed.other.batchId] },
+  );
+  tenantScopeSeed.otherTenantId = otherTenantId;
+  tenantScopeSeed.otherActorId = otherUserId;
+  tenantScopeSeed.goldisTenantId = goldis.tenantId;
+
+  const canonicalEntityId = randomUUID();
+  await sequelize.query(
+    `INSERT INTO canonical_entities
+       (canonical_entity_id, nip_normalized, regon, business_name, created_at, updated_at)
+     VALUES ($1, '5260250995', '012345678', 'Synthetic Company', $2, $2)`,
+    { bind: [canonicalEntityId, now] },
+  );
+  for (const seeded of [tenantScopeSeed.goldis, tenantScopeSeed.other]) {
+    await sequelize.query(
+      `INSERT INTO source_entity_links (source_row_id, canonical_entity_id, match_method, linked_at)
+       VALUES ($1, $2, 'nip_regon_exact', $3)`,
+      { bind: [seeded.sourceRowId, canonicalEntityId, now] },
+    );
+    await sequelize.query(
+      "UPDATE automation_runs SET canonical_entity_id = $1 WHERE id = $2",
+      { bind: [canonicalEntityId, seeded.runId] },
+    );
+  }
+  await sequelize.query(
+    `INSERT INTO entity_grouping_conflicts
+       (conflict_id, source_row_id, reason_code, candidate_entity_ids, status, created_at)
+     VALUES ($1, $2, 'NAME_MISMATCH', jsonb_build_array($3::text), 'open', $4)`,
+    { bind: [randomUUID(), tenantScopeSeed.other.sourceRowId, canonicalEntityId, now] },
+  );
+  await upThrough("024-canonical-entity-tenant-scope.js");
+
+  smokeStage = "canonical_tenant_scope_migration_assertions";
+  const entities = await models.CanonicalEntity.findAll({ order: [["tenantId", "ASC"]] });
+  const goldisEntity = entities.find((entity) => entity.tenantId === goldis.tenantId);
+  const otherEntity = entities.find((entity) => entity.tenantId === otherTenantId);
+  const goldisLink = await models.SourceEntityLink.findByPk(tenantScopeSeed.goldis.sourceRowId);
+  const otherLink = await models.SourceEntityLink.findByPk(tenantScopeSeed.other.sourceRowId);
+  const goldisRun = await models.AutomationRun.findByPk(tenantScopeSeed.goldis.runId);
+  const otherRun = await models.AutomationRun.findByPk(tenantScopeSeed.other.runId);
+  const [conflicts] = await sequelize.query(
+    "SELECT candidate_entity_ids FROM entity_grouping_conflicts WHERE source_row_id = $1",
+    { bind: [tenantScopeSeed.other.sourceRowId] },
+  );
+  if (entities.length !== 2 || !goldisEntity || !otherEntity || goldisEntity.canonicalEntityId === otherEntity.canonicalEntityId
+    || goldisEntity.nipNormalized !== otherEntity.nipNormalized || goldisEntity.regon !== otherEntity.regon
+    || goldisLink?.tenantId !== goldis.tenantId || goldisLink.canonicalEntityId !== goldisEntity.canonicalEntityId
+    || otherLink?.tenantId !== otherTenantId || otherLink.canonicalEntityId !== otherEntity.canonicalEntityId
+    || goldisRun?.canonicalEntityId !== goldisEntity.canonicalEntityId
+    || otherRun?.canonicalEntityId !== otherEntity.canonicalEntityId
+    || JSON.stringify(conflicts[0]?.candidate_entity_ids) !== JSON.stringify([otherEntity.canonicalEntityId])) {
+    throw new Error("CANONICAL_TENANT_BACKFILL_MISMATCH");
+  }
+
+  let sameTenantDuplicateRejected = false;
+  try {
+    await models.CanonicalEntity.create({
+      canonicalEntityId: randomUUID(), tenantId: otherTenantId, nipNormalized: "5260250995", regon: "987654321",
+      businessName: "Synthetic Conflicting Company", createdAt: now, updatedAt: now,
+    });
+  } catch (error) {
+    const code = error?.parent?.code ?? error?.original?.code;
+    if (code !== "23505") throw error;
+    sameTenantDuplicateRejected = true;
+  }
+  const thirdTenantId = randomUUID();
+  await models.Tenant.create({
+    tenantId: thirdTenantId, slug: "synthetic-canonical-third", displayName: "Synthetic Third", createdAt: now,
+  });
+  await models.CanonicalEntity.create({
+    canonicalEntityId: randomUUID(), tenantId: thirdTenantId, nipNormalized: "5260250995", regon: "012345678",
+    businessName: "Synthetic Company", createdAt: now, updatedAt: now,
+  });
+  const crossTenantRow = await models.SourceRow.create({
+    id: randomUUID(), batchId: tenantScopeSeed.goldis.batchId, rowNumber: 18100,
+    companyName: "Synthetic Company", decisionMakerName: "Synthetic Lead", nipRaw: "5260250995",
+    address: "Synthetic", postalCode: "00-000", city: "Synthetic", regonRaw: "012345678",
+    regon: "012345678", effectiveRegon: "012345678", rowVersion: 1, issues: [],
+  });
+  let crossTenantLinkRejected = false;
+  try {
+    await models.SourceEntityLink.create({
+      sourceRowId: crossTenantRow.id, tenantId: goldis.tenantId,
+      canonicalEntityId: otherEntity.canonicalEntityId, matchMethod: "manual", linkedAt: now,
+    });
+  } catch (error) {
+    const code = error?.parent?.code ?? error?.original?.code;
+    if (code !== "23503") throw error;
+    crossTenantLinkRejected = true;
+  }
+  if (!sameTenantDuplicateRejected || !crossTenantLinkRejected) {
+    throw new Error("CANONICAL_TENANT_CONSTRAINTS_NOT_ENFORCED");
+  }
+
+  smokeStage = "canonical_tenant_scope_application_queries";
+  const { EntityGroupingService } = require("../dist/entity-grouping-service");
+  const { CanonicalRunService, createLeadIdentityKey } = require("../dist/canonical-run-service");
+  const grouping = new EntityGroupingService();
+  const goldisNewRow = await models.SourceRow.create({
+    id: randomUUID(), batchId: tenantScopeSeed.goldis.batchId, rowNumber: 18101,
+    companyName: "Synthetic Company", decisionMakerName: "Synthetic Lead", nipRaw: "5260250995",
+    address: "Synthetic", postalCode: "00-000", city: "Synthetic", regonRaw: "012345678",
+    regon: "012345678", effectiveRegon: "012345678", rowVersion: 1, issues: [],
+  });
+  const otherNewRow = await models.SourceRow.create({
+    id: randomUUID(), batchId: tenantScopeSeed.other.batchId, rowNumber: 18101,
+    companyName: "Synthetic Company", decisionMakerName: "Synthetic Lead", nipRaw: "5260250995",
+    address: "Synthetic", postalCode: "00-000", city: "Synthetic", regonRaw: "012345678",
+    regon: "012345678", effectiveRegon: "012345678", rowVersion: 1, issues: [],
+  });
+  const goldisOutcome = await grouping.resolveSourceRow(tenantScopeSeed.goldis.batchId, 18101);
+  const otherOutcome = await grouping.resolveSourceRow(tenantScopeSeed.other.batchId, 18101);
+  let wrongTenantRunRejected = false;
+  try {
+    await new CanonicalRunService().createOrGet(
+      tenantScopeSeed.goldis.batchId, otherEntity.canonicalEntityId,
+      createLeadIdentityKey(otherEntity.canonicalEntityId, "Synthetic Lead"), [goldisNewRow],
+    );
+  } catch (error) { wrongTenantRunRejected = error?.getStatus?.() === 400; }
+  const refreshedLinks = await models.SourceEntityLink.findAll({ where: { sourceRowId: [goldisNewRow.id, otherNewRow.id] } });
+  if (goldisOutcome.status !== "linked" || goldisOutcome.canonicalEntityId !== goldisEntity.canonicalEntityId
+    || otherOutcome.status !== "linked" || otherOutcome.canonicalEntityId !== otherEntity.canonicalEntityId
+    || refreshedLinks.length !== 2 || refreshedLinks.some((link) => link.tenantId === otherTenantId && link.sourceRowId === goldisNewRow.id)
+    || !wrongTenantRunRejected) {
+    throw new Error("CANONICAL_TENANT_APPLICATION_SCOPE_MISMATCH");
+  }
+  await verifyReviewDecisionFlows(models, goldisEntity, otherEntity);
+  console.log("CANONICAL_TENANT_SCOPE_SMOKE_PASS migration=024 sharedLegacyEntitySplit=true linksRunsConflictsRemapped=true tenantScopedUnique=true compositeLinkFk=true groupingScoped=true wrongTenantRun=blocked reviewApproveReject=true conflictDecisions=true tenantGrantScoped=true auditRollback=true runIdentityImmutable=true");
+}
+
+async function verifyReviewDecisionFlows(models, goldisEntity, otherEntity) {
+  smokeStage = "review_decision_fixture_setup";
+  const { randomUUID } = require("node:crypto");
+  const { ImportService } = require("../dist/imports");
+  const { EntityGroupingService } = require("../dist/entity-grouping-service");
+  const { ReviewService } = require("../dist/review-service");
+  const imports = new ImportService();
+  const grouping = new EntityGroupingService();
+  const review = new ReviewService(grouping);
+  const actor = { tenantId: tenantScopeSeed.goldisTenantId, userId: tenantScopeSeed.goldisActorId, role: "admin" };
+  const reviewerId = randomUUID();
+  const now = new Date();
+  await models.User.create({
+    userId: reviewerId, username: "Synthetic.Review.Reader", usernameNormalized: "synthetic.review.reader",
+    passwordHash: "synthetic-password-hash-0123456789abcdef", status: "active", createdAt: now, updatedAt: now, lastLoginAt: null,
+  });
+  await models.TenantMembership.create({
+    tenantId: actor.tenantId, userId: reviewerId, role: "reviewer", status: "active", createdAt: now, updatedAt: now,
+  });
+  await models.ToolGrant.create({
+    tenantId: actor.tenantId, toolId: "oc-policy-verification", userId: reviewerId,
+    canDiscover: false, canExecute: false, canViewResults: false, canDownloadResults: false,
+    grantedBy: actor.userId, createdAt: now, updatedAt: now, version: 1,
+  });
+
+  let rowNumber = 18200;
+  const regon = () => randomUUID().replace(/\D/g, "").slice(0, 9).padEnd(9, "1");
+  const createRow = async (values = {}) => models.SourceRow.create({
+    id: randomUUID(), batchId: tenantScopeSeed.goldis.batchId, rowNumber: rowNumber++,
+    companyName: "Synthetic Review Company", decisionMakerName: "Synthetic Review Lead", nipRaw: "",
+    address: "Synthetic", postalCode: "00-000", city: "Synthetic", regonRaw: "", regon: null,
+    effectiveRegon: null, rowVersion: 1, issues: ["REGON_EMPTY"], ...values,
+  });
+  const proposal = async (row, proposedRegon) => imports.proposeRegonCorrection(
+    tenantScopeSeed.goldis.batchId, row.rowNumber,
+    { proposedRegon, reason: "Synthetic source document checked", expectedVersion: row.rowVersion },
+    actor.userId, { tenantId: actor.tenantId, actorUserId: actor.userId },
+  );
+
+  smokeStage = "review_queue_scope_sql";
+  const approveRow = await createRow();
+  const approveProposal = await proposal(approveRow, regon());
+  let reviewerPage = await review.listCorrections({ tenantId: actor.tenantId, userId: reviewerId, role: "reviewer" }, {
+    status: "pending", batchId: tenantScopeSeed.goldis.batchId, limit: "10",
+  });
+  if (reviewerPage.items.length !== 0) throw new Error("REVIEW_QUEUE_IGNORED_CURRENT_TOOL_GRANT");
+  await models.ToolGrant.update({ canViewResults: true, updatedAt: new Date(), version: 2 }, {
+    where: { tenantId: actor.tenantId, toolId: "oc-policy-verification", userId: reviewerId },
+  });
+  reviewerPage = await review.listCorrections({ tenantId: actor.tenantId, userId: reviewerId, role: "reviewer" }, {
+    status: "pending", batchId: tenantScopeSeed.goldis.batchId, limit: "10",
+  });
+  if (!reviewerPage.items.some((item) => item.id === approveProposal.correctionId)) throw new Error("REVIEW_QUEUE_IGNORED_GRANTED_REVIEWER");
+  const otherTenantPage = await review.listCorrections({ tenantId: tenantScopeSeed.otherTenantId, userId: tenantScopeSeed.otherActorId, role: "admin" }, {
+    status: "pending", batchId: tenantScopeSeed.goldis.batchId, limit: "10",
+  });
+  if (otherTenantPage.items.length !== 0) throw new Error("REVIEW_QUEUE_LEAKED_CROSS_TENANT_RECORD");
+
+  smokeStage = "review_correction_approve_atomic_grouping_audit";
+  const approved = await review.decideCorrection(approveProposal.correctionId, actor, {
+    decision: "approved", expectedRowVersion: approveProposal.rowVersion, reasonCode: "SOURCE_DOCUMENT_VERIFIED",
+  });
+  const approvedRow = await models.SourceRow.findByPk(approveRow.id);
+  const approvedLink = await models.SourceEntityLink.findByPk(approveRow.id);
+  const approvedCorrection = await models.RegonCorrection.findByPk(approveProposal.correctionId);
+  const [approvedAudit] = await sequelize.query(
+    "SELECT event_id FROM audit_events WHERE action = 'regon.correction.reviewed' AND resource_id = $1 AND actor_user_id = $2",
+    { bind: [approveProposal.correctionId, actor.userId] },
+  );
+  if (approved.decision !== "approved" || approvedRow?.effectiveRegon !== approveProposal.proposedRegon
+    || approvedRow?.issues.length !== 0 || approvedRow?.rowVersion !== approved.rowVersion
+    || approvedLink?.tenantId !== actor.tenantId || approvedCorrection?.reviewerRef !== actor.userId
+    || approvedCorrection?.status !== "approved" || approvedAudit.length !== 1) {
+    throw new Error("REVIEW_CORRECTION_APPROVAL_DID_NOT_ATOMICALLY_UPDATE_SOURCE_GROUP_AUDIT");
+  }
+
+  smokeStage = "review_correction_rejection_preserves_effective_value";
+  const rejectRow = await createRow({ effectiveRegon: "765432109", regonRaw: "765432109", regon: "765432109", issues: [] });
+  const rejectProposal = await proposal(rejectRow, regon());
+  await review.decideCorrection(rejectProposal.correctionId, actor, {
+    decision: "rejected", expectedRowVersion: rejectProposal.rowVersion, reasonCode: "OTHER",
+  });
+  const rejectedRow = await models.SourceRow.findByPk(rejectRow.id);
+  const rejectedCorrection = await models.RegonCorrection.findByPk(rejectProposal.correctionId);
+  if (rejectedRow?.effectiveRegon !== "765432109" || rejectedRow.rowVersion !== rejectProposal.rowVersion + 1
+    || rejectedCorrection?.status !== "rejected" || rejectedCorrection.reviewerRef !== actor.userId) {
+    throw new Error("REVIEW_CORRECTION_REJECTION_MUTATED_EFFECTIVE_VALUE");
+  }
+
+  smokeStage = "review_conflict_link_and_reject";
+  const manualCandidateId = randomUUID();
+  const manualRegon = regon();
+  await models.CanonicalEntity.create({
+    canonicalEntityId: manualCandidateId, tenantId: actor.tenantId, nipNormalized: null,
+    regon: manualRegon, businessName: "Synthetic Manual Candidate", createdAt: now, updatedAt: now,
+  });
+  const linkRow = await createRow({ companyName: "Synthetic Manual Candidate", regonRaw: manualRegon, regon: manualRegon, effectiveRegon: manualRegon, issues: [] });
+  const linkConflictId = randomUUID();
+  await models.EntityGroupingConflict.create({
+    conflictId: linkConflictId, sourceRowId: linkRow.id, reasonCode: "MULTIPLE_CANONICAL_MATCHES",
+    candidateEntityIds: [manualCandidateId], status: "open", resolutionNote: null, resolvedBy: null, resolvedAt: null, createdAt: now,
+  });
+  const linkDecision = await review.resolveConflict(linkConflictId, actor, {
+    action: "link_existing", expectedRowVersion: 1, reasonCode: "IDENTIFIERS_VERIFIED", canonicalEntityId: manualCandidateId,
+  });
+  const linkRecord = await models.SourceEntityLink.findByPk(linkRow.id);
+  const resolvedLinkConflict = await models.EntityGroupingConflict.findByPk(linkConflictId);
+  if (linkDecision.decision !== "link_existing" || linkRecord?.canonicalEntityId !== manualCandidateId
+    || resolvedLinkConflict?.status !== "resolved" || resolvedLinkConflict.resolvedBy !== actor.userId) {
+    throw new Error("REVIEW_CONFLICT_LINK_DECISION_MISMATCH");
+  }
+
+  const rejectLinkRow = await createRow({ companyName: "Synthetic Manual Candidate", regonRaw: manualRegon, regon: manualRegon, effectiveRegon: manualRegon, issues: [] });
+  await models.SourceEntityLink.create({
+    sourceRowId: rejectLinkRow.id, tenantId: actor.tenantId, canonicalEntityId: manualCandidateId,
+    matchMethod: "manual", linkedAt: now,
+  });
+  const rejectLinkConflictId = randomUUID();
+  await models.EntityGroupingConflict.create({
+    conflictId: rejectLinkConflictId, sourceRowId: rejectLinkRow.id, reasonCode: "SOURCE_LINK_MISMATCH",
+    candidateEntityIds: [manualCandidateId], status: "open", resolutionNote: null, resolvedBy: null, resolvedAt: null, createdAt: now,
+  });
+  await review.resolveConflict(rejectLinkConflictId, actor, {
+    action: "reject_link", expectedRowVersion: 1, reasonCode: "CANDIDATE_REJECTED",
+  });
+  const rejectedLinkRow = await models.SourceRow.findByPk(rejectLinkRow.id);
+  if (await models.SourceEntityLink.findByPk(rejectLinkRow.id) || !rejectedLinkRow?.issues.includes("ENTITY_LINK_REJECTED")) {
+    throw new Error("REVIEW_REJECT_LINK_DID_NOT_LEAVE_EXPLICIT_REVIEW_STATE");
+  }
+
+  smokeStage = "review_conflict_recheck_and_tenant_id_validation";
+  const mismatchRow = await createRow({
+    companyName: goldisEntity.businessName, nipRaw: goldisEntity.nipNormalized,
+    regonRaw: "987654321", regon: "987654321", effectiveRegon: "987654321", issues: [],
+  });
+  const mismatchOutcome = await grouping.resolveSourceRow(tenantScopeSeed.goldis.batchId, mismatchRow.rowNumber);
+  const mismatchConflict = await models.EntityGroupingConflict.findOne({ where: { sourceRowId: mismatchRow.id, status: "open" } });
+  if (mismatchOutcome.status !== "conflict" || !mismatchConflict) throw new Error("REVIEW_RECHECK_FIXTURE_NOT_CONFLICTED");
+  const recheck = await review.resolveConflict(mismatchConflict.conflictId, actor, {
+    action: "recheck", expectedRowVersion: mismatchOutcome.rowVersion, reasonCode: "SOURCE_DATA_UPDATED",
+  });
+  const openAfterRecheck = await models.EntityGroupingConflict.findAll({ where: { sourceRowId: mismatchRow.id, status: "open" } });
+  const crossTenantCandidateConflictId = randomUUID();
+  const foreignCandidateRow = await createRow({
+    companyName: otherEntity.businessName, nipRaw: otherEntity.nipNormalized,
+    regonRaw: otherEntity.regon, regon: otherEntity.regon, effectiveRegon: otherEntity.regon, issues: [],
+  });
+  await models.EntityGroupingConflict.create({
+    conflictId: crossTenantCandidateConflictId, sourceRowId: foreignCandidateRow.id, reasonCode: "MULTIPLE_CANONICAL_MATCHES",
+    candidateEntityIds: [otherEntity.canonicalEntityId], status: "open", resolutionNote: null, resolvedBy: null, resolvedAt: null, createdAt: now,
+  });
+  let foreignCandidateRejected = false;
+  try {
+    await review.resolveConflict(crossTenantCandidateConflictId, actor, {
+      action: "link_existing", expectedRowVersion: 1, reasonCode: "IDENTIFIERS_VERIFIED", canonicalEntityId: otherEntity.canonicalEntityId,
+    });
+  } catch (error) { foreignCandidateRejected = error?.getStatus?.() === 404; }
+  const crossTenantList = await review.listConflicts(actor, { status: "open", batchId: tenantScopeSeed.goldis.batchId, limit: "50" });
+  const hiddenForeignCandidate = crossTenantList.items.find((item) => item.id === crossTenantCandidateConflictId);
+  if (recheck.grouping !== "conflict" || openAfterRecheck.length !== 1 || !foreignCandidateRejected
+    || hiddenForeignCandidate?.candidates.some((candidate) => candidate.id === otherEntity.canonicalEntityId)) {
+    throw new Error("REVIEW_RECHECK_OR_FOREIGN_CANDIDATE_SCOPE_MISMATCH");
+  }
+
+  smokeStage = "review_existing_run_blocks_identity_change";
+  await models.AutomationRun.update({ status: "queued", currentStep: "queued" }, { where: { id: tenantScopeSeed.goldis.runId } });
+  const activeSourceRow = await models.SourceRow.findByPk(tenantScopeSeed.goldis.sourceRowId);
+  const activeProposal = await proposal(activeSourceRow, regon());
+  let existingRunBlocked = false;
+  try {
+    await review.decideCorrection(activeProposal.correctionId, actor, {
+      decision: "approved", expectedRowVersion: activeProposal.rowVersion, reasonCode: "SOURCE_DOCUMENT_VERIFIED",
+    });
+  } catch (error) { existingRunBlocked = error?.getStatus?.() === 409; }
+  const activeStillQueued = await models.AutomationRun.findByPk(tenantScopeSeed.goldis.runId);
+  const activeSourceAfter = await models.SourceRow.findByPk(tenantScopeSeed.goldis.sourceRowId);
+  if (!existingRunBlocked || activeStillQueued?.status !== "queued" || activeSourceAfter?.effectiveRegon !== "012345678") {
+    throw new Error("REVIEW_CHANGED_IDENTITY_OF_ACCEPTED_RUN");
+  }
+
+  smokeStage = "review_audit_failure_rolls_back_decision";
+  const rollbackRow = await createRow();
+  const rollbackProposal = await proposal(rollbackRow, regon());
+  await sequelize.query(`CREATE FUNCTION reject_review_audit_event() RETURNS trigger LANGUAGE plpgsql AS $$
+    BEGIN IF NEW.action = 'regon.correction.reviewed' THEN RAISE EXCEPTION 'SYNTHETIC_AUDIT_WRITE_FAILURE'; END IF; RETURN NEW; END $$`);
+  await sequelize.query("CREATE TRIGGER reject_review_audit_event BEFORE INSERT ON audit_events FOR EACH ROW EXECUTE FUNCTION reject_review_audit_event()");
+  let auditFailureObserved = false;
+  try {
+    await review.decideCorrection(rollbackProposal.correctionId, actor, {
+      decision: "approved", expectedRowVersion: rollbackProposal.rowVersion, reasonCode: "SOURCE_DOCUMENT_VERIFIED",
+    });
+  } catch { auditFailureObserved = true; }
+  finally {
+    await sequelize.query("DROP TRIGGER IF EXISTS reject_review_audit_event ON audit_events");
+    await sequelize.query("DROP FUNCTION IF EXISTS reject_review_audit_event()");
+  }
+  const rollbackAfter = await models.SourceRow.findByPk(rollbackRow.id);
+  const rollbackCorrectionAfter = await models.RegonCorrection.findByPk(rollbackProposal.correctionId);
+  if (!auditFailureObserved || rollbackAfter?.effectiveRegon !== null || rollbackAfter.rowVersion !== rollbackProposal.rowVersion
+    || rollbackCorrectionAfter?.status !== "pending" || await models.SourceEntityLink.findByPk(rollbackRow.id)) {
+    throw new Error("REVIEW_AUDIT_FAILURE_DID_NOT_ROLL_BACK_DECISION");
+  }
+}
+
+async function verifyEnrichmentJobFlows() {
+  smokeStage = "enrichment_job_persistence_and_runner";
+  const models = require("../dist/db");
+  const { EnrichmentJobService, RegistryEnrichmentJobRunner } = require("../dist/enrichment-jobs");
+  const jobs = new EnrichmentJobService();
+  const actor = { tenantId: tenantScopeSeed.goldisTenantId, userId: tenantScopeSeed.goldisActorId, role: "admin" };
+  let nextRowNumber = 18300;
+  const addRow = async (overrides = {}) => models.SourceRow.create({
+    id: randomUUID(), batchId: tenantScopeSeed.goldis.batchId, rowNumber: nextRowNumber++,
+    companyName: "Synthetic Enrichment Company", decisionMakerName: null, nipRaw: "1234563218",
+    address: "Synthetic", postalCode: "00-000", city: "Test City", regonRaw: "", regon: null,
+    effectiveRegon: null, rowVersion: 1, issues: ["REGON_EMPTY"], ...overrides,
+  });
+  const first = await addRow();
+  const second = await addRow();
+  const key = "synthetic-enrichment-job-fixture-01";
+  const input = { idempotencyKey: key, rowNumbers: [first.rowNumber, second.rowNumber] };
+  const created = await jobs.start(tenantScopeSeed.goldis.batchId, input, actor);
+  const replay = await jobs.start(tenantScopeSeed.goldis.batchId, input, actor);
+  let changedPayloadStatus = null;
+  try {
+    await jobs.start(tenantScopeSeed.goldis.batchId, { idempotencyKey: key, rowNumbers: [first.rowNumber] }, actor);
+  } catch (error) { changedPayloadStatus = error?.getStatus?.() ?? null; }
+  if (created.replayed || !replay.replayed || created.id !== replay.id || changedPayloadStatus !== 409) {
+    throw new Error("ENRICHMENT_JOB_IDEMPOTENCY_MISMATCH");
+  }
+  let crossTenantStatus = null;
+  try {
+    await jobs.get(created.id, { tenantId: tenantScopeSeed.otherTenantId, userId: tenantScopeSeed.otherActorId, role: "admin" });
+  } catch (error) { crossTenantStatus = error?.getStatus?.() ?? null; }
+  if (crossTenantStatus !== 404) throw new Error("ENRICHMENT_JOB_CROSS_TENANT_READ_NOT_CONCEALED");
+
+  const candidate = { nip: "1234563218", regon: "987654321", name: "Synthetic Enrichment Company" };
+  let providerCalls = 0;
+  const fixtureProvider = {
+    async lookupByNip() {
+      providerCalls += 1;
+      return {
+        providerName: "synthetic-registry", providerVersion: "fixture-1", dataVersion: "synthetic-release-1",
+        fetchedAt: new Date("2026-01-15T12:00:00.000Z"), candidates: [candidate],
+      };
+    },
+  };
+  const workerId = randomUUID();
+  const runner = new RegistryEnrichmentJobRunner(fixtureProvider);
+  if (!await runner.processOne(workerId) || !await runner.processOne(workerId) || await runner.processOne(workerId)) {
+    throw new Error("ENRICHMENT_JOB_RUNNER_DRAIN_MISMATCH");
+  }
+  const completed = await jobs.get(created.id, actor);
+  const persistedRows = await models.SourceRow.findAll({ where: { id: [first.id, second.id] }, order: [["rowNumber", "ASC"]] });
+  const links = await models.SourceEntityLink.findAll({ where: { sourceRowId: [first.id, second.id] } });
+  if (providerCalls !== 1 || completed.status !== "completed" || completed.completedCount !== 2
+    || persistedRows.length !== 2 || persistedRows.some((row) => row.effectiveRegon !== "987654321" || row.rowVersion !== 2)
+    || links.length !== 2 || links[0].canonicalEntityId !== links[1].canonicalEntityId
+    || links.some((link) => link.matchMethod !== "registry_verified")) {
+    throw new Error("ENRICHMENT_JOB_DEDUP_GROUPING_OR_APPLY_MISMATCH");
+  }
+  const items = await jobs.listItems(created.id, undefined, actor);
+  if (items.items.length !== 2 || items.items.some((item) => item.status !== "matched") || items.nextCursor !== null) {
+    throw new Error("ENRICHMENT_JOB_ITEM_PROJECTION_MISMATCH");
+  }
+
+  const makeValidNip = (prefixNumber) => {
+    const prefix = String(prefixNumber).padStart(9, "0").slice(-9);
+    const weights = [6, 5, 7, 2, 3, 4, 5, 6, 7];
+    const checksum = weights.reduce((sum, weight, index) => sum + weight * Number(prefix[index]), 0) % 11;
+    if (checksum === 10) return makeValidNip(prefixNumber + 1);
+    return `${prefix}${checksum}`;
+  };
+  const capacityRows = [];
+  const capacityNames = new Map();
+  const capacityJobs = [];
+  for (let index = 0; index < 4; index += 1) {
+    const nip = makeValidNip(123450000 + index);
+    const companyName = `Synthetic Capacity Company ${index}`;
+    const row = await addRow({ companyName, nipRaw: nip });
+    capacityRows.push(row);
+    capacityNames.set(nip, companyName);
+    capacityJobs.push(await jobs.start(tenantScopeSeed.goldis.batchId, {
+      idempotencyKey: `synthetic-enrichment-capacity-${index}`, rowNumbers: [row.rowNumber],
+    }, actor));
+  }
+  let activeLookups = 0;
+  let maxActiveLookups = 0;
+  let capacityCalls = 0;
+  const capacityProvider = {
+    async lookupByNip(nip) {
+      activeLookups += 1;
+      capacityCalls += 1;
+      const requestNumber = capacityCalls;
+      maxActiveLookups = Math.max(maxActiveLookups, activeLookups);
+      await new Promise((resolve) => setTimeout(resolve, 80));
+      activeLookups -= 1;
+      return {
+        providerName: "synthetic-registry", providerVersion: "fixture-1", dataVersion: "synthetic-release-1",
+        fetchedAt: new Date(), candidates: [{ nip, regon: `98765${String(requestNumber).padStart(4, "0")}`, name: capacityNames.get(nip) }],
+      };
+    },
+  };
+  const capacityWorkers = capacityJobs.map(() => new RegistryEnrichmentJobRunner(capacityProvider));
+  const capacityWorkerIds = capacityJobs.map(() => randomUUID());
+  const firstWave = await Promise.all(capacityWorkers.map((runner, index) => runner.processOne(capacityWorkerIds[index])));
+  if (maxActiveLookups > 3 || firstWave.filter(Boolean).length > 3 || capacityCalls > 4) {
+    throw new Error("ENRICHMENT_GLOBAL_WORKER_LIMIT_EXCEEDED");
+  }
+  for (let pass = 0; pass < 3; pass += 1) {
+    await Promise.all(capacityWorkers.map((runner, index) => runner.processOne(capacityWorkerIds[index])));
+  }
+  const capacityStates = await Promise.all(capacityJobs.map((job) => jobs.get(job.id, actor)));
+  if (maxActiveLookups > 3 || capacityStates.some((job) => job.status !== "completed")) {
+    throw new Error("ENRICHMENT_GLOBAL_WORKER_LEASE_OR_RECOVERY_MISMATCH");
+  }
+
+  const retryRow = await addRow({ nipRaw: makeValidNip(123460001) });
+  const retryJob = await jobs.start(tenantScopeSeed.goldis.batchId, {
+    idempotencyKey: "synthetic-enrichment-job-retries", rowNumbers: [retryRow.rowNumber],
+  }, actor);
+  const { RegistryProviderError } = require("../dist/registry-provider");
+  let retryCalls = 0;
+  const retryRunner = new RegistryEnrichmentJobRunner({
+    async lookupByNip() { retryCalls += 1; throw new RegistryProviderError("RATE_LIMITED", "synthetic throttle"); },
+  });
+  const retryWorkerId = randomUUID();
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    if (!await retryRunner.processOne(retryWorkerId)) throw new Error("ENRICHMENT_RETRY_ITEM_NOT_CLAIMED");
+    await models.EnrichmentJobItem.update({ nextAttemptAt: new Date(Date.now() - 1) }, { where: { jobId: retryJob.id } });
+  }
+  const retryState = await jobs.get(retryJob.id, actor);
+  const retryItems = await jobs.listItems(retryJob.id, undefined, actor);
+  if (retryCalls !== 3 || retryState.status !== "failed" || retryItems.items[0]?.attemptCount !== 3
+    || retryItems.items[0]?.errorCode !== "RATE_LIMITED") {
+    throw new Error("ENRICHMENT_PROVIDER_RETRY_BOUND_MISMATCH");
+  }
+
+  const noProviderRow = await addRow();
+  const noProviderJob = await jobs.start(tenantScopeSeed.goldis.batchId, {
+    idempotencyKey: "synthetic-enrichment-job-no-provider", rowNumbers: [noProviderRow.rowNumber],
+  }, actor);
+  const noProviderRunner = new RegistryEnrichmentJobRunner(null);
+  if (!await noProviderRunner.processOne(randomUUID())) throw new Error("ENRICHMENT_NO_PROVIDER_NOT_PROCESSED");
+  const noProviderState = await jobs.get(noProviderJob.id, actor);
+  const noProviderItems = await jobs.listItems(noProviderJob.id, undefined, actor);
+  if (noProviderState.status !== "failed" || noProviderItems.items[0]?.errorCode !== "PROVIDER_UNCONFIGURED") {
+    throw new Error("ENRICHMENT_NO_PROVIDER_DID_NOT_FAIL_SAFELY");
+  }
+
+  const cancelRow = await addRow();
+  const cancelJob = await jobs.start(tenantScopeSeed.goldis.batchId, {
+    idempotencyKey: "synthetic-enrichment-job-cancel", rowNumbers: [cancelRow.rowNumber],
+  }, actor);
+  let staleCancelStatus = null;
+  try { await jobs.cancel(cancelJob.id, { expectedVersion: cancelJob.version + 1 }, actor); }
+  catch (error) { staleCancelStatus = error?.getStatus?.() ?? null; }
+  const cancelled = await jobs.cancel(cancelJob.id, { expectedVersion: cancelJob.version }, actor);
+  if (staleCancelStatus !== 409 || cancelled.status !== "cancelled" || cancelled.cancelledCount !== 1
+    || await noProviderRunner.processOne(randomUUID())) {
+    throw new Error("ENRICHMENT_JOB_CANCEL_CAS_MISMATCH");
+  }
+
+  const runRow = await addRow({ rowNumber: 18350 });
+  await models.AutomationRun.create({
+    id: randomUUID(), batchId: tenantScopeSeed.goldis.batchId, sourceRowId: runRow.id, rowNumber: runRow.rowNumber,
+    toolId: "oc-policy-verification", status: "failed", currentStep: "failed", referenceDate: "2026-09-30",
+    errorCode: null, createdAt: new Date(), updatedAt: new Date(),
+  });
+  const blockedJob = await jobs.start(tenantScopeSeed.goldis.batchId, {
+    idempotencyKey: "synthetic-enrichment-job-run-block", rowNumbers: [runRow.rowNumber],
+  }, actor);
+  const blockedItems = await jobs.listItems(blockedJob.id, undefined, actor);
+  if (blockedItems.items[0]?.status !== "excluded" || blockedItems.items[0]?.reasonCode !== "RUN_EXISTS") {
+    throw new Error("ENRICHMENT_JOB_RUN_IDENTITY_WAS_NOT_BLOCKED");
+  }
+
+  const jobRows = await models.EnrichmentJob.findAll({ where: { jobId: [created.id, noProviderJob.id, cancelJob.id] } });
+  const itemRows = await models.EnrichmentJobItem.findAll({ where: { jobId: [created.id, noProviderJob.id, cancelJob.id] } });
+  const durablePayload = JSON.stringify({ jobs: jobRows.map((job) => job.toJSON()), items: itemRows.map((item) => item.toJSON()) });
+  if (durablePayload.includes("1234563218") || durablePayload.includes("Synthetic Enrichment Company") || durablePayload.includes("candidates")) {
+    throw new Error("ENRICHMENT_JOB_PERSISTED_RAW_SOURCE_OR_PROVIDER_DATA");
+  }
+  console.log("ENRICHMENT_JOB_SMOKE_PASS idempotency=true tenantRead=404 sameNipLookupDedup=true grouping=true unconfiguredProvider=controlled cancelCAS=true runIdentity=blocked rawQueueScan=clean");
+}
+
+async function verifyRunSubmissionFlows() {
+  smokeStage = "run_submission_preview_persistence_dispatch";
+  const models = require("../dist/db");
+  const { RunSubmissionService } = require("../dist/run-submissions");
+  const { EntityGroupingService } = require("../dist/entity-grouping-service");
+  const { CanonicalRunService } = require("../dist/canonical-run-service");
+  const actor = { tenantId: tenantScopeSeed.goldisTenantId, actorUserId: tenantScopeSeed.goldisActorId };
+  const grouping = new EntityGroupingService();
+  const canonicalRuns = new CanonicalRunService();
+  const runDispatch = {
+    async ensureDispatchForAdmission(runId, transaction) {
+      const unresolved = await models.RunDispatchOutbox.findOne({ where: { runId, status: ["pending", "publishing", "published"] }, transaction });
+      if (unresolved) return unresolved;
+      const now = new Date();
+      return models.RunDispatchOutbox.create({ dispatchId: randomUUID(), runId, intentType: "create", status: "pending",
+        attemptCount: 0, nextAttemptAt: now, claimedAt: null, claimedBy: null, lastErrorCode: null, createdAt: now, updatedAt: now }, { transaction });
+    },
+  };
+  const service = new RunSubmissionService(grouping, canonicalRuns, runDispatch);
+  let rowNumber = 18400;
+  const makeValidNip = (value) => {
+    const prefix = String(value).padStart(9, "0").slice(-9);
+    const weights = [6, 5, 7, 2, 3, 4, 5, 6, 7];
+    const checksum = weights.reduce((sum, weight, index) => sum + weight * Number(prefix[index]), 0) % 11;
+    return checksum === 10 ? makeValidNip(value + 1) : `${prefix}${checksum}`;
+  };
+  const addRow = async (overrides = {}) => models.SourceRow.create({
+    id: randomUUID(), batchId: tenantScopeSeed.goldis.batchId, rowNumber: rowNumber++,
+    companyName: "Synthetic Submission Company", decisionMakerName: "Synthetic Decision Maker", nipRaw: makeValidNip(526025000),
+    address: "Synthetic", postalCode: "00-000", city: "Test City", regonRaw: "876543210", regon: "876543210",
+    effectiveRegon: "876543210", rowVersion: 1, issues: [], ...overrides,
+  });
+  const first = await addRow();
+  const duplicate = await addRow();
+  const secondPerson = await addRow({ decisionMakerName: "Another Synthetic Decision Maker" });
+  const reviewRow = await addRow({ companyName: "Synthetic Review Company", nipRaw: makeValidNip(526025099),
+    regonRaw: "012345678", regon: "012345678", effectiveRegon: "012345678", decisionMakerName: null });
+  await models.RegonCorrection.create({ correctionId: randomUUID(), sourceRowId: reviewRow.id, authorRef: "fixture-operator",
+    reason: "Synthetic review fixture", previousRegon: null, proposedRegon: "012345678", status: "pending",
+    reviewerRef: null, reviewedAt: null, reviewReason: null, createdAt: new Date() });
+  const excluded = await addRow({ companyName: "Synthetic Excluded Company", nipRaw: makeValidNip(526025200),
+    regonRaw: "", regon: null, effectiveRegon: null, issues: ["REGON_EMPTY"], decisionMakerName: null });
+  const selection = { fromRow: first.rowNumber, toRow: excluded.rowNumber };
+  const beforePreview = await models.SourceEntityLink.count({ where: { sourceRowId: [first.id, duplicate.id, secondPerson.id, reviewRow.id, excluded.id] } });
+  const preview = await service.preview(tenantScopeSeed.goldis.batchId, selection, actor, "admin");
+  const afterPreview = await models.SourceEntityLink.count({ where: { sourceRowId: [first.id, duplicate.id, secondPerson.id, reviewRow.id, excluded.id] } });
+  if (beforePreview !== 0 || afterPreview !== 0 || preview.counts.selected !== 5 || preview.counts.ready !== 3
+    || preview.counts.needsReview !== 1 || preview.counts.excluded !== 1 || preview.counts.uniqueGroups !== 2) {
+    throw new Error(`RUN_SUBMISSION_PREVIEW_CLASSIFICATION_OR_READ_ONLY_MISMATCH_${JSON.stringify({ beforePreview, afterPreview, counts: preview.counts, states: preview.items.map((item) => [item.rowNumber, item.state, item.reasonCode]) })}`);
+  }
+  await models.SourceRow.update({ rowVersion: 2 }, { where: { id: first.id } });
+  let stalePreviewStatus = null;
+  try {
+    await service.create(tenantScopeSeed.goldis.batchId, { ...selection, selectionFingerprint: preview.selectionFingerprint,
+      idempotencyKey: "synthetic-submission-stale-preview" }, actor, "admin");
+  } catch (error) { stalePreviewStatus = error?.getStatus?.() ?? null; }
+  if (stalePreviewStatus !== 409 || await models.RunSubmission.count({ where: { idempotencyKey: "synthetic-submission-stale-preview" } })) {
+    throw new Error("RUN_SUBMISSION_STALE_PREVIEW_WAS_NOT_REJECTED_ATOMICALLY");
+  }
+  const currentPreview = await service.preview(tenantScopeSeed.goldis.batchId, selection, actor, "admin");
+  const input = { ...selection, selectionFingerprint: currentPreview.selectionFingerprint,
+    idempotencyKey: "synthetic-submission-main-key-01" };
+  const created = await service.create(tenantScopeSeed.goldis.batchId, input, actor, "admin");
+  const replay = await service.create(tenantScopeSeed.goldis.batchId, input, actor, "admin");
+  let changedKeyStatus = null;
+  try { await service.create(tenantScopeSeed.goldis.batchId, { rowNumbers: [first.rowNumber], selectionFingerprint: currentPreview.selectionFingerprint,
+    idempotencyKey: input.idempotencyKey }, actor, "admin"); }
+  catch (error) { changedKeyStatus = error?.getStatus?.() ?? null; }
+  let crossTenantStatus = null;
+  try { await service.get(created.submissionId, { tenantId: tenantScopeSeed.otherTenantId, actorUserId: tenantScopeSeed.otherActorId }, "admin"); }
+  catch (error) { crossTenantStatus = error?.getStatus?.() ?? null; }
+  const items = await service.listItems(created.submissionId, undefined, actor, "admin");
+  const storedItems = await models.RunSubmissionItem.findAll({ where: { submissionId: created.submissionId } });
+  const storedGroups = await models.RunSubmissionGroup.findAll({ where: { submissionId: created.submissionId } });
+  if (created.submissionId !== replay.submissionId || changedKeyStatus !== 409 || crossTenantStatus !== 404
+    || items.items.length !== 5 || storedItems.length !== 5 || storedGroups.length !== 2
+    || storedItems.filter((item) => item.preparationState === "ready").length !== 3
+    || storedItems.filter((item) => item.preparationState === "review").length !== 1
+    || storedItems.filter((item) => item.preparationState === "excluded").length !== 1) {
+    throw new Error("RUN_SUBMISSION_IDEMPOTENCY_SCOPE_OR_PERSISTENCE_MISMATCH");
+  }
+
+  const settings = await models.ToolSettings.findOne({ where: { tenantId: actor.tenantId, toolId: "oc-policy-verification" } });
+  if (!settings) throw new Error("RUN_SUBMISSION_SETTINGS_MISSING");
+  const [baselineRows] = await sequelize.query(
+    `SELECT count(*)::int AS count FROM automation_runs r JOIN import_batches b ON b.id = r.batch_id
+      WHERE b.tenant_id = $1 AND b.tool_id = 'oc-policy-verification' AND r.created_at >= now() - interval '60 minutes'`,
+    { bind: [actor.tenantId] },
+  );
+  const baseline = baselineRows[0].count;
+  await models.ToolSettings.update({ maxNewRunsPerHour: baseline + 1, enabledForNewRuns: true }, {
+    where: { tenantId: actor.tenantId, toolId: settings.toolId },
+  });
+  await service.dispatchPendingOnce();
+  await service.dispatchPendingOnce();
+  let accepted = await models.RunSubmissionGroup.findAll({ where: { submissionId: created.submissionId, admissionState: "accepted" } });
+  let waiting = await models.RunSubmissionGroup.findAll({ where: { submissionId: created.submissionId, admissionState: "waiting_capacity" } });
+  if (accepted.length !== 1 || waiting.length !== 1 || !accepted[0].runId) {
+    const allGroups = await models.RunSubmissionGroup.findAll({ where: { submissionId: created.submissionId },
+      attributes: ["groupId", "admissionState", "reasonCode", "runId", "nextAttemptAt", "leaseOwner"] });
+    const currentSettings = await models.ToolSettings.findOne({ where: { tenantId: actor.tenantId, toolId: settings.toolId } });
+    throw new Error(`RUN_SUBMISSION_SHARED_HOURLY_LIMIT_NOT_ENFORCED_${JSON.stringify({ accepted: accepted.length, waiting: waiting.length,
+      groups: allGroups.map((group) => group.toJSON()), limit: currentSettings?.maxNewRunsPerHour, baseline, now: new Date().toISOString() })}`);
+  }
+  const acceptedRunId = accepted[0].runId;
+  const outbox = await models.RunDispatchOutbox.findAll({ where: { runId: acceptedRunId, intentType: "create" } });
+  const sourceLinks = await models.RunSourceRow.findAll({ where: { runId: acceptedRunId } });
+  const acceptedItems = await models.RunSubmissionItem.findAll({ where: { groupId: accepted[0].groupId } });
+  if (outbox.length !== 1 || acceptedItems.length < 1 || sourceLinks.length !== acceptedItems.length) {
+    throw new Error(`RUN_SUBMISSION_ADMISSION_OUTBOX_OR_MEMBER_ROWS_MISMATCH_${JSON.stringify({
+      outboxCount: outbox.length, acceptedItemCount: acceptedItems.length, runMemberCount: sourceLinks.length,
+    })}`);
+  }
+  await models.ToolSettings.update({ maxNewRunsPerHour: baseline + 2 }, { where: { tenantId: actor.tenantId, toolId: settings.toolId } });
+  await models.RunSubmissionGroup.update({ nextAttemptAt: new Date(Date.now() - 1) }, { where: { groupId: waiting[0].groupId } });
+  await service.dispatchPendingOnce();
+  accepted = await models.RunSubmissionGroup.findAll({ where: { submissionId: created.submissionId, admissionState: "accepted" } });
+  if (accepted.length !== 2 || accepted.some((group) => !group.runId)) throw new Error("RUN_SUBMISSION_CAPACITY_RETRY_MISMATCH");
+  await models.AutomationRun.update({ status: "failed", currentStep: "failed", errorCode: "SYNTHETIC_TERMINAL" }, { where: { id: acceptedRunId } });
+  const runCountBeforeTerminalReplay = await models.AutomationRun.count({ where: { batchId: tenantScopeSeed.goldis.batchId,
+    canonicalEntityId: accepted[0].canonicalEntityId } });
+  await service.dispatchPendingOnce();
+  const acceptedAfterTerminal = await models.RunSubmissionGroup.findByPk(accepted[0].groupId);
+  const runCountAfterTerminalReplay = await models.AutomationRun.count({ where: { batchId: tenantScopeSeed.goldis.batchId,
+    canonicalEntityId: accepted[0].canonicalEntityId } });
+  if (acceptedAfterTerminal?.runId !== acceptedRunId || runCountAfterTerminalReplay !== runCountBeforeTerminalReplay) {
+    throw new Error("RUN_SUBMISSION_TERMINAL_REPLAY_CREATED_NEW_RUN");
+  }
+  const summary = await service.get(created.submissionId, actor, "admin");
+  if (summary.counts.selectedRows !== 5 || summary.counts.uniqueGroups !== 2
+    || Object.values(summary.counts.items).reduce((total, count) => total + count, 0) !== 5) {
+    throw new Error("RUN_SUBMISSION_ITEM_COUNTS_DO_NOT_RECONCILE");
+  }
+
+  const cancelRow = await addRow({ companyName: "Synthetic Cancel Company", nipRaw: makeValidNip(526025300), regonRaw: "543210987",
+    regon: "543210987", effectiveRegon: "543210987", decisionMakerName: null });
+  const cancelSelection = { rowNumbers: [cancelRow.rowNumber] };
+  const cancelPreview = await service.preview(tenantScopeSeed.goldis.batchId, cancelSelection, actor, "admin");
+  const cancellable = await service.create(tenantScopeSeed.goldis.batchId, { ...cancelSelection,
+    selectionFingerprint: cancelPreview.selectionFingerprint, idempotencyKey: "synthetic-submission-cancel-key" }, actor, "admin");
+  let staleCancelStatus = null;
+  try { await service.cancel(cancellable.submissionId, cancellable.version + 1, actor); }
+  catch (error) { staleCancelStatus = error?.getStatus?.() ?? null; }
+  const cancelled = await service.cancel(cancellable.submissionId, cancellable.version, actor);
+  const cancelledGroups = await models.RunSubmissionGroup.findAll({ where: { submissionId: cancellable.submissionId } });
+  if (staleCancelStatus !== 409 || cancelled.status !== "cancelled" || cancelledGroups.length !== 1
+    || cancelledGroups[0].admissionState !== "cancelled" || cancelledGroups[0].runId !== null) {
+    throw new Error("RUN_SUBMISSION_CANCEL_CAS_OR_UNADMITTED_GROUP_MISMATCH");
+  }
+
+  const capacityRow = await addRow({ companyName: "Synthetic Single Run Company", nipRaw: makeValidNip(526025400), regonRaw: "432109876",
+    regon: "432109876", effectiveRegon: "432109876", decisionMakerName: null });
+  const outcome = await grouping.resolveRelatedRows(tenantScopeSeed.goldis.batchId, capacityRow.rowNumber);
+  const selected = outcome.find((item) => item.rowNumber === capacityRow.rowNumber);
+  if (!selected || selected.status !== "linked") throw new Error("RUN_SUBMISSION_SINGLE_LIMIT_FIXTURE_NOT_LINKED");
+  const [singleEntity] = await models.SourceEntityLink.findAll({ where: { sourceRowId: capacityRow.id } });
+  const singleCanonical = await models.CanonicalEntity.findByPk(singleEntity.canonicalEntityId);
+  const singleLead = require("../dist/canonical-run-service").createLeadIdentityKey(singleCanonical.canonicalEntityId, capacityRow.decisionMakerName);
+  let singleLimitStatus = null;
+  try {
+    await canonicalRuns.createOrGet(tenantScopeSeed.goldis.batchId, singleCanonical.canonicalEntityId, singleLead,
+      [capacityRow], actor, undefined, { referenceDate: require("@goldis/core").todayInWarsaw() });
+  } catch (error) { singleLimitStatus = error?.status ?? error?.getStatus?.() ?? null; }
+  if (singleLimitStatus !== 429) throw new Error("SINGLE_AND_BATCH_RUNS_DID_NOT_SHARE_HOURLY_LIMIT");
+
+  const rollbackRow = await addRow({ companyName: "Synthetic Audit Rollback Company", nipRaw: makeValidNip(526025500), regonRaw: "321098765",
+    regon: "321098765", effectiveRegon: "321098765", decisionMakerName: null });
+  const rollbackSelection = { rowNumbers: [rollbackRow.rowNumber] };
+  const rollbackPreview = await service.preview(tenantScopeSeed.goldis.batchId, rollbackSelection, actor, "admin");
+  await sequelize.query(`CREATE OR REPLACE FUNCTION reject_run_submission_audit() RETURNS trigger LANGUAGE plpgsql AS $$
+    BEGIN IF NEW.action = 'run.submission.created' THEN RAISE EXCEPTION 'SYNTHETIC_AUDIT_FAILURE'; END IF; RETURN NEW; END $$`);
+  await sequelize.query("CREATE TRIGGER reject_run_submission_audit_trigger BEFORE INSERT ON audit_events FOR EACH ROW EXECUTE FUNCTION reject_run_submission_audit()");
+  let auditFailureObserved = false;
+  try { await service.create(tenantScopeSeed.goldis.batchId, { ...rollbackSelection, selectionFingerprint: rollbackPreview.selectionFingerprint,
+    idempotencyKey: "synthetic-submission-audit-rollback" }, actor, "admin"); }
+  catch { auditFailureObserved = true; }
+  finally {
+    await sequelize.query("DROP TRIGGER IF EXISTS reject_run_submission_audit_trigger ON audit_events");
+    await sequelize.query("DROP FUNCTION IF EXISTS reject_run_submission_audit()");
+  }
+  if (!auditFailureObserved || await models.RunSubmission.count({ where: { idempotencyKey: "synthetic-submission-audit-rollback" } })
+    || await models.SourceEntityLink.findByPk(rollbackRow.id)) throw new Error("RUN_SUBMISSION_AUDIT_FAILURE_DID_NOT_ROLL_BACK_ATOMICALLY");
+  const rawRows = await models.RunSubmissionItem.findAll({ where: { submissionId: created.submissionId } });
+  const rawGroups = await models.RunSubmissionGroup.findAll({ where: { submissionId: created.submissionId } });
+  const durablePayload = JSON.stringify({ items: rawRows.map((item) => item.toJSON()), groups: rawGroups.map((group) => group.toJSON()) });
+  if (durablePayload.includes("1234563218") || durablePayload.includes("Synthetic Submission Company") || durablePayload.includes("Synthetic Decision Maker")) {
+    throw new Error("RUN_SUBMISSION_QUEUE_PERSISTED_SOURCE_DATA");
+  }
+  console.log("RUN_SUBMISSION_SMOKE_PASS previewReadOnly=true fingerprintCAS=true mixedRows=true idempotency=true tenantRead=404 sharedRunLimit=true pauseAndCapacityReady=true outboxAtomic=true cancelCAS=true terminalNoReplay=true auditRollback=true rawQueueScan=clean");
+}
+
 async function run() {
   await sequelize.authenticate();
   if (mode === "from-006") {
@@ -2433,22 +3189,30 @@ async function run() {
   } else if (mode === "registry") {
     await upThrough("010-auth-challenges-and-interventions.js");
     const seeded = await seedLegacyRun("awaiting_portal_adapter");
-    await upThrough("012-source-row-version.js");
+    await upThrough("023-intervention-assignment.js");
+    await assignSyntheticBatchToGoldis(seeded.batchId);
+    await upThrough("024-canonical-entity-tenant-scope.js");
     await verifyRegistrySchema(seeded);
   } else if (mode === "corrections") {
     await upThrough("011-regon-entities.js");
     const seeded = await seedLegacyRun("awaiting_portal_adapter");
-    await upThrough("012-source-row-version.js");
+    await upThrough("023-intervention-assignment.js");
+    await assignSyntheticBatchToGoldis(seeded.batchId);
+    await upThrough("024-canonical-entity-tenant-scope.js");
     await verifyRegonCorrections(seeded);
   } else if (mode === "enrichment") {
     await upThrough("010-auth-challenges-and-interventions.js");
     const seeded = await seedLegacyRun("awaiting_portal_adapter");
-    await upThrough("013-regon-enrichment-audit.js");
+    await upThrough("023-intervention-assignment.js");
+    await assignSyntheticBatchToGoldis(seeded.batchId);
+    await upThrough("024-canonical-entity-tenant-scope.js");
     await verifyRegistryEnrichment(seeded);
   } else if (mode === "groups") {
     await upThrough("013-regon-enrichment-audit.js");
     const seeded = await seedLegacyRun("failed");
-    await upThrough("014-canonical-run-groups.js");
+    await upThrough("023-intervention-assignment.js");
+    await assignSyntheticBatchToGoldis(seeded.batchId);
+    await upThrough("024-canonical-entity-tenant-scope.js");
     await verifyCanonicalRunGroups(seeded);
   } else if (mode === "users-empty") {
     await umzug.up();
@@ -2498,6 +3262,7 @@ async function run() {
     await upThrough("021-tools-grants-settings.js");
     await upThrough("022-user-sessions.js");
     await upThrough("023-intervention-assignment.js");
+    await upThrough("024-canonical-entity-tenant-scope.js");
     const { BootstrapAdminService } = require("../dist/bootstrap-admin");
     const previousBootstrapUser = process.env.GOLDIS_ADMIN_USER;
     const previousBootstrapPassword = process.env.GOLDIS_ADMIN_PASSWORD;
@@ -2513,18 +3278,37 @@ async function run() {
     await verifyUserSchema(seeded, queuedSeed, legacyGrantUsers);
     await verifyOperationalSettingsAndRunControls();
     await require("./worker-result-smoke.cjs")(seedLegacyRun);
-    if (process.env.GOLDIS_AUTOMATION_E2E === "1") await require("./automation-flow-smoke.cjs")();
+  } else if (mode === "tenant-scope") {
+    await upThrough("014-canonical-run-groups.js");
+    tenantScopeSeed = {
+      goldis: await seedLegacyRun("failed"),
+      other: await seedLegacyRun("failed"),
+    };
+    await upThrough("023-intervention-assignment.js");
+    const goldisAssignment = await assignSyntheticBatchToGoldis(tenantScopeSeed.goldis.batchId);
+    tenantScopeSeed.goldisTenantId = goldisAssignment.tenant.tenantId;
+    tenantScopeSeed.goldisActorId = goldisAssignment.userId;
+    await verifyCanonicalTenantMigration();
   }
 
+  if (tenantScopeModes.includes(mode)) {
+    await upThrough("027-persistent-run-submissions.js");
+    if (mode === "tenant-scope") await verifyEnrichmentJobFlows();
+    if (mode === "tenant-scope") await verifyRunSubmissionFlows();
+    if (mode === "tenant-scope" && process.env.GOLDIS_AUTOMATION_E2E === "1") {
+      await require("./run-submission-platform-smoke.cjs")();
+    }
+  }
   const executed = await umzug.executed();
   const expectedCount = latestMigration;
-  const expectedLatest = latestMigration === 23 ? "023-intervention-assignment.js" : latestMigration === 20 ? "020-worker-runtime-status.js" : latestMigration === 19 ? "019-run-manual-data-overrides.js" : latestMigration === 18 ? "018-intervention-read-state.js" : latestMigration === 17 ? "017-run-dispatch-outbox-and-leases.js" : latestMigration === 16 ? "016-auth-cycle-and-current-challenge.js" : latestMigration === 15 ? "015-users-memberships-audit.js" : latestMigration === 14 ? "014-canonical-run-groups.js" : latestMigration === 13 ? "013-regon-enrichment-audit.js" : latestMigration === 12 ? "012-source-row-version.js" : latestMigration === 9 ? "009-export-artifacts.js" : latestMigration === 8 ? "008-identities-and-policies.js" : "007-run-checkpoints.js";
+  const expectedLatest = latestMigration === 27 ? "027-persistent-run-submissions.js" : latestMigration === 26 ? "026-enrichment-job-audit-actions.js" : latestMigration === 25 ? "025-persistent-enrichment-jobs.js" : latestMigration === 24 ? "024-canonical-entity-tenant-scope.js" : latestMigration === 23 ? "023-intervention-assignment.js" : latestMigration === 20 ? "020-worker-runtime-status.js" : latestMigration === 19 ? "019-run-manual-data-overrides.js" : latestMigration === 18 ? "018-intervention-read-state.js" : latestMigration === 17 ? "017-run-dispatch-outbox-and-leases.js" : latestMigration === 16 ? "016-auth-cycle-and-current-challenge.js" : latestMigration === 15 ? "015-users-memberships-audit.js" : latestMigration === 14 ? "014-canonical-run-groups.js" : latestMigration === 13 ? "013-regon-enrichment-audit.js" : latestMigration === 12 ? "012-source-row-version.js" : latestMigration === 9 ? "009-export-artifacts.js" : latestMigration === 8 ? "008-identities-and-policies.js" : "007-run-checkpoints.js";
   if (executed.length !== expectedCount || executed.at(-1)?.name !== expectedLatest) {
     throw new Error("MIGRATION_SMOKE_HISTORY_MISMATCH");
   }
   await umzug.up();
   if ((await umzug.executed()).length !== expectedCount) throw new Error("MIGRATION_SMOKE_RERUN_MISMATCH");
   console.log(`MIGRATION_SMOKE_PASS mode=${mode} applied=${expectedLatest.slice(0, 3)} rerun=stable`);
+  if (mode === "users" && process.env.GOLDIS_AUTOMATION_E2E === "1") await require("./automation-flow-smoke.cjs")();
 }
 
 run().catch((error) => {

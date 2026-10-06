@@ -5,6 +5,9 @@ import "./globals.css";
 import "./admin.css";
 import "./styles/theme.css";
 import "./history.css";
+import "./review.css";
+import "./enrichment-jobs.css";
+import "./run-submissions.css";
 
 const newsreader = localFont({
   src: "./fonts/Newsreader.ttf",

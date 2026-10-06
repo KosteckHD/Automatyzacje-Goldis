@@ -33,7 +33,7 @@ export function toolAccessFromRecords(
 }
 
 export function capabilityForPermission(action: string): ToolCapability | null {
-  if (["batch:create", "run:create", "run:cancel", "run:resume", "run:manual_data", "sms:submit"].includes(action)) return "execute";
+  if (["batch:create", "enrichment:start", "enrichment:cancel", "submission:cancel", "run:create", "run:cancel", "run:resume", "run:manual_data", "sms:submit"].includes(action)) return "execute";
   if (action === "artifact:download") return "download_results";
   if (["batch:read", "enrichment:read", "run:read", "intervention:read", "intervention:mark_read",
     "correction:propose", "correction:review", "conflict:review"].includes(action)) return "view_results";

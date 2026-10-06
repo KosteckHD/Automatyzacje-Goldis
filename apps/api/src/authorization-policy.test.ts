@@ -16,8 +16,8 @@ test("przydział interwencji wymaga właściwej roli i prawa do konkretnego rodz
   assert.equal(canAssignIntervention({ role: "admin", kind: "sms", canViewResults: false, canExecute: false }), true);
 });
 
-test("operator może prowadzić własne zadania, SMS i propozycje korekt w swojej firmie", () => {
-  for (const action of ["batch:read", "enrichment:read", "run:create", "run:read", "run:cancel", "sms:submit", "correction:propose", "artifact:download"] as const) {
+test("operator może prowadzić własne zadania, zgłoszenia, SMS i propozycje korekt w swojej firmie", () => {
+  for (const action of ["batch:read", "enrichment:read", "enrichment:start", "enrichment:cancel", "submission:read", "submission:cancel", "run:create", "run:read", "run:cancel", "sms:submit", "correction:propose", "artifact:download"] as const) {
     assert.equal(canPerform("operator", action, owned), true, action);
   }
   assert.equal(permissionScope("operator", "batch:create"), "tenant");
@@ -27,7 +27,7 @@ test("operator może prowadzić własne zadania, SMS i propozycje korekt w swoje
 
 test("operator nie ma dostępu do cudzych zasobów ani do zatwierdzania, konfliktów i audytu", () => {
   const otherOwner = { ...owned, resourceOwnerId: "user-operator-2" };
-  for (const action of ["batch:read", "enrichment:read", "run:create", "run:read", "run:cancel", "sms:submit", "correction:propose", "artifact:download"] as const) {
+  for (const action of ["batch:read", "enrichment:read", "enrichment:start", "enrichment:cancel", "submission:read", "submission:cancel", "run:create", "run:read", "run:cancel", "sms:submit", "correction:propose", "artifact:download"] as const) {
     assert.equal(canPerform("operator", action, otherOwner), false, action);
   }
   for (const action of ["correction:review", "conflict:review", "audit:read", "user:manage"] as const) {
@@ -39,7 +39,7 @@ test("reviewer widzi i rozstrzyga dane w tenant, ale nie uruchamia portali ani n
   for (const action of ["batch:read", "enrichment:read", "run:read", "correction:review", "conflict:review", "audit:read"] as const) {
     assert.equal(canPerform("reviewer", action, { ...owned, resourceOwnerId: "other-user" }), true, action);
   }
-  for (const action of ["run:create", "run:cancel", "sms:submit", "correction:propose", "artifact:download", "user:manage"] as const) {
+  for (const action of ["enrichment:start", "enrichment:cancel", "submission:read", "submission:cancel", "run:create", "run:cancel", "sms:submit", "correction:propose", "artifact:download", "user:manage"] as const) {
     assert.equal(canPerform("reviewer", action, owned), false, action);
   }
   assert.equal(canPerform("reviewer", "run:manual_data", owned), false);
@@ -57,7 +57,7 @@ test("auditor czyta wyłącznie audyt; każda rola jest blokowana między tenant
 });
 
 test("admin ma pełen zakres działań w swojej firmie, ale nie przekracza granicy tenanta", () => {
-  for (const action of ["batch:create", "batch:read", "enrichment:read", "run:create", "run:read", "run:cancel", "run:manual_data", "sms:submit", "correction:propose", "correction:review", "conflict:review", "audit:read", "artifact:download", "user:manage"] as const) {
+  for (const action of ["batch:create", "batch:read", "enrichment:read", "enrichment:start", "enrichment:cancel", "submission:read", "submission:cancel", "run:create", "run:read", "run:cancel", "run:manual_data", "sms:submit", "correction:propose", "correction:review", "conflict:review", "audit:read", "artifact:download", "user:manage"] as const) {
     assert.equal(canPerform("admin", action, owned), true, action);
     assert.equal(canPerform("admin", action, { ...owned, resourceTenantId: "tenant-other" }), false, action);
   }

@@ -1,4 +1,4 @@
-param([switch]$Automation)
+param([switch]$Automation, [switch]$PlatformOnly)
 $ErrorActionPreference = 'Stop'
 $testId = [Guid]::NewGuid().ToString('N')
 $testContainer = "goldis-db-smoke-$testId"
@@ -10,6 +10,7 @@ $testRedis = "goldis-automation-redis-$testId"
 $previousRedisUrl = $env:REDIS_URL
 $previousDisposableRedis = $env:GOLDIS_TEST_REDIS_DISPOSABLE
 $previousAutomation = $env:GOLDIS_AUTOMATION_E2E
+$previousDbModes = $env:GOLDIS_TEST_DB_MODES
 try {
     $compileProjects = @('packages/core/tsconfig.json', 'apps/api/tsconfig.json')
     if ($Automation) { $compileProjects += 'apps/worker/tsconfig.json' }
@@ -41,6 +42,7 @@ try {
         $env:GOLDIS_TEST_REDIS_DISPOSABLE = '1'
         $env:GOLDIS_AUTOMATION_E2E = '1'
     }
+    if ($PlatformOnly) { $env:GOLDIS_TEST_DB_MODES = 'users,tenant-scope' }
     npm run test:db-integration
     if ($LASTEXITCODE -ne 0) { throw 'DB_INTEGRATION_FAILED' }
 } finally {
@@ -48,6 +50,7 @@ try {
     $env:REDIS_URL = $previousRedisUrl
     $env:GOLDIS_TEST_REDIS_DISPOSABLE = $previousDisposableRedis
     $env:GOLDIS_AUTOMATION_E2E = $previousAutomation
+    $env:GOLDIS_TEST_DB_MODES = $previousDbModes
     if ($redisCreated) {
         $redisInspection = docker inspect $testRedis | ConvertFrom-Json
         if ($LASTEXITCODE -eq 0 -and $redisInspection[0].Config.Labels.'goldis.test.owner' -eq $testId) { docker rm --force $testRedis | Out-Null }

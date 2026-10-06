@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import EnrichmentReviewPanel from "./enrichment-review";
+import RunSubmissionLauncher from "./run-submission-launcher";
 import { GoldisLogo } from "../components/brand/GoldisLogo";
 import SpotlightCard from "../components/react-bits/SpotlightCard";
 import { RunStepper } from "../components/tools/RunStepper";
@@ -1033,10 +1034,11 @@ export default function Workspace() {
         </section>
 
         {result && canViewResults && <section id="workspace-result" tabIndex={-1} className="result-section"><div className="section-head"><div><p className="eyebrow">WYNIK IMPORTU</p><h2>Przegląd bazy</h2></div><span className="result-id">{result.id.slice(0, 8)}</span></div><div className="metrics"><div><strong>{result.totalRows.toLocaleString("pl-PL")}</strong><span>wierszy</span></div><div><strong>{result.readyRows.toLocaleString("pl-PL")}</strong><span>gotowych</span></div><div><strong>{result.invalidRows.toLocaleString("pl-PL")}</strong><span>do sprawdzenia</span></div></div><div className="row-tools"><label>Filtr <select value={rowState} onChange={(event) => { setRowState(event.target.value as "all" | "ready" | "review"); setRowPage(1); }}><option value="all">Wszystkie</option><option value="ready">Gotowe</option><option value="review">Do sprawdzenia</option></select></label><span>Strona {rowPage}</span><button type="button" disabled={rowPage === 1} onClick={() => setRowPage((page) => page - 1)}>Poprzednia</button><button type="button" disabled={rows.length < 50} onClick={() => setRowPage((page) => page + 1)}>Następna</button></div><div className="table-wrap" tabIndex={0} role="region" aria-label="Tabela wyników; przewiń w poziomie, aby zobaczyć wszystkie kolumny"><table><thead><tr><th>Wiersz</th><th>Nazwa</th><th>Osoba decyzyjna</th><th>REGON</th><th>Stan</th></tr></thead><tbody>{rows.map((row) => <tr key={row.rowNumber}><td>{row.rowNumber}</td><td>{row.companyName}</td><td>{row.decisionMakerName ?? "—"}</td><td className="mono">{row.regon}</td><td>{row.issues.length ? <span className="pill warn">Do sprawdzenia</span> : <span className="pill good">Gotowy</span>}</td></tr>)}</tbody></table></div><p className="table-note">Podgląd 50 wierszy na stronę. Import nie uruchamia zapytań do portali.</p></section>}
-        {result && canViewResults && <EnrichmentReviewPanel key={result.id} batchId={result.id} csrfToken={csrfToken} />}
+        {result && canViewResults && <EnrichmentReviewPanel key={result.id} batchId={result.id} csrfToken={csrfToken} canStart={canOperate} />}
 
         {result && (canOperate || canViewResults) && <section id="workspace-runs" tabIndex={-1} className="result-section run-section"><div className="section-head"><div><p className="eyebrow">KROK 02 / ZADANIA</p><h2>Kontrola pojedynczego wiersza</h2></div></div><p>Ten etap zapisuje zadanie, sprawdza dane wejściowe i pokazuje historię. Status „Oczekuje na adapter portali” oznacza, że worker portali nie jest aktywny.</p>
           {canOperate && <form className="run-form" onSubmit={startRun}><label>Numer wiersza w Excelu<input type="number" min="2" step="1" placeholder="np. 18001" value={runNumber} onChange={(event) => setRunNumber(event.target.value)} required /></label><button type="submit" disabled={working || !runNumber}>Sprawdź gotowość wiersza</button></form>}
+          {canOperate && <RunSubmissionLauncher batchId={result.id} csrfToken={csrfToken} />}
           {runError && <p className="error" role="alert">{runError}</p>}
           {canViewResults && runs.length > 0 && <div className="run-list"><h3>Ostatnie zadania</h3>{runs.map((run) => <button key={run.id} type="button" onClick={() => void showRun(run.id)}><span>Wiersz {run.rowNumber}</span><strong>{runLabels[run.status] ?? run.status}</strong><small>{run.referenceDate}</small></button>)}</div>}
           {selectedRun && canViewResults && <div className="run-detail" id="run-detail"><h3>Wiersz {selectedRun.rowNumber}: {runLabels[selectedRun.status] ?? selectedRun.status}</h3><p>Data odniesienia: {selectedRun.referenceDate}{selectedRun.errorCode ? " · " + selectedRun.errorCode : ""}</p>

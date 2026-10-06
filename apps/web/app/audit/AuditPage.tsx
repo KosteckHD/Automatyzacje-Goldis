@@ -14,7 +14,8 @@ type Filters = { fromDay: string; toDay: string; actorId: string; action: string
 
 const reviewerActions = [
   "import.created", "run.created", "run.cancelled", "run.auth_resumed", "run.review_resumed",
-  "run.manual_data_corrected", "sms.submitted", "regon.correction.proposed", "artifact.downloaded",
+  "run.manual_data_corrected", "sms.submitted", "regon.correction.proposed", "regon.correction.reviewed",
+  "entity.conflict.reviewed", "enrichment.job.created", "enrichment.job.cancelled", "enrichment.job.completed", "artifact.downloaded",
   "intervention.assigned", "intervention.unassigned", "intervention.priority_changed", "intervention.resolved",
 ];
 const allActions = [
@@ -22,8 +23,8 @@ const allActions = [
   ...reviewerActions, "user.created", "user.updated", "tool.grant.created", "tool.grant.updated",
   "tool.grant.revoked", "settings.updated",
 ];
-const reviewerResources = ["import", "run", "artifact", "intervention", "correction"];
-const allResources = ["import", "run", "artifact", "intervention", "correction", "user", "session", "tool", "settings", "challenge"];
+const reviewerResources = ["import", "run", "artifact", "intervention", "correction", "entity_conflict", "enrichment_job"];
+const allResources = ["import", "run", "artifact", "intervention", "correction", "entity_conflict", "enrichment_job", "user", "session", "tool", "settings", "challenge"];
 
 function warsawDay(date = new Date()): string {
   const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Warsaw", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date);
