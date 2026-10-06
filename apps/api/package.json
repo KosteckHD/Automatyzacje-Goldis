@@ -1,0 +1,39 @@
+{
+  "name": "@goldis/api",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "npm run build -w @goldis/core && tsc -p tsconfig.json",
+    "dev": "npm run build -w @goldis/core && ts-node src/main.ts",
+    "start": "node dist/main.js",
+    "migrate": "node dist/migrate.js",
+    "test:migrations": "node scripts/migration-smoke.cjs",
+    "test:login-rate-limit-redis-smoke": "node scripts/login-rate-limit-redis-smoke.cjs",
+    "test:w3-sms-redis-smoke": "node scripts/w3-sms-redis-smoke.cjs",
+    "test": "npm run build && node --test dist/*.test.js"
+  },
+  "dependencies": {
+    "@goldis/core": "0.1.0",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "bullmq": "^5.81.5",
+    "exceljs": "^4.4.0",
+    "ioredis": "^5.11.1",
+    "multer": "^2.0.0",
+    "pg": "^8.0.0",
+    "pg-hstore": "^2.0.0",
+    "reflect-metadata": "^0.2.0",
+    "rxjs": "^7.8.0",
+    "sequelize": "^6.37.0",
+    "umzug": "^3.8.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.9.0"
+  }
+}

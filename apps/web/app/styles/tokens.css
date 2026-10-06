@@ -1,0 +1,24 @@
+:root {
+  color-scheme: dark;
+  --color-bg: #08080c;
+  --color-brand-bg: #03010d;
+  --color-surface: #111116;
+  --color-surface-raised: #19191f;
+  --color-text: #f2eee5;
+  --color-text-muted: #a6a39a;
+  --color-gold: #d9b65f;
+  --color-gold-hover: #f2d889;
+  --color-border: #323238;
+  --color-field-border: #77717b;
+  --color-success: #accdb4;
+  --color-danger: #e7a8a2;
+  --color-attention: #f2d889;
+  --font-display: "Newsreader", Georgia, serif;
+  --font-body: "Hanken Grotesk", Arial, sans-serif;
+  --font-data: "IBM Plex Mono", Consolas, monospace;
+  --radius-control: 5px;
+  --radius-card: 9px;
+  --radius-modal: 12px;
+  --motion-fast: 160ms;
+  --motion-enter: 350ms;
+}

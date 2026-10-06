@@ -1,0 +1,90 @@
+{
+  "pzu": {
+    "entryUrl": "https://everest.pzu.pl/pc/PolicyCenter.do",
+    "allowedOrigins": ["https://everest.pzu.pl", "https://zaloguj.pzu.pl", "https://strefa.agentpzu.pl"],
+    "adapterVersion": "unverified-1",
+    "session": {
+      "authenticated": "UNVERIFIED_AUTHENTICATED_MARKER",
+      "loginForm": "UNVERIFIED_LOGIN_FORM",
+      "usernameInput": "UNVERIFIED_USERNAME_INPUT",
+      "passwordInput": "UNVERIFIED_PASSWORD_INPUT",
+      "loginSubmit": "UNVERIFIED_LOGIN_SUBMIT",
+      "smsChallenge": "iframe#secfense_iframe",
+      "smsCodeInput": "input#code[name=\"code\"][type=\"text\"]",
+      "smsCodeSubmit": "form:has(input#code) .buttons > button.btn.btn-primary",
+      "accessDenied": "UNVERIFIED_ACCESS_DENIED",
+      "smsFrame": "iframe#secfense_iframe",
+      "smsRememberDevice": "input#fprint_state[name=\"fprint_state\"][type=\"checkbox\"]",
+      "smsResendCode": "form:has(input#code) .buttons > a#resend",
+      "smsCodeRejected": "UNVERIFIED_REJECTION_MARKER",
+      "smsCodeExpired": ".errors_wrapper > span.errors:text-matches(\"expired\", \"i\")",
+      "postLoginLanding": "UNVERIFIED_POST_LOGIN_MARKER"
+    },
+    "everest": {
+      "searchNavigation": "UNVERIFIED_SEARCH_NAVIGATION",
+      "searchInput": "UNVERIFIED_QUICK_SEARCH_INPUT",
+      "resultRows": "UNVERIFIED_RESULT_ROWS",
+      "noResults": "UNVERIFIED_NO_RESULTS",
+      "optionalOverlay": {
+        "container": "UNVERIFIED_KNOWN_AD_CONTAINER",
+        "dismissButton": "UNVERIFIED_KNOWN_AD_DISMISS"
+      },
+      "fields": {
+        "accountType": "UNVERIFIED_ACCOUNT_TYPE",
+        "personName": "UNVERIFIED_PERSON_NAME",
+        "pesel": "UNVERIFIED_PERSON_ROW_PESEL_COLUMN"
+      }
+    }
+  },
+  "compensa": {
+    "entryUrl": "https://example.invalid/compensa-home",
+    "allowedOrigins": ["https://example.invalid"],
+    "registrationNumber": "RST22339",
+    "adapterVersion": "unverified-1",
+    "parserVersion": "unverified-1",
+    "session": {
+      "authenticated": "UNVERIFIED_AUTHENTICATED_MARKER",
+      "loginForm": "UNVERIFIED_LOGIN_FORM",
+      "usernameInput": "UNVERIFIED_USERNAME_INPUT",
+      "passwordInput": "UNVERIFIED_PASSWORD_INPUT",
+      "loginSubmit": "UNVERIFIED_LOGIN_SUBMIT",
+      "smsChallenge": "UNVERIFIED_SMS_CHALLENGE",
+      "smsCodeInput": "UNVERIFIED_SMS_CODE_INPUT",
+      "smsCodeSubmit": "UNVERIFIED_SMS_CODE_SUBMIT",
+      "accessDenied": "UNVERIFIED_ACCESS_DENIED",
+      "smsFrame": "UNVERIFIED_SMS_FRAME",
+      "smsCodeRejected": "UNVERIFIED_REJECTION_MARKER",
+      "smsCodeExpired": "UNVERIFIED_EXPIRY_MARKER",
+      "postLoginLanding": "UNVERIFIED_POST_LOGIN_MARKER"
+    },
+    "form": {
+      "communicationTile": "UNVERIFIED_COMPENSA_KOMUNIKACJA_TILE",
+      "startDialog": "UNVERIFIED_START_DIALOG",
+      "identifierInput": "UNVERIFIED_PESEL_INPUT",
+      "registrationInput": "UNVERIFIED_REGISTRATION_INPUT",
+      "startCommunication": "UNVERIFIED_START_COMMUNICATION",
+      "insuredDataSection": "UNVERIFIED_INSURED_DATA_SECTION",
+      "roleSelect": "UNVERIFIED_INSURING_PARTY_SELECT",
+      "firstNameInput": "UNVERIFIED_FIRST_NAME_INPUT",
+      "lastNameInput": "UNVERIFIED_LAST_NAME_INPUT",
+      "peselInput": "UNVERIFIED_CONFIRMED_PESEL",
+      "addressInput": "UNVERIFIED_ADDRESS_INPUT",
+      "postalCodeInput": "UNVERIFIED_POSTAL_CODE_INPUT",
+      "cityInput": "UNVERIFIED_CITY_INPUT",
+      "countyInput": "UNVERIFIED_COUNTY_INPUT",
+      "saveButton": "UNVERIFIED_SAVE_BUTTON"
+    },
+    "save": {
+      "insuredDataSection": "UNVERIFIED_INSURED_DATA_SECTION",
+      "caseReference": "UNVERIFIED_CASE_REFERENCE",
+      "saveButton": "UNVERIFIED_SAVE_BUTTON",
+      "savedConfirmation": "UNVERIFIED_SAVED_CONFIRMATION"
+    },
+    "ufg": {
+      "caseReference": "UNVERIFIED_CASE_REFERENCE",
+      "verifyUfgButton": "UNVERIFIED_VERIFY_UFG_BUTTON",
+      "summaryTable": "UNVERIFIED_UFG_SUMMARY_TABLE",
+      "openUfgSummary": "UNVERIFIED_OPEN_UFG_SUMMARY"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-02",
+  "source": "supervised-live-dom-inspection",
+  "entryUrl": "https://everest.pzu.pl/pc/PolicyCenter.do",
+  "loginOrigin": "https://zaloguj.pzu.pl",
+  "framePath": "/internalauth/authenticate/sms",
+  "session": {
+    "smsChallenge": "iframe#secfense_iframe",
+    "smsFrame": "iframe#secfense_iframe",
+    "smsCodeInput": "input#code[name=\"code\"][type=\"text\"]",
+    "smsCodeSubmit": "form:has(input#code) .buttons > button.btn.btn-primary",
+    "smsRememberDevice": "input#fprint_state[name=\"fprint_state\"][type=\"checkbox\"]",
+    "smsResendCode": "form:has(input#code) .buttons > a#resend",
+    "smsCodeExpired": ".errors_wrapper > span.errors:text-matches(\"expired\", \"i\")"
+  },
+  "verification": {
+    "frameCount": 1,
+    "codeInputCount": 1,
+    "submitButtonCount": 1,
+    "rememberDeviceType": "checkbox",
+    "resendTag": "a",
+    "codeSubmittedByAgent": false,
+    "resendClickedByAgent": false,
+    "expiredMarkerVisibleCount": 1,
+    "expiredMarkerTextToken": "expired",
+    "resendVisibleAfterExpiredCount": 1,
+    "resendDelaySecondsReportedByUser": [15, 20],
+    "resendDelayMeasuredLive": false,
+    "unobserved": ["smsCodeRejected", "accepted-platform-code"]
+  }
+}

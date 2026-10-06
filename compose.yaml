@@ -1,0 +1,124 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: goldis
+      POSTGRES_USER: goldis
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U goldis -d goldis"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: ${APP_ENV:-development}
+      API_PORT: 3001
+      DATABASE_URL: postgres://goldis:${DB_PASSWORD}@postgres:5432/goldis
+      REDIS_URL: redis://redis:6379
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env}
+      PUBLIC_APP_ORIGIN: ${PUBLIC_APP_ORIGIN:-http://127.0.0.1:3000}
+      GOLDIS_ADMIN_USER: ${GOLDIS_ADMIN_USER:?Set GOLDIS_ADMIN_USER in .env}
+      GOLDIS_ADMIN_PASSWORD: ${GOLDIS_ADMIN_PASSWORD:?Set GOLDIS_ADMIN_PASSWORD in .env}
+      PESEL_ENCRYPTION_ACTIVE_KEY_VERSION: ${PESEL_ENCRYPTION_ACTIVE_KEY_VERSION:-}
+      PESEL_ENCRYPTION_KEYS_BASE64: ${PESEL_ENCRYPTION_KEYS_BASE64:-}
+      API_EXPORT_DIR: /var/lib/goldis/exports
+      WORKER_INTERNAL_URL: http://worker:3022
+      WORKER_AUTH_SECRET: ${WORKER_AUTH_SECRET:?Set WORKER_AUTH_SECRET in .env}
+    volumes:
+      - export_data:/var/lib/goldis/exports
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["sh", "-c", "node apps/api/dist/migrate.js && node apps/api/dist/main.js"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    ports:
+      - "127.0.0.1:3001:3001"
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    environment:
+      NODE_ENV: ${APP_ENV:-development}
+      DATABASE_URL: postgres://goldis:${DB_PASSWORD}@postgres:5432/goldis
+      REDIS_URL: redis://redis:6379
+      WORKER_PROFILE_DIR: /home/pwuser/goldis-profile
+      WORKER_DB_POOL_MAX: ${WORKER_DB_POOL_MAX:-8}
+      WORKER_LIVE_PORTALS: ${WORKER_LIVE_PORTALS:-0}
+      WORKER_PORTAL_CONFIG_PATH: /run/config/portal-selectors.json
+      PZU_LOGIN: ${PZU_LOGIN:-}
+      PZU_PASSWORD: ${PZU_PASSWORD:-}
+      COMPENSA_LOGIN: ${COMPENSA_LOGIN:-}
+      COMPENSA_PASSWORD: ${COMPENSA_PASSWORD:-}
+      WORKER_STAGING_DIR: /home/pwuser/goldis-staging
+      WORKER_STAGING_KEY_VERSION: ${WORKER_STAGING_KEY_VERSION:-}
+      WORKER_STAGING_KEY_V1: ${WORKER_STAGING_KEY_V1:-}
+      PESEL_ENCRYPTION_ACTIVE_KEY_VERSION: ${PESEL_ENCRYPTION_ACTIVE_KEY_VERSION:-}
+      PESEL_ENCRYPTION_KEYS_BASE64: ${PESEL_ENCRYPTION_KEYS_BASE64:-}
+      WORKER_INTERNAL_HOST: 0.0.0.0
+      WORKER_INTERNAL_PORT: 3022
+      WORKER_AUTH_SECRET: ${WORKER_AUTH_SECRET:?Set WORKER_AUTH_SECRET in .env}
+      WORKER_RESULT_API_URL: http://api:3001
+      PUBLIC_APP_ORIGIN: ${PUBLIC_APP_ORIGIN:-http://127.0.0.1:3000}
+      WORKER_HEADLESS: "1"
+    volumes:
+      - worker_profile:/home/pwuser/goldis-profile
+      - worker_staging:/home/pwuser/goldis-staging
+      - ${WORKER_PORTAL_CONFIG_PATH_HOST:-./config/portal-selectors.example.json}:/run/config/portal-selectors.json:ro
+    expose:
+      - "3022"
+    init: true
+    shm_size: 1gb
+    depends_on:
+      api:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      NODE_ENV: production
+      API_INTERNAL_URL: http://api:3001
+    depends_on:
+      - api
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  worker_profile:
+  worker_staging:
+  export_data:

@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+!.env.windows.example
+docs/*.xlsx
+playwright/.auth/
+node_modules/
+.next/
+.npm-cache/
+.docker-config/
+dist/
+coverage/
+uploads/
+exports/
+worker-profiles/

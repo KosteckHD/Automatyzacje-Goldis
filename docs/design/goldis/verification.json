@@ -1,0 +1,45 @@
+{
+  "verifiedAt": "2026-10-02T11:13:11.347Z",
+  "desktop": {
+    "width": 1440,
+    "height": 980,
+    "screens": 7
+  },
+  "mobile": {
+    "width": 390,
+    "screenshots": 3
+  },
+  "overflowAt320": "none for all 7 screens",
+  "fonts": "3 local families loaded",
+  "javascriptErrors": [],
+  "contrasts": [
+    {
+      "name": "text",
+      "foreground": "#f2eee5",
+      "background": "#19191f",
+      "ratio": 15.11,
+      "minimum": 4.5
+    },
+    {
+      "name": "muted",
+      "foreground": "#a6a39a",
+      "background": "#19191f",
+      "ratio": 6.94,
+      "minimum": 4.5
+    },
+    {
+      "name": "primaryButton",
+      "foreground": "#191509",
+      "background": "#d9b65f",
+      "ratio": 9.38,
+      "minimum": 4.5
+    },
+    {
+      "name": "fieldBorder",
+      "foreground": "#77717b",
+      "background": "#19191f",
+      "ratio": 3.69,
+      "minimum": 3
+    }
+  ]
+}

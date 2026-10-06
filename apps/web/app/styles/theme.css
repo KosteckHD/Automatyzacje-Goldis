@@ -1,0 +1,409 @@
+/* Goldis visual system. Imported after the legacy screen styles to keep this layer authoritative. */
+html { color-scheme: dark; background: var(--color-bg); scroll-behavior: smooth; }
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body), Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  font-synthesis: none;
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+}
+::selection { background: #d9b65f66; color: #fffaf0; }
+a { color: var(--color-gold); text-underline-offset: .2em; }
+a:hover { color: var(--color-gold-hover); }
+button, input, select, textarea { font: inherit; }
+button { color: var(--color-text); }
+button:disabled { opacity: .58; cursor: not-allowed; }
+:focus-visible { outline: 3px solid var(--color-gold-hover); outline-offset: 3px; }
+
+.eyebrow { color: var(--color-gold); font-size: .68rem; font-weight: 650; letter-spacing: .16em; line-height: 1.4; }
+.intro h1, .login-intro h1, .login-card h2, .admin-hero h1, .account-content>h1 {
+  color: var(--color-text);
+  font-family: var(--font-display), Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 470;
+  letter-spacing: -.025em;
+  line-height: 1.06;
+}
+.intro h1 { max-width: 820px; font-size: clamp(2.5rem, 4.3vw, 4.1rem); }
+.intro>p:last-child, .admin-section-title>p, .account-card p,
+.card>p:not(.eyebrow), .card .section-head+p, .status-card>p:not(.eyebrow),
+.result-section>p:not(.eyebrow), .admin-card>p, .admin-card-head p { color: var(--color-text-muted); }
+
+.loading { background: var(--color-bg); color: var(--color-text-muted); }
+.loader { border-color: #77717b; border-top-color: var(--color-gold); }
+.no-tool-access { display: grid; min-height: 100svh; place-items: center; padding: 24px; background: var(--color-bg); }
+.no-tool-card { width: min(100%, 540px); padding: clamp(24px, 5vw, 46px); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); }
+.no-tool-card>.goldis-logo { margin: -20px 0 2px; }
+.no-tool-card h1 { margin: 0; color: var(--color-text); font: 480 clamp(2.2rem, 5vw, 3.2rem)/1.06 var(--font-display), Georgia, serif; }
+.no-tool-card>p:not(.eyebrow) { color: var(--color-text-muted); }
+.no-tool-card>div { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 24px; }
+.no-tool-card>div a, .no-tool-card>div button { min-height: 44px; display: inline-flex; align-items: center; padding: 9px 14px; border: 1px solid var(--color-field-border); border-radius: var(--radius-control); background: var(--color-surface-raised); color: var(--color-text); text-decoration: none; }
+.no-tool-card>div button:hover, .no-tool-card>div a:hover { border-color: var(--color-gold); color: var(--color-gold-hover); }
+
+/* Workspace shell and supplied brand mark */
+.shell { background: var(--color-bg); grid-template-columns: 248px minmax(0, 1fr); }
+.sidebar { background: var(--color-brand-bg); border-right: 1px solid var(--color-border); color: var(--color-text); padding: 20px 15px; }
+.sidebar-head { display: contents; }
+.mobile-menu-toggle, .mobile-nav-layer { display: none; }
+.mobile-nav-layer[hidden] { display: none !important; }
+.brand { display: grid; justify-items: center; gap: 3px; padding: 0 3px 20px; }
+.brand-symbol { display: none !important; }
+.brand strong { color: var(--color-text); font-family: var(--font-display), Georgia, serif; font-size: 1.15rem; font-weight: 500; letter-spacing: .025em; }
+.brand small { color: var(--color-text-muted); font-size: .7rem; letter-spacing: .08em; }
+.goldis-logo { position: relative; display: block; flex: none; overflow: hidden; background: var(--color-brand-bg); }
+.goldis-logo img { position: absolute; display: block; max-width: none; object-fit: fill; }
+.goldis-logo--sidebar { width: 200px; height: 145px; }
+.goldis-logo--sidebar img { width: 230px; height: 231px; left: -15px; top: -30px; }
+.goldis-logo--login { width: min(390px, 100%); height: 280px; }
+.goldis-logo--login img { width: 450px; height: 452px; left: -30px; top: -105px; }
+.goldis-logo--header { width: 140px; height: 110px; }
+.goldis-logo--header img { width: 180px; height: 181px; left: -20px; top: -37px; }
+.sidebar nav { display: grid; gap: 5px; }
+.sidebar nav a { display: block; padding: 11px 13px; border-left: 2px solid transparent; border-radius: 4px; color: #b6b2aa; font-size: .86rem; text-decoration: none; transition: background var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast); }
+.sidebar nav a:hover { background: #d9b65f12; color: var(--color-gold-hover); }
+.sidebar nav a.nav-active { border-left-color: var(--color-gold); background: linear-gradient(90deg, #d9b65f1f, #d9b65f08); color: var(--color-gold-hover); }
+.sidebar nav a:focus-visible { outline-offset: 1px; }
+.sidebar-foot { border-top-color: var(--color-border); color: var(--color-text-muted); }
+.sidebar-foot button { min-height: 40px; padding: 8px 0; color: var(--color-text); }
+.main, .admin-main { min-width: 0; background: var(--color-bg); }
+.topbar, .admin-topbar { border-bottom: 1px solid var(--color-border); background: rgb(8 8 12 / 94%); color: var(--color-text-muted); }
+.topbar-user { color: var(--color-text); }
+.workspace-links { display: flex; align-items: center; gap: clamp(10px, 2vw, 25px); }
+.workspace-links a { color: var(--color-text-muted); font-size: .78rem; font-weight: 600; text-decoration: none; }
+.workspace-links a:hover { color: var(--color-gold-hover); }
+.content { max-width: 1420px; padding-top: clamp(30px, 4vw, 52px); }
+
+/* Cards, workflow, result tables and operational states */
+.card, .result-section, .admin-card, .account-card {
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: 0 18px 50px #00000024;
+  color: var(--color-text);
+}
+.card h2, .result-section h2, .login-card h2 { color: var(--color-text); font-family: var(--font-body), Arial, sans-serif; font-weight: 620; letter-spacing: -.02em; }
+.section-head { min-width: 0; }
+.section-head h2, .admin-section-title h2, .admin-card h3, .account-card h2 { color: var(--color-text); }
+.automation-health { border: 1px solid var(--color-border); border-left: 3px solid var(--color-gold); border-radius: var(--radius-card); background: var(--color-surface); color: var(--color-text); }
+.automation-health div span { color: var(--color-text-muted); }
+.status-dot { background: var(--color-success); box-shadow: 0 0 12px #accdb433; }
+.status-dot.health-warn { background: var(--color-attention); box-shadow: 0 0 12px #f2d88924; }
+.process { margin: 32px 0; border-top: 1px solid var(--color-gold); border-bottom: 1px solid var(--color-border); }
+.process-step { color: var(--color-text); }
+.process-step+.process-step { border-left-color: var(--color-border); }
+.process-step>span { color: var(--color-gold); font-family: var(--font-data), Consolas, monospace; }
+.process-step small { color: var(--color-text-muted); }
+.process-step.active { background: linear-gradient(110deg, #d9b65f16, transparent 84%); }
+.process-step.active strong { color: var(--color-gold-hover); }
+.status-card { background: var(--color-surface-raised); }
+.file-mark, .result-id { border: 1px solid #63532d; border-radius: 4px; background: #d9b65f12; color: var(--color-gold-hover); font-family: var(--font-data), Consolas, monospace; }
+.file-input { border: 1px dashed var(--color-field-border); border-radius: var(--radius-control); background: #0d0d12; color: var(--color-text-muted); }
+.file-input:hover, .file-input:focus-within { border-color: var(--color-gold); }
+.upload-card button, .login-card button, .run-form button,
+.manual-data-form button, .run-detail .sms-challenge>button, .sms-form button,
+.admin-button, .download-link {
+  border: 1px solid var(--color-gold);
+  border-radius: var(--radius-control);
+  background: var(--color-gold);
+  color: #17120a;
+  font-weight: 700;
+  transition: background var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast), transform var(--motion-fast);
+}
+.upload-card button:hover:not(:disabled), .login-card button:hover:not(:disabled), .run-form button:hover:not(:disabled),
+.manual-data-form button:hover:not(:disabled), .run-detail .sms-challenge>button:hover:not(:disabled), .sms-form button:hover:not(:disabled),
+.admin-button:hover:not(:disabled), .download-link:hover {
+  border-color: var(--color-gold-hover); background: var(--color-gold-hover); color: #130f08;
+}
+.download-link { text-decoration: none; }
+.download-link:focus-visible { outline-color: var(--color-gold-hover); }
+.status-line, .status-line.muted { color: var(--color-text-muted); }
+.metrics, .run-policy-counts { border-color: var(--color-border); background: var(--color-surface-raised); }
+.metrics div+div, .run-policy-counts div+div { border-left-color: var(--color-border); }
+.metrics strong, .run-policy-counts strong { color: var(--color-gold-hover); font-family: var(--font-display), Georgia, serif; font-weight: 500; font-variant-numeric: tabular-nums; }
+.metrics span, .run-policy-counts span { color: var(--color-text-muted); }
+.table-wrap, .admin-table-wrap { max-width: 100%; border-radius: 5px; }
+.table-wrap[role="region"]:focus-visible, .admin-table-wrap[role="region"]:focus-visible { outline: 3px solid var(--color-gold-hover); outline-offset: 2px; }
+table { color: var(--color-text); font-variant-numeric: tabular-nums; }
+th { background: var(--color-surface-raised); color: var(--color-text-muted); }
+th, td { border-color: var(--color-border); }
+td { color: #e4dfd5; }
+tbody tr:hover { background: #d9b65f0a; }
+.mono, .result-id, .file-mark { font-family: var(--font-data), Consolas, monospace; font-variant-numeric: tabular-nums; }
+.pill.good { border: 1px solid #526c57; background: #accdb41b; color: var(--color-success); }
+.pill.warn { border: 1px solid #766536; background: #f2d88918; color: var(--color-attention); }
+.error, .admin-alert { border: 1px solid #744846; border-left: 3px solid var(--color-danger); border-radius: var(--radius-control); background: #291719; color: #f4c4bf; }
+.table-note, .intervention-empty, .admin-empty, .admin-muted { color: var(--color-text-muted); }
+.row-tools { color: var(--color-text-muted); }
+.row-tools select, .row-tools button, .intervention-item>button, .intervention-more button,
+.admin-quiet, .cancel-run {
+  border: 1px solid var(--color-field-border); border-radius: var(--radius-control); background: var(--color-surface-raised); color: var(--color-text);
+}
+.row-tools button:hover:not(:disabled), .intervention-item>button:hover, .intervention-more button:hover:not(:disabled),
+.admin-quiet:hover:not(:disabled) { border-color: var(--color-gold); color: var(--color-gold-hover); }
+.run-list button { border-bottom-color: var(--color-border); background: transparent; color: var(--color-text); }
+.run-list button:hover { background: #d9b65f0c; color: var(--color-gold-hover); }
+.run-list strong { color: var(--color-gold-hover); }
+.run-detail { border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface-raised); }
+.run-detail p, .run-detail li { color: var(--color-text-muted); }
+.run-detail ol { padding-left: 21px; }
+.cancel-run { color: var(--color-danger); }
+.sms-challenge { border: 1px solid #66532e; border-left: 3px solid var(--color-attention); border-radius: var(--radius-card); background: #19160f; color: var(--color-text); }
+.sms-challenge>p { color: var(--color-text-muted); }
+.sms-form input, .manual-data-form input, .manual-data-form textarea,
+.login-card input, .run-form input, .admin-field input, .admin-field select,
+.admin-filter-inline select, .admin-table-wrap select, .admin-table-wrap input {
+  min-height: 42px;
+  border: 1px solid var(--color-field-border);
+  border-radius: var(--radius-control);
+  background: #0c0c11;
+  color: var(--color-text);
+}
+.sms-form input, .admin-table-wrap td input, .admin-table-wrap td select { font-family: var(--font-data), Consolas, monospace; }
+.sms-form input:focus-visible, .manual-data-form input:focus-visible, .manual-data-form textarea:focus-visible,
+.login-card input:focus-visible, .admin-field input:focus-visible, .admin-field select:focus-visible { outline-color: var(--color-gold-hover); }
+input::placeholder, textarea::placeholder { color: #8e8a82; opacity: 1; }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--color-gold); }
+.intervention-center { border-top: 3px solid var(--color-gold); }
+.intervention-counts span { border-color: var(--color-border); background: var(--color-surface-raised); color: var(--color-text-muted); }
+.intervention-item { border-top-color: var(--color-border); }
+.intervention-item.unread { border-left-color: var(--color-gold); background: #d9b65f0a; }
+.intervention-copy small { color: var(--color-text-muted); }
+.manual-data-form { border-top-color: #66532e; }
+
+/* Login and SMS modal */
+.login-shell { min-height: 100svh; grid-template-columns: minmax(0, 1.22fr) minmax(340px, .78fr); background: var(--color-bg); }
+.login-intro { min-width: 0; border-right: 1px solid var(--color-border); background: var(--color-brand-bg); color: var(--color-text); padding: clamp(28px, 5vw, 76px); }
+.login-intro .goldis-logo { margin-bottom: 24px; }
+.login-intro .eyebrow { color: var(--color-gold); }
+.login-intro h1 { max-width: 690px; font-size: clamp(2.65rem, 5vw, 5rem); }
+.login-intro>p:not(.eyebrow) { max-width: 540px; color: var(--color-text-muted); line-height: 1.7; }
+.login-rail { gap: 12px 21px; color: var(--color-text-muted); font-family: var(--font-data), Consolas, monospace; }
+.login-card { width: min(430px, calc(100% - 48px)); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); padding: clamp(25px, 3vw, 38px); }
+.login-card h2 { margin-bottom: 25px; font-size: 2rem; }
+.login-card label { color: var(--color-text); }
+.login-card form { gap: 18px; }
+.login-card button { min-height: 46px; margin-top: 5px; }
+.sms-modal-backdrop { background: #03010de0; backdrop-filter: blur(5px); }
+.sms-modal { border: 1px solid #66532e; border-radius: var(--radius-modal); background: var(--color-surface); color: var(--color-text); box-shadow: 0 24px 70px #000a; }
+.sms-modal-close { color: var(--color-text-muted); }
+.sms-modal-close:hover { color: var(--color-gold-hover); }
+.platform-notice { border-color: #66532e; border-left-color: var(--color-gold); background: #19160f; color: var(--color-text); }
+.platform-notice button { background: var(--color-gold); color: #17120a; }
+
+/* Admin, account and correction screens use the same tokens and form language. */
+.admin-shell { background: var(--color-bg); color: var(--color-text); }
+.admin-rail { background: var(--color-brand-bg); border-right: 1px solid var(--color-border); color: var(--color-text); }
+.admin-brand { display: grid; justify-items: center; gap: 2px; padding: 0 4px 17px; color: var(--color-text); text-decoration: none; }
+.admin-brand>span:not(.goldis-logo) { display: none; }
+.admin-brand .goldis-logo--sidebar { width: 200px; height: 128px; }
+.admin-brand strong { color: var(--color-text); font-family: var(--font-display), Georgia, serif; font-weight: 500; letter-spacing: .04em; }
+.admin-brand small, .admin-rail-foot { color: var(--color-text-muted); }
+.admin-rail nav { gap: 4px; }
+.admin-rail nav a { border: 0; border-left: 2px solid transparent; border-radius: 4px; color: #b6b2aa; text-decoration: none; }
+.admin-rail nav a:hover { background: #d9b65f12; color: var(--color-gold-hover); }
+.admin-rail nav a.admin-nav-active { border-left-color: var(--color-gold); background: #d9b65f14; color: var(--color-gold-hover); }
+.admin-nav-hint { display: none; }
+.admin-rail-foot { border-top-color: var(--color-border); }
+.admin-rail-foot a { color: var(--color-text-muted); }
+.admin-content { max-width: 1510px; }
+.admin-hero { min-height: 0; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: radial-gradient(ellipse at 88% 10%, #d9b65f1b, transparent 44%), linear-gradient(130deg, #15130f, var(--color-surface) 55%); color: var(--color-text); }
+.admin-hero:after { background: linear-gradient(180deg, transparent, #d9b65f12, transparent); }
+.admin-hero h1 { font-size: clamp(2.7rem, 4vw, 4.7rem); }
+.admin-hero h1 em, .account-content>h1 em { color: var(--color-gold-hover); }
+.admin-hero>div:first-child>p:last-child { color: var(--color-text-muted); }
+.admin-hero-mark { border: 0; border-radius: 0; background: transparent; box-shadow: none; transform: none; }
+.admin-hero-mark .goldis-logo { width: 160px; height: 130px; }
+.admin-hero-mark .goldis-logo img { width: 210px; height: 211px; left: -25px; top: -41px; }
+.admin-alert, .admin-notice { padding: 12px 15px; }
+.admin-notice { border-color: #526c57; border-left-color: var(--color-success); background: #141b16; color: var(--color-success); }
+.admin-kpis article, .admin-report-kpis article { border-color: var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); }
+.admin-kpis small, .admin-report-kpis small { color: var(--color-text-muted); }
+.admin-kpis strong, .admin-report-kpis strong { color: var(--color-gold-hover); font-family: var(--font-display), Georgia, serif; font-weight: 500; font-variant-numeric: tabular-nums; }
+.admin-kpis span { color: var(--color-text-muted); }
+.admin-section-title { border-bottom-color: var(--color-border); }
+.admin-section-title>p { max-width: 470px; line-height: 1.6; }
+.admin-card { box-shadow: none; }
+.admin-card-head p, .admin-muted, .admin-field, .admin-field small { color: var(--color-text-muted); }
+.admin-field input, .admin-field select, .admin-filter-inline select, .admin-table-wrap select, .admin-table-wrap input { padding: 9px 10px; }
+.admin-grant { border-color: var(--color-border); border-left-color: var(--color-gold); border-radius: var(--radius-control); }
+.admin-grant legend { color: var(--color-text); }
+.admin-grant legend small { color: var(--color-text-muted); }
+.admin-checks label { color: var(--color-text-muted); }
+.admin-row-actions>span, .admin-settings-foot span { color: var(--color-text-muted); }
+.admin-button.danger-button { border-color: #a85750; background: #9d514a; color: #fff5f2; }
+.admin-quiet { color: var(--color-text); }
+.admin-quiet.danger { border-color: #81514c; color: #efb7b0; }
+.admin-quiet.danger:hover:not(:disabled) { border-color: var(--color-danger); color: #ffe0dc; }
+.admin-tool-line { border-bottom-color: var(--color-border); }
+.admin-tool-line small { color: var(--color-text-muted); }
+.admin-status { color: var(--color-text-muted); }
+.admin-selected-user { border-left-color: var(--color-gold); background: var(--color-surface-raised); }
+.admin-selected-user span { color: var(--color-text-muted); font-family: var(--font-data), Consolas, monospace; overflow-wrap: anywhere; }
+.admin-table-wrap th { background: var(--color-surface-raised); }
+.admin-table-wrap td small.admin-cell-sub { color: var(--color-text-muted); }
+.admin-counter { border: 1px solid #66532e; border-radius: 999px; background: #d9b65f12; color: var(--color-gold-hover); }
+.admin-service-strip { border-color: var(--color-border); border-radius: var(--radius-card); background: var(--color-surface-raised); }
+.admin-service-strip span { border-right-color: var(--color-border); color: var(--color-text-muted); }
+.admin-service-strip b { color: var(--color-text); }
+.priority-chip { background: #25242a; color: var(--color-text-muted); }
+.priority-chip.high { border: 1px solid #766536; background: #f2d88918; color: var(--color-attention); }
+.admin-activity { border-top-color: var(--color-border); background: var(--color-surface-raised); }
+.admin-activity ul, .admin-activity p { color: var(--color-text-muted); }
+.admin-toggle { border-left-color: var(--color-gold); background: #d9b65f0c; }
+.admin-toggle small { color: var(--color-text-muted); }
+.admin-settings-foot { border-top-color: var(--color-border); }
+.admin-bars { border-bottom-color: var(--color-border); }
+.admin-bars span { background: var(--color-gold); }
+.admin-bars small { color: var(--color-text-muted); }
+.admin-definition-list div { border-bottom-color: var(--color-border); }
+.admin-definition-list dt, .admin-card details { color: var(--color-text-muted); }
+.account-shell { background: var(--color-bg); color: var(--color-text); }
+.account-header { border-bottom-color: var(--color-border); background: var(--color-brand-bg); }
+.account-brand { color: var(--color-text); font-size: .8rem; }
+.account-brand>.goldis-logo.goldis-logo--header { width: 126px; height: 96px; }
+.account-brand-name { display: none; }
+.account-header nav a, .account-back a { color: var(--color-gold); }
+.account-content>h1 { font-size: clamp(2.7rem, 5vw, 4.6rem); }
+.account-card { padding: clamp(18px, 2vw, 26px); }
+.account-card h2 { font-size: 1.18rem; }
+.account-required { border: 1px solid #766536; border-left: 4px solid var(--color-attention); border-radius: var(--radius-control); background: #19160f; color: var(--color-text); }
+.account-required span { color: var(--color-text-muted); }
+.account-back a:hover, .account-header nav a:hover { color: var(--color-gold-hover); }
+.admin-card details summary { color: var(--color-text); }
+.admin-card details li { color: var(--color-text-muted); }
+.review-note, .enrichment-intro, .review-subline, .review-loading { color: var(--color-text-muted); }
+.enrichment-section { overflow: hidden; }
+.review-metrics { border-color: var(--color-border); background: var(--color-surface-raised); }
+.review-metrics div+div { border-left-color: var(--color-border); }
+.review-metrics strong { color: var(--color-gold-hover); font-family: var(--font-display), Georgia, serif; font-weight: 500; }
+.enrichment-table tbody tr:hover { background: #d9b65f0a; }
+.correction-form, .correction-action { color: var(--color-text); }
+.correction-form input, .correction-form textarea { border-color: var(--color-field-border); border-radius: var(--radius-control); background: #0c0c11; color: var(--color-text); }
+.review-button, .review-actions button, .review-pagination button { border-color: var(--color-field-border); border-radius: var(--radius-control); background: var(--color-surface-raised); color: var(--color-text); }
+.review-actions button[type="submit"] { border-color: var(--color-gold); background: var(--color-gold); color: #17120a; }
+.review-success { border-color: #526c57; background: #141b16; color: var(--color-success); }
+.review-conflict { color: var(--color-attention); }
+
+/* Motion is limited to short state changes and the optional card light. */
+@media (hover: hover) and (pointer: fine) {
+  .rb-goldis-card-spotlight { position: relative; isolation: isolate; overflow: hidden; }
+  .rb-goldis-card-spotlight::before { position: absolute; z-index: -1; inset: 0; border-radius: inherit; background: radial-gradient(440px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--spotlight-color, rgb(217 182 95 / 12%)), transparent 66%); content: ""; opacity: 0; pointer-events: none; transition: opacity 220ms ease; }
+  .rb-goldis-card-spotlight:hover::before { opacity: 1; }
+}
+.rb-goldis-count { display: inline-grid; position: relative; min-width: 1ch; font-variant-numeric: tabular-nums; }
+.rb-goldis-count-static, .rb-goldis-count-live { grid-area: 1 / 1; }
+.rb-goldis-count-static { visibility: hidden; }
+.rb-goldis-count-live { position: absolute; inset: 0; }
+.rb-goldis-stepper { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 32px 0; border-top: 1px solid var(--color-gold); border-bottom: 1px solid var(--color-border); }
+.rb-goldis-step { position: relative; min-width: 0; padding: 20px 18px 18px 49px; color: var(--color-text-muted); }
+.rb-goldis-step+.rb-goldis-step { border-left: 1px solid var(--color-border); }
+.rb-goldis-step-marker { position: absolute; top: 20px; left: 15px; display: grid; width: 22px; height: 22px; place-items: center; border: 1px solid var(--color-field-border); border-radius: 50%; color: var(--color-text-muted); font: 11px var(--font-data), Consolas, monospace; }
+.rb-goldis-step[aria-current="step"] { background: linear-gradient(110deg, #d9b65f16, transparent 84%); color: var(--color-text); }
+.rb-goldis-step[aria-current="step"] .rb-goldis-step-marker, .rb-goldis-step[data-state="complete"] .rb-goldis-step-marker { border-color: var(--color-gold); background: var(--color-gold); color: #17120a; }
+.rb-goldis-step strong, .rb-goldis-step small { display: block; }
+.rb-goldis-step strong { font-size: .91rem; font-weight: 650; }
+.rb-goldis-step[aria-current="step"] strong { color: var(--color-gold-hover); }
+.rb-goldis-step small { margin-top: 7px; color: var(--color-text-muted); font-size: .74rem; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+@media (max-width: 950px) {
+  .shell { display: block; }
+  .sidebar { min-height: 0; padding: 8px 18px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 16px; }
+  .sidebar-head { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+  .brand { display: flex; justify-content: flex-start; gap: 9px; padding: 0; }
+  .goldis-logo--sidebar { width: 138px; height: 104px; }
+  .goldis-logo--sidebar img { width: 180px; height: 181px; left: -13px; top: -23px; }
+  .sidebar .desktop-workspace-nav { display: none; }
+  .sidebar-foot { display: none; }
+  .mobile-menu-toggle { display: inline-grid; width: 46px; height: 46px; flex: 0 0 46px; place-items: center; border: 1px solid var(--color-border); border-radius: var(--radius-control); background: var(--color-surface); color: var(--color-gold-hover); cursor: pointer; }
+  .mobile-menu-toggle svg, .mobile-nav-close svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-width: 1.8; }
+  .mobile-menu-toggle:hover, .mobile-nav-close:hover { border-color: var(--color-gold); background: #d9b65f18; }
+  .mobile-nav-layer { position: fixed; z-index: 1000; inset: 0; display: block; background: rgb(0 0 0 / 68%); }
+  .mobile-nav-drawer { position: absolute; inset: 0 auto 0 0; display: flex; width: min(360px, calc(100vw - 38px)); flex-direction: column; gap: 18px; padding: 22px 20px max(20px, env(safe-area-inset-bottom)); overflow-y: auto; border-right: 1px solid var(--color-border); background: var(--color-brand-bg); box-shadow: 16px 0 46px rgb(0 0 0 / 30%); }
+  .mobile-nav-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--color-border); }
+  .mobile-nav-head h2 { margin: 0; color: var(--color-text); font: 480 1.5rem/1.2 var(--font-display), Georgia, serif; }
+  .mobile-nav-close { display: grid; width: 44px; height: 44px; flex: 0 0 44px; place-items: center; border: 1px solid var(--color-border); border-radius: var(--radius-control); background: var(--color-surface); color: var(--color-text); cursor: pointer; }
+  .mobile-nav-drawer nav, .mobile-nav-foot { display: grid; gap: 6px; }
+  .mobile-nav-drawer nav a, .mobile-nav-foot a, .mobile-nav-foot button { display: flex; min-height: 48px; align-items: center; padding: 10px 13px; border: 1px solid transparent; border-radius: var(--radius-control); color: var(--color-text); font-size: .94rem; text-decoration: none; }
+  .mobile-nav-drawer nav a:hover, .mobile-nav-foot a:hover { background: #d9b65f12; color: var(--color-gold-hover); }
+  .mobile-nav-drawer nav a.nav-active { border-left: 2px solid var(--color-gold); background: #d9b65f18; color: var(--color-gold-hover); }
+  .mobile-nav-foot { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--color-border); }
+  .mobile-nav-foot span { padding: 4px 13px; color: var(--color-text-muted); font-size: .79rem; }
+  .mobile-nav-foot button { width: 100%; justify-content: flex-start; border-color: var(--color-border); background: var(--color-surface); cursor: pointer; }
+  .topbar { padding: 0 24px; }
+  .content { padding: 30px 24px 62px; }
+  .workspace-grid { grid-template-columns: 1fr; }
+  .login-shell { grid-template-columns: 1fr; }
+  .login-intro { min-height: 330px; padding: 32px; }
+  .login-intro .goldis-logo { margin-bottom: 5px; }
+  .login-intro h1 { max-width: 680px; font-size: clamp(2.5rem, 6vw, 4rem); }
+  .login-rail { margin-top: 20px; }
+  .login-card { margin: 30px auto; }
+  .rb-goldis-stepper { margin: 27px 0; }
+}
+@media (max-width: 680px) {
+  html { scroll-behavior: auto; }
+  .sidebar { padding: 6px 12px 10px; gap: 0 8px; }
+  .goldis-logo--sidebar { width: 120px; height: 90px; }
+  .goldis-logo--sidebar img { width: 158px; height: 159px; left: -11px; top: -20px; }
+  .brand strong { font-size: 1rem; }
+  .brand small { font-size: .65rem; }
+  .mobile-menu-toggle { width: 44px; height: 44px; flex-basis: 44px; }
+  .topbar { height: auto; min-height: 54px; padding: 8px 14px; gap: 8px; font-size: .57rem; }
+  .workspace-links { gap: 10px; }
+  .topbar .workspace-links { display: none; }
+  .workspace-links a { font-size: .7rem; }
+  .workspace-links .topbar-user { display: none; }
+  .content { padding: 27px 15px 48px; }
+  .intro h1 { font-size: clamp(2.2rem, 10vw, 3rem); }
+  .process { display: none; }
+  .rb-goldis-stepper { display: block; margin: 24px 0; }
+  .rb-goldis-step { min-height: 73px; padding: 14px 12px 12px 48px; }
+  .rb-goldis-step+.rb-goldis-step { border-top: 1px solid var(--color-border); border-left: 0; }
+  .rb-goldis-step-marker { top: 15px; left: 13px; }
+  .card, .result-section { padding: 17px; }
+  .section-head { flex-wrap: wrap; }
+  .metrics { margin: 20px 0; }
+  .metrics div { padding: 13px 9px; }
+  .metrics strong { font-size: 1.3rem; }
+  .metrics span { font-size: .7rem; }
+  .login-intro { min-height: 0; padding: 18px 20px 24px; }
+  .goldis-logo--login { width: 245px; height: 204px; }
+  .goldis-logo--login img { width: 285px; height: 286px; left: -20px; top: -43px; }
+  .login-intro h1 { font-size: 2rem; }
+  .login-intro>p:not(.eyebrow), .login-rail { display: none; }
+  .login-card { width: min(420px, calc(100% - 30px)); margin: 22px auto 36px; padding: 22px; }
+  .admin-hero { padding: 23px 20px; }
+  .admin-hero-mark { display: none; }
+  .admin-content { padding: 18px 14px 48px; }
+  .admin-topbar { padding: 8px 14px; }
+  .admin-report-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-rail nav { overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: var(--color-field-border) transparent; }
+  .admin-nav-hint { display: block; margin: 3px 2px 0; color: var(--color-text-muted); font-size: .68rem; }
+  .account-header { min-height: 60px; height: auto; padding: 3px 12px; }
+  .goldis-logo--header { width: 105px; height: 82px; }
+  .goldis-logo--header img { width: 138px; height: 139px; left: -16px; top: -29px; }
+  .account-brand>.goldis-logo.goldis-logo--header { width: 105px; height: 82px; }
+  .account-header nav { gap: 10px; }
+  .account-header nav a { font-size: .69rem; }
+  .account-content { padding: 27px 14px 48px; }
+  .account-content>h1 { font-size: 2.7rem; }
+  .account-password-row { grid-template-columns: 1fr; }
+  .admin-filter-form { grid-template-columns: 1fr; }
+  .admin-table-wrap { overscroll-behavior-x: contain; }
+  .table-wrap[role="region"]::before, .admin-table-wrap[role="region"]::before { display: block; padding: 7px 10px; border-bottom: 1px solid var(--color-border); background: var(--color-surface-raised); color: var(--color-text-muted); content: "Przewiń tabelę w poziomie, aby zobaczyć pozostałe kolumny."; font-size: .72rem; line-height: 1.4; }
+  .login-card input, .run-form input, .admin-field input, .admin-field select, .admin-table-wrap select, .admin-table-wrap input,
+  .row-tools button, .intervention-item>button, .intervention-more button, .review-button, .review-actions button,
+  .review-pagination button, .admin-button, .admin-quiet { min-height: 44px; }
+  .file-input { display: flex; min-height: 48px; align-items: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

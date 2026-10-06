@@ -1,0 +1,20 @@
+{
+  "name": "goldis-platform",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "build": "npm run build -w @goldis/core && npm run build -w @goldis/api && npm run build -w @goldis/worker && npm run build -w @goldis/web",
+    "test": "npm run test -w @goldis/core && npm run test -w @goldis/api && npm run test -w @goldis/worker && npm run test:preflight",
+    "test:preflight": "node --test scripts/preflight-contract.test.cjs",
+    "test:db-integration": "node apps/api/scripts/run-db-integration.cjs",
+    "test:automation-e2e": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Test-GoldisDatabase.ps1 -Automation",
+    "dev:web": "npm run dev -w @goldis/web",
+    "dev:api": "npm run dev -w @goldis/api",
+    "dev:worker": "npm run dev -w @goldis/worker",
+    "preflight:local": "node scripts/local-preflight.cjs",
+    "start:local": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Start-GoldisLocal.ps1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

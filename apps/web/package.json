@@ -1,0 +1,28 @@
+{
+  "name": "@goldis/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "test:w3-sms-ui-smoke": "node scripts/w3-sms-ui-smoke.cjs",
+    "test:w4-enrichment-ui-smoke": "node scripts/w4-enrichment-ui-smoke.cjs",
+    "test:admin-ui-smoke": "node scripts/admin-ui-smoke.cjs",
+    "test:history-ui-smoke": "node scripts/history-ui-smoke.cjs",
+    "test:tool-grants-ui-smoke": "node scripts/tool-grants-ui-smoke.cjs",
+    "test:audit-ui-smoke": "node scripts/audit-ui-smoke.cjs"
+  },
+  "dependencies": {
+    "motion": "^12.43.0",
+    "next": "^16.3.7",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.9.0"
+  }
+}

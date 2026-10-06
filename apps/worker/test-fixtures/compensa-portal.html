@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CPortal — fixture syntetyczny</title>
+    <style>
+      body { font: 16px Arial, sans-serif; margin: 24px; color: #263238; }
+      button, input, select { font: inherit; padding: 8px; margin: 4px; }
+      [role="dialog"] { border: 1px solid #aaa; padding: 20px; max-width: 720px; margin-top: 20px; }
+      [hidden] { display: none !important; }
+      fieldset { margin: 16px 0; }
+      .row { display: flex; flex-wrap: wrap; gap: 8px; }
+    </style>
+  </head>
+  <body>
+    <header><h1>CPortal — strona testowa</h1><p data-screen="home">Zalogowany użytkownik syntetyczny</p></header>
+    <main>
+      <button type="button" id="compensa-communication-tile">Compensa Komunikacja</button>
+      <section id="start-dialog" role="dialog" aria-label="Compensa Komunikacja" hidden>
+        <h2>Compensa Komunikacja</h2>
+        <label>Podaj REGON lub PESEL
+          <input name="insuredIdentifier" autocomplete="off" />
+        </label>
+        <label>Numer rejestracyjny
+          <input name="vehicleRegistration" autocomplete="off" />
+        </label>
+        <button type="button" id="start-communication">Compensa Komunikacja</button>
+      </section>
+
+      <section id="insured-data" aria-label="Dane ubezpieczonych" hidden>
+        <h2>Dane ubezpieczonych</h2>
+        <p>Oferta Nr <span id="offer-reference">SYNTH-CASE-1</span></p>
+        <label>Rola
+          <select name="role"><option>Właściciel</option><option>Ubezpieczający</option></select>
+        </label>
+        <label>Typ klienta
+          <select name="customerType"><option>Osoba fizyczna</option></select>
+        </label>
+        <div class="row">
+          <label>Imię<input name="firstName" value="Ala" /></label>
+          <label>Nazwisko<input name="lastName" value="Testowa" /></label>
+          <label>PESEL<input name="pesel" value="90010100016" /></label>
+          <label>Nazwisko rodowe<input name="maidenName" value="" /></label>
+          <label>Adres<input name="address" value="Portalowa 1" /></label>
+          <label>Kod pocztowy<input name="postalCode" value="00-000" /></label>
+          <label>Miejscowość<input name="city" value="Portalowo" /></label>
+          <label>Powiat<input name="county" value="Powiat testowy" /></label>
+        </div>
+        <button type="button" id="save-insured">Zapisz</button>
+        <span id="saved-confirmation" data-saved-confirmation hidden>Zapis danych ubezpieczonych potwierdzony</span>
+        <button type="button" id="verify-ufg">Weryfikacja UFG</button>
+        <section id="ufg-status" hidden>
+          <table id="ufg-summary">
+            <thead><tr><th>Podsumowanie</th><th>OC</th><th>AC</th><th>ASS</th></tr></thead>
+            <tbody><tr><td>Liczba polis</td><td>3</td><td>0</td><td>0</td></tr><tr><td>Liczba zdarzeń</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+          </table>
+          <button type="button" id="open-ufg-summary">Szczegóły</button>
+        </section>
+        <section id="ufg-details" hidden>
+          <h3>Szczegóły weryfikacji UFG</h3>
+          <button type="button" id="oc-details">Szczegóły polis OC</button>
+          <table id="oc-table" hidden>
+            <thead><tr><th>L.p.</th><th>Ubezpieczony</th><th>Typ i nr polisy</th><th>Rodzaj umowy</th>
+              <th>Liczba szkód Ubezpieczonego</th><th>Nr rejestracyjny</th><th>Grupa pojazdu</th><th>Marka</th>
+              <th>Model</th><th>ZU</th><th>Okres ub. od</th><th>Okres ub. do</th><th>Akcje</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Ala Testowa</td><td>OC TEST-1</td><td>OC</td><td>0</td><td>TEST0001</td><td>Samochód</td><td>Marka Testowa</td><td>Model 1</td><td>ZU Testowe</td><td>2025-01-01</td><td>2026-09-29</td><td></td></tr>
+              <tr><td>2</td><td>Ala Testowa</td><td>OC TEST-2</td><td>OC</td><td>1</td><td>TEST0002</td><td>Samochód</td><td>Marka Testowa</td><td>Model 2</td><td>ZU Testowe</td><td>2025-01-01</td><td>2027-01-01</td><td></td></tr>
+              <tr><td>3</td><td>Ala Testowa</td><td>OC TEST-3</td><td>OC</td><td>0</td><td>TEST0003</td><td>Samochód</td><td>Marka Testowa</td><td>Model 3</td><td>ZU Testowe</td><td>2026-01-01</td><td>2026-09-30</td><td></td></tr>
+            </tbody>
+          </table>
+        </section>
+      </section>
+    </main>
+    <script>
+      const dialog = document.querySelector('#start-dialog');
+      const insuredData = document.querySelector('#insured-data');
+      document.querySelector('#compensa-communication-tile').addEventListener('click', () => { dialog.hidden = false; });
+      document.querySelector('#start-communication').addEventListener('click', () => {
+        dialog.hidden = true;
+        insuredData.hidden = false;
+      });
+      document.querySelector('#save-insured').addEventListener('click', () => {
+        window.syntheticSaveClickCount = (window.syntheticSaveClickCount || 0) + 1;
+        if (window.syntheticSaveNeverStored) { window.syntheticSaveNeverStored = false; return; }
+        window.syntheticSaved = true;
+        if (!window.syntheticHideSaveConfirmation) document.querySelector('#saved-confirmation').hidden = false;
+      });
+      document.querySelector('#verify-ufg').addEventListener('click', () => {
+        window.syntheticVerifyCount = (window.syntheticVerifyCount || 0) + 1;
+        document.querySelector('#ufg-status').hidden = false;
+      });
+      document.querySelector('#open-ufg-summary').addEventListener('click', () => {
+        document.querySelector('#ufg-details').hidden = false;
+      });
+      document.querySelector('#oc-details').addEventListener('click', () => {
+        document.querySelector('#oc-table').hidden = false;
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,79 @@
+{
+  "pzu": {
+    "entryUrl": "https://everest.pzu.pl/pc/PolicyCenter.do",
+    "allowedOrigins": ["https://everest.pzu.pl", "https://zaloguj.pzu.pl", "https://strefa.agentpzu.pl"],
+    "adapterVersion": "verify-live-v1",
+    "session": {
+      "authenticated": "[role=\"button\"][aria-label=\"Akcje\"]",
+      "loginForm": "#credentials_table",
+      "usernameInput": "input[name=\"username\"]",
+      "passwordInput": "input[name=\"password\"]",
+      "loginSubmit": "input[type=\"submit\"].credentials_input_submit",
+      "smsChallenge": "iframe#secfense_iframe",
+      "smsFrame": "iframe#secfense_iframe",
+      "smsCodeInput": "input#code[name=\"code\"][type=\"text\"]",
+      "smsCodeSubmit": "form:has(input#code) .buttons > button.btn.btn-primary",
+      "smsRememberDevice": "input#fprint_state[name=\"fprint_state\"][type=\"checkbox\"]",
+      "smsResendCode": "form:has(input#code) .buttons > a#resend",
+      "smsCodeExpired": ".errors_wrapper > span.errors:text-matches(\"expired\", \"i\")",
+      "postLoginLanding": "body:has(a[href^=\"http://everest.pzu.pl/\"])",
+      "accessDenied": "[data-verified-access-denied]"
+    },
+    "everest": {
+      "searchInput": "input[placeholder^=\"PESEL/REGON\"], input[name$=\"-smartsearch\"]",
+      "searchNavigation": ".gw-action--inner:has(> .gw-label:has-text('Szybkie wyszukiwanie'))",
+      "resultRows": "table.gw-ListViewWidget--table tr:has([id$=\"-AccountNumber_button\"])",
+      "noResults": ".no-results-info:has-text('Brak wyników wyszukiwania')",
+      "fields": {
+        "accountType": "td:nth-child(3)",
+        "personName": "td:nth-child(5)",
+        "pesel": "td:nth-child(4)"
+      }
+    }
+  },
+  "compensa": {
+    "entryUrl": "https://cportal.compensa.pl/Portal#/",
+    "allowedOrigins": ["https://cportal.compensa.pl"],
+    "registrationNumber": "RST22339",
+    "adapterVersion": "verify-live-v1",
+    "parserVersion": "verify-live-v1",
+    "session": {
+      "authenticated": "a.nav-link:has-text('Mój cPortal'):visible",
+      "loginForm": "#login",
+      "usernameInput": "#login",
+      "passwordInput": "#password",
+      "loginSubmit": "#submitLogin",
+      "smsChallenge": "[data-verified-sms-screen]",
+      "smsCodeInput": "[data-verified-sms-input]",
+      "smsCodeSubmit": "[data-verified-sms-submit]",
+      "accessDenied": "[data-verified-access-denied]"
+    },
+    "form": {
+      "communicationTile": "a:has(span:has-text('Compensa Komunikacja'))",
+      "startDialog": "div.row:has(> label:has-text('Podaj REGON lub PESEL'))",
+      "identifierInput": "div.row:has(> label:has-text('Podaj REGON lub PESEL')) input[type=text]",
+      "registrationInput": "div.row:has(> label:has-text('Numer rejestracyjny')) input[type=text]",
+      "startCommunication": "button:has-text('Compensa Komunikacja')",
+      "insuredDataSection": "insured-section",
+      "roleSelect": "label:has(span:has-text('Ubezpieczający'))",
+      "firstNameInput": "insured-section div.row:has(> label:has-text('Imię')) input",
+      "lastNameInput": "insured-section div.row:has(> label:has-text('Nazwisko')) input",
+      "peselInput": "insured-section div.row:has(> label:has-text('PESEL')) input",
+      "postalCodeInput": "insured-section div.row:has(> label:has-text('Kod pocztowy')) input",
+      "countyInput": "insured-section div.row:has(> label:has-text('Powiat')) select",
+      "saveButton": "button:has-text('Zapisz')"
+    },
+    "save": {
+      "insuredDataSection": "insured-section",
+      "caseReference": "div:has(> span.mr-2:has-text('Oferta Nr')) > span.tm-textGray14B",
+      "saveButton": "button:has-text('Zapisz')",
+      "savedConfirmation": "button[id^='VerificationStatus']:has-text('UFG'):enabled"
+    },
+    "ufg": {
+      "caseReference": "div:has(> span.mr-2:has-text('Oferta Nr')) > span.tm-textGray14B",
+      "verifyUfgButton": "button[id^='VerificationStatus']:has-text('UFG'):enabled",
+      "summaryTable": "ufg-verification table:has-text('Liczba polis')",
+      "openUfgSummary": "ufg-verification button:has-text('Szczegóły')"
+    }
+  }
+}
