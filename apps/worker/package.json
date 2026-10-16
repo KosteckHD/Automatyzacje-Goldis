@@ -4,10 +4,12 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "build": "npm run build -w @goldis/core && tsc -p tsconfig.json",
+    "clean": "node ../../scripts/clean-workspace-dist.cjs @goldis/worker",
+    "build": "npm run build -w @goldis/core && npm run clean && tsc -p tsconfig.json",
     "dev": "npm run build && node dist/run-worker.js",
     "start": "node dist/run-worker.js",
-    "test": "npm run build && node --test dist/*.test.js",
+    "test": "npm run build && node ../../scripts/run-node-tests.cjs dist",
+    "test:unit": "npm run build && node ../../scripts/run-node-tests.cjs dist unit",
     "test:playwright": "npm run build && node scripts/test-playwright.cjs"
   },
   "dependencies": {

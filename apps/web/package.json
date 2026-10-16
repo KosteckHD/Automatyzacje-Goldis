@@ -10,14 +10,17 @@
     "test:w4-enrichment-ui-smoke": "node scripts/w4-enrichment-ui-smoke.cjs",
     "test:admin-ui-smoke": "node scripts/admin-ui-smoke.cjs",
     "test:history-ui-smoke": "node scripts/history-ui-smoke.cjs",
+    "test:deletion-history-ui-smoke": "node scripts/deletion-history-ui-smoke.cjs",
     "test:tool-grants-ui-smoke": "node scripts/tool-grants-ui-smoke.cjs",
     "test:audit-ui-smoke": "node scripts/audit-ui-smoke.cjs",
     "test:review-ui-smoke": "node scripts/review-ui-smoke.cjs",
-    "test:run-submission-ui-smoke": "node scripts/run-submission-ui-smoke.cjs"
+    "test:run-submission-ui-smoke": "node scripts/run-submission-ui-smoke.cjs",
+    "test:manager-ui-smoke": "node scripts/manager-ui-smoke.cjs",
+    "test:lead-ui-smoke": "node scripts/lead-ui-smoke.cjs"
   },
   "dependencies": {
     "motion": "^12.43.0",
-    "next": "^16.3.7",
+    "next": "^16.4.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

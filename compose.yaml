@@ -1,93 +1,276 @@
 services:
   postgres:
-    image: postgres:17-alpine
+    image: ${GOLDIS_POSTGRES_IMAGE:-postgres:17-alpine}
     environment:
       POSTGRES_DB: goldis
       POSTGRES_USER: goldis
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      POSTGRES_PASSWORD_FILE: /run/secrets/database_password
+      DB_PASSWORD_FILE: /run/secrets/database_password
+      MIGRATOR_DB_PASSWORD_FILE: /run/secrets/migrator_db_password
+      API_DB_PASSWORD_FILE: /run/secrets/api_db_password
+      WORKER_DB_PASSWORD_FILE: /run/secrets/worker_db_password
+      ENRICHMENT_DB_PASSWORD_FILE: /run/secrets/enrichment_db_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/ensure-runtime-roles.sh:/docker-entrypoint-initdb.d/010-goldis-runtime-roles.sh:ro
+    secrets:
+      - database_password
+      - migrator_db_password
+      - api_db_password
+      - worker_db_password
+      - enrichment_db_password
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U goldis -d goldis"]
       interval: 5s
       timeout: 5s
       retries: 10
     restart: unless-stopped
+    networks:
+      - goldis_data
 
   redis:
-    image: redis:7-alpine
-    command: ["redis-server", "--appendonly", "yes"]
+    image: ${GOLDIS_REDIS_IMAGE:-goldis-redis:local}
+    build:
+      context: .
+      dockerfile: docker/redis/Dockerfile
+    environment:
+      REDIS_API_PASSWORD_FILE: /run/secrets/redis_api_password
+      REDIS_WORKER_PASSWORD_FILE: /run/secrets/redis_worker_password
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "REDISCLI_AUTH=$$(cat /run/secrets/redis_api_password) redis-cli --user goldis_api ping | grep -qx PONG"]
       interval: 5s
       timeout: 3s
       retries: 10
     restart: unless-stopped
+    secrets:
+      - redis_api_password
+      - redis_worker_password
+    networks:
+      - goldis_data
 
-  api:
+  db-roles:
+    image: ${GOLDIS_POSTGRES_IMAGE:-postgres:17-alpine}
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      DB_PASSWORD_FILE: /run/secrets/database_password
+      POSTGRES_DB: goldis
+      POSTGRES_USER: goldis
+      MIGRATOR_DB_PASSWORD_FILE: /run/secrets/migrator_db_password
+      API_DB_PASSWORD_FILE: /run/secrets/api_db_password
+      WORKER_DB_PASSWORD_FILE: /run/secrets/worker_db_password
+      ENRICHMENT_DB_PASSWORD_FILE: /run/secrets/enrichment_db_password
+    volumes:
+      - ./docker/postgres/ensure-runtime-roles.sh:/ensure-runtime-roles.sh:ro
+    secrets:
+      - database_password
+      - migrator_db_password
+      - api_db_password
+      - worker_db_password
+      - enrichment_db_password
+    entrypoint: ["sh", "-c", "until pg_isready -h postgres -U goldis -d goldis; do sleep 1; done; sh /ensure-runtime-roles.sh"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - goldis_data
+
+  migrate:
+    image: ${GOLDIS_API_IMAGE:-goldis-api:local}
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     environment:
+      DATABASE_URL_FILE: /run/secrets/database_url_migrator
+    command: ["sh", "-c", "node apps/api/dist/migrate.js && node apps/api/dist/apply-runtime-grants.js"]
+    depends_on:
+      db-roles:
+        condition: service_completed_successfully
+    restart: "no"
+    secrets:
+      - database_url_migrator
+    networks:
+      - goldis_data
+
+  bootstrap-admin:
+    image: ${GOLDIS_API_IMAGE:-goldis-api:local}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_URL_FILE: /run/secrets/database_url_migrator
+      GOLDIS_ADMIN_USER_FILE: /run/secrets/admin_user
+      GOLDIS_ADMIN_PASSWORD_FILE: /run/secrets/admin_password
+    command: ["node", "apps/api/dist/bootstrap-admin-main.js"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: "no"
+    secrets:
+      - database_url_migrator
+      - admin_user
+      - admin_password
+    networks:
+      - goldis_data
+
+  api:
+    image: ${GOLDIS_API_IMAGE:-goldis-api:local}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      APP_ENV: ${APP_ENV:-development}
       NODE_ENV: ${APP_ENV:-development}
       API_PORT: 3001
-      DATABASE_URL: postgres://goldis:${DB_PASSWORD}@postgres:5432/goldis
-      REDIS_URL: redis://redis:6379
-      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env}
+      DATABASE_URL_FILE: /run/secrets/database_url_api
+      REDIS_URL_FILE: /run/secrets/redis_url_api
+      SESSION_SECRET_FILE: /run/secrets/session_secret
+      LOGIN_RATE_LIMIT_SECRET_FILE: /run/secrets/login_rate_limit_secret
+      PRIVILEGED_ACTION_BINDING_KEY_FILE: /run/secrets/privileged_action_binding_key
       PUBLIC_APP_ORIGIN: ${PUBLIC_APP_ORIGIN:-http://127.0.0.1:3000}
-      GOLDIS_ADMIN_USER: ${GOLDIS_ADMIN_USER:?Set GOLDIS_ADMIN_USER in .env}
-      GOLDIS_ADMIN_PASSWORD: ${GOLDIS_ADMIN_PASSWORD:?Set GOLDIS_ADMIN_PASSWORD in .env}
+      GOLDIS_PASSWORD_RECOVERY_ENABLED: ${GOLDIS_PASSWORD_RECOVERY_ENABLED:-0}
+      GOLDIS_EMAIL_PROVIDER: ${GOLDIS_EMAIL_PROVIDER:-disabled}
+      GOLDIS_EMAIL_FROM: ${GOLDIS_EMAIL_FROM:-}
+      GOLDIS_EMAIL_REPLY_TO: ${GOLDIS_EMAIL_REPLY_TO:-}
+      RESEND_API_KEY_FILE: /run/secrets/resend_api_key
+      AUTH_MAIL_ENCRYPTION_ACTIVE_KEY_VERSION: ${AUTH_MAIL_ENCRYPTION_ACTIVE_KEY_VERSION:-}
+      AUTH_MAIL_ENCRYPTION_KEYS_BASE64_FILE: /run/secrets/auth_mail_keyring
+      TRUST_PROXY_IPS: ${TRUST_PROXY_IPS:-172.30.10.10}
       PESEL_ENCRYPTION_ACTIVE_KEY_VERSION: ${PESEL_ENCRYPTION_ACTIVE_KEY_VERSION:-}
-      PESEL_ENCRYPTION_KEYS_BASE64: ${PESEL_ENCRYPTION_KEYS_BASE64:-}
+      PESEL_ENCRYPTION_KEYS_BASE64_FILE: /run/secrets/pesel_keyring
+      ARTIFACT_ENCRYPTION_ACTIVE_KEY_VERSION: ${ARTIFACT_ENCRYPTION_ACTIVE_KEY_VERSION:-}
+      ARTIFACT_ENCRYPTION_KEYS_BASE64_FILE: /run/secrets/artifact_keyring
+      ARTIFACT_REQUIRE_ENCRYPTION: ${ARTIFACT_REQUIRE_ENCRYPTION:-1}
       API_EXPORT_DIR: /var/lib/goldis/exports
+      GOLDIS_DELETION_JOURNAL_DIR: /var/lib/goldis/deletion-journal
       WORKER_INTERNAL_URL: http://worker:3022
-      WORKER_AUTH_SECRET: ${WORKER_AUTH_SECRET:?Set WORKER_AUTH_SECRET in .env}
+      WORKER_AUTH_SECRET_FILE: /run/secrets/worker_auth_secret
+      IMPORT_PARSER_URL: http://import-parser:3010
+      IMPORT_PARSER_SHARED_SECRET_FILE: /run/secrets/import_parser_secret
     volumes:
       - export_data:/var/lib/goldis/exports
+      - deletion_journal:/var/lib/goldis/deletion-journal
+    secrets:
+      - database_url_api
+      - redis_url_api
+      - session_secret
+      - login_rate_limit_secret
+      - privileged_action_binding_key
+      - pesel_keyring
+      - artifact_keyring
+      - worker_auth_secret
+      - import_parser_secret
+      - resend_api_key
+      - auth_mail_keyring
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_healthy
-    command: ["sh", "-c", "node apps/api/dist/migrate.js && node apps/api/dist/main.js"]
+      migrate:
+        condition: service_completed_successfully
+      bootstrap-admin:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 5s
       timeout: 3s
       retries: 12
-    ports:
-      - "127.0.0.1:3001:3001"
     restart: unless-stopped
+    networks:
+      - goldis_frontend
+      - goldis_data
+      - goldis_parser
+
+  import-parser:
+    image: ${GOLDIS_API_IMAGE:-goldis-api:local}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      IMPORT_PARSER_HOST: 0.0.0.0
+      IMPORT_PARSER_PORT: 3010
+      IMPORT_PARSER_SHARED_SECRET_FILE: /run/secrets/import_parser_secret
+      NODE_ENV: production
+    command: ["node", "apps/api/dist/import-parser-main.js"]
+    expose:
+      - "3010"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3010/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    mem_limit: 768m
+    cpus: 1.0
+    pids_limit: 32
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks:
+      - goldis_parser
+    secrets:
+      - import_parser_secret
+
+  enrichment-worker:
+    image: ${GOLDIS_API_IMAGE:-goldis-api:local}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: ${APP_ENV:-development}
+      DATABASE_URL_FILE: /run/secrets/database_url_enrichment
+      GOLDIS_ENRICHMENT_PROVIDER: ${GOLDIS_ENRICHMENT_PROVIDER:-mf-vat}
+      MF_VAT_ENVIRONMENT: ${MF_VAT_ENVIRONMENT:-production}
+      MF_VAT_MIN_REQUEST_INTERVAL_MS: ${MF_VAT_MIN_REQUEST_INTERVAL_MS:-1000}
+      REGISTRY_CACHE_HMAC_KEY_FILE: /run/secrets/registry_cache_key
+    depends_on:
+      api:
+        condition: service_healthy
+    command: ["node", "apps/api/dist/enrichment-worker.js"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://api:3001/api/health/enrichment').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - goldis_data
+    secrets:
+      - database_url_enrichment
+      - registry_cache_key
 
   worker:
+    image: ${GOLDIS_WORKER_IMAGE:-goldis-worker:local}
     build:
       context: .
       dockerfile: apps/worker/Dockerfile
     environment:
       NODE_ENV: ${APP_ENV:-development}
-      DATABASE_URL: postgres://goldis:${DB_PASSWORD}@postgres:5432/goldis
-      REDIS_URL: redis://redis:6379
+      DATABASE_URL_FILE: /run/secrets/database_url_worker
+      REDIS_URL_FILE: /run/secrets/redis_url_worker
+      GOLDIS_API_READY_URL: http://api:3001/api/health/ready
       WORKER_PROFILE_DIR: /home/pwuser/goldis-profile
       WORKER_DB_POOL_MAX: ${WORKER_DB_POOL_MAX:-8}
       WORKER_LIVE_PORTALS: ${WORKER_LIVE_PORTALS:-0}
       WORKER_PORTAL_CONFIG_PATH: /run/config/portal-selectors.json
-      PZU_LOGIN: ${PZU_LOGIN:-}
-      PZU_PASSWORD: ${PZU_PASSWORD:-}
-      COMPENSA_LOGIN: ${COMPENSA_LOGIN:-}
-      COMPENSA_PASSWORD: ${COMPENSA_PASSWORD:-}
+      PZU_LOGIN_FILE: /run/secrets/pzu_login
+      PZU_PASSWORD_FILE: /run/secrets/pzu_password
+      COMPENSA_LOGIN_FILE: /run/secrets/compensa_login
+      COMPENSA_PASSWORD_FILE: /run/secrets/compensa_password
       WORKER_STAGING_DIR: /home/pwuser/goldis-staging
       WORKER_STAGING_KEY_VERSION: ${WORKER_STAGING_KEY_VERSION:-}
-      WORKER_STAGING_KEY_V1: ${WORKER_STAGING_KEY_V1:-}
+      WORKER_STAGING_KEY_V1_FILE: /run/secrets/worker_staging_key
       PESEL_ENCRYPTION_ACTIVE_KEY_VERSION: ${PESEL_ENCRYPTION_ACTIVE_KEY_VERSION:-}
-      PESEL_ENCRYPTION_KEYS_BASE64: ${PESEL_ENCRYPTION_KEYS_BASE64:-}
+      PESEL_ENCRYPTION_KEYS_BASE64_FILE: /run/secrets/pesel_keyring
       WORKER_INTERNAL_HOST: 0.0.0.0
       WORKER_INTERNAL_PORT: 3022
-      WORKER_AUTH_SECRET: ${WORKER_AUTH_SECRET:?Set WORKER_AUTH_SECRET in .env}
+      WORKER_AUTH_SECRET_FILE: /run/secrets/worker_auth_secret
       WORKER_RESULT_API_URL: http://api:3001
       PUBLIC_APP_ORIGIN: ${PUBLIC_APP_ORIGIN:-http://127.0.0.1:3000}
       WORKER_HEADLESS: "1"
+      WORKER_CHROMIUM_SANDBOX: "1"
     volumes:
       - worker_profile:/home/pwuser/goldis-profile
       - worker_staging:/home/pwuser/goldis-staging
@@ -95,15 +278,37 @@ services:
     expose:
       - "3022"
     init: true
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:./deploy/docker/chromium-seccomp.json
     shm_size: 1gb
     depends_on:
       api:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://api:3001/api/health/automation').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 4
+      start_period: 20s
     restart: unless-stopped
+    networks:
+      - goldis_data
+    secrets:
+      - database_url_worker
+      - redis_url_worker
+      - pzu_login
+      - pzu_password
+      - compensa_login
+      - compensa_password
+      - worker_staging_key
+      - pesel_keyring
+      - worker_auth_secret
 
   web:
+    image: ${GOLDIS_WEB_IMAGE:-goldis-web:local}
     build:
       context: .
       dockerfile: apps/web/Dockerfile
@@ -112,9 +317,18 @@ services:
       API_INTERNAL_URL: http://api:3001
     depends_on:
       - api
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/',{redirect:'manual'}).then(r=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
     ports:
       - "127.0.0.1:3000:3000"
     restart: unless-stopped
+    networks:
+      goldis_frontend:
+        ipv4_address: 172.30.10.10
 
 volumes:
   postgres_data:
@@ -122,3 +336,77 @@ volumes:
   worker_profile:
   worker_staging:
   export_data:
+  deletion_journal:
+
+networks:
+  goldis_frontend:
+    ipam:
+      config:
+        - subnet: 172.30.10.0/24
+  goldis_data:
+    driver: bridge
+  goldis_parser:
+    driver: bridge
+    internal: true
+
+secrets:
+  database_password:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/database_password
+  migrator_db_password:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/migrator_db_password
+  api_db_password:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/api_db_password
+  worker_db_password:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/worker_db_password
+  enrichment_db_password:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/enrichment_db_password
+  redis_api_password:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/redis_api_password
+  redis_worker_password:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/redis_worker_password
+  database_url_migrator:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/database_url_migrator
+  database_url_api:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/database_url_api
+  database_url_worker:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/database_url_worker
+  database_url_enrichment:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/database_url_enrichment
+  redis_url_api:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/redis_url_api
+  redis_url_worker:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/redis_url_worker
+  session_secret:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/session_secret
+  login_rate_limit_secret:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/login_rate_limit_secret
+  privileged_action_binding_key:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/privileged_action_binding_key
+  admin_user:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/admin_user
+  admin_password:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/admin_password
+  pesel_keyring:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/pesel_keyring
+  artifact_keyring:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/artifact_keyring
+  worker_auth_secret:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/worker_auth_secret
+  import_parser_secret:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/import_parser_secret
+  registry_cache_key:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/registry_cache_key
+  pzu_login:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/pzu_login
+  pzu_password:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/pzu_password
+  compensa_login:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/compensa_login
+  compensa_password:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/compensa_password
+  worker_staging_key:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/worker_staging_key
+  resend_api_key:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/resend_api_key
+  auth_mail_keyring:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/auth_mail_keyring

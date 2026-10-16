@@ -1,0 +1,322 @@
+{
+  "generatedAt": "2026-10-12T08:08:01.995Z",
+  "source": "lokalny build aplikacji; dane demonstracyjne mockowane przez Playwright",
+  "viewport": "1440×1040",
+  "captured": [
+    {
+      "name": "01-logowanie",
+      "title": "Logowanie",
+      "role": "bez logowania",
+      "path": "/",
+      "file": "01-logowanie.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "02-dashboard-pracownik",
+      "title": "Przegląd — pracownik",
+      "role": "operator",
+      "path": "/dashboard",
+      "file": "02-dashboard-pracownik.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "03-dashboard-menedzer",
+      "title": "Przegląd — menedżer",
+      "role": "manager",
+      "path": "/dashboard",
+      "file": "03-dashboard-menedzer.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "04-katalog-automatyzacji-pracownik",
+      "title": "Katalog automatyzacji — pracownik",
+      "role": "operator",
+      "path": "/tools",
+      "file": "04-katalog-automatyzacji-pracownik.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "05-katalog-automatyzacji-menedzer",
+      "title": "Katalog automatyzacji — menedżer",
+      "role": "manager",
+      "path": "/tools",
+      "file": "05-katalog-automatyzacji-menedzer.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "06-narzedzie-oc",
+      "title": "Automatyzacja OC — import i start",
+      "role": "operator",
+      "path": "/tools/oc-policy-verification",
+      "file": "06-narzedzie-oc.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "07-import-wyniki-i-zadania",
+      "title": "Import — podgląd wyników i zadań",
+      "role": "operator",
+      "path": "/tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444",
+      "file": "07-import-wyniki-i-zadania.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "08-wyniki-pula-menedzer",
+      "title": "Wyniki — wspólna pula i przydzielanie",
+      "role": "manager",
+      "path": "/results/oc-policy-verification",
+      "file": "08-wyniki-pula-menedzer.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "09-wyniki-pula-pracownik",
+      "title": "Wyniki — wspólna pula pracownika",
+      "role": "operator",
+      "path": "/results/oc-policy-verification",
+      "file": "09-wyniki-pula-pracownik.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "10-moje-wyniki",
+      "title": "Moje wyniki",
+      "role": "operator",
+      "path": "/my-results",
+      "file": "10-moje-wyniki.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "11-szczegoly-leadu",
+      "title": "Szczegóły firmy / leadu",
+      "role": "operator",
+      "path": "/my-results/77777777-7777-4777-8777-777777777777",
+      "file": "11-szczegoly-leadu.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "12-historia-importow",
+      "title": "Historia importów",
+      "role": "manager",
+      "path": "/imports",
+      "file": "12-historia-importow.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "13-historia-zadan",
+      "title": "Historia zadań",
+      "role": "manager",
+      "path": "/runs",
+      "file": "13-historia-zadan.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "14-historia-wynikow",
+      "title": "Historia wyników",
+      "role": "manager",
+      "path": "/results/history",
+      "file": "14-historia-wynikow.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "15-szczegoly-zadania",
+      "title": "Szczegóły uruchomienia",
+      "role": "manager",
+      "path": "/runs/55555555-5555-4555-8555-555555555555",
+      "file": "15-szczegoly-zadania.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "16-szczegoly-zgloszenia",
+      "title": "Szczegóły zgłoszenia",
+      "role": "manager",
+      "path": "/submissions/88888888-8888-4888-8888-888888888888",
+      "file": "16-szczegoly-zgloszenia.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "17-weryfikacja-danych",
+      "title": "Weryfikacja danych — recenzent",
+      "role": "reviewer",
+      "path": "/review",
+      "file": "17-weryfikacja-danych.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "18-weryfikacja-danych-pracownik",
+      "title": "Moje korekty — pracownik",
+      "role": "operator",
+      "path": "/review",
+      "file": "18-weryfikacja-danych-pracownik.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "19-dziennik-audytu-recenzent",
+      "title": "Dziennik aktywności — recenzent",
+      "role": "reviewer",
+      "path": "/audit",
+      "file": "19-dziennik-audytu-recenzent.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "20-dziennik-audytu-audytor",
+      "title": "Dziennik aktywności — audytor",
+      "role": "auditor",
+      "path": "/audit",
+      "file": "20-dziennik-audytu-audytor.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "21-powiadomienia",
+      "title": "Powiadomienia",
+      "role": "operator",
+      "path": "/notifications",
+      "file": "21-powiadomienia.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "22-zespol",
+      "title": "Zespół i konta pracowników",
+      "role": "manager",
+      "path": "/team",
+      "file": "22-zespol.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "23-dostepy-do-narzedzi",
+      "title": "Dostępy do narzędzi",
+      "role": "manager",
+      "path": "/access",
+      "file": "23-dostepy-do-narzedzi.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "24-raporty",
+      "title": "Raporty",
+      "role": "manager",
+      "path": "/reports",
+      "file": "24-raporty.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "25-panel-admina",
+      "title": "Panel administracyjny — pełna strona",
+      "role": "admin",
+      "path": "/admin",
+      "file": "25-panel-admina.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "admin-resources",
+      "title": "Administracja — resources",
+      "role": "admin",
+      "path": "/admin#resources",
+      "file": "25-admin-resources.png",
+      "fullPage": false,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "admin-accounts",
+      "title": "Administracja — accounts",
+      "role": "admin",
+      "path": "/admin#accounts",
+      "file": "25-admin-accounts.png",
+      "fullPage": false,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "admin-operations",
+      "title": "Administracja — operations",
+      "role": "admin",
+      "path": "/admin#operations",
+      "file": "25-admin-operations.png",
+      "fullPage": false,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "admin-automation",
+      "title": "Administracja — automation",
+      "role": "admin",
+      "path": "/admin#automation",
+      "file": "25-admin-automation.png",
+      "fullPage": false,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "admin-audit",
+      "title": "Administracja — audit",
+      "role": "admin",
+      "path": "/admin#audit",
+      "file": "25-admin-audit.png",
+      "fullPage": false,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "admin-reports",
+      "title": "Administracja — reports",
+      "role": "admin",
+      "path": "/admin#reports",
+      "file": "25-admin-reports.png",
+      "fullPage": false,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "26-konto-i-bezpieczenstwo",
+      "title": "Konto i bezpieczeństwo",
+      "role": "operator",
+      "path": "/account",
+      "file": "26-konto-i-bezpieczenstwo.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "27-pula-wynikow-alias",
+      "title": "Wyniki — ścieżka /results",
+      "role": "manager",
+      "path": "/results",
+      "file": "27-pula-wynikow-alias.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "28-szczegoly-leadu-z-puli",
+      "title": "Szczegóły leadu ze wspólnej puli",
+      "role": "manager",
+      "path": "/leads/77777777-7777-4777-8777-777777777777",
+      "file": "28-szczegoly-leadu-z-puli.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "29-weryfikacja-konflikty",
+      "title": "Weryfikacja danych — konflikty encji",
+      "role": "reviewer",
+      "path": "/review?tab=conflicts",
+      "file": "29-weryfikacja-konflikty.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    }
+  ]
+}

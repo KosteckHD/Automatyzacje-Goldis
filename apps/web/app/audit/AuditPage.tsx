@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { GoldisLogo } from "../../components/brand/GoldisLogo";
 
-type Role = "admin" | "operator" | "reviewer" | "auditor";
+type Role = "admin" | "manager" | "operator" | "reviewer" | "auditor";
 type Session = { role?: Role };
 type AuditEvent = {
   eventId: string; actorUserId: string | null; actorUsername: string | null; action: string;
@@ -13,7 +13,10 @@ type AuditPageResult = { items: AuditEvent[]; nextCursor: string | null };
 type Filters = { fromDay: string; toDay: string; actorId: string; action: string; resourceType: string; resourceId: string; outcome: string; toolId: string };
 
 const reviewerActions = [
-  "import.created", "run.created", "run.cancelled", "run.auth_resumed", "run.review_resumed",
+  "import.created", "import.preparation.started", "import.preparation.completed", "import.preparation.cancelled",
+  "import.preparation.workflow.started", "import.preparation.workflow.completed",
+  "import.preparation.workflow.cancelled", "import.preparation.workflow.failed",
+  "run.created", "run.cancelled", "run.auth_resumed", "run.review_resumed",
   "run.manual_data_corrected", "sms.submitted", "regon.correction.proposed", "regon.correction.reviewed",
   "entity.conflict.reviewed", "enrichment.job.created", "enrichment.job.cancelled", "enrichment.job.completed", "artifact.downloaded",
   "intervention.assigned", "intervention.unassigned", "intervention.priority_changed", "intervention.resolved",
@@ -23,8 +26,8 @@ const allActions = [
   ...reviewerActions, "user.created", "user.updated", "tool.grant.created", "tool.grant.updated",
   "tool.grant.revoked", "settings.updated",
 ];
-const reviewerResources = ["import", "run", "artifact", "intervention", "correction", "entity_conflict", "enrichment_job"];
-const allResources = ["import", "run", "artifact", "intervention", "correction", "entity_conflict", "enrichment_job", "user", "session", "tool", "settings", "challenge"];
+const reviewerResources = ["import", "preparation_workflow", "run", "artifact", "intervention", "correction", "entity_conflict", "enrichment_job"];
+const allResources = ["import", "preparation_workflow", "run", "artifact", "intervention", "correction", "entity_conflict", "enrichment_job", "user", "session", "tool", "settings", "challenge"];
 
 function warsawDay(date = new Date()): string {
   const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Warsaw", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date);
@@ -131,7 +134,7 @@ export default function AuditPage() {
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
-  const permittedRole = session?.role === "admin" || session?.role === "reviewer" || session?.role === "auditor";
+  const permittedRole = session?.role === "admin" || session?.role === "manager" || session?.role === "reviewer" || session?.role === "auditor";
 
   useEffect(() => {
     if (sessionState !== "ready" || !permittedRole) return;
@@ -193,7 +196,7 @@ export default function AuditPage() {
   const reviewer = session?.role === "reviewer";
 
   return <main className="history-page">
-    <header className="history-topbar"><a className="history-brand" href="/" aria-label="Goldis — katalog"><GoldisLogo variant="header" /><span>Goldis · Platforma automatyzacji</span></a><nav aria-label="Platforma"><a href="/">Katalog</a>{(session?.role === "admin" || session?.role === "reviewer") && <><a href="/imports">Importy</a><a href="/runs">Zadania</a><a href="/results">Wyniki</a></>}{permittedRole && <a href="/audit" aria-current="page">Audyt</a>}<a href="/account">Moje konto</a></nav></header>
+    <header className="history-topbar"><a className="history-brand" href="/" aria-label="Goldis — katalog"><GoldisLogo variant="header" /><span>Goldis · Platforma automatyzacji</span></a><nav aria-label="Platforma"><a href="/">Katalog</a>{(session?.role === "admin" || session?.role === "manager" || session?.role === "reviewer") && <><a href="/imports">Importy</a><a href="/runs">Zadania</a><a href="/results">Wyniki</a></>}{permittedRole && <a href="/audit" aria-current="page">Audyt</a>}<a href="/account">Moje konto</a></nav></header>
     <section className="history-content audit-content">
       <p className="eyebrow">PLATFORMA / BEZPIECZEŃSTWO</p><h1>Dziennik audytu</h1>
       <p className="history-lede">Przeszukuj zdarzenia organizacji. Wpisy nie zawierają treści plików ani danych formularzy.</p>

@@ -1,0 +1,753 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-11T11:09:22.905354+00:00",
+  "title": "Design System: Goldis MVP mockup",
+  "extensions": {
+    "scope": {
+      "root": "docs/design/goldis/mvp-2026-10-11",
+      "productionAuthority": false,
+      "sourceFiles": [
+        "src/style.css",
+        "src/sidebar.tsx",
+        "src/app.tsx"
+      ],
+      "sourceSha256": {
+        "src/style.css": "0cbd347757415e48131ea3a22d17f2f38224bef7a1909779c7d2f0271e8753e7",
+        "src/sidebar.tsx": "844618c500ec41baea504213c420945e94ee08ae01d18bd8a14ee8777eb57c2f",
+        "src/app.tsx": "39c1fc6e9786cd4fab34f12c49e401ce70c32eb758f24bd20c0d947a331e52fd"
+      },
+      "reviewVerdict": "Independent review; this documentation does not certify shipping."
+    },
+    "colorMeta": {
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Canvas",
+        "tonalRamp": [
+          "oklch(15% 0.00260 247.97)",
+          "oklch(26% 0.00260 247.97)",
+          "oklch(38% 0.00260 247.97)",
+          "oklch(49% 0.00260 247.97)",
+          "oklch(61% 0.00260 247.97)",
+          "oklch(72% 0.00260 247.97)",
+          "oklch(84% 0.00260 247.97)",
+          "oklch(95% 0.00260 247.97)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "sidebar": {
+        "role": "neutral",
+        "displayName": "Sidebar",
+        "tonalRamp": [
+          "oklch(15% 0.00271 248.00)",
+          "oklch(26% 0.00271 248.00)",
+          "oklch(38% 0.00271 248.00)",
+          "oklch(49% 0.00271 248.00)",
+          "oklch(61% 0.00271 248.00)",
+          "oklch(72% 0.00271 248.00)",
+          "oklch(84% 0.00271 248.00)",
+          "oklch(95% 0.00271 248.00)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "tonalRamp": [
+          "oklch(15% 0.00660 258.37)",
+          "oklch(26% 0.00660 258.37)",
+          "oklch(38% 0.00660 258.37)",
+          "oklch(49% 0.00660 258.37)",
+          "oklch(61% 0.00660 258.37)",
+          "oklch(72% 0.00660 258.37)",
+          "oklch(84% 0.00660 258.37)",
+          "oklch(95% 0.00660 258.37)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "surface-raised": {
+        "role": "neutral",
+        "displayName": "Surface raised",
+        "tonalRamp": [
+          "oklch(15% 0.00811 264.42)",
+          "oklch(26% 0.00811 264.42)",
+          "oklch(38% 0.00811 264.42)",
+          "oklch(49% 0.00811 264.42)",
+          "oklch(61% 0.00811 264.42)",
+          "oklch(72% 0.00811 264.42)",
+          "oklch(84% 0.00811 264.42)",
+          "oklch(95% 0.00811 264.42)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Border",
+        "tonalRamp": [
+          "oklch(15% 0.00917 268.39)",
+          "oklch(26% 0.00917 268.39)",
+          "oklch(38% 0.00917 268.39)",
+          "oklch(49% 0.00917 268.39)",
+          "oklch(61% 0.00917 268.39)",
+          "oklch(72% 0.00917 268.39)",
+          "oklch(84% 0.00917 268.39)",
+          "oklch(95% 0.00917 268.39)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Text",
+        "tonalRamp": [
+          "oklch(15% 0.00543 95.10)",
+          "oklch(26% 0.00543 95.10)",
+          "oklch(38% 0.00543 95.10)",
+          "oklch(49% 0.00543 95.10)",
+          "oklch(61% 0.00543 95.10)",
+          "oklch(72% 0.00543 95.10)",
+          "oklch(84% 0.00543 95.10)",
+          "oklch(95% 0.00543 95.10)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "tonalRamp": [
+          "oklch(15% 0.00723 277.12)",
+          "oklch(26% 0.00723 277.12)",
+          "oklch(38% 0.00723 277.12)",
+          "oklch(49% 0.00723 277.12)",
+          "oklch(61% 0.00723 277.12)",
+          "oklch(72% 0.00723 277.12)",
+          "oklch(84% 0.00723 277.12)",
+          "oklch(95% 0.00723 277.12)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "gold": {
+        "role": "primary",
+        "displayName": "Gold",
+        "tonalRamp": [
+          "oklch(15% 0.09843 84.01)",
+          "oklch(26% 0.09843 84.01)",
+          "oklch(38% 0.09843 84.01)",
+          "oklch(49% 0.09843 84.01)",
+          "oklch(61% 0.09843 84.01)",
+          "oklch(72% 0.09843 84.01)",
+          "oklch(84% 0.09843 84.01)",
+          "oklch(95% 0.09843 84.01)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "gold-hover": {
+        "role": "primary",
+        "displayName": "Gold hover",
+        "tonalRamp": [
+          "oklch(15% 0.09027 86.76)",
+          "oklch(26% 0.09027 86.76)",
+          "oklch(38% 0.09027 86.76)",
+          "oklch(49% 0.09027 86.76)",
+          "oklch(61% 0.09027 86.76)",
+          "oklch(72% 0.09027 86.76)",
+          "oklch(84% 0.09027 86.76)",
+          "oklch(95% 0.09027 86.76)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "success": {
+        "role": "semantic",
+        "displayName": "Success",
+        "tonalRamp": [
+          "oklch(15% 0.06756 158.73)",
+          "oklch(26% 0.06756 158.73)",
+          "oklch(38% 0.06756 158.73)",
+          "oklch(49% 0.06756 158.73)",
+          "oklch(61% 0.06756 158.73)",
+          "oklch(72% 0.06756 158.73)",
+          "oklch(84% 0.06756 158.73)",
+          "oklch(95% 0.06756 158.73)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "warning": {
+        "role": "semantic",
+        "displayName": "Warning",
+        "tonalRamp": [
+          "oklch(15% 0.08642 73.04)",
+          "oklch(26% 0.08642 73.04)",
+          "oklch(38% 0.08642 73.04)",
+          "oklch(49% 0.08642 73.04)",
+          "oklch(61% 0.08642 73.04)",
+          "oklch(72% 0.08642 73.04)",
+          "oklch(84% 0.08642 73.04)",
+          "oklch(95% 0.08642 73.04)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "information": {
+        "role": "semantic",
+        "displayName": "Information",
+        "tonalRamp": [
+          "oklch(15% 0.05798 249.33)",
+          "oklch(26% 0.05798 249.33)",
+          "oklch(38% 0.05798 249.33)",
+          "oklch(49% 0.05798 249.33)",
+          "oklch(61% 0.05798 249.33)",
+          "oklch(72% 0.05798 249.33)",
+          "oklch(84% 0.05798 249.33)",
+          "oklch(95% 0.05798 249.33)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "primary-ink": {
+        "role": "neutral",
+        "displayName": "Primary ink",
+        "tonalRamp": [
+          "oklch(15% 0.01253 84.50)",
+          "oklch(26% 0.01253 84.50)",
+          "oklch(38% 0.01253 84.50)",
+          "oklch(49% 0.01253 84.50)",
+          "oklch(61% 0.01253 84.50)",
+          "oklch(72% 0.01253 84.50)",
+          "oklch(84% 0.01253 84.50)",
+          "oklch(95% 0.01253 84.50)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "navigation-text": {
+        "role": "neutral",
+        "displayName": "Navigation text",
+        "tonalRamp": [
+          "oklch(15% 0.00712 277.13)",
+          "oklch(26% 0.00712 277.13)",
+          "oklch(38% 0.00712 277.13)",
+          "oklch(49% 0.00712 277.13)",
+          "oklch(61% 0.00712 277.13)",
+          "oklch(72% 0.00712 277.13)",
+          "oklch(84% 0.00712 277.13)",
+          "oklch(95% 0.00712 277.13)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "navigation-hover": {
+        "role": "neutral",
+        "displayName": "Navigation hover",
+        "tonalRamp": [
+          "oklch(15% 0.00653 258.36)",
+          "oklch(26% 0.00653 258.36)",
+          "oklch(38% 0.00653 258.36)",
+          "oklch(49% 0.00653 258.36)",
+          "oklch(61% 0.00653 258.36)",
+          "oklch(72% 0.00653 258.36)",
+          "oklch(84% 0.00653 258.36)",
+          "oklch(95% 0.00653 258.36)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "navigation-active": {
+        "role": "neutral",
+        "displayName": "Navigation active",
+        "tonalRamp": [
+          "oklch(15% 0.01562 84.52)",
+          "oklch(26% 0.01562 84.52)",
+          "oklch(38% 0.01562 84.52)",
+          "oklch(49% 0.01562 84.52)",
+          "oklch(61% 0.01562 84.52)",
+          "oklch(72% 0.01562 84.52)",
+          "oklch(84% 0.01562 84.52)",
+          "oklch(95% 0.01562 84.52)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "badge-background": {
+        "role": "neutral",
+        "displayName": "Badge background",
+        "tonalRamp": [
+          "oklch(15% 0.00950 268.35)",
+          "oklch(26% 0.00950 268.35)",
+          "oklch(38% 0.00950 268.35)",
+          "oklch(49% 0.00950 268.35)",
+          "oklch(61% 0.00950 268.35)",
+          "oklch(72% 0.00950 268.35)",
+          "oklch(84% 0.00950 268.35)",
+          "oklch(95% 0.00950 268.35)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "badge-text": {
+        "role": "neutral",
+        "displayName": "Badge text",
+        "tonalRamp": [
+          "oklch(15% 0.00838 278.61)",
+          "oklch(26% 0.00838 278.61)",
+          "oklch(38% 0.00838 278.61)",
+          "oklch(49% 0.00838 278.61)",
+          "oklch(61% 0.00838 278.61)",
+          "oklch(72% 0.00838 278.61)",
+          "oklch(84% 0.00838 278.61)",
+          "oklch(95% 0.00838 278.61)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "badge-border": {
+        "role": "neutral",
+        "displayName": "Badge border",
+        "tonalRamp": [
+          "oklch(15% 0.01063 271.12)",
+          "oklch(26% 0.01063 271.12)",
+          "oklch(38% 0.01063 271.12)",
+          "oklch(49% 0.01063 271.12)",
+          "oklch(61% 0.01063 271.12)",
+          "oklch(72% 0.01063 271.12)",
+          "oklch(84% 0.01063 271.12)",
+          "oklch(95% 0.01063 271.12)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "success-background": {
+        "role": "semantic",
+        "displayName": "Success background",
+        "tonalRamp": [
+          "oklch(15% 0.02892 162.17)",
+          "oklch(26% 0.02892 162.17)",
+          "oklch(38% 0.02892 162.17)",
+          "oklch(49% 0.02892 162.17)",
+          "oklch(61% 0.02892 162.17)",
+          "oklch(72% 0.02892 162.17)",
+          "oklch(84% 0.02892 162.17)",
+          "oklch(95% 0.02892 162.17)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "success-border": {
+        "role": "semantic",
+        "displayName": "Success border",
+        "tonalRamp": [
+          "oklch(15% 0.04977 155.34)",
+          "oklch(26% 0.04977 155.34)",
+          "oklch(38% 0.04977 155.34)",
+          "oklch(49% 0.04977 155.34)",
+          "oklch(61% 0.04977 155.34)",
+          "oklch(72% 0.04977 155.34)",
+          "oklch(84% 0.04977 155.34)",
+          "oklch(95% 0.04977 155.34)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "warning-background": {
+        "role": "semantic",
+        "displayName": "Warning background",
+        "tonalRamp": [
+          "oklch(15% 0.02838 68.61)",
+          "oklch(26% 0.02838 68.61)",
+          "oklch(38% 0.02838 68.61)",
+          "oklch(49% 0.02838 68.61)",
+          "oklch(61% 0.02838 68.61)",
+          "oklch(72% 0.02838 68.61)",
+          "oklch(84% 0.02838 68.61)",
+          "oklch(95% 0.02838 68.61)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "warning-border": {
+        "role": "semantic",
+        "displayName": "Warning border",
+        "tonalRamp": [
+          "oklch(15% 0.04757 70.82)",
+          "oklch(26% 0.04757 70.82)",
+          "oklch(38% 0.04757 70.82)",
+          "oklch(49% 0.04757 70.82)",
+          "oklch(61% 0.04757 70.82)",
+          "oklch(72% 0.04757 70.82)",
+          "oklch(84% 0.04757 70.82)",
+          "oklch(95% 0.04757 70.82)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "information-background": {
+        "role": "semantic",
+        "displayName": "Information background",
+        "tonalRamp": [
+          "oklch(15% 0.03436 254.00)",
+          "oklch(26% 0.03436 254.00)",
+          "oklch(38% 0.03436 254.00)",
+          "oklch(49% 0.03436 254.00)",
+          "oklch(61% 0.03436 254.00)",
+          "oklch(72% 0.03436 254.00)",
+          "oklch(84% 0.03436 254.00)",
+          "oklch(95% 0.03436 254.00)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "information-border": {
+        "role": "semantic",
+        "displayName": "Information border",
+        "tonalRamp": [
+          "oklch(15% 0.03971 252.81)",
+          "oklch(26% 0.03971 252.81)",
+          "oklch(38% 0.03971 252.81)",
+          "oklch(49% 0.03971 252.81)",
+          "oklch(61% 0.03971 252.81)",
+          "oklch(72% 0.03971 252.81)",
+          "oklch(84% 0.03971 252.81)",
+          "oklch(95% 0.03971 252.81)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "allocation-background": {
+        "role": "neutral",
+        "displayName": "Allocation background",
+        "tonalRamp": [
+          "oklch(15% 0.00814 84.59)",
+          "oklch(26% 0.00814 84.59)",
+          "oklch(38% 0.00814 84.59)",
+          "oklch(49% 0.00814 84.59)",
+          "oklch(61% 0.00814 84.59)",
+          "oklch(72% 0.00814 84.59)",
+          "oklch(84% 0.00814 84.59)",
+          "oklch(95% 0.00814 84.59)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "allocation-border": {
+        "role": "neutral",
+        "displayName": "Allocation border",
+        "tonalRamp": [
+          "oklch(15% 0.05482 79.38)",
+          "oklch(26% 0.05482 79.38)",
+          "oklch(38% 0.05482 79.38)",
+          "oklch(49% 0.05482 79.38)",
+          "oklch(61% 0.05482 79.38)",
+          "oklch(72% 0.05482 79.38)",
+          "oklch(84% 0.05482 79.38)",
+          "oklch(95% 0.05482 79.38)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "contact-background": {
+        "role": "neutral",
+        "displayName": "Contact background",
+        "tonalRamp": [
+          "oklch(15% 0.00980 268.30)",
+          "oklch(26% 0.00980 268.30)",
+          "oklch(38% 0.00980 268.30)",
+          "oklch(49% 0.00980 268.30)",
+          "oklch(61% 0.00980 268.30)",
+          "oklch(72% 0.00980 268.30)",
+          "oklch(84% 0.00980 268.30)",
+          "oklch(95% 0.00980 268.30)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "danger-text": {
+        "role": "neutral",
+        "displayName": "Danger text",
+        "tonalRamp": [
+          "oklch(15% 0.06191 21.00)",
+          "oklch(26% 0.06191 21.00)",
+          "oklch(38% 0.06191 21.00)",
+          "oklch(49% 0.06191 21.00)",
+          "oklch(61% 0.06191 21.00)",
+          "oklch(72% 0.06191 21.00)",
+          "oklch(84% 0.06191 21.00)",
+          "oklch(95% 0.06191 21.00)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "danger-border": {
+        "role": "neutral",
+        "displayName": "Danger border",
+        "tonalRamp": [
+          "oklch(15% 0.06955 21.47)",
+          "oklch(26% 0.06955 21.47)",
+          "oklch(38% 0.06955 21.47)",
+          "oklch(49% 0.06955 21.47)",
+          "oklch(61% 0.06955 21.47)",
+          "oklch(72% 0.06955 21.47)",
+          "oklch(84% 0.06955 21.47)",
+          "oklch(95% 0.06955 21.47)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      },
+      "danger-background": {
+        "role": "neutral",
+        "displayName": "Danger background",
+        "tonalRamp": [
+          "oklch(15% 0.02496 18.87)",
+          "oklch(26% 0.02496 18.87)",
+          "oklch(38% 0.02496 18.87)",
+          "oklch(49% 0.02496 18.87)",
+          "oklch(61% 0.02496 18.87)",
+          "oklch(72% 0.02496 18.87)",
+          "oklch(84% 0.02496 18.87)",
+          "oklch(95% 0.02496 18.87)"
+        ],
+        "tonalRampSource": "Synthesized OKLCH preview; not normative implementation colors."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Desktop login text."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Desktop page heading."
+      },
+      "headline-mobile": {
+        "displayName": "Headline mobile",
+        "purpose": "Mobile page heading at max-width 767px."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Ordinary section heading; local section headers use 16px."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default content."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Field captions."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Secondary hints and metadata."
+      }
+    },
+    "shadows": [
+      {
+        "name": "prototype-toolbar",
+        "value": "0 -6px 24px #0005",
+        "purpose": "Fixed review toolbar."
+      },
+      {
+        "name": "toast",
+        "value": "0 8px 30px #0005",
+        "purpose": "Transient status feedback."
+      }
+    ],
+    "motion": [
+      {
+        "name": "sidebar",
+        "value": "0.2s",
+        "purpose": "Framer desktop width and drawer translation; 0 under reduced motion."
+      },
+      {
+        "name": "sidebar-label",
+        "value": "0.15s",
+        "purpose": "Sidebar label reveal; 0 under reduced motion."
+      },
+      {
+        "name": "control-state",
+        "value": "0.15s",
+        "purpose": "Button/nav color changes and switch thumb movement."
+      },
+      {
+        "name": "toast-timeout",
+        "value": "3500ms",
+        "purpose": "Feedback dismissal, not animation duration."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide",
+        "value": "1600px",
+        "query": "min-width"
+      },
+      {
+        "name": "compact-desktop",
+        "value": "1250px",
+        "query": "max-width"
+      },
+      {
+        "name": "mobile",
+        "value": "767px",
+        "query": "max-width"
+      }
+    ],
+    "focus": {
+      "outline": "2px solid var(--gold)",
+      "offset": "4px",
+      "searchAndSwitchOffset": "3px"
+    },
+    "behavior": {
+      "sidebar": {
+        "expanded": "300px",
+        "collapsed": "60px",
+        "initialDesktopPinned": true,
+        "mobileDialog": true,
+        "mobileBodyScrollLock": true,
+        "mobileFocusTrap": "Tab/Shift+Tab wrap; Escape closes; trigger focus restored on close.",
+        "architecture": [
+          "SidebarProvider/context",
+          "DesktopSidebar",
+          "MobileSidebar",
+          "SidebarLink"
+        ]
+      },
+      "allocation": {
+        "desktopWidth": "290px",
+        "wideWidth": "320px",
+        "compactPlacement": "Above table at max-width 1250px",
+        "validation": "Integer 1 through free lead count",
+        "recipients": [
+          "employee",
+          "current manager",
+          "other manager"
+        ],
+        "fixedAssignment": true,
+        "desktopContextColumns": "Phone/email and OC result columns hidden while pane is open; restored in mobile cards."
+      },
+      "contactStatus": {
+        "editableScope": "Only assigned person",
+        "options": [
+          "Nie kontaktowano",
+          "Klient zgadza się na ofertę",
+          "Klient niezainteresowany"
+        ],
+        "notes": false,
+        "contactHistory": false,
+        "minimumHeight": "36px",
+        "minimumWidth": "175px",
+        "maximumWidth": "245px",
+        "allocationMinimumWidth": "155px",
+        "allocationMaximumWidth": "175px"
+      },
+      "sourceImport": {
+        "startedReadonly": true,
+        "laterEditRequiresNewRun": true
+      },
+      "roles": {
+        "employee": "Shared results/source/downloads and own work; automation launch separately granted.",
+        "manager": "Employee account editing/access/reports; no elevated-account editing or role grants.",
+        "admin": "Full organization controls, automation settings, monitoring and audit."
+      },
+      "notifications": "Only tasks launched by current person."
+    },
+    "snippetLimit": "Static render samples; no React/runtime/API persistence. Native controls and CSS states remain interactive."
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "description": "Gold main action with charcoal text.",
+      "html": "<button class=\"ds-button ds-primary\">Przydziel leady</button>",
+      "css": ".ds-button{font-family:var(--font,Hanken,Arial,sans-serif);font-size:14px;line-height:1.5;font-weight:550;display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:42px;padding:10px 15px;border:1px solid var(--border,#35373c);border-radius:6px;cursor:pointer;transition:background .15s}.ds-button:focus-visible{outline:2px solid var(--gold,#d9b66f);outline-offset:4px}.ds-button:disabled{cursor:not-allowed;opacity:.5}@media(prefers-reduced-motion:reduce){.ds-button{transition:none}}.ds-primary{background:var(--gold,#d9b66f);border-color:var(--gold,#d9b66f);color:#17140e}.ds-primary:hover{background:var(--gold-hover,#e6c987)}",
+      "refersTo": "button-primary"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "description": "Raised charcoal secondary action.",
+      "html": "<button class=\"ds-button ds-secondary\">Otwórz import</button>",
+      "css": ".ds-button{font-family:var(--font,Hanken,Arial,sans-serif);font-size:14px;line-height:1.5;font-weight:550;display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:42px;padding:10px 15px;border:1px solid var(--border,#35373c);border-radius:6px;cursor:pointer;transition:background .15s}.ds-button:focus-visible{outline:2px solid var(--gold,#d9b66f);outline-offset:4px}.ds-button:disabled{cursor:not-allowed;opacity:.5}@media(prefers-reduced-motion:reduce){.ds-button{transition:none}}.ds-secondary{background:var(--surface-raised,#202226);color:var(--text,#f1f0ec)}.ds-secondary:hover{background:#2d3035}",
+      "refersTo": "button-secondary"
+    },
+    {
+      "name": "Destructive button",
+      "kind": "button",
+      "description": "Muted red deletion action; actual prototype confirms deletion separately.",
+      "html": "<button class=\"ds-button ds-danger\">Usuń dane wyniku</button>",
+      "css": ".ds-button{font-family:var(--font,Hanken,Arial,sans-serif);font-size:14px;line-height:1.5;font-weight:550;display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:42px;padding:10px 15px;border:1px solid var(--border,#35373c);border-radius:6px;cursor:pointer;transition:background .15s}.ds-button:focus-visible{outline:2px solid var(--gold,#d9b66f);outline-offset:4px}.ds-button:disabled{cursor:not-allowed;opacity:.5}@media(prefers-reduced-motion:reduce){.ds-button{transition:none}}.ds-danger{background:#302020;color:#eab5b3;border-color:#754342}.ds-danger:hover{background:#2d3035}",
+      "refersTo": "button-danger"
+    },
+    {
+      "name": "Labelled field",
+      "kind": "input",
+      "description": "Visible label above a native input.",
+      "html": "<label class=\"ds-field\">Liczba leadów<input class=\"ds-input\" type=\"number\" min=\"1\" value=\"3\"></label>",
+      "css": ".ds-field{font-family:var(--font,Hanken,Arial,sans-serif);display:flex;flex-direction:column;gap:8px;color:#dddee1;font-size:13px;font-weight:550}.ds-input{font-family:var(--font,Hanken,Arial,sans-serif);font-size:14px;line-height:1.5;background:var(--surface,#191b1e);color:var(--text,#f1f0ec);border:1px solid var(--border,#35373c);border-radius:6px;min-height:40px;padding:8px 12px;caret-color:var(--gold,#d9b66f)}.ds-input::placeholder{color:var(--muted,#a8a9ae)}.ds-input:focus-visible{outline:2px solid var(--gold,#d9b66f);outline-offset:4px}",
+      "refersTo": "input"
+    },
+    {
+      "name": "Active navigation",
+      "kind": "nav",
+      "description": "Active and ordinary Sidebar links; static sample does not recreate React drawer logic.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Przykładowa nawigacja\"><a class=\"ds-link ds-current\" href=\"#results\" aria-current=\"page\"><svg width=\"19\" height=\"19\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M3 7h6l2 2h10v11H3z\"/></svg>Wyniki</a><a class=\"ds-link\" href=\"#mine\">Moje wyniki</a></nav>",
+      "css": ".ds-nav{font-family:var(--font,Hanken,Arial,sans-serif);display:flex;flex-direction:column;gap:5px;font-size:14px}.ds-link{display:flex;align-items:center;gap:13px;min-height:46px;padding:12px 10px;border-radius:6px;text-decoration:none;color:#b6b7bc;transition:background .15s,color .15s}.ds-link:hover{background:#1b1d20;color:var(--text,#f1f0ec)}.ds-link.ds-current{background:#26221a;color:var(--gold,#d9b66f)}.ds-link:focus-visible{outline:2px solid var(--gold,#d9b66f);outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-link{transition:none}}",
+      "refersTo": "navigation-active"
+    },
+    {
+      "name": "Success badge",
+      "kind": "chip",
+      "description": "Written success state with an inline icon; no interactive behavior.",
+      "html": "<span class=\"ds-badge\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m20 6-11 11-5-5\"/></svg>Wynik gotowy</span>",
+      "css": ".ds-badge{font-family:var(--font,Hanken,Arial,sans-serif);display:inline-flex;align-items:center;gap:5px;background:#1e3027;color:var(--green,#a4d7b9);border:1px solid #365541;border-radius:4px;padding:4px 7px;font-size:12px;line-height:1.2;white-space:nowrap}",
+      "refersTo": "badge-success"
+    },
+    {
+      "name": "Section container",
+      "kind": "card",
+      "description": "Flat section with a hairline header division.",
+      "html": "<section class=\"ds-card\"><h2>Dane firmy</h2><p>Telefon i e-mail pozostają także w Excelu.</p></section>",
+      "css": ".ds-card{font-family:var(--font,Hanken,Arial,sans-serif);border:1px solid var(--border,#35373c);border-radius:8px;background:var(--surface,#191b1e);color:var(--text,#f1f0ec);overflow:hidden}.ds-card h2{font-size:16px;font-weight:600;line-height:1.3;letter-spacing:-.2px;padding:20px 22px;margin:0;border-bottom:1px solid var(--border,#35373c)}.ds-card p{font-size:14px;line-height:1.5;color:var(--muted,#a8a9ae);padding:20px 22px;margin:0}",
+      "refersTo": "container"
+    },
+    {
+      "name": "Assigned contact status",
+      "kind": "input",
+      "description": "Three native options; the application renders editing only for the assigned person.",
+      "html": "<select class=\"ds-status\" aria-label=\"Status kontaktu: Transport Demo\"><option>Nie kontaktowano</option><option selected>Klient zgadza się na ofertę</option><option>Klient niezainteresowany</option></select>",
+      "css": ".ds-status{font-family:var(--font,Hanken,Arial,sans-serif);font-size:12px;line-height:1.5;background:#222429;color:var(--green,#a4d7b9);border:1px solid #486a54;border-radius:6px;padding:7px 8px 7px 8px;min-height:36px;min-width:175px;max-width:245px}.ds-status:focus-visible{outline:2px solid var(--gold,#d9b66f);outline-offset:4px}",
+      "refersTo": "contact-status"
+    },
+    {
+      "name": "Allocation pane",
+      "kind": "custom",
+      "description": "Representative static quantity pane; live assignment validation belongs to app.tsx.",
+      "html": "<aside class=\"ds-allocation\"><h2>Przydziel leady</h2><p>Przydziel wybraną liczbę nieprzypisanych leadów.</p><label class=\"ds-field\">Osoba<select class=\"ds-input\"><option>Anna Kowalska · pracownik</option><option>Marta Nowak · Ty, menedżer</option><option>Piotr Zieliński · menedżer</option></select></label><label class=\"ds-field\">Liczba leadów<input class=\"ds-input\" type=\"number\" min=\"1\" value=\"3\"></label><button class=\"ds-button ds-primary\">Przydziel 3 leady</button></aside>",
+      "css": ".ds-allocation{font-family:var(--font,Hanken,Arial,sans-serif);background:#1e1c18;color:var(--text,#f1f0ec);border:1px solid #6d5938;border-radius:8px;padding:20px;width:250px}.ds-allocation h2{font-size:18px;font-weight:600;line-height:1.3;letter-spacing:-.2px;margin:0 0 16px}.ds-allocation p{font-size:13px;line-height:1.5;color:#b8b4ac;margin:0 0 20px}.ds-allocation .ds-field{margin:20px 0}.ds-allocation .ds-button{width:100%}.ds-field{font-family:var(--font,Hanken,Arial,sans-serif);display:flex;flex-direction:column;gap:8px;color:#dddee1;font-size:13px;font-weight:550}.ds-input{font-family:var(--font,Hanken,Arial,sans-serif);font-size:14px;line-height:1.5;background:var(--surface,#191b1e);color:var(--text,#f1f0ec);border:1px solid var(--border,#35373c);border-radius:6px;min-height:40px;padding:8px 12px;caret-color:var(--gold,#d9b66f)}.ds-input::placeholder{color:var(--muted,#a8a9ae)}.ds-input:focus-visible{outline:2px solid var(--gold,#d9b66f);outline-offset:4px}.ds-button{font-family:var(--font,Hanken,Arial,sans-serif);font-size:14px;line-height:1.5;font-weight:550;display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:42px;padding:10px 15px;border:1px solid var(--border,#35373c);border-radius:6px;cursor:pointer;transition:background .15s}.ds-button:focus-visible{outline:2px solid var(--gold,#d9b66f);outline-offset:4px}.ds-button:disabled{cursor:not-allowed;opacity:.5}@media(prefers-reduced-motion:reduce){.ds-button{transition:none}}.ds-primary{background:var(--gold,#d9b66f);border-color:var(--gold,#d9b66f);color:#17140e}.ds-primary:hover{background:var(--gold-hover,#e6c987)}",
+      "refersTo": "allocation-panel"
+    },
+    {
+      "name": "Permission switch",
+      "kind": "input",
+      "description": "Native checkbox with gold checked track and visible focus.",
+      "html": "<label class=\"ds-switch\"><input type=\"checkbox\" checked aria-label=\"Uruchamianie OC\"><span class=\"ds-track\"></span>Uruchamianie OC</label>",
+      "css": ".ds-switch{font-family:var(--font,Hanken,Arial,sans-serif);display:inline-flex;align-items:center;gap:12px;position:relative;color:var(--text,#f1f0ec);font-size:13px;cursor:pointer}.ds-switch input{position:absolute;opacity:0;width:38px;height:22px;margin:0;z-index:2;cursor:pointer}.ds-track{width:38px;height:22px;background:#55585e;border-radius:20px;position:relative;display:block}.ds-track:after{content:\"\";width:16px;height:16px;position:absolute;top:3px;left:3px;background:#e6e6e6;border-radius:50%;transition:transform .15s}.ds-switch input:checked+.ds-track{background:var(--gold,#d9b66f)}.ds-switch input:checked+.ds-track:after{transform:translateX(16px);background:#17140e}.ds-switch input:focus-visible+.ds-track{outline:2px solid var(--gold,#d9b66f);outline-offset:3px}@media(prefers-reduced-motion:reduce){.ds-track:after{transition:none}}"
+    }
+  ],
+  "narrative": {
+    "overview": "The confirmed direction is matte near-black, layered charcoal, warm champagne gold, quiet hairlines and local Hanken Grotesk. This is an operational interface with dense, readable rows. The official Goldis wordmark and the supplied Sidebar structure remain the identity anchors.\n\nThis document applies only to `docs/design/goldis/mvp-2026-10-11`. It captures the standalone prototype's current CSS and React behavior. It does not establish production API capabilities or a shipping verdict. `PRODUCT.md` owns product truth; `SURFACE_BRIEF.md` owns this surface's composition. The frontmatter records extracted values; the sidecar records extensions and representative static component snippets.",
+    "keyCharacteristics": [
+      "Matte near-black canvas and layered charcoal containers.",
+      "Warm champagne gold for primary actions and active navigation.",
+      "Dense but readable rows with explicit personal and shared scopes.",
+      "Original logo, local type and the authored Sidebar architecture.",
+      "Labelled controls, visible focus and reduced-motion support."
+    ],
+    "rules": [
+      {
+        "name": "The Written Status Rule",
+        "body": "Color accompanies a written state; it never replaces the state label.",
+        "section": "colors"
+      },
+      {
+        "name": "The Numeric Rhythm Rule",
+        "body": "Keep tabular numerals in data cells and operational counts so scanning is stable as values change.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tonal Layer Rule",
+        "body": "Use charcoal surface differences and hairlines for ordinary containers; reserve the existing shadows for fixed review controls and transient feedback.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** preserve the official Goldis logo, local Hanken and the pinned matte charcoal/gold direction.",
+      "**Do** retain the supplied Sidebar provider/context and desktop/mobile/link structure.",
+      "**Do** show personal/shared scope explicitly and preserve a written label for every status.",
+      "**Do** keep focus visible, labels specific and mobile table content reachable.",
+      "**Do** preserve the own-assignee status rule and employee-only manager account editing.",
+      "**Do** keep this documentation and all prototype behavior confined to the mockup artifact."
+    ],
+    "donts": [
+      "**Don't** introduce a replacement visual identity or a new font pairing.",
+      "**Don't** invent additional contact outcomes, notes or contact-history controls.",
+      "**Don't** conflate shared-result visibility with permission to run an automation.",
+      "**Don't** expose source editing for a started run or offer reassignment in this MVP.",
+      "**Don't** treat the mockup, static component snippets or documentation as proof of production API support or a shipping verdict."
+    ]
+  }
+}

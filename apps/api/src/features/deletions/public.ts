@@ -1,0 +1,14 @@
+export type { TombstonedResourceType } from "../../contracts/deletion-barrier";
+export { isResourceTombstoned, isRunDeletionPending } from "../../contracts/deletion-barrier";
+export { removePrivateArtifact } from "./deletion-artifacts";
+export { DeletionJobRunner } from "./deletion-job-runner";
+export { DeletionJobController } from "./deletion-jobs";
+export { DeletionJobsRepository } from "./deletion-jobs.repository";
+export { DeletionJobsService } from "./deletion-jobs.service";
+export { assertDeletionJournalApplied } from "./deletion-journal-admission";
+export type { DeletionPreviewSummary, DeletionTargetType, PreviewSnapshot } from "./deletions.contract";
+export { deletionPreviewLifetimeMs, previewFingerprint } from "./deletions.contract";
+export { DeletionController } from "./deletions.controller";
+export { DeletionsModule } from "./deletions.module";
+export { DeletionsPreviewRepository, loadPreviewSnapshot } from "./deletions.repository";
+export { DeletionsService } from "./deletions.service";

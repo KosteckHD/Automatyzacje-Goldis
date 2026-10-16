@@ -1,0 +1,399 @@
+{
+  "pathname": "/tools/oc-policy-verification",
+  "width": 375,
+  "overflow": false,
+  "headings": [
+    {
+      "level": "H2",
+      "text": "Nawigacja"
+    },
+    {
+      "level": "H1",
+      "text": "Weryfikacja danych transportowych"
+    },
+    {
+      "level": "H2",
+      "text": "Sprawy wymagające uwagi"
+    },
+    {
+      "level": "H2",
+      "text": "Tryb podglądu"
+    },
+    {
+      "level": "H2",
+      "text": "Przegląd bazy"
+    },
+    {
+      "level": "H2",
+      "text": "Uzupełnianie i korekty danych"
+    },
+    {
+      "level": "H3",
+      "text": "Wzbogacanie NIP → REGON"
+    },
+    {
+      "level": "H2",
+      "text": "Kontrola pojedynczego wiersza"
+    },
+    {
+      "level": "H3",
+      "text": "Ostatnie zadania"
+    },
+    {
+      "level": "H3",
+      "text": "Wiersz 18001: Zakończono"
+    }
+  ],
+  "unnamed": [],
+  "smallTargets": [],
+  "textStyles": [
+    {
+      "text": "panel narzędzi",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "10.4px"
+    },
+    {
+      "text": "",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "fontSize": "15px"
+    },
+    {
+      "text": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "fontSize": "15px"
+    },
+    {
+      "text": "Przegląd",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgba(217, 182, 95, 0.094)",
+      "fontSize": "15.04px"
+    },
+    {
+      "text": "Importy",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "15.04px"
+    },
+    {
+      "text": "Zadania",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "15.04px"
+    },
+    {
+      "text": "Wyniki",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "15.04px"
+    },
+    {
+      "text": "Katalog platformy",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "15.04px"
+    },
+    {
+      "text": "Historia importów",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "15.04px"
+    },
+    {
+      "text": "Historia zadań",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "15.04px"
+    },
+    {
+      "text": "Wyniki OC",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "15.04px"
+    },
+    {
+      "text": "Moje konto",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "15.04px"
+    },
+    {
+      "text": "Wyloguj",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "fontSize": "15.04px"
+    },
+    {
+      "text": "NARZĘDZIE 01 / POLISY OC",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Przygotuj bazę firm do sprawdzenia w Everest i Compensie. Po imporcie ",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Sprawdzenie REGON i nazwy · zakończono",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "Sprawdzenie w portalach · zakończono",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "Zapisany wynik i eksport · bieżący etap",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "CENTRUM ZGŁOSZEŃ",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Brak otwartych zgłoszeń.",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "14.08px"
+    },
+    {
+      "text": "STAN NARZĘDZIA",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Sprawdzanie portali wymaga lokalnego workera Playwright i potwierdzony",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "14.4px"
+    },
+    {
+      "text": "WYNIK IMPORTU",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Filtr WszystkieGotoweDo sprawdzenia",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Poprzednia",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Następna",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Wiersz",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Nazwa",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Osoba decyzyjna",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "REGON",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Stan",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "2",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Transport Test sp. z o.o.",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Anna Testowa",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "123456789",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Gotowy",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Podgląd 50 wierszy na stronę. Import nie uruchamia zapytań do portali.",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.16px"
+    },
+    {
+      "text": "REGON / KONTROLA ŹRÓDEŁ",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Wartość operacyjna pozostaje oddzielona od danych z importu. Propozycj",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "14.08px"
+    },
+    {
+      "text": "ZADANIA REJESTRU",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Wybierz zakres numerów wierszy z arkusza. Wybór nie zależy od aktualne",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "15px"
+    },
+    {
+      "text": "Odśwież status",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "Status jest odświeżany co 15 sekund.",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Unexpected synthetic request",
+      "color": "rgb(244, 196, 191)",
+      "background": "rgb(41, 23, 25)",
+      "fontSize": "13.12px"
+    },
+    {
+      "text": "Źródło",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Wiersz / firma",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "REGON z Excela",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "REGON operacyjny",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Wzbogacenie i konflikty",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Korekta operatora",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Ten import nie zawiera wierszy.",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Poprzednia",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "Następna",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "KROK 02 / ZADANIA",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Ten etap zapisuje zadanie, sprawdza dane wejściowe i pokazuje historię",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "14.4px"
+    },
+    {
+      "text": "Wiersz 18001Zakończono2026-10-01",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "15px"
+    },
+    {
+      "text": "2026-10-01",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.5px"
+    },
+    {
+      "text": "Data odniesienia: 2026-10-01",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "13.12px"
+    }
+  ]
+}

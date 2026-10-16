@@ -1,0 +1,133 @@
+{
+  "generatedAt": "2026-10-12T08:09:31.519Z",
+  "source": "lokalny build aplikacji; dane demonstracyjne mockowane przez Playwright",
+  "viewport": "1440×1040",
+  "captured": [
+    {
+      "name": "01-logowanie",
+      "title": "Logowanie",
+      "role": "bez logowania",
+      "path": "/",
+      "file": "01-logowanie.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "02-dashboard-pracownik",
+      "title": "Przegląd — pracownik",
+      "role": "operator",
+      "path": "/dashboard",
+      "file": "02-dashboard-pracownik.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "03-dashboard-menedzer",
+      "title": "Przegląd — menedżer",
+      "role": "manager",
+      "path": "/dashboard",
+      "file": "03-dashboard-menedzer.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "06-narzedzie-oc",
+      "title": "Automatyzacja OC — import i start",
+      "role": "operator",
+      "path": "/tools/oc-policy-verification",
+      "file": "06-narzedzie-oc.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "08-wyniki-pula-menedzer",
+      "title": "Wyniki — wspólna pula i przydzielanie",
+      "role": "manager",
+      "path": "/results/oc-policy-verification",
+      "file": "08-wyniki-pula-menedzer.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "10-moje-wyniki",
+      "title": "Moje wyniki",
+      "role": "operator",
+      "path": "/my-results",
+      "file": "10-moje-wyniki.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "17-weryfikacja-danych",
+      "title": "Weryfikacja danych — recenzent",
+      "role": "reviewer",
+      "path": "/review",
+      "file": "17-weryfikacja-danych.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "20-dziennik-audytu-audytor",
+      "title": "Dziennik aktywności — audytor",
+      "role": "auditor",
+      "path": "/audit",
+      "file": "20-dziennik-audytu-audytor.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "22-zespol",
+      "title": "Zespół i konta pracowników",
+      "role": "manager",
+      "path": "/team",
+      "file": "22-zespol.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "23-dostepy-do-narzedzi",
+      "title": "Dostępy do narzędzi",
+      "role": "manager",
+      "path": "/access",
+      "file": "23-dostepy-do-narzedzi.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "24-raporty",
+      "title": "Raporty",
+      "role": "manager",
+      "path": "/reports",
+      "file": "24-raporty.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "25-panel-admina",
+      "title": "Panel administracyjny — pełna strona",
+      "role": "admin",
+      "path": "/admin",
+      "file": "25-panel-admina.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "26-konto-i-bezpieczenstwo",
+      "title": "Konto i bezpieczeństwo",
+      "role": "operator",
+      "path": "/account",
+      "file": "26-konto-i-bezpieczenstwo.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    },
+    {
+      "name": "28-szczegoly-leadu-z-puli",
+      "title": "Szczegóły leadu ze wspólnej puli",
+      "role": "manager",
+      "path": "/leads/77777777-7777-4777-8777-777777777777",
+      "file": "28-szczegoly-leadu-z-puli.png",
+      "fullPage": true,
+      "viewport": "1440×1040"
+    }
+  ]
+}

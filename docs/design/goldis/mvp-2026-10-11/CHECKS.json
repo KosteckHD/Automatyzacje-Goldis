@@ -1,0 +1,20 @@
+{
+  "screens": 38,
+  "errors": [],
+  "tests": [
+    "Allocation bounded by unassigned pool; ownership persists across role switch",
+    "Employee edits only assigned leads; no allocation controls",
+    "Contact outcome stored in prototype state",
+    "Employee administration route denied",
+    "Source import immutable after start",
+    "Manager cannot change employee role",
+    "Mobile dialog closes with Escape and returns focus",
+    "Execution-denied tool and upload captures asserted",
+    "Administrator selected account data matches selected person",
+    "Pre-start correction persists and updates ready count",
+    "Personal notifications filtered by fixed launcher",
+    "Run launcher remains fixed across viewer roles",
+    "New run progress uses confirmed ready count41; screenshot .impeccable/review/new-run.png"
+  ],
+  "passed": true
+}

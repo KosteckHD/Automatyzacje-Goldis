@@ -1,0 +1,1127 @@
+{
+  "pathname": "/",
+  "width": 320,
+  "overflow": false,
+  "headings": [
+    {
+      "level": "H1",
+      "text": "Weryfikacja danych transportowych"
+    },
+    {
+      "level": "H2",
+      "text": "Sprawy wymagające uwagi"
+    },
+    {
+      "level": "H2",
+      "text": "Dodaj bazę transportową"
+    },
+    {
+      "level": "H2",
+      "text": "Import gotowy do użycia"
+    },
+    {
+      "level": "H2",
+      "text": "Przegląd bazy"
+    },
+    {
+      "level": "H2",
+      "text": "Uzupełnianie i korekty danych"
+    },
+    {
+      "level": "H3",
+      "text": "Wzbogacanie NIP → REGON"
+    },
+    {
+      "level": "H2",
+      "text": "Kontrola pojedynczego wiersza"
+    },
+    {
+      "level": "H2",
+      "text": "Sprawdź wiele wierszy"
+    }
+  ],
+  "unnamed": [],
+  "smallTargets": [],
+  "textStyles": [
+    {
+      "text": "",
+      "className": "goldis-logo goldis-logo--sidebar",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "goldis-logo goldis-logo--sidebar",
+      "fontSize": "15px"
+    },
+    {
+      "text": "Goldispanel narzędzi",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "sidebar",
+      "fontSize": "15px"
+    },
+    {
+      "text": "panel narzędzi",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "sidebar",
+      "fontSize": "10.4px"
+    },
+    {
+      "text": "",
+      "className": "mobile-menu-toggle",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "mobile-menu-toggle",
+      "fontSize": "15px"
+    },
+    {
+      "text": "GOLDIS / NARZĘDZIA",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(8, 8, 12, 0.94)",
+      "backgroundClass": "topbar",
+      "fontSize": "9.12px"
+    },
+    {
+      "text": "NARZĘDZIE 01 / POLISY OC",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "main",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Przygotuj bazę firm do sprawdzenia w Everest i Compensie. Po imporcie zobaczysz wiersze wy",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "main",
+      "fontSize": "16px"
+    },
+    {
+      "text": "",
+      "className": "status-dot health-warn",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(242, 216, 137)",
+      "backgroundClass": "status-dot health-warn",
+      "fontSize": "15px"
+    },
+    {
+      "text": "Usługi: niedostępne · Worker: undefined · Tryb portali: nieznany",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "automation-health",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "✓",
+      "className": "rb-goldis-step-marker",
+      "color": "rgb(23, 18, 10)",
+      "background": "rgb(217, 182, 95)",
+      "backgroundClass": "rb-goldis-step-marker",
+      "fontSize": "11px"
+    },
+    {
+      "text": "Sprawdzenie REGON i nazwy · zakończono",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "main",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "02",
+      "className": "rb-goldis-step-marker",
+      "color": "rgb(23, 18, 10)",
+      "background": "rgb(217, 182, 95)",
+      "backgroundClass": "rb-goldis-step-marker",
+      "fontSize": "11px"
+    },
+    {
+      "text": "Sprawdzenie w portalach · bieżący etap",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "main",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "03",
+      "className": "rb-goldis-step-marker",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "main",
+      "fontSize": "11px"
+    },
+    {
+      "text": "Zapisany wynik i eksport",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "main",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "CENTRUM ZGŁOSZEŃ",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section intervention-center",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Sprawy wymagające uwagi",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section intervention-center",
+      "fontSize": "20.48px"
+    },
+    {
+      "text": "0 otwartych",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "0 nieprzeczytanych",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "0 kodów SMS",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Centrum zgłoszeń jest chwilowo niedostępne.",
+      "className": "error",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(41, 23, 25)",
+      "backgroundClass": "error",
+      "fontSize": "13.12px"
+    },
+    {
+      "text": "Brak otwartych zgłoszeń.",
+      "className": "intervention-empty",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section intervention-center",
+      "fontSize": "14.08px"
+    },
+    {
+      "text": "KROK 01",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "rb-goldis-card-spotlight card upload-card",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Dodaj bazę transportową",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "rb-goldis-card-spotlight card upload-card",
+      "fontSize": "20.48px"
+    },
+    {
+      "text": ".xlsx",
+      "className": "file-mark",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgba(217, 182, 95, 0.07)",
+      "backgroundClass": "file-mark",
+      "fontSize": "12.32px"
+    },
+    {
+      "text": "Arkusz „Realizacja” musi zawierać kolumny „Nazwa” i „REGON”. Kolumna „Osoba Decyzyjna” jes",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "rb-goldis-card-spotlight card upload-card",
+      "fontSize": "14.4px"
+    },
+    {
+      "text": "Wybierz plik Excel",
+      "className": "file-input",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(13, 13, 18)",
+      "backgroundClass": "file-input",
+      "fontSize": "13.44px"
+    },
+    {
+      "text": "Sprawdź i zaimportuj",
+      "className": "",
+      "color": "rgb(23, 18, 10)",
+      "background": "rgb(217, 182, 95)",
+      "backgroundClass": "",
+      "fontSize": "13.44px"
+    },
+    {
+      "text": "STAN NARZĘDZIA",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "card status-card",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Import gotowy do użycia",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "card status-card",
+      "fontSize": "20.48px"
+    },
+    {
+      "text": "Sprawdzanie portali wymaga lokalnego workera Playwright i potwierdzonych selektorów ekranó",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "card status-card",
+      "fontSize": "14.4px"
+    },
+    {
+      "text": "",
+      "className": "status-dot",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(172, 205, 180)",
+      "backgroundClass": "status-dot",
+      "fontSize": "13.12px"
+    },
+    {
+      "text": "",
+      "className": "status-dot",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(172, 186, 196)",
+      "backgroundClass": "status-dot",
+      "fontSize": "13.12px"
+    },
+    {
+      "text": "WYNIK IMPORTU",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Przegląd bazy",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "20.48px"
+    },
+    {
+      "text": "33333333",
+      "className": "result-id",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgba(217, 182, 95, 0.07)",
+      "backgroundClass": "result-id",
+      "fontSize": "12px"
+    },
+    {
+      "text": "wierszy",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "metrics",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "gotowych",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "metrics",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "do sprawdzenia",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "metrics",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Filtr WszystkieGotoweDo sprawdzenia",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Strona 1",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Poprzednia",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Następna",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Wiersz",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Nazwa",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Osoba decyzyjna",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "REGON",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Stan",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "18001",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Firma syntetyczna Alfa",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Osoba testowa",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "",
+      "className": "mono",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Gotowy",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Gotowy",
+      "className": "pill good",
+      "color": "rgb(172, 205, 180)",
+      "background": "rgba(172, 205, 180, 0.106)",
+      "backgroundClass": "pill good",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "18002",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Firma syntetyczna Beta",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "—",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "987654321",
+      "className": "mono",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Gotowy",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Gotowy",
+      "className": "pill good",
+      "color": "rgb(172, 205, 180)",
+      "background": "rgba(172, 205, 180, 0.106)",
+      "backgroundClass": "pill good",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Podgląd 50 wierszy na stronę. Import nie uruchamia zapytań do portali.",
+      "className": "table-note",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section",
+      "fontSize": "12.16px"
+    },
+    {
+      "text": "REGON / KONTROLA ŹRÓDEŁ",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Uzupełnianie i korekty danych",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "20.48px"
+    },
+    {
+      "text": "Strona 1",
+      "className": "result-id",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgba(217, 182, 95, 0.07)",
+      "backgroundClass": "result-id",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Wartość operacyjna pozostaje oddzielona od danych z importu. Propozycja korekty jest zapis",
+      "className": "enrichment-intro",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "14.08px"
+    },
+    {
+      "text": "Wiersz zmienił się od czasu odczytu. Odświeżyłem dane; sprawdź nową wartość przed ponowną ",
+      "className": "review-conflict",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "ZADANIA REJESTRU",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(251, 252, 253)",
+      "backgroundClass": "enrichment-job-panel",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Wzbogacanie NIP → REGON",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(251, 252, 253)",
+      "backgroundClass": "enrichment-job-panel",
+      "fontSize": "16.8px"
+    },
+    {
+      "text": "Wybierz zakres numerów wierszy z arkusza. Wybór nie zależy od aktualnej strony tabeli.",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(251, 252, 253)",
+      "backgroundClass": "enrichment-job-panel",
+      "fontSize": "15px"
+    },
+    {
+      "text": "Odśwież status",
+      "className": "review-button",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "review-button",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "Dostawca: GUS BIR — rejestr REGON",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(239, 247, 241)",
+      "backgroundClass": "enrichment-runtime-status",
+      "fontSize": "12.16px"
+    },
+    {
+      "text": "GUS BIR wyszukuje w rejestrze REGON po NIP; produkcyjne użycie wymaga klucza wydanego prze",
+      "className": "enrichment-provider-coverage",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(239, 247, 241)",
+      "backgroundClass": "enrichment-runtime-status",
+      "fontSize": "12.16px"
+    },
+    {
+      "text": "Status jest odświeżany co 15 sekund.",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(239, 247, 241)",
+      "backgroundClass": "enrichment-runtime-status",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Od wiersza",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(251, 252, 253)",
+      "backgroundClass": "enrichment-job-panel",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Do wiersza",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(251, 252, 253)",
+      "backgroundClass": "enrichment-job-panel",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Dodaj zadanie",
+      "className": "",
+      "color": "rgb(255, 255, 255)",
+      "background": "rgb(0, 109, 163)",
+      "backgroundClass": "",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "Zadanie anulowano. Zapisane wyniki pozostają bez zmian.",
+      "className": "review-success",
+      "color": "rgb(172, 205, 180)",
+      "background": "rgb(20, 27, 22)",
+      "backgroundClass": "review-success",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Zakończono · 5.10.2026, 12:00:00",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(255, 255, 255)",
+      "backgroundClass": "",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Anulowano · 6.10.2026, 12:00:00",
+      "className": "",
+      "color": "rgb(0, 109, 163)",
+      "background": "rgb(255, 255, 255)",
+      "backgroundClass": "",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Anulowano",
+      "className": "pill warn",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgba(242, 216, 137, 0.094)",
+      "backgroundClass": "pill warn",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "6.10.2026, 12:00:00",
+      "className": "review-subline",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(251, 252, 253)",
+      "backgroundClass": "enrichment-job-panel",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "sprawdzone",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "review-metrics",
+      "fontSize": "12px"
+    },
+    {
+      "text": "pominięte",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "review-metrics",
+      "fontSize": "12px"
+    },
+    {
+      "text": "błędy",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "review-metrics",
+      "fontSize": "12px"
+    },
+    {
+      "text": "oczekujące",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "review-metrics",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Wiersz 18000",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(255, 255, 255)",
+      "backgroundClass": "",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "Dopasowano",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(255, 255, 255)",
+      "backgroundClass": "",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "wierszy bez REGON-u",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "review-metrics",
+      "fontSize": "12px"
+    },
+    {
+      "text": "oczekujących korekt",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "review-metrics",
+      "fontSize": "12px"
+    },
+    {
+      "text": "otwartych konfliktów",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "review-metrics",
+      "fontSize": "12px"
+    },
+    {
+      "text": "wierszy z wynikiem rejestru",
+      "className": "",
+      "color": "rgb(96, 115, 137)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "review-metrics",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Źródło",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Wiersz / firma",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "REGON z Excela",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "REGON operacyjny",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Wzbogacenie i konflikty",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Korekta operatora",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Brak REGON-u",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Brak REGON-u",
+      "className": "pill warn",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgba(242, 216, 137, 0.094)",
+      "backgroundClass": "pill warn",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Firma syntetyczna AlfaWiersz 18001 · Osoba testowa",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Wiersz 18001 · Osoba testowa",
+      "className": "review-subline",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "—",
+      "className": "mono",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "—",
+      "className": "mono",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Korekta oczekujeBrak wyniku · synthetic-registry · NO_MATCH",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Korekta oczekuje",
+      "className": "pill warn",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgba(242, 216, 137, 0.094)",
+      "backgroundClass": "pill warn",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Brak wyniku · synthetic-registry · NO_MATCH",
+      "className": "review-subline",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Propozycja 012345678 oczekuje na rozstrzygnięcie. Powód: Potwierdzenie w fikcyjnym źródle",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Propozycja 012345678 oczekuje na rozstrzygnięcie. Powód: Potwierdzenie w fikcyjnym źródle",
+      "className": "review-note",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "Plik Excel",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Plik Excel",
+      "className": "pill good",
+      "color": "rgb(172, 205, 180)",
+      "background": "rgba(172, 205, 180, 0.106)",
+      "backgroundClass": "pill good",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Firma syntetyczna BetaWiersz 18002",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Wiersz 18002",
+      "className": "review-subline",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "987654321",
+      "className": "mono",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "987654321",
+      "className": "mono",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Konflikt podmiotuTen sam NIP wskazuje różne numery REGON. (1 dopas.)",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Konflikt podmiotu",
+      "className": "pill warn",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgba(242, 216, 137, 0.094)",
+      "backgroundClass": "pill warn",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Ten sam NIP wskazuje różne numery REGON. (1 dopas.)",
+      "className": "review-conflict",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Zaproponuj korektę",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Zaproponuj korektę",
+      "className": "review-button",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "review-button",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "Strona 1 · 2 wierszy w imporcie",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section enrichment-section",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Poprzednia",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "Następna",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.84px"
+    },
+    {
+      "text": "KROK 02 / ZADANIA",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section run-section",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Kontrola pojedynczego wiersza",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section run-section",
+      "fontSize": "20.48px"
+    },
+    {
+      "text": "Ten etap zapisuje zadanie, sprawdza dane wejściowe i pokazuje historię. Status „Oczekuje n",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section run-section",
+      "fontSize": "14.4px"
+    },
+    {
+      "text": "Numer wiersza w Excelu",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "result-section run-section",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Sprawdź gotowość wiersza",
+      "className": "",
+      "color": "rgb(23, 18, 10)",
+      "background": "rgb(217, 182, 95)",
+      "backgroundClass": "",
+      "fontSize": "15px"
+    },
+    {
+      "text": "URUCHOMIENIE PARTII",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "result-section submission-launcher",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Sprawdź wiele wierszy",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "result-section submission-launcher",
+      "fontSize": "20.48px"
+    },
+    {
+      "text": "Najpierw zobaczysz, które wiersze są gotowe, wymagają kontroli lub zostaną pominięte. Zada",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "result-section submission-launcher",
+      "fontSize": "13.44px"
+    },
+    {
+      "text": "Zakres",
+      "className": "",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgba(217, 182, 95, 0.07)",
+      "backgroundClass": "",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Lista numerów",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Od wiersza (zakres partii)",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "result-section submission-launcher",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Do wiersza (zakres partii)",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "result-section submission-launcher",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Pokaż podsumowanie",
+      "className": "",
+      "color": "rgb(23, 18, 10)",
+      "background": "rgb(217, 182, 95)",
+      "backgroundClass": "",
+      "fontSize": "12.16px"
+    }
+  ]
+}

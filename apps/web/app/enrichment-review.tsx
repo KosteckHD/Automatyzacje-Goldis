@@ -50,6 +50,15 @@ type EnrichmentJobItem = {
   nextAttemptAt: string | null;
 };
 
+type EnrichmentRuntimeHealth = {
+  status: "ready" | "not_ready";
+  available: boolean;
+  worker: "disabled" | "ready" | "degraded" | "offline";
+  provider: "disabled" | "configured" | "unknown";
+  providerName: string | null;
+  message: string;
+};
+
 const sourceLabels: Record<ReviewRow["source"], string> = {
   missing: "Brak REGON-u",
   import: "Plik Excel",
@@ -108,6 +117,23 @@ const itemStatusLabels: Record<string, string> = {
   cancelled: "Anulowano",
 };
 
+const runtimeStatusLabels: Record<EnrichmentRuntimeHealth["worker"], string> = {
+  disabled: "worker działa, lookup wyłączony",
+  ready: "worker działa",
+  degraded: "worker wymaga uwagi",
+  offline: "worker nie odpowiada",
+};
+
+const providerLabels: Record<string, string> = {
+  "mf-vat": "MF VAT — wykaz podatników VAT",
+  "gus-bir": "GUS BIR — rejestr REGON",
+};
+
+const providerCoverage: Record<string, string> = {
+  "mf-vat": "Wykaz MF obejmuje podmioty ujęte w wykazie VAT; brak wyniku nie dowodzi, że firma nie istnieje.",
+  "gus-bir": "GUS BIR wyszukuje w rejestrze REGON po NIP; produkcyjne użycie wymaga klucza wydanego przez GUS.",
+};
+
 const jobReasonLabels: Record<string, string> = {
   PROVIDER_UNCONFIGURED: "Dostawca rejestru nie jest skonfigurowany.",
   ROW_VERSION_CHANGED: "Wiersz zmienił się przed rozpoczęciem sprawdzania.",
@@ -118,12 +144,30 @@ const jobReasonLabels: Record<string, string> = {
   REGON_PRESENT: "Wiersz ma już REGON.",
   REGON_REQUIRES_REVIEW: "Format REGON-u wymaga ręcznej kontroli.",
   NIP_INVALID: "NIP wymaga poprawy przed wyszukiwaniem.",
+  RATE_LIMITED: "Dostawca ograniczył liczbę zapytań; zadanie ponowi próbę po wskazanym czasie.",
+  REGISTRY_PROVIDER_UNAVAILABLE: "Dostawca rejestru jest chwilowo niedostępny; zadanie oczekuje na ponowienie.",
 };
 
-function CorrectionProposal({ row, batchId, csrfToken, onSubmitted }: {
+function jobSelectionStorageKey(batchId: string): string {
+  return `goldis.enrichment.selected-job.${batchId}`;
+}
+
+function readStoredJobSelection(batchId: string): string | null {
+  try { return window.sessionStorage.getItem(jobSelectionStorageKey(batchId)); }
+  catch { return null; }
+}
+
+function storeJobSelection(batchId: string, jobId: string): void {
+  try { window.sessionStorage.setItem(jobSelectionStorageKey(batchId), jobId); }
+  catch { /* The server remains the source of job state when storage is unavailable. */ }
+}
+
+function CorrectionProposal({ row, batchId, csrfToken, onUnauthorized, onConflict, onSubmitted }: {
   row: ReviewRow;
   batchId: string;
   csrfToken: string;
+  onUnauthorized: () => void;
+  onConflict: () => void;
   onSubmitted: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -147,6 +191,13 @@ function CorrectionProposal({ row, batchId, csrfToken, onSubmitted }: {
         body: JSON.stringify({ proposedRegon: regon, reason, expectedVersion: row.rowVersion }),
       });
       const payload = await response.json().catch(() => ({})) as { message?: string };
+      if (response.status === 401) { onUnauthorized(); return; }
+      if (response.status === 409) {
+        setOpen(false);
+        onConflict();
+        onSubmitted();
+        return;
+      }
       if (!response.ok) throw new Error(payload.message || "Nie udało się zapisać propozycji korekty.");
       setMessage("Propozycja została zapisana do kontroli. Nie zmienia jeszcze wartości używanej przez zadania.");
       setRegon("");
@@ -160,7 +211,7 @@ function CorrectionProposal({ row, batchId, csrfToken, onSubmitted }: {
     }
   }
 
-  if (row.correction?.status === "pending") return <p className="review-note">Propozycja {row.correction.proposedRegon} oczekuje na rozstrzygnięcie. Powód: {row.correction.reason}</p>;
+  if (row.correction?.status === "pending") return <p className="review-note">Propozycja {row.correction.proposedRegon} oczekuje na rozstrzygnięcie. Powód: {row.correction.reason} <a href={`/review?batchId=${encodeURIComponent(batchId)}&toolId=oc-policy-verification`}>Zobacz moje korekty</a></p>;
 
   return <div className="correction-action">
     {row.correction && <p className="review-note">Ostatnia propozycja: {row.correction.proposedRegon} · {row.correction.status === "approved" ? "zatwierdzona" : "odrzucona"}. {row.correction.reason}</p>}
@@ -174,7 +225,7 @@ function CorrectionProposal({ row, batchId, csrfToken, onSubmitted }: {
   </div>;
 }
 
-export default function EnrichmentReviewPanel({ batchId, csrfToken, canStart }: { batchId: string; csrfToken: string; canStart: boolean }) {
+export default function EnrichmentReviewPanel({ batchId, csrfToken, canStart, onUnauthorized }: { batchId: string; csrfToken: string; canStart: boolean; onUnauthorized: () => void }) {
   const [page, setPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0);
   const [data, setData] = useState<ReviewData | null>(null);
@@ -186,9 +237,16 @@ export default function EnrichmentReviewPanel({ batchId, csrfToken, canStart }: 
   const [fromRow, setFromRow] = useState("");
   const [toRow, setToRow] = useState("");
   const [jobRefreshKey, setJobRefreshKey] = useState(0);
+  const [jobItemPages, setJobItemPages] = useState(1);
+  const [jobItemsCursor, setJobItemsCursor] = useState<string | null>(null);
+  const [jobItemsHasMore, setJobItemsHasMore] = useState(false);
+  const [jobItemsLoadingMore, setJobItemsLoadingMore] = useState(false);
   const [jobBusy, setJobBusy] = useState(false);
   const [jobError, setJobError] = useState("");
   const [jobNotice, setJobNotice] = useState("");
+  const [correctionNotice, setCorrectionNotice] = useState("");
+  const [runtimeHealth, setRuntimeHealth] = useState<EnrichmentRuntimeHealth | null>(null);
+  const [runtimeHealthUnavailable, setRuntimeHealthUnavailable] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -197,48 +255,139 @@ export default function EnrichmentReviewPanel({ batchId, csrfToken, canStart }: 
     fetch(`/api/imports/${batchId}/enrichment?page=${page}`, { credentials: "same-origin" })
       .then(async (response) => {
         const payload = await response.json().catch(() => ({})) as ReviewData & { message?: string };
+        if (response.status === 401) { onUnauthorized(); return; }
         if (!response.ok) throw new Error(payload.message || "Nie udało się pobrać statusu REGON.");
         if (active) setData(payload);
       })
       .catch((cause) => { if (active) setError(cause instanceof Error ? cause.message : "Nie udało się pobrać statusu REGON."); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [batchId, page, refreshKey]);
+  }, [batchId, page, refreshKey, onUnauthorized]);
 
   useEffect(() => {
     let active = true;
-    const loadJobs = async () => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const controller = new AbortController();
+    const refresh = async () => {
       try {
-        const response = await fetch(`/api/imports/${batchId}/enrichment-jobs`, { credentials: "same-origin" });
+        const response = await fetch("/api/health/enrichment", { credentials: "same-origin", signal: controller.signal });
+        const payload = await response.json().catch(() => null) as EnrichmentRuntimeHealth | null;
+        if (!payload || typeof payload.message !== "string"
+          || !["disabled", "ready", "degraded", "offline"].includes(payload.worker)
+          || !["disabled", "configured", "unknown"].includes(payload.provider)
+          || !(payload.providerName === null || typeof payload.providerName === "string")) {
+          throw new Error("ENRICHMENT_HEALTH_INVALID");
+        }
+        if (active) {
+          setRuntimeHealth((previous) => previous
+            && previous.worker === payload.worker && previous.provider === payload.provider
+            && previous.providerName === payload.providerName && previous.message === payload.message
+            ? previous : payload);
+          setRuntimeHealthUnavailable(false);
+        }
+      } catch {
+        if (active && !controller.signal.aborted) setRuntimeHealthUnavailable(true);
+      } finally {
+        if (active) timer = setTimeout(() => void refresh(), 15_000);
+      }
+    };
+    void refresh();
+    return () => {
+      active = false;
+      if (timer) clearTimeout(timer);
+      controller.abort();
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    let running = false;
+    let timer: number | undefined;
+    let controller: AbortController | undefined;
+    const loadJobs = async () => {
+      if (!active || running) return;
+      running = true;
+      controller = new AbortController();
+      try {
+        const response = await fetch(`/api/imports/${batchId}/enrichment-jobs`, { credentials: "same-origin", signal: controller.signal });
         const payload = await response.json().catch(() => ({})) as { items?: EnrichmentJob[]; message?: string };
+        if (response.status === 401) { onUnauthorized(); return; }
         if (!response.ok) throw new Error(payload.message || "Nie udało się pobrać zadań rejestru.");
         const nextJobs = payload.items ?? [];
         if (!active) return;
         setJobs(nextJobs);
-        const selected = nextJobs.find((job) => job.id === selectedJobId) ?? nextJobs[0];
-        if (selected && selected.id !== selectedJobId) setSelectedJobId(selected.id);
+        setJobError("");
+        const savedSelection = readStoredJobSelection(batchId);
+        const selected = nextJobs.find((job) => job.id === selectedJobId)
+          ?? nextJobs.find((job) => job.id === savedSelection)
+          ?? nextJobs[0];
+        if (selected && selected.id !== selectedJobId) {
+          setSelectedJobId(selected.id);
+          setJobItemPages(1);
+          storeJobSelection(batchId, selected.id);
+        }
         if (selected) {
           const allItems: EnrichmentJobItem[] = [];
           let cursor: string | undefined;
-          for (let pageIndex = 0; pageIndex < 10; pageIndex += 1) {
+          const pagesToLoad = selected.id === selectedJobId ? jobItemPages : 1;
+          for (let pageIndex = 0; pageIndex < pagesToLoad; pageIndex += 1) {
             const query = cursor ? `?cursor=${encodeURIComponent(cursor)}` : "";
-            const itemsResponse = await fetch(`/api/enrichment-jobs/${selected.id}/items${query}`, { credentials: "same-origin" });
+            const itemsResponse = await fetch(`/api/enrichment-jobs/${selected.id}/items${query}`, { credentials: "same-origin", signal: controller.signal });
             const itemsPayload = await itemsResponse.json().catch(() => ({})) as { items?: EnrichmentJobItem[]; nextCursor?: string | null };
-            if (!itemsResponse.ok) break;
+            if (itemsResponse.status === 401) { onUnauthorized(); return; }
+            if (!itemsResponse.ok) throw new Error("Nie udało się pobrać pozycji zadania.");
             allItems.push(...(itemsPayload.items ?? []));
-            if (!itemsPayload.nextCursor) break;
-            cursor = itemsPayload.nextCursor;
+            cursor = itemsPayload.nextCursor ?? undefined;
+            if (!cursor) break;
           }
-          if (active) setJobItems(allItems);
-        } else if (active) setJobItems([]);
+          if (active) {
+            setJobItems(allItems);
+            setJobItemsCursor(cursor ?? null);
+            setJobItemsHasMore(Boolean(cursor));
+          }
+        } else if (active) {
+          setJobItems([]);
+          setJobItemsCursor(null);
+          setJobItemsHasMore(false);
+        }
       } catch (cause) {
-        if (active) setJobError(cause instanceof Error ? cause.message : "Nie udało się pobrać zadań rejestru.");
+        if (active && !(cause instanceof DOMException && cause.name === "AbortError")) {
+          setJobError(cause instanceof Error ? cause.message : "Nie udało się pobrać zadań rejestru.");
+        }
+      } finally {
+        running = false;
+        if (active) timer = window.setTimeout(() => void loadJobs(), 4000);
       }
     };
     void loadJobs();
-    const timer = window.setInterval(() => void loadJobs(), 4000);
-    return () => { active = false; window.clearInterval(timer); };
-  }, [batchId, jobRefreshKey, selectedJobId]);
+    return () => { active = false; if (timer !== undefined) window.clearTimeout(timer); controller?.abort(); };
+  }, [batchId, jobRefreshKey, selectedJobId, jobItemPages, onUnauthorized]);
+
+  async function loadMoreJobItems() {
+    if (!selectedJob || !jobItemsCursor || jobItemsLoadingMore) return;
+    setJobItemsLoadingMore(true);
+    setJobError("");
+    try {
+      const response = await fetch(`/api/enrichment-jobs/${selectedJob.id}/items?cursor=${encodeURIComponent(jobItemsCursor)}`, { credentials: "same-origin" });
+      const payload = await response.json().catch(() => ({})) as { items?: EnrichmentJobItem[]; nextCursor?: string | null; message?: string };
+      if (response.status === 401) { onUnauthorized(); return; }
+      if (!response.ok) throw new Error(payload.message || "Nie udało się pobrać kolejnej strony zadania.");
+      setJobItems((current) => [...current, ...(payload.items ?? [])]);
+      setJobItemsCursor(payload.nextCursor ?? null);
+      setJobItemsHasMore(Boolean(payload.nextCursor));
+      setJobItemPages((current) => current + 1);
+    } catch (cause) {
+      setJobError(cause instanceof Error ? cause.message : "Nie udało się pobrać kolejnej strony zadania.");
+    } finally {
+      setJobItemsLoadingMore(false);
+    }
+  }
+
+  function selectJob(jobId: string) {
+    setSelectedJobId(jobId);
+    setJobItemPages(1);
+    storeJobSelection(batchId, jobId);
+  }
 
   async function startEnrichmentJob(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -255,9 +404,10 @@ export default function EnrichmentReviewPanel({ batchId, csrfToken, canStart }: 
         body: JSON.stringify({ idempotencyKey: crypto.randomUUID(), fromRow: start, toRow: end }),
       });
       const payload = await response.json().catch(() => ({})) as EnrichmentJob & { message?: string };
+      if (response.status === 401) { onUnauthorized(); return; }
       if (!response.ok) throw new Error(payload.message || "Nie udało się uruchomić zadania rejestru.");
       setJobNotice(`Dodano zadanie dla ${payload.selectedCount} wierszy.`);
-      setSelectedJobId(payload.id);
+      selectJob(payload.id);
       setJobRefreshKey((value) => value + 1);
     } catch (cause) {
       setJobError(cause instanceof Error ? cause.message : "Nie udało się uruchomić zadania rejestru.");
@@ -278,6 +428,12 @@ export default function EnrichmentReviewPanel({ batchId, csrfToken, canStart }: 
         body: JSON.stringify({ expectedVersion: job.version }),
       });
       const payload = await response.json().catch(() => ({})) as { message?: string };
+      if (response.status === 401) { onUnauthorized(); return; }
+      if (response.status === 409) {
+        setJobNotice("Zadanie zmieniło się w innej karcie. Odświeżam zapisany stan; nie wysyłam ponownie anulowania.");
+        setJobRefreshKey((value) => value + 1);
+        return;
+      }
       if (!response.ok) throw new Error(payload.message || "Nie udało się anulować zadania.");
       setJobNotice("Zadanie anulowano. Zapisane wyniki pozostają bez zmian.");
       setJobRefreshKey((value) => value + 1);
@@ -295,8 +451,16 @@ export default function EnrichmentReviewPanel({ batchId, csrfToken, canStart }: 
   return <section className="result-section enrichment-section" aria-labelledby="enrichment-title">
     <div className="section-head"><div><p className="eyebrow">REGON / KONTROLA ŹRÓDEŁ</p><h2 id="enrichment-title">Uzupełnianie i korekty danych</h2></div><span className="result-id">Strona {page}</span></div>
     <p className="enrichment-intro">Wartość operacyjna pozostaje oddzielona od danych z importu. Propozycja korekty jest zapisywana do kontroli i sama nie zmienia REGON-u używanego przy uruchamianiu zadania.</p>
+    {correctionNotice && <p className="review-conflict" role="status">{correctionNotice}</p>}
     <div className="enrichment-job-panel" aria-label="Trwałe zadania rejestru">
-      <div><p className="eyebrow">ZADANIA REJESTRU</p><h3>Wzbogacanie NIP → REGON</h3><p>Wybierz zakres numerów wierszy z arkusza. Wybór nie zależy od aktualnej strony tabeli.</p></div>
+      <div className="section-head"><div><p className="eyebrow">ZADANIA REJESTRU</p><h3>Wzbogacanie NIP → REGON</h3><p>Wybierz zakres numerów wierszy z arkusza. Wybór nie zależy od aktualnej strony tabeli.</p></div><button className="review-button" type="button" onClick={() => setJobRefreshKey((value) => value + 1)}>Odśwież status</button></div>
+      <div className="enrichment-runtime-status" data-state={runtimeHealthUnavailable || runtimeHealth?.worker === "offline" || runtimeHealth?.worker === "degraded" || runtimeHealth?.provider === "unknown" ? "warning" : runtimeHealth?.provider === "configured" ? "ready" : "disabled"} role="status" aria-live="polite">
+        <strong>{runtimeHealthUnavailable ? "Status rejestru jest chwilowo niedostępny." : runtimeHealth ? runtimeStatusLabels[runtimeHealth.worker] : "Odczytuję status workera…"}</strong>
+        {runtimeHealth && !runtimeHealthUnavailable && <span>Dostawca: {runtimeHealth.providerName ? providerLabels[runtimeHealth.providerName] ?? runtimeHealth.providerName : runtimeHealth.provider === "disabled" ? "wyłączony" : "status konfiguracji niedostępny"}</span>}
+        {!runtimeHealthUnavailable && runtimeHealth?.providerName && providerCoverage[runtimeHealth.providerName] && <span className="enrichment-provider-coverage">{providerCoverage[runtimeHealth.providerName]}</span>}
+        {runtimeHealth?.worker === "offline" || runtimeHealth?.worker === "degraded" ? <span>{runtimeHealth.message}</span> : null}
+        <small>Status jest odświeżany co 15 sekund.</small>
+      </div>
       {canStart && <form className="enrichment-job-form" onSubmit={(event) => void startEnrichmentJob(event)}>
         <label>Od wiersza<input type="number" min="2" step="1" value={fromRow} onChange={(event) => setFromRow(event.target.value)} required /></label>
         <label>Do wiersza<input type="number" min="2" step="1" value={toRow} onChange={(event) => setToRow(event.target.value)} required /></label>
@@ -304,14 +468,15 @@ export default function EnrichmentReviewPanel({ batchId, csrfToken, canStart }: 
       </form>}
       {jobError && <p className="error" role="alert">{jobError}</p>}
       {jobNotice && <p className="review-success" role="status">{jobNotice}</p>}
-      {jobs.length > 1 && <nav className="enrichment-job-history" aria-label="Historia zadań rejestru">{jobs.map((job) => <button key={job.id} type="button" aria-pressed={job.id === selectedJob?.id} onClick={() => setSelectedJobId(job.id)}>{jobStatusLabels[job.status]} · {new Date(job.createdAt).toLocaleString("pl-PL")}</button>)}</nav>}
+      {jobs.length > 1 && <nav className="enrichment-job-history" aria-label="Historia zadań rejestru">{jobs.map((job) => <button key={job.id} type="button" aria-pressed={job.id === selectedJob?.id} onClick={() => selectJob(job.id)}>{jobStatusLabels[job.status]} · {new Date(job.createdAt).toLocaleString("pl-PL")}</button>)}</nav>}
       {selectedJob && <div className="enrichment-job-state" aria-live="polite">
         <div className="section-head"><div><span className={`pill ${["completed", "partial"].includes(selectedJob.status) ? "good" : "warn"}`}>{jobStatusLabels[selectedJob.status]}</span><small className="review-subline">{new Date(selectedJob.createdAt).toLocaleString("pl-PL")}</small></div>
           {canStart && ["queued", "processing"].includes(selectedJob.status) && <button className="review-button" type="button" disabled={jobBusy} onClick={() => void cancelEnrichmentJob(selectedJob)}>Anuluj zadanie</button>}
         </div>
         <div className="review-metrics"><div><strong>{selectedJob.completedCount.toLocaleString("pl-PL")}</strong><span>sprawdzone</span></div><div><strong>{selectedJob.excludedCount.toLocaleString("pl-PL")}</strong><span>pominięte</span></div><div><strong>{selectedJob.failedCount.toLocaleString("pl-PL")}</strong><span>błędy</span></div><div><strong>{(selectedJob.selectedCount - selectedJob.completedCount - selectedJob.excludedCount - selectedJob.failedCount - selectedJob.cancelledCount).toLocaleString("pl-PL")}</strong><span>oczekujące</span></div></div>
         {selectedJob.errorCode && <p className="review-conflict">{jobReasonLabels[selectedJob.errorCode] ?? selectedJob.errorCode}</p>}
-        <ul className="enrichment-job-items">{jobItems.map((item) => <li key={item.rowNumber}><span>Wiersz {item.rowNumber}</span><span>{itemStatusLabels[item.status] ?? item.status}</span>{(item.reasonCode || item.errorCode) && <small>{jobReasonLabels[item.errorCode ?? item.reasonCode!] ?? item.errorCode ?? item.reasonCode}</small>}{item.nextAttemptAt && <small>Ponowienie po {new Date(item.nextAttemptAt).toLocaleTimeString("pl-PL")}</small>}</li>)}</ul>
+        <ul className="enrichment-job-items">{jobItems.map((item) => <li key={item.rowNumber}><span>Wiersz {item.rowNumber}</span><span>{itemStatusLabels[item.status] ?? item.status}</span>{(item.reasonCode || item.errorCode) && <small>{jobReasonLabels[item.errorCode ?? item.reasonCode!] ?? item.errorCode ?? item.reasonCode}</small>}{item.nextAttemptAt && <small>Następna próba po {new Date(item.nextAttemptAt).toLocaleString("pl-PL", { dateStyle: "short", timeStyle: "short" })}</small>}</li>)}</ul>
+        {jobItemsHasMore && <div className="review-pagination"><span>Załadowano {jobItems.length.toLocaleString("pl-PL")} z {selectedJob.selectedCount.toLocaleString("pl-PL")} pozycji</span><button type="button" disabled={jobItemsLoadingMore} onClick={() => void loadMoreJobItems()}>{jobItemsLoadingMore ? "Pobieranie…" : "Pokaż następne 50"}</button></div>}
       </div>}
     </div>
     {data && <div className="review-metrics" aria-label="Postęp uzupełniania REGON">
@@ -334,7 +499,7 @@ export default function EnrichmentReviewPanel({ batchId, csrfToken, canStart }: 
             {row.conflict && <small className="review-conflict">{conflictLabels[row.conflict.reasonCode] ?? "Nierozpoznany konflikt podmiotu."} ({row.conflict.candidateCount} dopas.)</small>}
             {row.issues.map((issue) => <small className="review-subline" key={issue}>{issue}</small>)}
           </td>
-          <td><CorrectionProposal row={row} batchId={batchId} csrfToken={csrfToken} onSubmitted={() => setRefreshKey((value) => value + 1)} /></td>
+          <td><CorrectionProposal row={row} batchId={batchId} csrfToken={csrfToken} onUnauthorized={onUnauthorized} onConflict={() => setCorrectionNotice("Wiersz zmienił się od czasu odczytu. Odświeżyłem dane; sprawdź nową wartość przed ponowną propozycją.")} onSubmitted={() => setRefreshKey((value) => value + 1)} /></td>
         </tr>)}
         {data.rows.length === 0 && <tr><td colSpan={6}>Ten import nie zawiera wierszy.</td></tr>}
       </tbody></table></div>

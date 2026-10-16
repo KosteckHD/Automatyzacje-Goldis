@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { GoldisLogo } from "../../components/brand/GoldisLogo";
 
-type Role = "admin" | "operator" | "reviewer" | "auditor";
+type Role = "admin" | "manager" | "operator" | "reviewer" | "auditor";
 type Session = { role: Role; username: string; csrfToken: string; mustChangePassword?: boolean };
 type Correction = {
   id: string; status: "pending" | "approved" | "rejected"; createdAt: string; previousRegon: string | null;
   proposedRegon: string; reason: string; rowNumber: number; rowVersion: number; companyName: string; batchId: string; toolId: string;
+  reviewedAt?: string | null; reviewReason?: string | null;
 };
 type Candidate = { id: string; businessName: string; regon: string | null };
 type Conflict = {
@@ -18,7 +18,12 @@ type Page<T> = { items: T[]; nextCursor: string | null; hasMore: boolean; limit:
 type Tab = "corrections" | "conflicts";
 type QueueFilters = { status: string; batchId: string; toolId: string; cursor: string | null };
 
-const roles: Record<Role, string> = { admin: "Administrator", operator: "Operator", reviewer: "Reviewer", auditor: "Auditor" };
+const correctionReviewReasonLabels: Record<string, string> = {
+  SOURCE_DOCUMENT_VERIFIED: "Sprawdzono dokument źródłowy",
+  REGISTRY_MATCH_VERIFIED: "Potwierdzono zgodność z rejestrem",
+  DUPLICATE_IMPORT: "Rozstrzygnięto duplikat importu",
+  OTHER: "Inny udokumentowany powód",
+};
 const conflictLabels: Record<string, string> = {
   INVALID_NIP: "Nieprawidłowy NIP", INVALID_REGON: "Nieprawidłowy REGON", IDENTIFIER_MISSING: "Brak poprawnego identyfikatora",
   SOURCE_NAME_MISSING: "Brak nazwy firmy", CANONICAL_IDENTITY_INVALID: "Nieprawidłowa tożsamość encji",
@@ -33,11 +38,16 @@ const correctionReasonLabels: Record<string, string> = {
   OTHER: "Inny udokumentowany powód",
 };
 
-function filtersFromUrl(): { tab: Tab; filters: QueueFilters } {
+function filtersFromUrl(operator = false): { tab: Tab; filters: QueueFilters } {
   const params = new URLSearchParams(window.location.search);
+  const requestedTab = params.get("tab");
+  const requestedStatus = params.get("status") ?? "";
   return {
-    tab: params.get("tab") === "conflicts" ? "conflicts" : "corrections",
-    filters: { status: params.get("status") ?? "", batchId: params.get("batchId") ?? "", toolId: params.get("toolId") ?? "", cursor: params.get("cursor") },
+    tab: !operator && requestedTab === "conflicts" ? "conflicts" : "corrections",
+    filters: {
+      status: operator && !["", "pending", "approved", "rejected"].includes(requestedStatus) ? "" : requestedStatus,
+      batchId: params.get("batchId") ?? "", toolId: params.get("toolId") ?? "", cursor: params.get("cursor"),
+    },
   };
 }
 
@@ -88,16 +98,30 @@ export default function ReviewPage() {
     writeUrl(initial.tab, initial.filters, true);
     const abort = new AbortController();
     fetch("/api/auth/me", { credentials: "same-origin", signal: abort.signal }).then((response) => jsonResponse<Session>(response))
-      .then((value) => { setSession(value); setSessionState("ready"); })
+      .then((value) => {
+        setSession(value);
+        if (value.role === "operator") {
+          const ownQueue = filtersFromUrl(true);
+          setTab(ownQueue.tab); setFilters(ownQueue.filters); setDraft(ownQueue.filters);
+          writeUrl(ownQueue.tab, ownQueue.filters, true);
+        }
+        setSessionState("ready");
+      })
       .catch((cause) => { if (!abort.signal.aborted) setSessionState((cause as { status?: number }).status === 401 ? "signed-out" : "error"); });
-    const onPopState = () => {
-      const restored = filtersFromUrl(); setTab(restored.tab); setFilters(restored.filters); setDraft(restored.filters);
-    };
-    window.addEventListener("popstate", onPopState);
-    return () => { abort.abort(); window.removeEventListener("popstate", onPopState); };
+    return () => abort.abort();
   }, []);
 
-  const allowedToDecide = session?.role === "admin" || session?.role === "reviewer";
+  useEffect(() => {
+    const onPopState = () => {
+      const restored = filtersFromUrl(session?.role === "operator");
+      setTab(restored.tab); setFilters(restored.filters); setDraft(restored.filters);
+      if (session?.role === "operator") writeUrl(restored.tab, restored.filters, true);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [session?.role]);
+
+  const allowedToDecide = session?.role === "admin" || session?.role === "manager" || session?.role === "reviewer";
   const endpoint = session?.role === "operator" ? "/api/review/my-corrections"
     : tab === "corrections" ? "/api/review/corrections" : "/api/review/conflicts";
   const query = useMemo(() => {
@@ -138,7 +162,8 @@ export default function ReviewPage() {
   function applyFilters(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const next = { ...draft, cursor: null };
-    setFilters(next); setPage(null); setActionId(""); writeUrl(tab, next);
+    if (session?.role === "operator") next.status = ["pending", "approved", "rejected"].includes(next.status) ? next.status : "";
+    setFilters(next); setPage(null); setActionId(""); writeUrl(session?.role === "operator" ? "corrections" : tab, next);
   }
 
   function nextPage() {
@@ -165,29 +190,15 @@ export default function ReviewPage() {
     } finally { setBusyId(""); }
   }
 
-  async function logout() {
-    if (session?.csrfToken) await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin", headers: { "X-CSRF-Token": session.csrfToken } }).catch(() => undefined);
-    window.location.assign("/");
-  }
-
   const rows = page?.items ?? [];
   const title = session?.role === "operator" ? "Moje propozycje korekt" : tab === "corrections" ? "Korekty REGON" : "Konflikty encji";
 
   return <div className="admin-shell review-shell">
-    <aside className="admin-rail">
-      <a className="admin-brand" href="/"><GoldisLogo variant="sidebar" /><div><strong>GOLDIS</strong><small>centrum operacyjne</small></div></a>
-      <nav aria-label="Nawigacja platformy">
-        <a href="/">Narzędzia</a><a href="/imports">Importy</a><a href="/runs">Zadania</a>
-        {(session?.role === "admin" || session?.role === "reviewer") && <a className="admin-nav-active" href="/review" aria-current="page">Decyzje i konflikty</a>}
-        {session && ["admin", "reviewer", "auditor"].includes(session.role) && <a href="/audit">Audyt</a>}
-        {session?.role === "admin" && <a href="/admin">Administracja</a>}
-      </nav>
-      <div className="admin-rail-foot"><span>Organizacja Goldis</span><a href="/account">Moje konto</a><button type="button" onClick={() => void logout()}>Wyloguj</button></div>
-    </aside>
     <main className="admin-main">
-      <header className="admin-topbar"><span>OPERACJE / WERYFIKACJA DANYCH</span><span>{session ? `${session.username} · ${roles[session.role]}` : "Ładowanie sesji…"}</span></header>
       <div className="admin-content review-content">
-        <section className="review-hero"><div><p className="eyebrow">KOLEJKI DECYZYJNE</p><h1>{title}</h1><p>Rozstrzygaj zgłoszenia z kontrolą wersji i aktualnych uprawnień. Każda decyzja jest zapisywana w dzienniku audytu.</p></div><div className="review-hero-mark" aria-hidden="true"><span>R</span><i /></div></section>
+        <section className="review-hero"><div><p className="eyebrow">{session?.role === "operator" ? "STATUS ZGŁOSZEŃ" : "KOLEJKI DECYZYJNE"}</p><h1>{title}</h1><p>{session?.role === "operator"
+          ? "Sprawdź, które propozycje REGON oczekują na weryfikację i jakie decyzje podjął zespół. Korekta zaczyna obowiązywać dopiero po zatwierdzeniu."
+          : "Rozstrzygaj zgłoszenia z kontrolą wersji i aktualnych uprawnień. Każda decyzja jest zapisywana w dzienniku audytu."}</p></div><div className="review-hero-mark" aria-hidden="true"><span>R</span><i /></div></section>
         {sessionState === "loading" && <section className="admin-card" role="status">Sprawdzam sesję i uprawnienia…</section>}
         {sessionState === "signed-out" && <section className="admin-card"><h2>Sesja wygasła</h2><p>Zaloguj się ponownie, aby otworzyć kolejkę.</p><a className="admin-button" href="/">Przejdź do logowania</a></section>}
         {sessionState === "error" && <section className="admin-card" role="alert"><h2>Nie można sprawdzić sesji</h2><p>Odśwież stronę. Jeśli problem się powtarza, sprawdź dostępność API.</p><button className="admin-quiet" type="button" onClick={() => window.location.reload()}>Odśwież stronę</button></section>}
@@ -204,14 +215,14 @@ export default function ReviewPage() {
               {tab === "corrections" ? <><option value="pending">Oczekujące</option><option value="approved">Zatwierdzone</option><option value="rejected">Odrzucone</option></>
                 : <><option value="open">Otwarte</option><option value="resolved">Rozstrzygnięte</option></>}
             </select></label>
-            <label>Import UUID<input value={draft.batchId} onChange={(event) => setDraft({ ...draft, batchId: event.target.value })} maxLength={36} placeholder="Opcjonalny filtr" /></label>
+            <label>Identyfikator importu<input value={draft.batchId} onChange={(event) => setDraft({ ...draft, batchId: event.target.value })} maxLength={36} placeholder="Opcjonalny filtr" /><small className="review-filter-hint">Skopiuj go z adresu strony importu.</small></label>
             <label>Narzędzie<input value={draft.toolId} onChange={(event) => setDraft({ ...draft, toolId: event.target.value })} maxLength={80} placeholder="np. oc-policy-verification" /></label>
             <button className="admin-button" type="submit" disabled={loading}>Zastosuj filtry</button>
           </form>
           {error && <div className="review-error" role="alert"><p>{error}</p>{error.includes("Odśwież kolejkę") && <button className="admin-quiet" type="button" onClick={() => setRevision((value) => value + 1)}>Odśwież kolejkę</button>}</div>}
           {notice && <p className="review-notice" role="status">{notice}</p>}
           {loading && <p className="review-loading" role="status">Pobieram aktualną kolejkę…</p>}
-          {!loading && !error && rows.length === 0 && <section className="admin-card review-empty"><span aria-hidden="true">✓</span><h2>Brak spraw do rozpatrzenia</h2><p>Przy zastosowanych filtrach kolejka jest pusta.</p></section>}
+          {!loading && !error && rows.length === 0 && <section className="admin-card review-empty"><span aria-hidden="true">✓</span><h2>{session.role === "operator" ? "Brak zgłoszeń do wyświetlenia" : "Brak spraw do rozpatrzenia"}</h2><p>{session.role === "operator" ? "Wysłane propozycje REGON i ich decyzje pojawią się tutaj. Jeśli od razu wracasz z importu, sprawdź filtr importu." : "Przy zastosowanych filtrach kolejka jest pusta."}</p>{session.role === "operator" && <a className="admin-quiet" href="/imports">Otwórz importy</a>}</section>}
           {rows.length > 0 && <section className="review-list" aria-label={title}>
             {rows.map((item) => tab === "corrections" || session.role === "operator"
               ? <CorrectionCard key={item.id} item={item as Correction} mayDecide={allowedToDecide} busy={busyId === item.id} open={actionId === item.id}
@@ -239,9 +250,11 @@ function CorrectionCard({ item, mayDecide, busy, open, onOpen, onCancel, reasonC
   reasonCode: string; setReasonCode: (value: string) => void; onDecision: (decision: "approved" | "rejected") => void;
 }) {
   return <article className="review-card">
-    <div className="review-card-head"><div><p className="eyebrow">KOREKTA REGON · WIERSZ {item.rowNumber}</p><h2>{item.companyName}</h2><p className="review-meta">{item.toolId} · import <code>{item.batchId}</code> · {displayDate(item.createdAt)}</p></div><span className={`review-status status-${item.status}`}>{item.status === "pending" ? "Oczekuje" : item.status === "approved" ? "Zatwierdzona" : "Odrzucona"}</span></div>
+    <div className="review-card-head"><div><p className="eyebrow">KOREKTA REGON · WIERSZ {item.rowNumber}</p><h2>{item.companyName}</h2><p className="review-meta">{item.toolId} · import <code>{item.batchId}</code> · {displayDate(item.createdAt)}</p></div><span className={`review-status status-${item.status}`}>{item.status === "pending" ? "Oczekuje na weryfikację" : item.status === "approved" ? "Zatwierdzona" : "Odrzucona"}</span></div>
     <div className="review-diff"><div><small>REGON operacyjny przed decyzją</small><strong>{item.previousRegon || "Brak"}</strong></div><span aria-hidden="true">→</span><div><small>Proponowana wartość</small><strong>{item.proposedRegon}</strong></div><div><small>Wersja wiersza</small><strong>{item.rowVersion}</strong></div></div>
     <p className="review-reason"><strong>Uzasadnienie operatora:</strong> {item.reason}</p>
+    {item.reviewedAt && <p className="review-decision-meta">Decyzja z {displayDate(item.reviewedAt)}{item.reviewReason ? ` · ${correctionReviewReasonLabels[item.reviewReason] ?? item.reviewReason}` : ""}</p>}
+    <a className="review-import-link" href={`/tools/${encodeURIComponent(item.toolId)}?import=${encodeURIComponent(item.batchId)}`}>Otwórz import</a>
     {mayDecide && item.status === "pending" && !open && <button className="admin-button" type="button" disabled={busy} onClick={onOpen}>Rozpatrz korektę</button>}
     {open && <div className="review-decision"><p>Potwierdź decyzję dla wersji {item.rowVersion}. Zatwierdzenie ustawi wartość operacyjną i ponownie sprawdzi grupowanie.</p><label>Kod przyczyny<select value={reasonCode} onChange={(event) => setReasonCode(event.target.value)}>{Object.entries(correctionReasonLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label><div className="review-actions"><button className="admin-button" type="button" disabled={busy} onClick={() => onDecision("approved")}>{busy ? "Zapisywanie…" : "Zatwierdź"}</button><button className="admin-quiet danger" type="button" disabled={busy} onClick={() => onDecision("rejected")}>Odrzuć</button><button className="admin-quiet" type="button" disabled={busy} onClick={onCancel}>Anuluj</button></div></div>}
   </article>;

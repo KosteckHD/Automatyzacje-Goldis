@@ -4,8 +4,8 @@ import { createRequire } from "node:module";
 import { createInterface } from "node:readline";
 import { chromium } from "playwright";
 const require = createRequire(import.meta.url);
-const { parseTransportWorkbook } = require("../../api/dist/workbook.js");
-const { readOcSnapshot, selectCurrentPolicies } = require("../dist/oc.js");
+const { parseTransportWorkbook } = require("../../api/dist/features/imports/workbook.js");
+const { readOcSnapshot, selectCurrentPolicies } = require("../dist/features/results/oc.js");
 
 const profile = resolve(process.env.WORKER_PROFILE_DIR || "worker-profiles/portal-local");
 const urls = {

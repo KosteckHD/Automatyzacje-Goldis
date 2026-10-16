@@ -45,13 +45,15 @@ async function main() {
     page.on("pageerror", (error) => pageErrors.push(error.message));
     page.on("request", (request) => requestUrls.push(request.url()));
     page.on("console", (message) => { if (message.type() === "error") console.error("AUDIT_UI_CONSOLE", message.text()); });
-    page.on("requestfailed", (request) => console.error("AUDIT_UI_REQUEST_FAILED", request.url(), request.failure()?.errorText));
+    page.on("requestfailed", (request) => { if (request.failure()?.errorText !== "net::ERR_ABORTED") console.error("AUDIT_UI_REQUEST_FAILED", request.url(), request.failure()?.errorText); });
     page.on("response", (response) => { if (response.status() >= 400) console.error("AUDIT_UI_HTTP", response.status(), response.url()); });
     await page.route("**/api/**", async (route) => {
       const request = route.request();
       const url = new URL(request.url());
       let body = {};
       if (url.pathname === "/api/auth/me") body = { role, username: `${role}.demo`, csrfToken: "synthetic-audit-csrf-token", mustChangePassword: false, tools: [] };
+      else if (url.pathname === "/api/dashboard") body = { role: "operator", tools: [], metrics: { operations: { total: 0, active: 0, attention: 0, completed: 0 },
+        myLeads: { total: 0, notContacted: 0, accepted: 0, notInterested: 0 }, team: null }, operations: [], actionRequired: [], unreadNotifications: 0 };
       else if (url.pathname === "/api/audit/events") {
         auditRequests.push(url.searchParams.toString());
         body = url.searchParams.has("cursor")
@@ -62,8 +64,9 @@ async function main() {
     });
 
     await page.goto(baseUrl);
-    await page.getByRole("link", { name: "Audyt", exact: true }).waitFor({ state: "visible" });
-    await page.getByRole("link", { name: "Audyt", exact: true }).click();
+    await page.waitForURL("**/review");
+    await page.getByRole("link", { name: "Dziennik aktywności", exact: true }).waitFor({ state: "visible" });
+    await page.getByRole("link", { name: "Dziennik aktywności", exact: true }).click();
     await page.getByRole("heading", { name: "Dziennik audytu" }).waitFor({ state: "visible" });
     await page.locator(".audit-event-main code").filter({ hasText: "run.created" }).waitFor({ state: "visible" });
     assert.equal(await page.getByLabel("Czynność").locator("option[value='user.created']").count(), 0, "reviewer nie dostaje filtrów administracyjnych");
@@ -97,8 +100,9 @@ async function main() {
 
     role = "auditor";
     await page.goto(baseUrl);
-    await page.getByRole("link", { name: "Audyt", exact: true }).waitFor({ state: "visible" });
-    await page.getByRole("link", { name: "Audyt", exact: true }).click();
+    await page.waitForURL("**/audit");
+    await page.getByRole("link", { name: "Dziennik aktywności", exact: true }).waitFor({ state: "visible" });
+    await page.getByRole("link", { name: "Dziennik aktywności", exact: true }).click();
     await page.getByRole("heading", { name: "Dziennik audytu" }).waitFor({ state: "visible" });
     await page.getByLabel("Czynność").locator("option[value='user.created']").waitFor({ state: "attached" });
     assert.equal(await page.getByLabel("Aktor ID").count(), 1, "auditor ma pełne filtry dziennika");
@@ -113,12 +117,13 @@ async function main() {
     role = "operator";
     const beforeOperator = auditRequests.length;
     await page.goto(baseUrl);
-    assert.equal(await page.getByRole("link", { name: "Audyt", exact: true }).count(), 0, "operator nie otrzymuje linku do audytu");
+    await page.waitForURL("**/dashboard");
+    assert.equal(await page.getByRole("link", { name: "Dziennik aktywności", exact: true }).count(), 0, "operator nie otrzymuje linku do audytu");
     await page.goto(`${baseUrl}/audit`);
     await page.getByText("Twoja rola nie ma dostępu do dziennika audytu.").waitFor({ state: "visible" });
     await page.waitForTimeout(100);
     assert.equal(auditRequests.length, beforeOperator, "operator nie wysyła zapytania do endpointu audytu");
-    assert.equal(await page.getByRole("link", { name: "Audyt", exact: true }).count(), 0, "operator nie widzi linku do audytu na stronie odmowy");
+    assert.equal(await page.getByRole("link", { name: "Dziennik aktywności", exact: true }).count(), 0, "operator nie widzi linku do audytu na stronie odmowy");
 
     assert.ok(requestUrls.every((url) => new URL(url).origin === baseUrl), "żądania smoke nie wychodzą poza testowy host");
     assert.deepEqual(pageErrors, [], "brak błędów JavaScript");

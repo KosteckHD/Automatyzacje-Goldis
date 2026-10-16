@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-09",
+  "customerData": false,
+  "spreadsheet": {
+    "compressedBytes": 6488,
+    "physicalRows": 2,
+    "physicalCells": 4,
+    "mergedRange": "A3:XFD1000",
+    "impliedMergedCells": 16351232,
+    "archiveValidation": "accepted",
+    "isolatedParserHeapLimitMiB": 96,
+    "parserExitCode": 134,
+    "parserSignal": null,
+    "parserTimeout": false,
+    "elapsedMs": 1404,
+    "outOfMemory": true,
+    "stdout": ""
+  },
+  "forwarding": {
+    "productionNextBuildCopy": true,
+    "backendTrustsImmediateWebProxy": true,
+    "syntheticIpBudget": 3,
+    "checks": [
+      {
+        "suppliedIp": "198.51.100.10",
+        "status": 200,
+        "body": {
+          "ip": "198.51.100.10"
+        }
+      },
+      {
+        "suppliedIp": "198.51.100.10",
+        "status": 200,
+        "body": {
+          "ip": "198.51.100.10"
+        }
+      },
+      {
+        "suppliedIp": "198.51.100.10",
+        "status": 200,
+        "body": {
+          "ip": "198.51.100.10"
+        }
+      },
+      {
+        "suppliedIp": "198.51.100.10",
+        "status": 429,
+        "body": {
+          "message": "Zbyt wiele żądań"
+        }
+      },
+      {
+        "suppliedIp": "198.51.100.11",
+        "status": 200,
+        "body": {
+          "ip": "198.51.100.11"
+        }
+      }
+    ],
+    "browserSecurity": {
+      "inlineScriptBlocked": true,
+      "cspStrictDynamic": true,
+      "unsafeEval": false,
+      "noStore": true,
+      "frameDenied": true,
+      "nosniff": true,
+      "limitation": "Injected HTML in synthetic browser; no stored-XSS or real DB tested."
+    },
+    "limitation": "Synthetic backend matches API trust and middleware; no real Redis, live application or external edge used."
+  },
+  "keyConfiguration": {
+    "reproducesGeneratedLocalVersion": "local-v1",
+    "preflight": {
+      "mode": "off",
+      "errors": []
+    },
+    "encryptionError": "PESEL_ENCRYPTION_CONFIG_INVALID",
+    "limitation": "Synthetic configuration reproduces setup script; existing .env files not read or changed. Encryption fails closed."
+  }
+}

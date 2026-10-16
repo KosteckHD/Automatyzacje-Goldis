@@ -1,0 +1,184 @@
+[
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\admin.css",
+    "line": 10,
+    "snippet": "border-left:3px solid #1584a5}.admin-enrichment-strip small{flex-basis:100%",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\globals.css",
+    "line": 1,
+    "snippet": "border-left:3px solid #44aed0}.sidebar-foot{margin-top:auto",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\globals.css",
+    "line": 6,
+    "snippet": "border-left:4px solid #c27c22",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\globals.css",
+    "line": 8,
+    "snippet": "border-left:4px solid #b96712",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\globals.css",
+    "line": 9,
+    "snippet": "border-left:3px solid #b96712",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "border-accent-on-rounded",
+    "name": "Border accent on rounded element",
+    "description": "Thick accent border on a rounded card — the border clashes with the rounded corners. Remove the border or the border-radius.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\globals.css",
+    "line": 7,
+    "snippet": "border-top:4px solid",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\history.css",
+    "line": 37,
+    "snippet": "border-left:2px solid var(--color-gold)",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\run-submissions.css",
+    "line": 48,
+    "snippet": "border-left: 2px solid var(--color-gold)",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\run-submissions.css",
+    "line": 49,
+    "snippet": "border-left: 3px solid var(--color-gold)",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\styles\\theme.css",
+    "line": 93,
+    "snippet": "border-left: 3px solid var(--color-gold)",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\styles\\theme.css",
+    "line": 140,
+    "snippet": "border-left: 3px solid var(--color-danger)",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\styles\\theme.css",
+    "line": 156,
+    "snippet": "border-left: 3px solid var(--color-attention)",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\styles\\theme.css",
+    "line": 275,
+    "snippet": "border-left: 4px solid var(--color-attention)",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\apps\\web\\app\\styles\\theme.css",
+    "line": 335,
+    "snippet": "border-left: 2px solid var(--color-gold)",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  }
+]

@@ -3,10 +3,12 @@ const { mkdirSync } = require("node:fs");
 const { spawn } = require("node:child_process");
 const { createServer } = require("node:net");
 const { resolve } = require("node:path");
+const os = require("node:os");
 const { chromium } = require("playwright");
 
 const batchId = "33333333-3333-4333-8333-333333333333";
 const runId = "22222222-2222-4222-8222-222222222222";
+const preparationId = "44444444-4444-4444-8444-444444444444";
 const csrfToken = "synthetic-tool-grants-csrf-token-123456789";
 const portProbe = createServer();
 
@@ -42,6 +44,7 @@ async function main() {
     const externalRequests = [];
     const calls = [];
     let mode = "none";
+    let preparationCreated = false;
     page.on("pageerror", (error) => pageErrors.push(error.message));
     page.on("request", (request) => { const url = new URL(request.url()); if (/^https?:$/.test(url.protocol) && url.origin !== baseUrl) externalRequests.push(url.origin); });
     await page.route("**/api/**", async (route) => {
@@ -53,11 +56,12 @@ async function main() {
       let body = {};
       let status = 200;
       const access = mode === "execute"
-        ? { toolId: "oc-policy-verification", canDiscover: true, canExecute: true, canViewResults: false, canDownloadResults: false }
+        ? { toolId: "oc-policy-verification", canDiscover: true, canExecute: true, canViewResults: true, canDownloadResults: true }
         : mode === "view"
-          ? { toolId: "oc-policy-verification", canDiscover: true, canExecute: false, canViewResults: true, canDownloadResults: false }
+          ? { toolId: "oc-policy-verification", canDiscover: true, canExecute: false, canViewResults: true, canDownloadResults: true }
           : null;
-      if (path === "/api/auth/me") { body = { role: "operator", username: "synthetic.operator", csrfToken, tools: access ? [access] : [] }; if (mode === "login") status = 401; }
+      if (path === "/api/auth/me") { body = { role: mode === "none" ? "auditor" : "operator", username: "synthetic.operator", csrfToken, tools: access ? [access] : [] }; if (mode === "login") status = 401; }
+      else if (path === "/api/notifications") body = { unreadCount: 0, items: [] };
       else if (path === "/api/auth/login" && method === "POST") { status = 401; body = { message: "Niepoprawne dane logowania" }; }
       else if (path === "/api/auth/logout" && method === "POST") body = { ok: true };
       else if (path === "/api/health/automation") body = { automationReady: false, servicesReady: false, worker: "offline", portalMode: "off", portalConfig: "valid", message: "Tryb testowy" };
@@ -65,6 +69,24 @@ async function main() {
       else if (path === "/api/interventions") body = { items: [], nextCursor: null };
       else if (path === `/api/imports/${batchId}`) body = { id: batchId, totalRows: 1, invalidRows: 0, readyRows: 1, sha256: "a".repeat(64) };
       else if (path === `/api/imports/${batchId}/rows`) body = [{ rowNumber: 2, companyName: "Transport Test sp. z o.o.", decisionMakerName: "Anna Testowa", regon: "123456789", issues: [] }];
+      else if (path === `/api/imports/${batchId}/preparations` && method === "GET") body = { preparations: preparationCreated ? [{
+        preparationId, batchId, revision: 1, rulesVersion: "smoke-v1", sourceFingerprint: "c".repeat(64), status: "completed", stage: "completed",
+        totalRows: 1, counts: { ready: 1, review: 0, skippedNoIdentifiers: 0, duplicates: 0, waitingRegistry: 0 }, version: 1,
+        errorCode: null, createdAt: "2026-10-02T08:00:00.000Z", updatedAt: "2026-10-02T08:00:01.000Z",
+        finishedAt: "2026-10-02T08:00:01.000Z", sealedAt: "2026-10-02T08:00:01.000Z",
+      }] : [] };
+      else if (path === `/api/imports/${batchId}/preparations` && method === "POST") {
+        preparationCreated = true;
+        body = { preparationId, batchId, revision: 1, rulesVersion: "smoke-v1", sourceFingerprint: "c".repeat(64), status: "completed", stage: "completed",
+          totalRows: 1, counts: { ready: 1, review: 0, skippedNoIdentifiers: 0, duplicates: 0, waitingRegistry: 0 }, version: 1,
+          errorCode: null, createdAt: "2026-10-02T08:00:00.000Z", updatedAt: "2026-10-02T08:00:01.000Z",
+          finishedAt: "2026-10-02T08:00:01.000Z", sealedAt: "2026-10-02T08:00:01.000Z" };
+      }
+      else if (path === `/api/imports/${batchId}/preparation-workflows`) body = { workflows: [] };
+      else if (path === `/api/imports/${batchId}/preparations/${preparationId}/rows`) body = { preparationId, status: "completed", page: 1, pageSize: 50, total: 1, rows: [
+        { rowNumber: 2, sourceRowId: "55555555-5555-4555-8555-555555555555", expectedRowVersion: 1, status: "ready", reasonCode: null,
+          representativeRowNumber: 2, normalizedName: "Transport Test sp. z o.o.", normalizedNip: "1234567890", effectiveRegon: "123456789", regonProvenance: "import" },
+      ] };
       else if (path === `/api/imports/${batchId}/enrichment`) body = { page: 1, pageSize: 50, totalRows: 0, summary: { missingRegonRows: 0, pendingCorrectionRows: 0, openConflictRows: 0, lookupStatuses: {} }, rows: [] };
       else if (path === "/api/imports" && method === "POST") body = { id: batchId, totalRows: 1, invalidRows: 0, readyRows: 1, sha256: "b".repeat(64) };
       else if (path === "/api/runs" && method === "GET") body = mode === "view" ? [{ id: runId, rowNumber: 18001, status: "completed", currentStep: "completed", referenceDate: "2026-10-01", errorCode: null, createdAt: "2026-10-02T08:00:00.000Z", artifactAvailable: true }] : [];
@@ -73,7 +95,9 @@ async function main() {
       await route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body), headers: { "cache-control": "private, no-store" } });
     });
 
-    const screenshotDir = resolve(__dirname, "../../../docs/design/goldis/implemented");
+    const screenshotDir = process.env.GOLDIS_UI_SMOKE_SCREENSHOT_DIR
+      ? resolve(process.env.GOLDIS_UI_SMOKE_SCREENSHOT_DIR)
+      : resolve(os.tmpdir(), "goldis-tool-grants-ui-smoke");
     mkdirSync(screenshotDir, { recursive: true });
     mode = "login";
     await page.goto(baseUrl);
@@ -95,7 +119,8 @@ async function main() {
     await page.goto(`${baseUrl}/tools/oc-policy-verification?import=${batchId}`);
     await page.getByRole("heading", { name: "Brak dostępu do narzędzia" }).waitFor({ state: "visible" });
     assert.equal(calls.some((item) => item.path.startsWith(`/api/imports/${batchId}`)), false, "brak grantu odkrywania nie pobiera importu po URL");
-    assert.deepEqual(calls.map((item) => item.path), ["/api/auth/me"], "bez grantu nie są pobierane dane operacyjne");
+    assert.deepEqual(calls.filter((item) => !["/api/auth/me", "/api/notifications"].includes(item.path)), [],
+      "bez grantu menu nie pobiera importów ani innych danych operacyjnych; sesja i osobiste powiadomienia są dozwolone");
 
     mode = "execute";
     calls.length = 0;
@@ -105,9 +130,13 @@ async function main() {
     await page.locator('input[type="file"]').setInputFiles({ name: "synthetic.xlsx", mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", buffer: Buffer.from("synthetic-only") });
     await page.getByRole("button", { name: "Sprawdź i zaimportuj" }).click();
     await page.getByRole("heading", { name: "Kontrola pojedynczego wiersza" }).waitFor({ state: "visible" });
-    assert.equal(await page.locator("#workspace-runs form").count(), 1, "grant wykonania pokazuje uruchamianie");
-    assert.equal(await page.locator(".run-list, .run-detail, .enrichment-section, .download-link").count(), 0, "grant wykonania nie pokazuje historii, danych ani plików");
-    assert.equal(calls.some((item) => item.path.startsWith(`/api/imports/${batchId}/rows`)), false, "wykonanie bez odczytu nie pobiera wierszy");
+    await page.getByRole("button", { name: "Sprawdź i przygotuj import" }).click();
+    await page.locator("#workspace-runs form.run-form").waitFor({ state: "visible" });
+    assert.equal(await page.locator("#workspace-runs form.run-form").count(), 1, "grant wykonania pokazuje uruchamianie pojedynczego wiersza");
+    assert.equal(await page.locator("#workspace-runs form.submission-selection").count(), 1, "grant wykonania pokazuje osobną selekcję uruchomienia partii");
+    assert.equal(await page.locator("#workspace-result").count(), 1, "pracownik zachowuje wspólny odczyt wyników podczas wykonywania");
+    assert.equal(await page.locator(".run-detail").count(), 0, "przed startem nie ma jeszcze szczegółu zadania");
+    assert.equal(calls.some((item) => item.path.startsWith(`/api/imports/${batchId}/preparations/`)), true, "wykonujący widzi przygotowanie własnego importu");
 
     mode = "view";
     await page.goto(`${baseUrl}/tools/oc-policy-verification?import=${batchId}`);
@@ -115,7 +144,8 @@ async function main() {
     assert.equal(await page.locator("#workspace-runs form").count(), 0, "grant odczytu bez wykonania ukrywa start zadania");
     await page.getByRole("button", { name: /Wiersz 18001/ }).click();
     await page.getByRole("heading", { name: /Wiersz 18001: Zakończono/ }).waitFor({ state: "visible" });
-    assert.equal(await page.locator(".download-link").count(), 0, "grant odczytu bez pobierania ukrywa artefakt");
+    assert.equal(await page.locator(`.download-link[href="/api/runs/${runId}/artifact"]`).count(), 1,
+      "wspólny dostęp pracownika do wyników obejmuje pobranie Excel zadania");
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.screenshot({ path: resolve(screenshotDir, "workspace-desktop.png"), fullPage: true, animations: "disabled" });
 
@@ -129,23 +159,18 @@ async function main() {
     await menuToggle.click();
     const drawer = page.getByRole("dialog", { name: "Nawigacja" });
     await drawer.waitFor({ state: "visible" });
-    await page.waitForFunction(() => document.activeElement?.closest(".mobile-nav-drawer") !== null);
+    await page.waitForFunction(() => document.activeElement?.closest(".lead-mobile-drawer") !== null);
     assert.equal(await drawer.evaluate((node) => node.contains(document.activeElement)), true, "otwarcie menu przenosi fokus do dialogu");
     await page.screenshot({ path: resolve(screenshotDir, "workspace-mobile-menu.png"), animations: "disabled" });
-    await drawer.getByRole("button", { name: "Zamknij menu nawigacji" }).focus();
+    await drawer.getByRole("button", { name: "Zamknij menu" }).focus();
     await page.keyboard.press("Shift+Tab");
-    assert.equal(await drawer.getByRole("button", { name: "Wyloguj" }).evaluate((node) => node === document.activeElement), true, "fokus zapętla się wewnątrz menu");
+    assert.equal(await drawer.getByRole("link", { name: "Moje konto" }).evaluate((node) => node === document.activeElement), true, "fokus zapętla się wewnątrz menu");
     await page.keyboard.press("Escape");
-    await page.waitForFunction(() => document.activeElement?.classList.contains("mobile-menu-toggle"));
+    await page.waitForFunction(() => document.activeElement?.classList.contains("lead-mobile-menu-button"));
     assert.equal(await menuToggle.getAttribute("aria-expanded"), "false", "Escape zamyka menu");
     assert.equal(await menuToggle.evaluate((node) => node === document.activeElement), true, "zamknięcie menu przywraca fokus do przycisku");
-    await menuToggle.click();
-    await page.getByRole("dialog", { name: "Nawigacja" }).getByRole("link", { name: "Wyniki", exact: true }).click();
-    assert.equal(new URL(page.url()).hash, "#workspace-result", "wybór nawigacji przechodzi do wybranej sekcji");
-    await page.waitForFunction(() => document.activeElement?.id === "workspace-result");
-    assert.equal(await page.locator("#workspace-result").evaluate((node) => node === document.activeElement), true, "po zamknięciu menu fokus przechodzi na cel nawigacji");
-    await page.setViewportSize({ width: 768, height: 900 });
-    assert.equal(await menuToggle.isVisible(), true, "drawer pozostaje dostępny na tablecie");
+    await page.setViewportSize({ width: 760, height: 900 });
+    assert.equal(await menuToggle.isVisible(), true, "drawer pozostaje dostępny przy mobilnym progu układu");
     await page.setViewportSize({ width: 1024, height: 768 });
     assert.equal(await menuToggle.isVisible(), false, "szeroki widok pokazuje nawigację boczną");
     assert.equal(await page.getByRole("navigation", { name: "Główna nawigacja" }).first().isVisible(), true, "nawigacja desktopowa pozostaje widoczna");
@@ -153,13 +178,10 @@ async function main() {
     await page.setViewportSize({ width: 1920, height: 1080 });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "dokument nie przewija się poziomo przy 1920 px");
     await page.setViewportSize({ width: 375, height: 812 });
-    await menuToggle.click();
-    await page.getByRole("dialog", { name: "Nawigacja" }).getByRole("button", { name: "Wyloguj" }).click();
-    await page.getByRole("heading", { name: "Zaloguj się" }).waitFor({ state: "visible" });
-    assert.equal(await page.evaluate(() => document.body.style.overflow), "", "wylogowanie z menu zwalnia blokadę scrolla");
+    assert.equal(await page.evaluate(() => document.body.style.overflow), "", "zamknięcie menu zwalnia blokadę scrolla");
     assert.deepEqual(pageErrors, [], "brak błędów JavaScript");
     assert.deepEqual(externalRequests, [], "fonty i zasoby UI nie ładują się z zewnętrznej domeny");
-    console.log("TOOL_GRANTS_UI_SMOKE_PASS discovery=true executeOnly=true viewOnly=true downloadSeparate=true mobileDrawer=true focusTrap=true mobileLogout=true responsive320To1920=true noExternalRequests=true screenshots=true syntheticOnly=true");
+    console.log("TOOL_GRANTS_UI_SMOKE_PASS noAccessRole=true operatorSharedReadAndDownload=true executeGate=true viewOnlyHidesStart=true mobileDrawer=true focusTrap=true responsive320To1920=true noExternalRequests=true screenshots=true syntheticOnly=true");
   } finally {
     if (browser) await browser.close();
     if (server.exitCode === null) { server.kill(); await new Promise((resolveExit) => server.once("exit", resolveExit)); }

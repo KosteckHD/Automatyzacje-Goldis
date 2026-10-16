@@ -4,15 +4,20 @@
   "private": true,
   "main": "dist/main.js",
   "scripts": {
-    "build": "npm run build -w @goldis/core && tsc -p tsconfig.json",
+    "clean": "node ../../scripts/clean-workspace-dist.cjs @goldis/api",
+    "build": "npm run build -w @goldis/core && npm run clean && tsc -p tsconfig.json",
     "dev": "npm run build -w @goldis/core && ts-node src/main.ts",
     "start": "node dist/main.js",
     "migrate": "node dist/migrate.js",
     "start:enrichment-worker": "node dist/enrichment-worker.js",
+    "test:registry-budget": "npm run build && node --test dist/features/enrichment/registry-request-budget.spec.js",
     "test:migrations": "node scripts/migration-smoke.cjs",
     "test:login-rate-limit-redis-smoke": "node scripts/login-rate-limit-redis-smoke.cjs",
     "test:w3-sms-redis-smoke": "node scripts/w3-sms-redis-smoke.cjs",
-    "test": "npm run build && node --test dist/*.test.js"
+    "test": "npm run build && node ../../scripts/run-node-tests.cjs dist",
+    "test:unit": "npm run build && node ../../scripts/run-node-tests.cjs dist unit",
+    "test:http": "npm run build && node ../../scripts/run-node-tests.cjs dist http",
+    "test:contract": "npm run build && node ../../scripts/run-node-tests.cjs dist contract"
   },
   "dependencies": {
     "@goldis/core": "0.1.0",
@@ -27,6 +32,7 @@
     "pg-hstore": "^2.0.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.0",
+    "saxes": "^5.0.1",
     "sequelize": "^6.37.0",
     "umzug": "^3.8.0"
   },

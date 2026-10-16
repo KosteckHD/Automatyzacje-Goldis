@@ -14,6 +14,8 @@ const interventionId = "44444444-4444-4444-8444-444444444444";
 const interventionPageTwoId = "88888888-8888-4888-8888-888888888888";
 const userRoleOverrides = new Map();
 const userStatusOverrides = new Map();
+const deletionGrantOverrides = new Map();
+const deletionGrantVersions = new Map();
 let assignmentConflictOnce = true;
 let operationFailureOnce = true;
 const firstHundredUsers = [
@@ -44,6 +46,13 @@ async function waitForServer(url, process) {
   throw new Error("NEXT_SERVER_START_TIMEOUT");
 }
 
+async function confirmCurrentPassword(page) {
+  const dialog = page.getByRole("dialog", { name: "Potwierdź swoją tożsamość" });
+  await dialog.waitFor({ state: "visible" });
+  await dialog.getByLabel("Obecne hasło").fill("Synthetic-Current-Password-2026!");
+  await dialog.getByRole("button", { name: "Potwierdź i wykonaj" }).click();
+}
+
 async function main() {
   const port = await freePort();
   const baseUrl = `http://127.0.0.1:${port}`;
@@ -68,7 +77,8 @@ async function main() {
       const path = url.pathname;
       let body = {};
       let status = 200;
-      if (path === "/api/auth/me") body = { role: "admin", username: "admin.demo", csrfToken, mustChangePassword: false };
+      if (path === "/api/admin/privileged-confirmations" && method === "POST") body = { token: "77777777-7777-4777-8777-777777777777.synthetic-step-up-token-123456789012345678901234567890123" };
+      else if (path === "/api/auth/me") body = { role: "admin", username: "admin.demo", csrfToken, mustChangePassword: false };
       else if (path === "/api/admin/overview") body = { userCount: 2, toolCount: 1, openInterventionCount: 1, activeRunCount: 1 };
       else if (path === "/api/admin/users" && method === "GET") {
         const cursor = url.searchParams.get("cursor");
@@ -83,7 +93,27 @@ async function main() {
           : { items: searched ?? firstHundredUsers.map((user) => ({ ...user, role: userRoleOverrides.get(user.userId) ?? user.role, status: userStatusOverrides.get(user.userId) ?? user.status })), nextCursor: searched ? null : "users-page-2" };
       }
       else if (path === "/api/admin/tools" || path === "/api/tools") body = { items: [{ toolId, displayName: "Weryfikacja polis OC", description: "synthetic", status: "available" }] };
-      else if (path === "/api/admin/operations/summary") body = { api: "online", database: "online", redis: "online", worker: "offline", portalMode: "off", portalConfig: "valid", automationReady: false, runCounts: { waiting_for_sms: 1 }, openInterventionCount: 1, dispatch: { pendingCount: 0, oldestCreatedAt: null } };
+      else if (path === "/api/admin/runtime") body = {
+        build: { version: "0.1.0-test", commit: "abcdef123456", imageDigest: null },
+        schema: { migrationCount: 29, latestMigration: "029-registry-result-cache", version: "029" },
+      };
+      else if (path === "/api/admin/operations/summary") body = {
+        api: "online", database: "online", redis: "online", worker: "offline", portalMode: "off", portalConfig: "valid", automationReady: false,
+        runCounts: { waiting_for_sms: 1 }, openInterventionCount: 1, dispatch: { pendingCount: 0, oldestCreatedAt: null },
+        submissionGroups: { pendingCount: 3, oldestPendingAt: "2026-10-06T07:00:00.000Z", byStateAndReason: [
+          { status: "waiting_capacity", reasonCode: "DISPATCH_CAPACITY", count: 2 },
+          { status: "blocked", reasonCode: "SOURCE_CONFLICT", count: 1 },
+        ] },
+        submissionCounts: { queued: 1, completed: 2 },
+        enrichment: {
+          worker: { available: false, worker: "offline", provider: "disabled", providerName: null, message: "Worker wzbogacania jest offline" },
+          jobs: { pendingCount: 2, oldestPendingAt: "2026-10-06T08:00:00.000Z" },
+          providerBudgets: [
+            { providerName: "mf-vat", usageDate: "2026-10-07", dailyLimit: 100, reservedRequests: 100, remainingRequests: 0, limitReached: true, resetsAt: "2026-10-07T22:00:00.000Z" },
+            { providerName: "gus-bir", usageDate: "2026-10-07", dailyLimit: 6000, reservedRequests: 0, remainingRequests: 6000, limitReached: false, resetsAt: null },
+          ],
+        },
+      };
       else if (path === "/api/admin/operations/runs") {
         const pageNumber = Number(url.searchParams.get("page") ?? "1");
         pageRequests.push(`operations:${pageNumber}`);
@@ -96,12 +126,19 @@ async function main() {
         pageRequests.push(`interventions:${pageNumber}`);
         body = { page: pageNumber, hasMore: pageNumber === 1, items: [{ interventionId: pageNumber === 1 ? interventionId : interventionPageTwoId, runId: pageNumber === 1 ? "33333333-3333-4333-8333-333333333333" : "55555555-5555-4555-8555-555555555555", toolId, kind: "sms", portal: "pzu", reasonCode: "SMS_TIMEOUT", status: "open", priority: "normal", dueAt: "2026-10-05T12:00:00.123Z", assigneeUserId: null, assigneeUsername: null, revision: 2, createdAt: "2026-10-02T08:00:00.000Z", rowNumber: 18001 + pageNumber, currentStep: "waiting_for_sms", runErrorCode: "SMS_RETRY_REQUIRED" }] };
       }
-      else if (path.endsWith(`/users/${adminId}/grants`) || path.endsWith(`/users/${operatorId}/grants`) || /\/users\/[0-9a-f-]+\/grants$/.test(path)) body = { userId: operatorId, role: "operator", items: [{ toolId, displayName: "Weryfikacja polis OC", status: "available", canDiscover: true, canExecute: false, canViewResults: true, canDownloadResults: false, version: 3 }] };
+      else if (/\/users\/[0-9a-f-]+\/grants$/.test(path)) {
+        const userId = path.split("/").at(-2);
+        const user = [...firstHundredUsers, user101].find((item) => item.userId === userId);
+        body = { userId, role: userRoleOverrides.get(userId) ?? user?.role ?? "operator",
+          canDeleteData: deletionGrantOverrides.get(userId) ?? false,
+          deletionGrantVersion: deletionGrantVersions.get(userId) ?? 0,
+          items: [{ toolId, displayName: "Weryfikacja polis OC", status: "available", canDiscover: true, canExecute: false, canViewResults: true, canDownloadResults: false, version: 3 }] };
+      }
       else if (/\/users\/[0-9a-f-]+\/sessions$/.test(path)) body = { items: [{ sessionId: "55555555-5555-4555-8555-555555555555", createdAt: "2026-10-02T07:00:00.000Z", lastSeenAt: "2026-10-02T08:00:00.000Z", expiresAt: "2026-10-02T15:00:00.000Z", revokedAt: null, browserLabel: "Chrome · Windows", isCurrent: false }] };
       else if (method === "GET" && /\/admin\/tools\/[^/]+\/settings$/.test(path)) body = { enabledForNewRuns: true, maxNewRunsPerHour: 5, allowedLocalStart: "08:00:00", allowedLocalEnd: "18:00:00", timezone: "Europe/Warsaw", version: 2, updatedAt: "2026-10-02T08:00:00.000Z" };
       else if (/\/admin\/interventions\/[0-9a-f-]+\/activity$/.test(path)) body = { items: [{ eventType: "assigned", actorUsername: "admin.demo", createdAt: "2026-10-02T08:00:00.000Z" }] };
       else if (path === "/api/audit/events") body = { items: [{ eventId: "66666666-6666-4666-8666-666666666666", actorUserId: adminId, actorUsername: "admin.demo", action: "tool.grant.updated", resourceType: "tool", resourceId: toolId, outcome: "succeeded", createdAt: "2026-10-02T08:00:00.000Z" }], nextCursor: null };
-      else if (path === "/api/admin/reports/overview") body = { counts: { created: 4, completed: 2, noPolicies: 1, failed: 1, inProgress: 0, downloads: 3, generated: 2, openInterventions: 1 }, completionRate: 0.5, durationSeconds: { median: 300, p90: 600 }, medianResolvedInterventionSeconds: 1800, daily: [{ day: "2026-10-02", created: 4, completed: 2, noPolicies: 1, failed: 1 }], definitions: { created: "run.created_at w zakresie", completionRate: "według finished_at" } };
+      else if (path === "/api/admin/reports/overview") body = { counts: { sourceRows: 40, canonicalGroups: 12, submissions: 5, actualRuns: 4, created: 4, completed: 2, noPolicies: 1, failed: 1, inProgress: 0, downloads: 3, generated: 2, openInterventions: 1 }, completionRate: 0.5, durationSeconds: { median: 300, p90: 600 }, medianResolvedInterventionSeconds: 1800, submissionsByStatus: { queued: 5 }, submissionGroupsByStateAndReason: [{ status: "waiting_capacity", reasonCode: "CAPACITY_LIMIT", count: 4 }], daily: [{ day: "2026-10-02", created: 4, completed: 2, noPolicies: 1, failed: 1 }], definitions: { sourceRows: "rows in imports", canonicalGroups: "canonical tenants", submissions: "submission count", actualRuns: "run count", created: "run.created_at w zakresie", completionRate: "według finished_at" } };
       else if (path === "/api/admin/reports/failures") body = { items: [] };
       else if (path === "/api/admin/reports/interventions") body = { items: [{ kind: "sms", status: "open", reasonCode: "SMS_TIMEOUT", count: 1, medianResolutionSeconds: null, openCount: 1 }] };
       else if (path === "/api/admin/reports/throughput") body = { items: [{ day: "2026-10-02", created: 4, completed: 2, noPolicies: 1, failed: 1, medianRunSeconds: 300 }] };
@@ -119,6 +156,19 @@ async function main() {
         writes.push({ path, method, headers: request.headers(), payload: request.postDataJSON() });
         userRoleOverrides.set(path.split("/").at(-2), request.postDataJSON().role);
         body = { ok: true };
+      }
+      else if (method === "PUT" && /\/admin\/users\/[0-9a-f-]+\/deletion-grant$/.test(path)) {
+        const userId = path.split("/").at(-2);
+        const payload = request.postDataJSON();
+        writes.push({ path, method, headers: request.headers(), payload });
+        const version = deletionGrantVersions.get(userId) ?? 0;
+        if (payload.expectedVersion !== version) { status = 409; body = { message: "Grant usuwania zmienił się" }; }
+        else {
+          const nextVersion = version + (deletionGrantOverrides.get(userId) === payload.canDeleteData ? 0 : 1);
+          deletionGrantVersions.set(userId, nextVersion);
+          deletionGrantOverrides.set(userId, payload.canDeleteData);
+          body = { userId, canDeleteData: payload.canDeleteData, version: nextVersion };
+        }
       }
       else if (method === "POST" && /\/admin\/users\/[0-9a-f-]+\/disable$/.test(path)) {
         writes.push({ path, method, headers: request.headers(), payload: request.postDataJSON() });
@@ -139,11 +189,19 @@ async function main() {
 
     await page.goto(`${baseUrl}/admin`);
     await page.getByRole("heading", { name: "Dostęp i jakość pracy pod kontrolą." }).waitFor({ state: "visible" });
+    await page.getByText("0.1.0-test", { exact: true }).waitFor({ state: "visible" });
+    await page.getByText("029-registry-result-cache · 29 migracji", { exact: true }).waitFor({ state: "visible" });
+    const enrichmentOperations = page.locator(".admin-enrichment-strip");
+    const visibleBudget = await enrichmentOperations.locator("span").filter({ hasText: /^Budżet dzienny/ }).locator("b").innerText();
+    assert.match(visibleBudget, /mf-vat: 100\/100 · limit · reset/, "panel pokazuje wykorzystany limit dostawcy");
+    assert.match(visibleBudget, /8\.10\.2026/, `reset budżetu jest wyświetlany w Europe/Warsaw: ${visibleBudget}`);
+    assert.match(visibleBudget, /Europe\/Warsaw/, "panel jawnie pokazuje strefę resetu limitu");
     await page.locator("label.admin-field").filter({ hasText: /^Użytkownik/ }).locator("select").selectOption(operatorId);
     const execute = page.getByLabel("Uruchamianie");
     await execute.waitFor({ state: "visible" });
     await execute.check();
-    await page.getByRole("button", { name: "Zapisz grant" }).click();
+    await page.getByRole("button", { name: "Zapisz grant", exact: true }).click();
+    await confirmCurrentPassword(page);
     await page.getByRole("status").filter({ hasText: "Uprawnienia zapisane" }).waitFor({ state: "visible" });
     const grantWrite = writes.find((item) => item.path.endsWith(`/users/${operatorId}/grants/${toolId}`) && item.method === "PUT");
     assert.equal(grantWrite?.payload.expectedVersion, 3, "zapis grantu używa wersji CAS");
@@ -158,6 +216,7 @@ async function main() {
     assert.equal(await revokeGrant.evaluate((element) => element === document.activeElement), true, "zamknięcie dialogu zwraca fokus do akcji wywołującej");
     await revokeGrant.click();
     await page.getByRole("alertdialog").getByRole("button", { name: "Cofnij dostęp" }).click();
+    await confirmCurrentPassword(page);
     await page.getByRole("status").filter({ hasText: "Grant cofnięty" }).waitFor({ state: "visible" });
     assert.equal(writes.filter((item) => item.path.endsWith(`/grants/${toolId}/revoke`)).length, 1, "potwierdzenie grantu wysyła dokładnie jedną mutację");
 
@@ -168,23 +227,38 @@ async function main() {
     await page.getByText("operator.member.101", { exact: true }).waitFor({ state: "visible" });
     await page.getByRole("button", { name: "Wyłącz konto" }).click();
     await page.getByRole("alertdialog").getByRole("button", { name: "Wyłącz konto" }).click();
+    await confirmCurrentPassword(page);
     await page.getByRole("status").filter({ hasText: "Konto wyłączone" }).waitFor({ state: "visible" });
     assert.equal(await userSelect.inputValue(), user101Id, "wybrany 101. użytkownik pozostaje wybrany po odświeżeniu strony");
     await page.getByRole("button", { name: "Włącz konto" }).click();
+    await confirmCurrentPassword(page);
     await page.getByRole("status").filter({ hasText: "Konto włączone" }).waitFor({ state: "visible" });
     assert.equal(await userSelect.inputValue(), user101Id, "wybrany użytkownik spoza strony pozostaje dostępny po mutacji");
     await userSelect.selectOption(operatorId);
 
     const roleSelect = page.locator("#accounts .admin-form-row select");
-    await roleSelect.selectOption("reviewer");
+    await roleSelect.selectOption("manager");
     assert.equal(writes.filter((item) => item.path.endsWith("/role")).length, 0, "wybór roli nie zapisuje jej automatycznie");
     await page.getByRole("button", { name: "Zapisz rolę" }).click();
     await page.getByRole("alertdialog").getByRole("button", { name: "Anuluj" }).click();
     assert.equal(writes.filter((item) => item.path.endsWith("/role")).length, 0, "anulowanie zmiany roli nie wysyła mutacji");
     await page.getByRole("button", { name: "Zapisz rolę" }).click();
     await page.getByRole("alertdialog").getByRole("button", { name: "Zapisz rolę" }).click();
+    await confirmCurrentPassword(page);
     await page.getByRole("status").filter({ hasText: "Rola zaktualizowana" }).waitFor({ state: "visible" });
     assert.equal(writes.filter((item) => item.path.endsWith("/role")).length, 1, "potwierdzenie roli wysyła jedną zmianę z API");
+    assert.equal(writes.find((item) => item.path.endsWith("/role")).payload.role, "manager", "panel zapisuje nową rolę Menedżer dokładnie po potwierdzeniu");
+    const deletionGrantToggle = page.getByLabel("Menedżer może usuwać importy i wyniki");
+    await deletionGrantToggle.waitFor({ state: "visible" });
+    await deletionGrantToggle.check();
+    await page.getByRole("button", { name: "Zapisz grant kasowania" }).click();
+    await confirmCurrentPassword(page);
+    await page.getByRole("status").filter({ hasText: "Grant usuwania danych Menedżera zapisany" }).waitFor({ state: "visible" });
+    const deletionGrantWrite = writes.find((item) => item.path.endsWith(`/users/${operatorId}/deletion-grant`) && item.method === "PUT");
+    assert.equal(deletionGrantWrite?.payload.canDeleteData, true, "grant kasowania zachowuje żądany stan");
+    assert.equal(deletionGrantWrite?.payload.expectedVersion, 0, "grant kasowania używa własnej rewizji CAS");
+    assert.ok(deletionGrantWrite?.payload.confirmationToken && deletionGrantWrite?.payload.idempotencyKey, "grant kasowania jest związany z jednorazowym potwierdzeniem");
+    assert.equal(deletionGrantWrite?.headers["x-csrf-token"], csrfToken, "grant kasowania zawiera CSRF");
 
     const disablesBeforeOperator = writes.filter((item) => item.path.endsWith("/disable")).length;
     await page.getByRole("button", { name: "Wyłącz konto" }).click();
@@ -192,11 +266,13 @@ async function main() {
     assert.equal(writes.filter((item) => item.path.endsWith("/disable")).length, disablesBeforeOperator, "anulowanie wyłączenia konta nie wysyła mutacji");
     await page.getByRole("button", { name: "Wyłącz konto" }).click();
     await page.getByRole("alertdialog").getByRole("button", { name: "Wyłącz konto" }).click();
+    await confirmCurrentPassword(page);
     await page.getByRole("status").filter({ hasText: "Konto wyłączone" }).waitFor({ state: "visible" });
     assert.equal(writes.filter((item) => item.path.endsWith("/disable")).length, disablesBeforeOperator + 1, "potwierdzenie wyłącza konto dokładnie raz");
 
     const enablesBeforeOperator = writes.filter((item) => item.path.endsWith("/enable")).length;
     await page.getByRole("button", { name: "Włącz konto" }).click();
+    await confirmCurrentPassword(page);
     await page.getByRole("status").filter({ hasText: "Konto włączone" }).waitFor({ state: "visible" });
     assert.equal(writes.filter((item) => item.path.endsWith("/enable")).length, enablesBeforeOperator + 1, "włączenie konta nie wymaga dodatkowego dialogu");
 
@@ -205,16 +281,28 @@ async function main() {
     assert.equal(writes.filter((item) => item.path.endsWith("/revoke-sessions")).length, 0, "anulowanie cofnięcia sesji nie wysyła mutacji");
     await page.getByRole("button", { name: "Cofnij wszystkie sesje" }).click();
     await page.getByRole("alertdialog").getByRole("button", { name: "Cofnij wszystkie sesje" }).click();
+    await confirmCurrentPassword(page);
     await page.getByRole("status").filter({ hasText: "Aktywne sesje cofnięte" }).waitFor({ state: "visible" });
     assert.equal(writes.filter((item) => item.path.endsWith("/revoke-sessions")).length, 1, "potwierdzenie cofa sesje jednym żądaniem");
 
     await page.getByLabel("Login", { exact: true }).fill("new.operator");
     await page.locator("#accounts form").first().locator('input[type="password"]').fill("Synthetic-Temp-Password-2026!");
     await page.getByRole("button", { name: "Utwórz konto" }).click();
+    await confirmCurrentPassword(page);
     await page.getByRole("status").filter({ hasText: "Konto utworzone" }).waitFor({ state: "visible" });
     assert.ok(writes.some((item) => item.path === "/api/admin/users" && item.payload.password === "Synthetic-Temp-Password-2026!"));
 
     await page.locator("#operations").scrollIntoViewIfNeeded();
+    const submissionStatus = page.locator(".admin-service-strip span").filter({ hasText: "Grupy zgłoszeń" });
+    await submissionStatus.waitFor({ state: "visible" });
+    assert.match(await submissionStatus.innerText(), /3 oczekujących/, "panel pokazuje liczbę oczekujących grup zgłoszeń");
+    assert.match(await submissionStatus.innerText(), /SOURCE_CONFLICT × 1/, "panel pokazuje powód blokady zgłoszenia");
+    await page.locator(".admin-service-strip span").filter({ hasText: "Submissiony" }).getByText("W kolejce 1 · Zakończone 2", { exact: true }).waitFor({ state: "visible" });
+    await page.getByText("2 · najstarszy", { exact: false }).waitFor({ state: "visible" });
+    const enrichmentStrip = page.locator(".admin-enrichment-strip");
+    await enrichmentStrip.waitFor({ state: "visible" });
+    assert.match(await enrichmentStrip.innerText(), /mf-vat:\s*100\/100.*reset 8\.10\.2026.*Europe\/Warsaw/, "panel pokazuje zużycie, limit i czas jego resetu");
+    await enrichmentStrip.getByText("Worker rejestru").waitFor({ state: "visible" });
     const failedOperationsRequest = page.waitForResponse((response) => response.url().includes("/api/admin/operations/runs?") && response.url().includes("page=1"));
     await page.getByRole("button", { name: "Filtruj zadania" }).click();
     assert.equal((await failedOperationsRequest).status(), 503, "panel odbiera kontrolowany błąd niedostępnej listy");
@@ -320,7 +408,31 @@ async function main() {
     assert.ok(writes.some((item) => item.path === "/api/admin/users" && item.headers["x-csrf-token"] === csrfToken));
     assert.ok(writes.every((item) => item.headers["x-csrf-token"] === csrfToken), "każda administracyjna mutacja przesyła CSRF");
     assert.deepEqual(pageErrors, [], "brak błędów JavaScript w panelu");
-    const screenshotDir = resolve(__dirname, "../../../docs/design/goldis/implemented");
+    const interventionFilters = page.locator(".admin-intervention-controls > .admin-filter-inline");
+    await interventionFilters.scrollIntoViewIfNeeded();
+    for (const width of [320, 390, 720, 768, 1024, 1280, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      const layout = await interventionFilters.evaluate((element) => {
+        const bounds = element.getBoundingClientRect();
+        return {
+          clientWidth: element.clientWidth,
+          scrollWidth: element.scrollWidth,
+          children: Array.from(element.children).map((child) => {
+            const childBounds = child.getBoundingClientRect();
+            return { left: childBounds.left, right: childBounds.right };
+          }),
+          left: bounds.left,
+          right: bounds.right,
+        };
+      });
+      assert.ok(layout.scrollWidth <= layout.clientWidth + 1, `filtry zgłoszeń mieszczą się we własnym kontenerze przy ${width}px`);
+      assert.ok(layout.children.every((child) => child.left >= layout.left - 1 && child.right <= layout.right + 1),
+        `kontrolki filtrów nie wystają poza kontener przy ${width}px`);
+    }
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const screenshotDir = process.env.GOLDIS_UI_SMOKE_SCREENSHOT_DIR
+      ? resolve(process.env.GOLDIS_UI_SMOKE_SCREENSHOT_DIR)
+      : resolve(__dirname, "../../../docs/design/goldis/implemented");
     mkdirSync(screenshotDir, { recursive: true });
     await page.screenshot({ path: resolve(screenshotDir, "admin-desktop.png"), fullPage: true, animations: "disabled" });
     await page.setViewportSize({ width: 375, height: 812 });
@@ -333,7 +445,7 @@ async function main() {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "panel admina nie przewija się poziomo przy 1024 px");
     await page.setViewportSize({ width: 1920, height: 1080 });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "panel admina nie przewija się poziomo przy 1920 px");
-    console.log("ADMIN_UI_SMOKE_PASS grantsCas=true user101Pagination=true user101SelectionSurvivesMutations=true assigneeSearch=true adminConfirmCancelAndConfirm=true confirmationFocusReturn=true assignmentRevisionConflictRecovery=true warsawTimeRoundTrip=true dueAtClear=true dstGapRejected=true dstBothOffsetsExplicit=true operationsAndInterventionPagination=true service503Recovery=true settingsCas=true auditSearch=true reports=true csrf=true responsive320To1920=true screenshots=true");
+    console.log("ADMIN_UI_SMOKE_PASS runtimeManifest=true enrichmentWorkerBudgetAndPendingJobs=true submissionCountsAndGroupReasons=true grantsCas=true deletionGrantManagerCas=true user101Pagination=true user101SelectionSurvivesMutations=true assigneeSearch=true adminConfirmCancelAndConfirm=true confirmationFocusReturn=true assignmentRevisionConflictRecovery=true warsawTimeRoundTrip=true dueAtClear=true dstGapRejected=true dstBothOffsetsExplicit=true operationsAndInterventionPagination=true service503Recovery=true settingsCas=true auditSearch=true reports=true csrf=true responsive320To1920=true screenshots=true");
   } finally {
     if (browser) await browser.close();
     if (server.exitCode === null) { server.kill(); await new Promise((resolveExit) => server.once("exit", resolveExit)); }

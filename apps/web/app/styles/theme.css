@@ -127,7 +127,7 @@ button:disabled { opacity: .58; cursor: not-allowed; }
 .metrics div+div, .run-policy-counts div+div { border-left-color: var(--color-border); }
 .metrics strong, .run-policy-counts strong { color: var(--color-gold-hover); font-family: var(--font-display), Georgia, serif; font-weight: 500; font-variant-numeric: tabular-nums; }
 .metrics span, .run-policy-counts span { color: var(--color-text-muted); }
-.table-wrap, .admin-table-wrap { max-width: 100%; border-radius: 5px; }
+.table-wrap, .admin-table-wrap { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; border-radius: 5px; }
 .table-wrap[role="region"]:focus-visible, .admin-table-wrap[role="region"]:focus-visible { outline: 3px solid var(--color-gold-hover); outline-offset: 2px; }
 table { color: var(--color-text); font-variant-numeric: tabular-nums; }
 th { background: var(--color-surface-raised); color: var(--color-text-muted); }
@@ -189,6 +189,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--color-gold); }
 .login-card label { color: var(--color-text); }
 .login-card form { gap: 18px; }
 .login-card button { min-height: 46px; margin-top: 5px; }
+.login-help { margin: 0; color: var(--color-text-muted); font-size: .875rem; line-height: 1.5; }
 .sms-modal-backdrop { background: #03010de0; backdrop-filter: blur(5px); }
 .sms-modal { border: 1px solid #66532e; border-radius: var(--radius-modal); background: var(--color-surface); color: var(--color-text); box-shadow: 0 24px 70px #000a; }
 .sms-modal-close { color: var(--color-text-muted); }
@@ -373,12 +374,12 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--color-gold); }
   .metrics div { padding: 13px 9px; }
   .metrics strong { font-size: 1.3rem; }
   .metrics span { font-size: .7rem; }
-  .login-intro { min-height: 0; padding: 18px 20px 24px; }
-  .goldis-logo--login { width: 245px; height: 204px; }
-  .goldis-logo--login img { width: 285px; height: 286px; left: -20px; top: -43px; }
+  .login-intro { min-height: 0; padding: 16px 20px 18px; }
+  .goldis-logo--login { width: 176px; height: 130px; }
+  .goldis-logo--login img { width: 206px; height: 207px; left: -15px; top: -48px; }
   .login-intro h1 { font-size: 2rem; }
   .login-intro>p:not(.eyebrow), .login-rail { display: none; }
-  .login-card { width: min(420px, calc(100% - 30px)); margin: 22px auto 36px; padding: 22px; }
+  .login-card { width: min(420px, calc(100% - 30px)); margin: 14px auto 28px; padding: 22px; }
   .admin-hero { padding: 23px 20px; }
   .admin-hero-mark { display: none; }
   .admin-content { padding: 18px 14px 48px; }

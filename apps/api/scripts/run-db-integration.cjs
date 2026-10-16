@@ -22,12 +22,30 @@ async function withDisposableDatabase(baseUrl, mode) {
     await client.connect();
     await client.query(`CREATE DATABASE "${databaseName}"`);
     created = true;
-    const smokePath = require("node:path").resolve(__dirname, "migration-smoke.cjs");
-    const child = spawnSync(process.execPath, [smokePath, mode, databaseName], {
+    const smokeName = ["runtime-roles", "app-module"].includes(mode)
+      ? "runtime-role-smoke.cjs"
+      : mode === "upgrade-061-062" ? "migration-upgrade-smoke.cjs" : "migration-smoke.cjs";
+    const smokePath = require("node:path").resolve(__dirname, smokeName);
+    const childEnvironment = { ...process.env, DATABASE_URL: baseUrl.toString() };
+    if (process.env.GOLDIS_TEST_MODULE_RUNNER === "1") {
+      for (const key of ["GOLDIS_AUTOMATION_E2E", "GOLDIS_FULL_FLOW_E2E", "GOLDIS_PLATFORM_E2E", "GOLDIS_LIVE_E2E"]) delete childEnvironment[key];
+      childEnvironment.WORKER_LIVE_PORTALS = "0";
+      childEnvironment.PLAYWRIGHT_INTEGRATION = "0";
+    }
+    const smokeArgs = ["runtime-roles", "app-module"].includes(mode) || mode === "upgrade-061-062"
+      ? [databaseName]
+      : [mode, databaseName];
+    const smokeTimeoutMs = mode === "users" && process.env.GOLDIS_AUTOMATION_E2E === "1" ? 360_000 : 180_000;
+    const child = spawnSync(process.execPath, [smokePath, ...smokeArgs], {
       cwd: require("node:path").resolve(__dirname, "../../.."),
-      env: { ...process.env, DATABASE_URL: baseUrl.toString() }, stdio: "inherit", timeout: 180_000,
+      env: childEnvironment, stdio: "inherit", timeout: smokeTimeoutMs,
     });
-    if (child.error || child.status !== 0) throw new Error(`MIGRATION_SMOKE_FAILED_${mode}`);
+    if (child.error || child.status !== 0) {
+      const status = child.status === null ? "null" : String(child.status);
+      const signal = child.signal ?? "none";
+      const spawnError = child.error?.code ?? child.error?.name ?? "none";
+      throw new Error(`MIGRATION_SMOKE_FAILED_${mode}_status_${status}_signal_${signal}_spawn_${spawnError}`);
+    }
   } finally {
     if (created) {
       const owned = await client.query("SELECT datname FROM pg_database WHERE datname = $1", [databaseName]);
@@ -48,7 +66,7 @@ async function main() {
     return;
   }
   try {
-    const allModes = ["users-empty", "users", "tenant-scope"];
+    const allModes = ["users-empty", "users", "tenant-scope", "teams", "admin-users", "grouping-perf", "registry-jobs", "reports", "deletion", "backup-restore", "run-control", "runtime-roles", "app-module", "upgrade-061-062"];
     const requestedModes = process.env.GOLDIS_TEST_DB_MODES
       ? [...new Set(process.env.GOLDIS_TEST_DB_MODES.split(",").map((value) => value.trim()).filter(Boolean))]
       : allModes;
@@ -56,7 +74,7 @@ async function main() {
       throw new Error("GOLDIS_TEST_DB_MODES_INVALID");
     }
     for (const mode of requestedModes) await withDisposableDatabase(baseUrl, mode);
-    console.log(`DB_INTEGRATION_PASS modes=${requestedModes.join(",")} migrations=001-027 disposable_databases=dropped`);
+    console.log(`DB_INTEGRATION_PASS modes=${requestedModes.join(",")} migrations=001-062 disposable_databases=dropped`);
   } catch (error) {
     console.error("DB_INTEGRATION_FAILED", error instanceof Error ? error.message : "SMOKE_FAILED");
     process.exitCode = 1;

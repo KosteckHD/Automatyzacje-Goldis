@@ -40,9 +40,9 @@ async function waitForWeb(url, child) {
 
 async function main() {
   const redisUrl = assertDisposableRedis();
-  const models = require("../dist/db");
-  const { hashPassword } = require("../dist/password-hash");
-  const { NestFactory } = require("@nestjs/core");
+  const models = require("../dist/infrastructure/database/db");
+  const { hashPassword } = require("../dist/features/auth/index");
+  const { createHttpApplication } = require("../dist/infrastructure/http/index");
   const { Queue } = require("bullmq");
   const { chromium } = require("playwright");
   const root = await mkdtemp(join(tmpdir(), "goldis-run-submission-platform-"));
@@ -153,9 +153,8 @@ async function main() {
     ]);
 
     stage = "api_start";
-    const { AppModule } = require("../dist/module");
-    app = await NestFactory.create(AppModule, { logger: false });
-    app.setGlobalPrefix("api");
+    const { AppModule } = require("../dist/composition/module");
+    app = await createHttpApplication(AppModule, { logger: false });
     await app.listen(apiPort, "127.0.0.1");
 
     stage = "next_start";
@@ -178,6 +177,11 @@ async function main() {
     await page.getByLabel("Hasło").fill(password);
     await page.getByRole("button", { name: "Przejdź do panelu" }).click();
     await page.getByRole("heading", { name: "Sprawdź wiele wierszy" }).waitFor({ state: "visible", timeout: 30_000 });
+
+    stage = "enrichment_routes";
+    const enrichmentJobs = await page.context().request.get(`${webOrigin}/api/imports/${batchId}/enrichment-jobs`);
+    assert.equal(enrichmentJobs.status(), 200, "enrichment uses the same single /api prefix as the deployed UI");
+    assert.ok(Array.isArray((await enrichmentJobs.json()).items));
 
     stage = "preview";
     const launcher = page.locator(".submission-launcher");
@@ -254,7 +258,7 @@ async function main() {
       await queue.close();
     }
 
-    console.log("RUN_SUBMISSION_PLATFORM_SMOKE_PASS realNext=true realApi=true browserLogin=true preview=true create=true postgres=true audit=true dispatcher=true redisOutbox=true detailReload=true portals=off syntheticOnly=true");
+    console.log("RUN_SUBMISSION_PLATFORM_SMOKE_PASS realNext=true realApi=true browserLogin=true enrichmentRoutes=true preview=true create=true postgres=true audit=true dispatcher=true redisOutbox=true detailReload=true portals=off syntheticOnly=true");
   } catch (error) {
     console.error("RUN_SUBMISSION_PLATFORM_SMOKE_FAILED", `stage=${stage}`, error?.message ?? "unknown");
     throw error;

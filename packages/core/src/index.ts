@@ -2,6 +2,9 @@ export type SourceRow = {
   rowNumber: number;
   companyName: string;
   decisionMakerName: string | null;
+  mobile?: string;
+  phone?: string;
+  email?: string;
   nipRaw: string;
   address: string;
   postalCode: string;
@@ -151,6 +154,10 @@ export type AutomationErrorCodeV1 =
   | "INPUT_INVALID"
   | "IDENTITY_AMBIGUOUS"
   | "IDENTITY_NOT_FOUND"
+  | "IDENTITY_EXPECTED_PERSON_MISSING"
+  | "IDENTITY_PESEL_MISSING"
+  | "IDENTITY_PESEL_INVALID"
+  | "IDENTITY_UNSUPPORTED_TYPE"
   | "MFA_REQUIRED"
   | "MANUAL_DATA_REQUIRED"
   | "PORTAL_FAILURE"
@@ -165,6 +172,28 @@ export type AutomationErrorCodeV1 =
   | "SMS_RETRY_REQUIRED"
   | "SMS_RETRY_QUEUED"
   | "REVIEW_RETRY_QUEUED";
+
+export type IdentityLookupClassification =
+  | Readonly<{ disposition: "matched" }>
+  | Readonly<{ disposition: "failed"; errorCode: "IDENTITY_NOT_FOUND" | "IDENTITY_EXPECTED_PERSON_MISSING" | "IDENTITY_PESEL_MISSING" | "IDENTITY_PESEL_INVALID" | "IDENTITY_UNSUPPORTED_TYPE" }>
+  | Readonly<{ disposition: "review"; errorCode: "IDENTITY_AMBIGUOUS" }>;
+
+/** Shared terminal/review policy for the real and synthetic automation pipelines. */
+export function classifyIdentityLookup(input: Readonly<{
+  kind: "matched" | "not_found" | "ambiguous" | "identity_review";
+  reason?: "name_mismatch" | "missing_pesel" | "invalid_pesel" | "missing_expected_person" | "unsupported_entity_type";
+}>): IdentityLookupClassification {
+  if (input.kind === "matched") return { disposition: "matched" };
+  if (input.kind === "not_found") return { disposition: "failed", errorCode: "IDENTITY_NOT_FOUND" };
+  if (input.kind === "ambiguous" || input.reason === "name_mismatch") {
+    return { disposition: "review", errorCode: "IDENTITY_AMBIGUOUS" };
+  }
+  if (input.reason === "missing_expected_person") return { disposition: "failed", errorCode: "IDENTITY_EXPECTED_PERSON_MISSING" };
+  if (input.reason === "missing_pesel") return { disposition: "failed", errorCode: "IDENTITY_PESEL_MISSING" };
+  if (input.reason === "invalid_pesel") return { disposition: "failed", errorCode: "IDENTITY_PESEL_INVALID" };
+  if (input.reason === "unsupported_entity_type") return { disposition: "failed", errorCode: "IDENTITY_UNSUPPORTED_TYPE" };
+  return { disposition: "review", errorCode: "IDENTITY_AMBIGUOUS" };
+}
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -418,18 +447,20 @@ export function todayInWarsaw(now: Date = new Date()): string {
 export function policyMatchesDate(policy: OcPolicy, referenceDate: string): boolean {
   const end = parsePolishDate(policy.coverageTo);
   if (!end) throw new Error("COVERAGE_TO_INVALID");
-  return end >= referenceDate;
+  const reference = parsePolishDate(referenceDate);
+  if (!reference) throw new Error("REFERENCE_DATE_INVALID");
+  return end >= reference;
 }
 
 function safeFilePart(value: string, limit: number): string {
   return value.normalize("NFKC").replace(/(?<!\d)\d{11}(?!\d)/g, "ukryto").replace(/[<>:"/\\|?*\x00-\x1f]/g, "_").replace(/[. ]+$/g, "").trim().slice(0, limit).replace(/[. ]+$/g, "");
 }
 
-export function exportFileName(regon: string, companyName: string, decisionMakerName?: string | null): string {
+export function exportFileName(regon: string, companyName: string): string {
+  if (!/^\d{9}(?:\d{5})?$/.test(regon)) throw new Error("EXPORT_REGON_INVALID");
   const safeCompany = safeFilePart(companyName, 100);
-  const safePerson = decisionMakerName ? safeFilePart(decisionMakerName, 80) : "";
   if (!safeCompany) throw new Error("EXPORT_NAME_INCOMPLETE");
-  return `${regon}_${safeCompany}${safePerson ? `_${safePerson}` : ""}.xlsx`;
+  return `${safeCompany}_${regon}.xlsx`;
 }
 
 export {
@@ -442,3 +473,11 @@ export {
   type EncryptedRunIdentityRecord,
   type PeselEncryptionContext,
 } from "./pesel-crypto";
+export {
+  assertRuntimeDatabaseRole,
+  RUNTIME_DATABASE_ROLE_PROBE_SQL,
+  type RuntimeDatabaseRoleName,
+  type RuntimeDatabaseRoleSnapshot,
+} from "./runtime-database-role";
+export { isRunDispatchIntentV1, RUN_DISPATCH_INTENTS_V1 } from "./contracts/run-dispatch";
+export type { RunDispatchIntentV1 } from "./contracts/run-dispatch";

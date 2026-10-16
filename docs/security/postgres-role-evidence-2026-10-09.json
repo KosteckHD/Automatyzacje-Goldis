@@ -1,0 +1,10 @@
+{
+  "auditDate": "2026-10-09",
+  "scope": "Fresh isolated postgres:17-alpine matching POSTGRES_USER and POSTGRES_DB from compose.yaml",
+  "customerData": false,
+  "existingVpsRoleVerified": false,
+  "role": "goldis",
+  "superuser": true,
+  "createDatabase": true,
+  "createRole": true
+}

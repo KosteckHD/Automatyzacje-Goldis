@@ -1,0 +1,630 @@
+{
+  "source": "Current production Next build, Chromium, synthetic API only",
+  "capturedAt": "2026-10-15T10:10:14.097Z",
+  "results": [
+    {
+      "name": "login",
+      "route": "/",
+      "role": null,
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "width": 1440,
+      "scrollWidth": 1440,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Wyślij link do resetu",
+          "width": 129,
+          "height": 18
+        }
+      ],
+      "controlsBelow44": 1,
+      "unnamedControls": [],
+      "headings": [
+        "Narzędzia dla pracy z danymi.",
+        "Zaloguj się"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "dashboard",
+      "route": "/dashboard",
+      "role": "manager",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "width": 1440,
+      "scrollWidth": 1440,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Powiadomienia · 2",
+          "width": 101,
+          "height": 19
+        },
+        {
+          "tag": "A",
+          "name": "Wszystkie zadania →",
+          "width": 116,
+          "height": 19
+        },
+        {
+          "tag": "A",
+          "name": "Historia zadań →",
+          "width": 95,
+          "height": 19
+        }
+      ],
+      "controlsBelow44": 5,
+      "unnamedControls": [],
+      "headings": [
+        "Przegląd",
+        "Do zrobienia",
+        "Twoje operacje",
+        "Twoje narzędzia i wyniki",
+        "Stan puli zespołu"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "tools",
+      "route": "/tools",
+      "role": "manager",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "width": 1440,
+      "scrollWidth": 1440,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto ↗",
+          "width": 73,
+          "height": 19
+        }
+      ],
+      "controlsBelow44": 3,
+      "unnamedControls": [],
+      "headings": [
+        "Automatyzacje",
+        "Weryfikacja polis OC"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "oc",
+      "route": "/tools/oc-policy-verification",
+      "role": "operator",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "width": 1440,
+      "scrollWidth": 1440,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto ↗",
+          "width": 73,
+          "height": 19
+        }
+      ],
+      "controlsBelow44": 4,
+      "unnamedControls": [],
+      "headings": [
+        "Weryfikacja danych transportowych",
+        "Sprawy wymagające uwagi",
+        "Dodaj bazę transportową",
+        "Import i przygotowanie dostępne"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "results",
+      "route": "/results/oc-policy-verification",
+      "role": "manager",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "width": 1440,
+      "scrollWidth": 1440,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Konto",
+          "width": 33,
+          "height": 19
+        },
+        {
+          "tag": "A",
+          "name": "Mazovia Cargo S.A.",
+          "width": 113,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "name": "Wschód Freight Group",
+          "width": 131,
+          "height": 17
+        }
+      ],
+      "controlsBelow44": 20,
+      "unnamedControls": [],
+      "headings": [
+        "Wyniki automatyzacji OC",
+        "Przydziel leady osobie z zespołu",
+        "Wyniki automatyzacji"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "review",
+      "route": "/review",
+      "role": "reviewer",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "width": 1440,
+      "scrollWidth": 1440,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto ↗",
+          "width": 73,
+          "height": 19
+        },
+        {
+          "tag": "A",
+          "name": "Otwórz import",
+          "width": 79,
+          "height": 19
+        }
+      ],
+      "controlsBelow44": 4,
+      "unnamedControls": [],
+      "headings": [
+        "Korekty REGON",
+        "Polskie Drogi Transport sp. z o.o."
+      ],
+      "alerts": []
+    },
+    {
+      "name": "account",
+      "route": "/account",
+      "role": "operator",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "width": 1440,
+      "scrollWidth": 1440,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto ↗",
+          "width": 73,
+          "height": 19
+        },
+        {
+          "tag": "A",
+          "name": "← Powrót do platformy",
+          "width": 137,
+          "height": 17
+        }
+      ],
+      "controlsBelow44": 7,
+      "unnamedControls": [],
+      "headings": [
+        "Twoje sesje,Twoje hasło.",
+        "Adres odzyskiwania",
+        "Zmień hasło",
+        "Aktywne sesje"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "team",
+      "route": "/team",
+      "role": "manager",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "width": 1440,
+      "scrollWidth": 1440,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto",
+          "width": 75,
+          "height": 23
+        }
+      ],
+      "controlsBelow44": 6,
+      "unnamedControls": [],
+      "headings": [
+        "Pracownicy",
+        "Dodaj pracownika",
+        "Lista pracowników"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "oc-health-outage",
+      "route": "/tools/oc-policy-verification",
+      "role": "operator",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "width": 1440,
+      "scrollWidth": 1440,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto ↗",
+          "width": 73,
+          "height": 19
+        }
+      ],
+      "controlsBelow44": 4,
+      "unnamedControls": [],
+      "headings": [
+        "Weryfikacja danych transportowych",
+        "Sprawy wymagające uwagi",
+        "Dodaj bazę transportową",
+        "Import i przygotowanie dostępne"
+      ],
+      "alerts": [],
+      "healthText": [],
+      "bodyText": "GOLDIS\nplatforma operacyjna\n\nPRACA\n\nPrzegląd\nAutomatyzacje\nImporty\nWyniki\nMoje wyniki\nZadania\nPowiadomienia\n2\nMoje korekty\n\nKONTO\n\nMoje konto\nZwiń menu\nPracownik\nGOLDIS / AUTOMATYZACJE\nanna.nowak · Pracownik\nMoje konto ↗\n\nNARZĘDZIE 01 / POLISY OC\n\nWeryfikacja danych transportowych\n\nPrzygotuj bazę firm do sprawdzenia w Everest i Compensie. Po imporcie zobaczysz wiersze wymagające poprawy.\n\nSprawdzanie gotowości usług…\n01\nImport Excela\nSprawdzenie REGON i nazwy · bieżący etap\n02\nEverest i Compensa\nSprawdzenie w portalach\n03\nPolisy OC\nZapisany wynik i eksport\n\nCENTRUM ZGŁOSZEŃ\n\nSprawy wymagające uwagi\n2 otwartych\n1 nieprzeczytanych\n1 kodów SMS\nKod wygasł\nWiersz 14 · PZU Everest\nKod wygasł — zadanie czeka na kontrolowane ponowienie.\nNowa zmiana · aktualizacja 11.10.2026, 10:22:00\nOtwórz zgłoszenie\n\nKROK 01\n\nDodaj bazę transportową\n.xlsx\n\nArkusz „Realizacja” musi zawierać kolumnę „Nazwa” oraz co najmniej jedną z kolumn „NIP” lub „REGON”. Brak REGON-u przy poprawnym NIP-ie oznacza weryfikację w rejestrze. Kolumna „Osoba Decyzyjna” jest opcjonalna. Oryginalny plik pozostaje bez zmian.\n\nWybierz plik Excel\nSprawdź i zaimportuj\n\nSTAN NARZĘDZIA\n\nImport i przygotowanie dostępne\n\nUruchomienie sprawdzania portali wymaga aktywnego workera Playwright i potwierdzonych selektorów ekranów.\n\nImport i walidacja dostępne\nAutomatyzacja portali wymaga workera"
+    },
+    {
+      "name": "tools-outage",
+      "route": "/tools",
+      "role": "manager",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "width": 1440,
+      "scrollWidth": 1440,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto ↗",
+          "width": 73,
+          "height": 19
+        }
+      ],
+      "controlsBelow44": 2,
+      "unnamedControls": [],
+      "headings": [
+        "Automatyzacje",
+        "Brak dostępnych narzędzi"
+      ],
+      "alerts": [
+        "synthetic outage"
+      ]
+    },
+    {
+      "name": "login",
+      "route": "/",
+      "role": null,
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "width": 375,
+      "scrollWidth": 375,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Wyślij link do resetu",
+          "width": 129,
+          "height": 18
+        }
+      ],
+      "controlsBelow44": 1,
+      "unnamedControls": [],
+      "headings": [
+        "Narzędzia dla pracy z danymi.",
+        "Zaloguj się"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "dashboard",
+      "route": "/dashboard",
+      "role": "manager",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "width": 375,
+      "scrollWidth": 375,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Powiadomienia · 2",
+          "width": 92,
+          "height": 18
+        },
+        {
+          "tag": "A",
+          "name": "Wszystkie zadania →",
+          "width": 116,
+          "height": 19
+        },
+        {
+          "tag": "A",
+          "name": "Historia zadań →",
+          "width": 95,
+          "height": 19
+        }
+      ],
+      "controlsBelow44": 6,
+      "unnamedControls": [],
+      "headings": [
+        "Przegląd",
+        "Do zrobienia",
+        "Twoje operacje",
+        "Twoje narzędzia i wyniki",
+        "Stan puli zespołu"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "tools",
+      "route": "/tools",
+      "role": "manager",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "width": 375,
+      "scrollWidth": 375,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto ↗",
+          "width": 73,
+          "height": 19
+        }
+      ],
+      "controlsBelow44": 3,
+      "unnamedControls": [],
+      "headings": [
+        "Automatyzacje",
+        "Weryfikacja polis OC"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "oc",
+      "route": "/tools/oc-policy-verification",
+      "role": "operator",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "width": 375,
+      "scrollWidth": 375,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto ↗",
+          "width": 73,
+          "height": 19
+        }
+      ],
+      "controlsBelow44": 2,
+      "unnamedControls": [],
+      "headings": [
+        "Weryfikacja danych transportowych",
+        "Sprawy wymagające uwagi",
+        "Dodaj bazę transportową",
+        "Import i przygotowanie dostępne"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "results",
+      "route": "/results/oc-policy-verification",
+      "role": "manager",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "width": 375,
+      "scrollWidth": 375,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Konto",
+          "width": 30,
+          "height": 18
+        },
+        {
+          "tag": "A",
+          "name": "Mazovia Cargo S.A.",
+          "width": 113,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "name": "Wschód Freight Group",
+          "width": 131,
+          "height": 17
+        }
+      ],
+      "controlsBelow44": 20,
+      "unnamedControls": [],
+      "headings": [
+        "Wyniki automatyzacji OC",
+        "Przydziel leady osobie z zespołu",
+        "Wyniki automatyzacji"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "review",
+      "route": "/review",
+      "role": "reviewer",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "width": 375,
+      "scrollWidth": 375,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto ↗",
+          "width": 73,
+          "height": 19
+        },
+        {
+          "tag": "A",
+          "name": "Otwórz import",
+          "width": 79,
+          "height": 19
+        }
+      ],
+      "controlsBelow44": 3,
+      "unnamedControls": [],
+      "headings": [
+        "Korekty REGON",
+        "Polskie Drogi Transport sp. z o.o."
+      ],
+      "alerts": []
+    },
+    {
+      "name": "account",
+      "route": "/account",
+      "role": "operator",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "width": 375,
+      "scrollWidth": 375,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto ↗",
+          "width": 73,
+          "height": 19
+        },
+        {
+          "tag": "A",
+          "name": "← Powrót do platformy",
+          "width": 137,
+          "height": 17
+        }
+      ],
+      "controlsBelow44": 3,
+      "unnamedControls": [],
+      "headings": [
+        "Twoje sesje,Twoje hasło.",
+        "Adres odzyskiwania",
+        "Zmień hasło",
+        "Aktywne sesje"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "team",
+      "route": "/team",
+      "role": "manager",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "width": 375,
+      "scrollWidth": 375,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto",
+          "width": 75,
+          "height": 23
+        }
+      ],
+      "controlsBelow44": 6,
+      "unnamedControls": [],
+      "headings": [
+        "Pracownicy",
+        "Dodaj pracownika",
+        "Lista pracowników"
+      ],
+      "alerts": []
+    },
+    {
+      "name": "oc-health-outage",
+      "route": "/tools/oc-policy-verification",
+      "role": "operator",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "width": 375,
+      "scrollWidth": 375,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto ↗",
+          "width": 73,
+          "height": 19
+        }
+      ],
+      "controlsBelow44": 2,
+      "unnamedControls": [],
+      "headings": [
+        "Weryfikacja danych transportowych",
+        "Sprawy wymagające uwagi",
+        "Dodaj bazę transportową",
+        "Import i przygotowanie dostępne"
+      ],
+      "alerts": [],
+      "healthText": [],
+      "bodyText": "Goldis\nplatforma operacyjna\nGOLDIS / AUTOMATYZACJE\nMoje konto ↗\n\nNARZĘDZIE 01 / POLISY OC\n\nWeryfikacja danych transportowych\n\nPrzygotuj bazę firm do sprawdzenia w Everest i Compensie. Po imporcie zobaczysz wiersze wymagające poprawy.\n\nSprawdzanie gotowości usług…\n01\nImport Excela\nSprawdzenie REGON i nazwy · bieżący etap\n02\nEverest i Compensa\nSprawdzenie w portalach\n03\nPolisy OC\nZapisany wynik i eksport\n\nCENTRUM ZGŁOSZEŃ\n\nSprawy wymagające uwagi\n2 otwartych\n1 nieprzeczytanych\n1 kodów SMS\nKod wygasł\nWiersz 14 · PZU Everest\nKod wygasł — zadanie czeka na kontrolowane ponowienie.\nNowa zmiana · aktualizacja 11.10.2026, 10:22:00\nOtwórz zgłoszenie\n\nKROK 01\n\nDodaj bazę transportową\n.xlsx\n\nArkusz „Realizacja” musi zawierać kolumnę „Nazwa” oraz co najmniej jedną z kolumn „NIP” lub „REGON”. Brak REGON-u przy poprawnym NIP-ie oznacza weryfikację w rejestrze. Kolumna „Osoba Decyzyjna” jest opcjonalna. Oryginalny plik pozostaje bez zmian.\n\nWybierz plik Excel\nSprawdź i zaimportuj\n\nSTAN NARZĘDZIA\n\nImport i przygotowanie dostępne\n\nUruchomienie sprawdzania portali wymaga aktywnego workera Playwright i potwierdzonych selektorów ekranów.\n\nImport i walidacja dostępne\nAutomatyzacja portali wymaga workera"
+    },
+    {
+      "name": "tools-outage",
+      "route": "/tools",
+      "role": "manager",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "width": 375,
+      "scrollWidth": 375,
+      "smallControls": [
+        {
+          "tag": "A",
+          "name": "Moje konto ↗",
+          "width": 73,
+          "height": 19
+        }
+      ],
+      "controlsBelow44": 2,
+      "unnamedControls": [],
+      "headings": [
+        "Automatyzacje",
+        "Brak dostępnych narzędzi"
+      ],
+      "alerts": [
+        "synthetic outage"
+      ]
+    }
+  ],
+  "errors": [],
+  "unexpected": []
+}

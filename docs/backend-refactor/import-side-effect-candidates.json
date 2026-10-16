@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-16T12:02:55.072Z",
+  "scanner": "scripts/backend-refactor-import-effects.cjs",
+  "scope": "Static top-level scan only; findings require source review. Function bodies and class bodies are excluded because they execute after import, except module-level calls that invoke them.",
+  "evidence": {
+    "runtimeSourceFilesScanned": 354,
+    "filesWithCandidates": 0,
+    "candidateCount": 0,
+    "unguardedCandidateCount": 0,
+    "unreviewedCandidateFiles": [],
+    "staleReviewFiles": []
+  },
+  "candidates": []
+}

@@ -1,0 +1,17 @@
+[
+  {
+    "File": ".env",
+    "Protected": false,
+    "Access": "S-1-5-21-2953184899-2351349145-3005937889-2648260171:Modify, Synchronize:Inherited=True; LAPTOP_MICHAL\\CodexSandboxUsers:Modify, Synchronize:Inherited=True; S-1-5-21-2184747857-1196610492-889505123-1220962121:Modify, Synchronize:Inherited=True; BUILTIN\\Użytkownicy:Modify, Synchronize:Inherited=True; ZARZĄDZANIE NT\\SYSTEM:FullControl:Inherited=True; BUILTIN\\Administratorzy:FullControl:Inherited=True; LAPTOP_MICHAL\\micha:FullControl:Inherited=True"
+  },
+  {
+    "File": ".env.local",
+    "Protected": true,
+    "Access": "ZARZĄDZANIE NT\\SYSTEM:FullControl:Inherited=False; BUILTIN\\Administratorzy:FullControl:Inherited=False; LAPTOP_MICHAL\\micha:FullControl:Inherited=False"
+  },
+  {
+    "File": ".env.compose.local",
+    "Protected": false,
+    "Access": "S-1-5-21-2953184899-2351349145-3005937889-2648260171:Modify, Synchronize:Inherited=True; LAPTOP_MICHAL\\CodexSandboxUsers:Modify, Synchronize:Inherited=True; S-1-5-21-2184747857-1196610492-889505123-1220962121:Modify, Synchronize:Inherited=True; BUILTIN\\Użytkownicy:Modify, Synchronize:Inherited=True; ZARZĄDZANIE NT\\SYSTEM:FullControl:Inherited=True; BUILTIN\\Administratorzy:FullControl:Inherited=True; LAPTOP_MICHAL\\micha:FullControl:Inherited=True"
+  }
+]

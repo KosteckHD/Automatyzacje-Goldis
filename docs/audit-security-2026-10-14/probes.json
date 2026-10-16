@@ -1,0 +1,29 @@
+{
+  "fixtureOnly": true,
+  "settingsHttp": {
+    "anonymous": 401,
+    "operator": 403,
+    "crossOrigin": 403,
+    "missingCsrf": 403,
+    "adminWithoutConfirmation": 200,
+    "saves": 1
+  },
+  "sharedOc": {
+    "absentGrant": {
+      "toolId": "oc-policy-verification",
+      "canDiscover": true,
+      "canExecute": false,
+      "canViewResults": true,
+      "canDownloadResults": true
+    },
+    "disabledToolAndDeniedGrant": {
+      "toolId": "oc-policy-verification",
+      "canDiscover": false,
+      "canExecute": false,
+      "canViewResults": true,
+      "canDownloadResults": true
+    }
+  },
+  "passwordpasswordAccepted": true,
+  "passwordResetAuditMetadataError": "AUDIT_METADATA_SENSITIVE_KEY"
+}

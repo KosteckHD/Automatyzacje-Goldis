@@ -8,16 +8,23 @@ const { join } = require("node:path");
 module.exports = async function verifyWorkerResults() {
   const { Module } = require("@nestjs/common");
   const { NestFactory } = require("@nestjs/core");
-  const models = require("../dist/db");
-  const { WorkerResultController, WorkerResultGuard } = require("../dist/worker-results");
-  const { persistOcSnapshot } = require("../dist/oc-snapshot-store");
-  const { WorkerExecutionConflict } = require("../dist/worker-execution");
-  const { getVerifiedArtifactDownload } = require("../dist/artifact-download");
+  const models = require("../dist/infrastructure/database/db");
+  const { WorkerResultController, WorkerResultGuard } = require("../dist/features/results/worker-result.controller");
+  const { ResultsRepository } = require("../dist/features/results/results.repository");
+  const { ResultsService } = require("../dist/features/results/results.service");
+  const { persistOcSnapshot } = require("../dist/features/results/oc-snapshot.repository");
+  const { WorkerExecutionConflict } = require("../dist/contracts/worker-execution");
+  const { ArtifactDownloadRepository } = require("../dist/features/results/artifact-download.repository");
+  const { ArtifactDownloadService } = require("../dist/features/results/artifact-download.service");
+  const getVerifiedArtifactDownload = (runId) => new ArtifactDownloadService(new ArtifactDownloadRepository()).download(runId);
   const root = await mkdtemp(join(tmpdir(), "goldis-worker-result-smoke-"));
   const overrides = {
     WORKER_AUTH_SECRET: randomBytes(32).toString("hex"),
     PESEL_ENCRYPTION_ACTIVE_KEY_VERSION: "1",
     PESEL_ENCRYPTION_KEYS_BASE64: Buffer.from(JSON.stringify({ "1": randomBytes(32).toString("base64") })).toString("base64"),
+    ARTIFACT_ENCRYPTION_ACTIVE_KEY_VERSION: "1",
+    ARTIFACT_ENCRYPTION_KEYS_BASE64: Buffer.from(JSON.stringify({ "1": randomBytes(32).toString("base64") })).toString("base64"),
+    ARTIFACT_REQUIRE_ENCRYPTION: "0",
     API_EXPORT_DIR: root,
   };
   const previous = Object.fromEntries(Object.keys(overrides).map((key) => [key, process.env[key]]));
@@ -38,14 +45,22 @@ module.exports = async function verifyWorkerResults() {
     await models.SourceRow.create({ id: sourceRowId, batchId, rowNumber: 1, companyName: "Synthetic Company", decisionMakerName: null,
       nipRaw: "", address: "Test 1", postalCode: "00-000", city: "Test City", regonRaw: "012345678", regon: "012345678", effectiveRegon: "012345678", issues: [] });
     await models.AutomationRun.create({ id: runId, batchId, sourceRowId, rowNumber: 1, toolId: "oc-policy-verification", status,
-      currentStep: status, referenceDate: "2026-09-30", createdAt: now, updatedAt: now });
+      currentStep: status, referenceDate: "2026-09-30",
+      inputSnapshot: { schemaVersion: 1, sourceRowId, rowNumber: 1, rowVersion: 1,
+        companyName: "Synthetic Company", decisionMakerName: null, nipRaw: "", address: "Test 1",
+        postalCode: "00-000", city: "Test City", countyCode: null, regonRaw: "012345678",
+        regon: "012345678", effectiveRegon: "012345678", issues: [] },
+      createdAt: now, updatedAt: now });
     const run = { runId, sourceRowId, batchId };
     const execution = { executionId: randomUUID(), workerSessionId: randomUUID() };
     await models.AutomationRun.update({ ...execution, leaseExpiresAt: new Date(Date.now() + 60_000) }, { where: { id: run.runId } });
     return { ...run, execution };
   }
   class WorkerResultSmokeModule {}
-  Module({ controllers: [WorkerResultController], providers: [WorkerResultGuard] })(WorkerResultSmokeModule);
+  Module({
+    controllers: [WorkerResultController],
+    providers: [WorkerResultGuard, ResultsRepository, ResultsService],
+  })(WorkerResultSmokeModule);
   let app;
   try {
     app = await NestFactory.create(WorkerResultSmokeModule, { logger: false });

@@ -1,5 +1,5 @@
-import HistoryList from "../history/HistoryList";
+import LeadWorkspace from "../leads/LeadWorkspace";
 
-export default function ResultsHistoryPage() {
-  return <HistoryList kind="results" />;
+export default function BusinessResultsPage() {
+  return <LeadWorkspace mode="pool" />;
 }
