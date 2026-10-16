@@ -1,0 +1,2238 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "ref": "refs/stash",
+    "commit": "9c188aecaa289644e7f1fcb04102aa668f1add60",
+    "parent": "e3a507ea8e534f06d698289bf1165f79691e5a6d",
+    "note": "Working-tree snapshot labelled codex baseline before backend feature refactor 2026-10-15"
+  },
+  "routeCount": 84,
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/admin/interventions",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": [
+            "status"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "assigneeUserId"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "toolId"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "priority"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "page"
+          ]
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "adminInterventions"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/interventions/:id/activity",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "interventionActivity"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/interventions/:id/assignment",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "assignIntervention"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/interventions/:id/priority",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "setInterventionPriority"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/operations/runs",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": [
+            "toolId"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "status"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "page"
+          ]
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "operationsRuns"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/operations/summary",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "operationsSummary"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/overview",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "overview"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/reports/failures",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": [
+            "from"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "to"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "toolId"
+          ]
+        }
+      ],
+      "controllerGuards": [
+        "OperationalReportsGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin-reports.ts",
+      "controller": "AdminReportsController",
+      "handler": "failures"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/reports/interventions",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": [
+            "from"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "to"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "toolId"
+          ]
+        }
+      ],
+      "controllerGuards": [
+        "OperationalReportsGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin-reports.ts",
+      "controller": "AdminReportsController",
+      "handler": "interventions"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/reports/overview",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": [
+            "from"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "to"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "toolId"
+          ]
+        }
+      ],
+      "controllerGuards": [
+        "OperationalReportsGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin-reports.ts",
+      "controller": "AdminReportsController",
+      "handler": "overview"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/reports/throughput",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": [
+            "from"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "to"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "toolId"
+          ]
+        }
+      ],
+      "controllerGuards": [
+        "OperationalReportsGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin-reports.ts",
+      "controller": "AdminReportsController",
+      "handler": "throughput"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/runtime",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "runtime"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tools",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "adminTools"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tools/:toolId/settings",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "toolId"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "getSettings"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/tools/:toolId/settings",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "toolId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "updateSettings"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": [
+            "limit"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "cursor"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "q"
+          ]
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "users"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "createUser"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/users/:userId/deletion-grant",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "userId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "setDeletionGrant"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:userId/disable",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "userId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "disableUser"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:userId/enable",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "userId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "enableUser"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/:userId/grants",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "userId"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "grants"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/users/:userId/grants/:toolId",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "userId"
+          ]
+        },
+        {
+          "name": "Param",
+          "args": [
+            "toolId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "setGrant"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:userId/grants/:toolId/revoke",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "userId"
+          ]
+        },
+        {
+          "name": "Param",
+          "args": [
+            "toolId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "revokeGrant"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:userId/password",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "userId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "resetPassword"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:userId/password-reset-link",
+      "status": 202,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "userId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "requestPasswordResetLink"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:userId/recovery-email",
+      "status": 202,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "userId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "requestUserRecoveryEmail"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:userId/revoke-sessions",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "userId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "revokeUserSessions"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/users/:userId/role",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "userId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "updateRole"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/:userId/sessions",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "userId"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "userSessions"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:userId/sessions/:sessionId/revoke",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "userId"
+          ]
+        },
+        {
+          "name": "Param",
+          "args": [
+            "sessionId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "AdminOnlyGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "AdminController",
+      "handler": "revokeUserSession"
+    },
+    {
+      "method": "GET",
+      "path": "/audit/events",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin-reports.ts",
+      "controller": "AuditSearchController",
+      "handler": "search"
+    },
+    {
+      "method": "GET",
+      "path": "/auth-challenges",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Query",
+          "args": [
+            "runId"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/auth-challenges.ts",
+      "controller": "AuthChallengeController",
+      "handler": "getForRun"
+    },
+    {
+      "method": "POST",
+      "path": "/auth-challenges/:id/code",
+      "status": 202,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/auth-challenges.ts",
+      "controller": "AuthChallengeController",
+      "handler": "submitCode"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/change-password",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Res",
+          "args": [
+            "{ passthrough: true }"
+          ]
+        }
+      ],
+      "controllerGuards": [],
+      "methodGuards": [
+        "SessionGuard"
+      ],
+      "source": "apps/api/src/session.ts",
+      "controller": "AuthController",
+      "handler": "changePassword"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/deletion-step-up",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Res",
+          "args": [
+            "{ passthrough: true }"
+          ]
+        }
+      ],
+      "controllerGuards": [],
+      "methodGuards": [
+        "SessionGuard"
+      ],
+      "source": "apps/api/src/session.ts",
+      "controller": "AuthController",
+      "handler": "deletionStepUp"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Res",
+          "args": [
+            "{ passthrough: true }"
+          ]
+        }
+      ],
+      "controllerGuards": [],
+      "methodGuards": [],
+      "source": "apps/api/src/session.ts",
+      "controller": "AuthController",
+      "handler": "login"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/logout",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Res",
+          "args": [
+            "{ passthrough: true }"
+          ]
+        }
+      ],
+      "controllerGuards": [],
+      "methodGuards": [],
+      "source": "apps/api/src/session.ts",
+      "controller": "AuthController",
+      "handler": "logout"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/me",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [],
+      "methodGuards": [
+        "SessionGuard"
+      ],
+      "source": "apps/api/src/session.ts",
+      "controller": "AuthController",
+      "handler": "me"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/sessions",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [],
+      "methodGuards": [
+        "SessionGuard"
+      ],
+      "source": "apps/api/src/session.ts",
+      "controller": "AuthController",
+      "handler": "sessions"
+    },
+    {
+      "method": "DELETE",
+      "path": "/auth/sessions/:sessionId",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "sessionId"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Res",
+          "args": [
+            "{ passthrough: true }"
+          ]
+        }
+      ],
+      "controllerGuards": [],
+      "methodGuards": [
+        "SessionGuard"
+      ],
+      "source": "apps/api/src/session.ts",
+      "controller": "AuthController",
+      "handler": "revokeSession"
+    },
+    {
+      "method": "GET",
+      "path": "/enrichment-jobs/:id",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/enrichment-jobs.ts",
+      "controller": "EnrichmentJobController",
+      "handler": "get"
+    },
+    {
+      "method": "POST",
+      "path": "/enrichment-jobs/:id/cancel",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/enrichment-jobs.ts",
+      "controller": "EnrichmentJobController",
+      "handler": "cancel"
+    },
+    {
+      "method": "GET",
+      "path": "/enrichment-jobs/:id/items",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "cursor"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/enrichment-jobs.ts",
+      "controller": "EnrichmentJobController",
+      "handler": "listItems"
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "status": 200,
+      "requestDecorators": [],
+      "controllerGuards": [],
+      "methodGuards": [],
+      "source": "apps/api/src/health.ts",
+      "controller": "HealthController",
+      "handler": "live"
+    },
+    {
+      "method": "GET",
+      "path": "/health/automation",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Res",
+          "args": []
+        }
+      ],
+      "controllerGuards": [],
+      "methodGuards": [],
+      "source": "apps/api/src/health.ts",
+      "controller": "HealthController",
+      "handler": "automation"
+    },
+    {
+      "method": "GET",
+      "path": "/health/enrichment",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Res",
+          "args": []
+        }
+      ],
+      "controllerGuards": [],
+      "methodGuards": [],
+      "source": "apps/api/src/health.ts",
+      "controller": "HealthController",
+      "handler": "enrichment"
+    },
+    {
+      "method": "GET",
+      "path": "/health/live",
+      "status": 200,
+      "requestDecorators": [],
+      "controllerGuards": [],
+      "methodGuards": [],
+      "source": "apps/api/src/health.ts",
+      "controller": "HealthController",
+      "handler": "liveness"
+    },
+    {
+      "method": "GET",
+      "path": "/health/ready",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Res",
+          "args": []
+        }
+      ],
+      "controllerGuards": [],
+      "methodGuards": [],
+      "source": "apps/api/src/health.ts",
+      "controller": "HealthController",
+      "handler": "readiness"
+    },
+    {
+      "method": "GET",
+      "path": "/history/results",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/history.ts",
+      "controller": "HistoryController",
+      "handler": "results"
+    },
+    {
+      "method": "GET",
+      "path": "/history/runs",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/history.ts",
+      "controller": "HistoryController",
+      "handler": "runs"
+    },
+    {
+      "method": "GET",
+      "path": "/imports",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/imports.ts",
+      "controller": "ImportController",
+      "handler": "list"
+    },
+    {
+      "method": "POST",
+      "path": "/imports",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "UploadedFile",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/imports.ts",
+      "controller": "ImportController",
+      "handler": "create"
+    },
+    {
+      "method": "GET",
+      "path": "/imports/:batchId/enrichment-jobs",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "batchId"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/enrichment-jobs.ts",
+      "controller": "EnrichmentJobController",
+      "handler": "listForBatch"
+    },
+    {
+      "method": "POST",
+      "path": "/imports/:batchId/enrichment-jobs",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "batchId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/enrichment-jobs.ts",
+      "controller": "EnrichmentJobController",
+      "handler": "start"
+    },
+    {
+      "method": "POST",
+      "path": "/imports/:batchId/run-submissions",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "batchId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/run-submissions.ts",
+      "controller": "RunSubmissionController",
+      "handler": "create"
+    },
+    {
+      "method": "POST",
+      "path": "/imports/:batchId/run-submissions/preview",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "batchId"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/run-submissions.ts",
+      "controller": "RunSubmissionController",
+      "handler": "preview"
+    },
+    {
+      "method": "GET",
+      "path": "/imports/:id",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/imports.ts",
+      "controller": "ImportController",
+      "handler": "get"
+    },
+    {
+      "method": "GET",
+      "path": "/imports/:id/enrichment",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "page"
+          ]
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/imports.ts",
+      "controller": "ImportController",
+      "handler": "enrichmentReview"
+    },
+    {
+      "method": "GET",
+      "path": "/imports/:id/rows",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "page"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "state"
+          ]
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/imports.ts",
+      "controller": "ImportController",
+      "handler": "rows"
+    },
+    {
+      "method": "PATCH",
+      "path": "/imports/:id/rows/:rowNumber",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Param",
+          "args": [
+            "rowNumber"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/imports.ts",
+      "controller": "ImportController",
+      "handler": "proposeRegonCorrection"
+    },
+    {
+      "method": "POST",
+      "path": "/imports/tool/:toolId",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "toolId"
+          ]
+        },
+        {
+          "name": "UploadedFile",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/imports.ts",
+      "controller": "ImportController",
+      "handler": "createForTool"
+    },
+    {
+      "method": "POST",
+      "path": "/internal/worker-runs/:id/result",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "WorkerResultGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/worker-results.ts",
+      "controller": "WorkerResultController",
+      "handler": "result"
+    },
+    {
+      "method": "GET",
+      "path": "/interventions",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/interventions.ts",
+      "controller": "InterventionController",
+      "handler": "list"
+    },
+    {
+      "method": "POST",
+      "path": "/interventions/:id/read",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Body",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/interventions.ts",
+      "controller": "InterventionController",
+      "handler": "markRead"
+    },
+    {
+      "method": "GET",
+      "path": "/interventions/summary",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/interventions.ts",
+      "controller": "InterventionController",
+      "handler": "summary"
+    },
+    {
+      "method": "GET",
+      "path": "/review/conflicts",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/review.ts",
+      "controller": "ReviewController",
+      "handler": "conflicts"
+    },
+    {
+      "method": "POST",
+      "path": "/review/conflicts/:id/resolution",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/review.ts",
+      "controller": "ReviewController",
+      "handler": "resolveConflict"
+    },
+    {
+      "method": "GET",
+      "path": "/review/corrections",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/review.ts",
+      "controller": "ReviewController",
+      "handler": "corrections"
+    },
+    {
+      "method": "POST",
+      "path": "/review/corrections/:id/decision",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/review.ts",
+      "controller": "ReviewController",
+      "handler": "decideCorrection"
+    },
+    {
+      "method": "GET",
+      "path": "/review/my-corrections",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Query",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/review.ts",
+      "controller": "ReviewController",
+      "handler": "myCorrections"
+    },
+    {
+      "method": "GET",
+      "path": "/run-submissions/:id",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/run-submissions.ts",
+      "controller": "RunSubmissionController",
+      "handler": "get"
+    },
+    {
+      "method": "POST",
+      "path": "/run-submissions/:id/cancel",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/run-submissions.ts",
+      "controller": "RunSubmissionController",
+      "handler": "cancel"
+    },
+    {
+      "method": "GET",
+      "path": "/run-submissions/:id/items",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Query",
+          "args": [
+            "cursor"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/run-submissions.ts",
+      "controller": "RunSubmissionController",
+      "handler": "items"
+    },
+    {
+      "method": "GET",
+      "path": "/runs",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Query",
+          "args": [
+            "batchId"
+          ]
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/runs.ts",
+      "controller": "RunController",
+      "handler": "list"
+    },
+    {
+      "method": "POST",
+      "path": "/runs",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/runs.ts",
+      "controller": "RunController",
+      "handler": "create"
+    },
+    {
+      "method": "GET",
+      "path": "/runs/:id",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/runs.ts",
+      "controller": "RunController",
+      "handler": "get"
+    },
+    {
+      "method": "GET",
+      "path": "/runs/:id/artifact",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        },
+        {
+          "name": "Res",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/runs.ts",
+      "controller": "RunController",
+      "handler": "artifact"
+    },
+    {
+      "method": "POST",
+      "path": "/runs/:id/cancel",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/runs.ts",
+      "controller": "RunController",
+      "handler": "cancel"
+    },
+    {
+      "method": "PATCH",
+      "path": "/runs/:id/manual-data",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Body",
+          "args": []
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/manual-data.ts",
+      "controller": "ManualDataController",
+      "handler": "patch"
+    },
+    {
+      "method": "POST",
+      "path": "/runs/:id/pause",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/runs.ts",
+      "controller": "RunController",
+      "handler": "pause"
+    },
+    {
+      "method": "POST",
+      "path": "/runs/:id/resume",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/runs.ts",
+      "controller": "RunController",
+      "handler": "resumePaused"
+    },
+    {
+      "method": "POST",
+      "path": "/runs/:id/resume-auth",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/runs.ts",
+      "controller": "RunController",
+      "handler": "resumeAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/runs/:id/resume-review",
+      "status": 201,
+      "requestDecorators": [
+        {
+          "name": "Param",
+          "args": [
+            "id"
+          ]
+        },
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "PermissionGuard",
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/runs.ts",
+      "controller": "RunController",
+      "handler": "resumeReview"
+    },
+    {
+      "method": "GET",
+      "path": "/tools",
+      "status": 200,
+      "requestDecorators": [
+        {
+          "name": "Req",
+          "args": []
+        }
+      ],
+      "controllerGuards": [
+        "SessionGuard"
+      ],
+      "methodGuards": [],
+      "source": "apps/api/src/admin.ts",
+      "controller": "ToolCatalogController",
+      "handler": "list"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"name":"goldis-mvp-mockups-runtime","private":true,"description":"Isolated build helpers for the Goldis mockups","dependencies":{"esbuild":"^0.28.2","lucide-react":"^1.55.0"}}

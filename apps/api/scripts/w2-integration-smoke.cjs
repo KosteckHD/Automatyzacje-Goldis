@@ -33,9 +33,9 @@ process.env.PESEL_ENCRYPTION_KEYS_BASE64 = Buffer.from(JSON.stringify({
   "1": Buffer.alloc(32, 5).toString("base64"),
 }), "utf8").toString("base64");
 
-const { sequelize, AutomationRun, RunEvent, SourceRow } = require("../dist/db");
+const { sequelize, AutomationRun, RunEvent, SourceRow } = require("../dist/infrastructure/database/db");
 const umzug = new Umzug({
-  migrations: { glob: path.join(__dirname, "../dist/migrations/0{0[1-9],1[0-5]}-*.js").replace(/\\/g, "/") },
+  migrations: { glob: path.join(__dirname, "../dist/infrastructure/database/migrations/0{0[1-9],1[0-5]}-*.js").replace(/\\/g, "/") },
   context: sequelize.getQueryInterface(),
   storage: new SequelizeStorage({ sequelize }),
   logger: undefined,
@@ -97,14 +97,14 @@ async function persistPipelineCheckpoints(runId, checkpointEvents) {
 
 async function executeSyntheticPipeline(runId, pool, exportRoot) {
   const { validateAndParkRun } = require("../../worker/dist/run-worker");
-  const { runPipeline } = require("../../worker/dist/pipeline");
-  const { SyntheticEverestProvider } = require("../../worker/dist/identity-fixtures");
-  const { SyntheticPolicyProvider } = require("../../worker/dist/oc-fixtures");
-  const { MemoryRunRepository } = require("../../worker/dist/test-support/memory-run-repository");
-  const { persistOcSnapshot } = require("../dist/oc-snapshot-store");
-  const { evaluateStoredSnapshot } = require("../dist/run-evaluation");
-  const { finalizeRunExport } = require("../dist/export-finalizer");
-  const { ExportArtifact, OcPolicyRecord, OcSnapshot } = require("../dist/db");
+  const { runPipeline } = require("../../worker/dist/features/execution/pipeline");
+  const { SyntheticEverestProvider } = require("../../worker/dist/testing/fixtures/identity-fixtures");
+  const { SyntheticPolicyProvider } = require("../../worker/dist/testing/fixtures/oc-fixtures");
+  const { MemoryRunRepository } = require("../../worker/dist/testing/support/memory-run-repository");
+  const { persistOcSnapshot } = require("../dist/features/results/oc-snapshot.repository");
+  const { evaluateStoredSnapshot } = require("../dist/features/results/run-evaluation.repository");
+  const { finalizeRunExport } = require("../dist/features/results/export-finalization.service");
+  const { ExportArtifact, OcPolicyRecord, OcSnapshot } = require("../dist/infrastructure/database/db");
 
   await validateAndParkRun(pool, runId);
   const run = await AutomationRun.findByPk(runId);
@@ -188,7 +188,7 @@ async function main() {
   let app;
   let worker;
   try {
-    const { AppModule } = require("../dist/module");
+    const { AppModule } = require("../dist/composition/module");
     app = await NestFactory.create(AppModule, { logger: false });
     app.setGlobalPrefix("api");
     await app.listen(0, "127.0.0.1");
@@ -262,7 +262,7 @@ async function main() {
 
     const download = await fetch(`${baseUrl}/runs/${createdRun.id}/artifact`, { headers: authHeaders });
     const downloadedBytes = Buffer.from(await download.arrayBuffer());
-    const { ExportArtifact } = require("../dist/db");
+    const { ExportArtifact } = require("../dist/infrastructure/database/db");
     const artifactRecord = await ExportArtifact.findOne({ where: { runId: createdRun.id, state: "ready" } });
     if (!download.ok || download.headers.get("cache-control") !== "private, no-store"
       || !/filename\*?=.*\.xlsx/i.test(download.headers.get("content-disposition") ?? "")

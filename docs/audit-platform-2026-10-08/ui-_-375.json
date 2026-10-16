@@ -1,0 +1,55 @@
+{
+  "pathname": "/",
+  "width": 375,
+  "overflow": false,
+  "headings": [
+    {
+      "level": "H1",
+      "text": "Narzędzia dla pracy z danymi."
+    },
+    {
+      "level": "H2",
+      "text": "Zaloguj się"
+    }
+  ],
+  "unnamed": [],
+  "smallTargets": [],
+  "textStyles": [
+    {
+      "text": "GOLDIS UBEZPIECZENIA",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "DOSTĘP DO PANELU",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Użytkownik",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Hasło",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.96px"
+    },
+    {
+      "text": "Sprawdź login i hasło.",
+      "color": "rgb(244, 196, 191)",
+      "background": "rgb(41, 23, 25)",
+      "fontSize": "13.12px"
+    },
+    {
+      "text": "Przejdź do panelu",
+      "color": "rgb(23, 18, 10)",
+      "background": "rgb(217, 182, 95)",
+      "fontSize": "13.44px"
+    }
+  ]
+}

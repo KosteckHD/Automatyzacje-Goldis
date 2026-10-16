@@ -1,0 +1,93 @@
+services:
+  postgres:
+    image: ${GOLDIS_POSTGRES_IMAGE:?Set GOLDIS_POSTGRES_IMAGE to a verified image digest}
+    build: !reset null
+    restart: unless-stopped
+    mem_limit: 2g
+    cpus: 2.0
+
+  db-roles:
+    image: ${GOLDIS_POSTGRES_IMAGE:?Set GOLDIS_POSTGRES_IMAGE to a verified image digest}
+    build: !reset null
+
+  redis:
+    image: ${GOLDIS_REDIS_IMAGE:?Set GOLDIS_REDIS_IMAGE to a verified image digest}
+    build: !reset null
+    mem_limit: 512m
+    cpus: 0.5
+
+  migrate:
+    image: ${GOLDIS_API_IMAGE:?Set GOLDIS_API_IMAGE to a verified image digest}
+    build: !reset null
+
+  bootstrap-admin:
+    image: ${GOLDIS_API_IMAGE:?Set GOLDIS_API_IMAGE to a verified image digest}
+    build: !reset null
+
+  api:
+    image: ${GOLDIS_API_IMAGE:?Set GOLDIS_API_IMAGE to a verified image digest}
+    build: !reset null
+    environment:
+      APP_ENV: production
+      NODE_ENV: production
+      PUBLIC_APP_ORIGIN: ${PUBLIC_APP_ORIGIN:?Set the production HTTPS origin}
+      GOLDIS_BUILD_VERSION: ${GOLDIS_BUILD_VERSION:?Set GOLDIS_BUILD_VERSION from the release commit}
+      GOLDIS_BUILD_COMMIT: ${GOLDIS_BUILD_COMMIT:?Set GOLDIS_BUILD_COMMIT from the release commit}
+      GOLDIS_IMAGE_DIGEST: ${GOLDIS_IMAGE_DIGEST:?Set GOLDIS_IMAGE_DIGEST to the API image digest}
+      ARTIFACT_REQUIRE_ENCRYPTION: "1"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 1536m
+    cpus: 1.5
+
+  import-parser:
+    image: ${GOLDIS_API_IMAGE:?Set GOLDIS_API_IMAGE to a verified image digest}
+    build: !reset null
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=32m
+    cap_drop:
+      - ALL
+
+  enrichment-worker:
+    image: ${GOLDIS_API_IMAGE:?Set GOLDIS_API_IMAGE to a verified image digest}
+    build: !reset null
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 768m
+    cpus: 0.75
+
+  worker:
+    image: ${GOLDIS_WORKER_IMAGE:?Set GOLDIS_WORKER_IMAGE to a verified image digest}
+    build: !reset null
+    cap_drop:
+      - ALL
+    mem_limit: 2g
+    cpus: 2.0
+
+  web:
+    image: ${GOLDIS_WEB_IMAGE:?Set GOLDIS_WEB_IMAGE to a verified image digest}
+    build: !reset null
+    ports: !override
+      - "127.0.0.1:${GOLDIS_WEB_HOST_PORT:-3000}:3000"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    volumes:
+      - web_cache:/app/apps/web/.next/cache
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 768m
+    cpus: 1.0
+
+volumes:
+  web_cache:

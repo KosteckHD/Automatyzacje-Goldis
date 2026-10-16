@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-09",
+  "source": "production-PzuEverestSession-in-configured-worker-profile",
+  "entryUrl": "https://everest.pzu.pl/pc/PolicyCenter.do",
+  "loginOrigin": "https://zaloguj.pzu.pl",
+  "session": {
+    "loginForm": "#credentials_table:has(input[name=\"username\"]):has(input[name=\"password\"])",
+    "usernameInput": "input[name=\"username\"]",
+    "passwordInput": "input[name=\"password\"]",
+    "loginSubmit": "#credentials_table input[type=\"submit\"]",
+    "postLoginLanding": "a.shortcut:has-text(\"Everest\")"
+  },
+  "verification": {
+    "initialState": "login_required",
+    "credentialsSource": ".env",
+    "credentialsLogged": false,
+    "productionSignInResult": "waiting_for_sms",
+    "sessionConflictVisibleCount": 0,
+    "recoveryLinkCount": 0,
+    "exclusiveWorkerProfileOwner": true,
+    "endToEndAccepted": false
+  }
+}

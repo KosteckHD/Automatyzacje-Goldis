@@ -25,6 +25,7 @@ const itemLabels: Record<string, string> = {
   failed: "Błąd", cancelled: "Anulowano", blocked: "Zablokowany",
 };
 const reasonLabels: Record<string, string> = {
+  DUPLICATE_SOURCE_ROW: "Duplikat — pominięty w zestawie roboczym; import źródłowy pozostaje zachowany",
   PENDING_REGON_CORRECTION: "Oczekuje korekta REGON", OPEN_ENTITY_CONFLICT: "Otwarty konflikt grupowania",
   REGON_REQUIRED: "Brak REGON-u", SOURCE_ROW_HAS_ISSUES: "Błąd walidacji danych", INVALID_NIP: "Nieprawidłowy NIP",
   INVALID_REGON: "Nieprawidłowy REGON", HOURLY_RUN_LIMIT: "Osiągnięto limit zadań na godzinę",
@@ -32,6 +33,12 @@ const reasonLabels: Record<string, string> = {
   SOURCE_VERSION_CHANGED: "Dane zmieniły się po przygotowaniu podglądu", PENDING_CORRECTION: "Oczekuje korekta REGON",
   OPEN_CONFLICT: "Konflikt grupowania wymaga rozstrzygnięcia", EXECUTE_ACCESS_REVOKED: "Prawo uruchomienia zostało cofnięte",
   ACTIVE_RUN_REFERENCE_DATE_MISMATCH: "Aktywne zadanie ma inną datę odniesienia", GROUP_REVIEW_REQUIRED: "Grupowanie wymaga kontroli",
+  IDENTITY_NOT_FOUND: "Nie znaleziono oczekiwanej osoby po wyszukaniu REGON-u",
+  IDENTITY_EXPECTED_PERSON_MISSING: "Brak oczekiwanej osoby decyzyjnej",
+  IDENTITY_PESEL_MISSING: "Nie znaleziono dostępnego PESEL-u dla dopasowanej osoby",
+  IDENTITY_PESEL_INVALID: "Numer PESEL z rejestru jest nieprawidłowy",
+  IDENTITY_UNSUPPORTED_TYPE: "Typ podmiotu nieobsługiwany przez bieżącą ścieżkę",
+  IDENTITY_AMBIGUOUS: "Osoba wymaga ręcznego dopasowania",
 };
 
 async function payload<T>(response: Response): Promise<T> {
@@ -145,7 +152,7 @@ export default function SubmissionDetail({ submissionId }: { submissionId: strin
           const cancellableGroups = (submission.counts.groups.pending ?? 0) + (submission.counts.groups.waiting ?? 0);
           return <section className="submission-status-card" aria-live="polite">
           <div><p className="eyebrow">{submission.status === "waiting_attention" ? "WYMAGA UWAGI" : "STATUS"}</p><h2>{statusLabels[submission.status] ?? submission.status}</h2><p>Data odniesienia: {submission.referenceDate} · Utworzono {formatDate(submission.createdAt)}</p></div>
-          <div className="submission-actions"><button type="button" onClick={() => void refresh()} disabled={refreshing}>{refreshing ? "Odświeżam…" : "Odśwież stan"}</button>{cancellableGroups > 0 && (session?.role === "admin" || session?.role === "operator") && <button type="button" onClick={() => void cancelPending()} disabled={cancelBusy}>{cancelBusy ? "Anuluję…" : "Anuluj oczekujące"}</button>}</div>
+          <div className="submission-actions"><button type="button" onClick={() => void refresh()} disabled={refreshing}>{refreshing ? "Odświeżam…" : "Odśwież stan"}</button>{cancellableGroups > 0 && (session?.role === "admin" || session?.role === "manager" || session?.role === "operator") && <button type="button" onClick={() => void cancelPending()} disabled={cancelBusy}>{cancelBusy ? "Anuluję…" : "Anuluj oczekujące"}</button>}</div>
         </section>;
         })()}
         <dl className="submission-counts submission-detail-counts"><div><dt>Wybrane wiersze</dt><dd>{submission.counts.selectedRows}</dd></div><div><dt>Unikalne grupy</dt><dd>{submission.counts.uniqueGroups}</dd></div><div><dt>Przyjęte runy</dt><dd>{submission.counts.groups.accepted ?? 0}</dd></div><div><dt>Oczekujące grupy</dt><dd>{(submission.counts.groups.pending ?? 0) + (submission.counts.groups.waiting ?? 0)}</dd></div>{Object.entries(submission.counts.items).map(([key, value]) => <div key={key}><dt>{itemLabels[key] ?? key}</dt><dd>{value}</dd></div>)}</dl>

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-09",
+  "adapterVersion": "observed-20261009",
+  "selectors": {
+    "searchInput": "input[placeholder^=\"PESEL/REGON\"], input[name$=\"-smartsearch\"]",
+    "resultRows": "table.gw-ListViewWidget--table tr:has(td.gw-CellWidget)",
+    "noResults": "text=\"Brak wyników wyszukiwania\"",
+    "fields": {
+      "accountType": "td[id$=\"-AccountType_Cell\"]",
+      "personName": "td[id$=\"-Name_Cell\"]",
+      "pesel": "td[id$=\"-peselOrRegon_Cell\"]"
+    }
+  },
+  "verification": {
+    "rowNumber": 18001,
+    "personRowObserved": true,
+    "peselColumnNumericLength": 11,
+    "noResultsPending": true,
+    "identityMatchPending": true,
+    "endToEndAccepted": false
+  }
+}

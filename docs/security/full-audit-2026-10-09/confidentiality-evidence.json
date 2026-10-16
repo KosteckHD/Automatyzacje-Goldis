@@ -1,0 +1,38 @@
+{
+  "auditDate": "2026-10-09",
+  "usesCustomerData": false,
+  "externalRequests": 0,
+  "realDatabaseConnections": 0,
+  "meaning": "Confirms observed behaviors, including missing controls; success does not certify security.",
+  "evidence": [
+    {
+      "id": "VPS-01",
+      "test": "ImportService plaintext persistence",
+      "confirmed": true,
+      "limitation": "Captured ORM payload with stubbed storage; not a disk or database encryption measurement."
+    },
+    {
+      "id": "VPS-02",
+      "test": "Private artifact is standard XLSX; PESEL readable without key",
+      "confirmed": true
+    },
+    {
+      "id": "VPS-07",
+      "test": "Browser launch does not enable Chromium sandbox",
+      "confirmed": true,
+      "limitation": "Launch capture; default false verified separately against Playwright documentation. No browser exploit executed."
+    },
+    {
+      "id": "VPS-08",
+      "test": "Portal config accepts arbitrary HTTPS host named in same config",
+      "confirmed": true,
+      "limitation": "Requires control of operator configuration; not customer XLSX SSRF. No network request made."
+    },
+    {
+      "id": "VPS-05",
+      "test": "Admin download privilege is unconditional within role policy",
+      "confirmed": true,
+      "limitation": "Intentional role behavior; tenant guard still applies. Not an authorization bypass."
+    }
+  ]
+}

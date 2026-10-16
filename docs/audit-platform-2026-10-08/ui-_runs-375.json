@@ -1,0 +1,176 @@
+{
+  "pathname": "/runs",
+  "width": 375,
+  "overflow": false,
+  "headings": [
+    {
+      "level": "H1",
+      "text": "Historia zadań"
+    },
+    {
+      "level": "H2",
+      "text": "Brak pozycji dla tych filtrów"
+    }
+  ],
+  "unnamed": [],
+  "smallTargets": [
+    {
+      "tag": "A",
+      "text": "Katalog",
+      "width": 43,
+      "height": 19
+    },
+    {
+      "tag": "A",
+      "text": "Importy",
+      "width": 44,
+      "height": 19
+    },
+    {
+      "tag": "A",
+      "text": "Zadania",
+      "width": 44,
+      "height": 19
+    },
+    {
+      "tag": "A",
+      "text": "Wyniki",
+      "width": 37,
+      "height": 19
+    },
+    {
+      "tag": "A",
+      "text": "Audyt",
+      "width": 33,
+      "height": 19
+    },
+    {
+      "tag": "A",
+      "text": "Moje konto",
+      "width": 62,
+      "height": 19
+    },
+    {
+      "tag": "A",
+      "text": "Otwórz narzędzie OC",
+      "width": 144,
+      "height": 20
+    }
+  ],
+  "textStyles": [
+    {
+      "text": "Goldis · Platforma automatyzacji",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Katalog",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Importy",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Zadania",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Wyniki",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Audyt",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Moje konto",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "PLATFORMA / OC",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Śledź wykonanie zadań dla dozwolonych importów.",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "15px"
+    },
+    {
+      "text": "NarzędzieWszystkie z dostępemWeryfikacja polis OC",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "StatusWszystkieW kolejceSprawdzanie danychOczekuje na adapter portaliL",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Od dnia (Warszawa)",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Do dnia (Warszawa)",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Zastosuj filtry",
+      "color": "rgb(23, 18, 10)",
+      "background": "rgb(217, 182, 95)",
+      "fontSize": "12.16px"
+    },
+    {
+      "text": "Daty filtrowane według strefy Europe/Warsaw. Czasy zdarzeń wyświetlamy",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Wyczyść filtr lub wykonaj nowy import w narzędziu OC.",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "13.12px"
+    },
+    {
+      "text": "Otwórz narzędzie OC",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "15px"
+    },
+    {
+      "text": "Poprzednia strona",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "12.16px"
+    },
+    {
+      "text": "Następna strona",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "12.16px"
+    }
+  ]
+}

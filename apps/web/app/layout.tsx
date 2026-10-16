@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { connection } from "next/server";
+import { ActivitySignal } from "./activity-signal";
+import PlatformRouteFrame from "./platform-route-frame";
 import "./styles/tokens.css";
 import "./globals.css";
 import "./admin.css";
@@ -8,6 +11,8 @@ import "./history.css";
 import "./review.css";
 import "./enrichment-jobs.css";
 import "./run-submissions.css";
+import "./import-preparations.css";
+import "./legacy-platform-frame.css";
 
 const newsreader = localFont({
   src: "./fonts/Newsreader.ttf",
@@ -39,6 +44,7 @@ export const metadata: Metadata = {
   description: "Panel automatyzacji Goldis Ubezpieczenia",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="pl"><body className={`${newsreader.variable} ${hankenGrotesk.variable} ${ibmPlexMono.variable}`}>{children}</body></html>;
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  await connection();
+  return <html lang="pl"><body className={`${newsreader.variable} ${hankenGrotesk.variable} ${ibmPlexMono.variable}`}><ActivitySignal /><PlatformRouteFrame>{children}</PlatformRouteFrame></body></html>;
 }

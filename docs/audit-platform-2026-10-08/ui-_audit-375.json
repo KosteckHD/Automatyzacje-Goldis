@@ -1,0 +1,152 @@
+{
+  "pathname": "/audit",
+  "width": 375,
+  "overflow": false,
+  "headings": [
+    {
+      "level": "H1",
+      "text": "Dziennik audytu"
+    },
+    {
+      "level": "H2",
+      "text": "run.created"
+    }
+  ],
+  "unnamed": [],
+  "smallTargets": [
+    {
+      "tag": "A",
+      "text": "Katalog",
+      "width": 43,
+      "height": 19
+    },
+    {
+      "tag": "A",
+      "text": "Audyt",
+      "width": 33,
+      "height": 19
+    },
+    {
+      "tag": "A",
+      "text": "Moje konto",
+      "width": 62,
+      "height": 19
+    }
+  ],
+  "textStyles": [
+    {
+      "text": "Goldis · Platforma automatyzacji",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Katalog",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Audyt",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Moje konto",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "PLATFORMA / BEZPIECZEŃSTWO",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Przeszukuj zdarzenia organizacji. Wpisy nie zawierają treści plików an",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "15px"
+    },
+    {
+      "text": "Od dnia (Warszawa)",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Do dnia (Warszawa)",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Aktor ID",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "CzynnośćWszystkielogin.succeededlogin.failedlogout.succeededsession.re",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Rodzaj zasobuWszystkieimportrunartifactinterventioncorrectionentity_co",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "ID zasobu",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "WynikDowolnyPowodzenieBłądOdmowa",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Narzędzie ID",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Szukaj zdarzeń",
+      "color": "rgb(23, 18, 10)",
+      "background": "rgb(217, 182, 95)",
+      "fontSize": "12.16px"
+    },
+    {
+      "text": "Zakres dni jest interpretowany w strefie Europe/Warsaw; koniec zakresu",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "reviewer.demo · run · 88888888-8888-4888-8888-888888888888",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(0, 0, 0, 0)",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Nowsze",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "12.16px"
+    },
+    {
+      "text": "Starsze",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "fontSize": "12.16px"
+    }
+  ]
+}

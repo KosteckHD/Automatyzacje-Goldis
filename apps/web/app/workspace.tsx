@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import EnrichmentReviewPanel from "./enrichment-review";
+import ImportPreparationPanel from "./import-preparation-panel";
 import RunSubmissionLauncher from "./run-submission-launcher";
+import { useAutomationHealth } from "./lib/use-automation-health";
 import { GoldisLogo } from "../components/brand/GoldisLogo";
 import SpotlightCard from "../components/react-bits/SpotlightCard";
 import { RunStepper } from "../components/tools/RunStepper";
 
 type ImportResult = { id: string; totalRows: number; invalidRows: number; readyRows: number; sha256: string };
 type ImportRow = { rowNumber: number; companyName: string; decisionMakerName: string | null; regon: string; issues: string[] };
-type Run = { id: string; batchId?: string; rowNumber: number; status: string; currentStep: string; referenceDate: string; errorCode: string | null; manualDataVersion?: number; createdAt: string; incident?: { kind: string; portal: string | null; reasonCode: string | null; fieldCode?: string | null; createdAt: string; retryAllowed?: boolean; canResumeAuth?: boolean; canResumeReview?: boolean } | null; policyCounts?: { totalOcCount: number; currentOcCount: number } | null; artifactAvailable?: boolean; events?: { status: string; step: string; errorCode: string | null; createdAt: string }[] };
+type Run = { id: string; batchId?: string; rowNumber: number; status: string; currentStep: string; referenceDate: string; errorCode: string | null; controlState?: "running" | "pause_requested" | "paused"; controlRevision?: string; controlAckRevision?: string; controlCheckpointStatus?: string | null; manualDataVersion?: number; createdAt: string; incident?: { kind: string; portal: string | null; reasonCode: string | null; fieldCode?: string | null; createdAt: string; retryAllowed?: boolean; canResumeAuth?: boolean; canResumeReview?: boolean } | null; policyCounts?: { totalOcCount: number; currentOcCount: number } | null; artifactAvailable?: boolean; events?: { status: string; step: string; errorCode: string | null; createdAt: string }[] };
 type AuthChallenge = { challengeId: string; runId: string; portal: "pzu" | "compensa"; status: "active" | "claimed" | "submitted"; expiresAt: string; serverNow?: string; attemptCount: number; attemptLimit: number; reasonCode?: string };
 type Intervention = {
   interventionId: string; runId: string; batchId: string; rowNumber: number; kind: string; portal: "pzu" | "compensa" | null;
@@ -19,7 +21,6 @@ type Intervention = {
   canResumeAuth?: boolean;
 };
 type InterventionSummary = { openCount: number; unreadCount: number; smsCount: number };
-type AutomationHealth = { automationReady: boolean; servicesReady: boolean; worker: string; portalMode: string; portalConfig: string; message: string };
 type ToolAccess = { toolId: string; canDiscover: boolean; canExecute: boolean; canViewResults: boolean; canDownloadResults: boolean };
 type CatalogTool = { toolId: string; displayName: string; description: string; status: "available" | "maintenance" | "disabled"; access: ToolAccess };
 const runLabels: Record<string, string> = {
@@ -30,13 +31,16 @@ const runLabels: Record<string, string> = {
   export_ready: "Przygotowywanie pliku", no_matching_policies: "Brak aktualnych polis OC", completed: "Zakończono",
   cancelled: "Anulowano", failed: "Błąd",
 };
-const roleLabels = { admin: "Administrator", operator: "Operator", reviewer: "Recenzent", auditor: "Audytor" } as const;
+const roleLabels = { admin: "Administrator", manager: "Menedżer", operator: "Operator", reviewer: "Recenzent", auditor: "Audytor" } as const;
 const interventionLabels: Record<string, string> = {
   sms: "Kod SMS", identity_review: "Weryfikacja tożsamości", portal_error: "Błąd portalu",
   SMS_TIMEOUT: "Kod wygasł", SMS_DELIVERY_UNCERTAIN: "Niepewne przekazanie kodu", PORTAL_FAILURE: "Błąd automatyzacji",
   SMS_REQUIRED: "Potwierdź logowanie kodem SMS", SMS_CODE_REJECTED: "Portal odrzucił kod SMS",
   SMS_ATTEMPT_LIMIT: "Limit prób kodu SMS został wykorzystany", PORTAL_SESSION_EXPIRED: "Sesja portalu wymaga sprawdzenia",
   MANUAL_DATA_REQUIRED: "Brakujące dane", IDENTITY_AMBIGUOUS: "Niejednoznaczna osoba", IDENTITY_NOT_FOUND: "Nie znaleziono osoby",
+  IDENTITY_EXPECTED_PERSON_MISSING: "Brak oczekiwanej osoby decyzyjnej", IDENTITY_PESEL_MISSING: "Brak dostępnego PESEL-u",
+  IDENTITY_PESEL_INVALID: "PESEL z rejestru jest nieprawidłowy",
+  IDENTITY_UNSUPPORTED_TYPE: "Typ podmiotu nieobsługiwany przez bieżącą ścieżkę",
 };
 const manualFieldLabels: Record<string, string> = {
   ADDRESS: "Adres", POSTAL_CODE: "Kod pocztowy", CITY: "Miejscowość", COUNTY: "Kod opcji powiatu z portalu", EXPECTED_PERSON: "Oczekiwana osoba (imię i nazwisko)",
@@ -183,7 +187,7 @@ function SmsDialog({ challenge, runId, csrfToken, onAccepted, onRefresh, onUnaut
 
 export default function Workspace() {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-  const [userRole, setUserRole] = useState<"admin" | "operator" | "reviewer" | "auditor" | null>(null);
+  const [userRole, setUserRole] = useState<"admin" | "manager" | "operator" | "reviewer" | "auditor" | null>(null);
   const [toolAccess, setToolAccess] = useState<ToolAccess[]>([]);
   const [catalogItems, setCatalogItems] = useState<CatalogTool[]>([]);
   const [catalogError, setCatalogError] = useState("");
@@ -198,6 +202,7 @@ export default function Workspace() {
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<ImportResult | null>(null);
+  const [preparationReadyBatchId, setPreparationReadyBatchId] = useState<string | null>(null);
   const [rows, setRows] = useState<ImportRow[]>([]);
   const [rowPage, setRowPage] = useState(1);
   const [rowState, setRowState] = useState<"all" | "ready" | "review">("all");
@@ -207,6 +212,8 @@ export default function Workspace() {
   const [activeChallenge, setActiveChallenge] = useState<AuthChallenge | null>(null);
   const [smsModalRunId, setSmsModalRunId] = useState<string | null>(null);
   const [authResuming, setAuthResuming] = useState(false);
+  const [runControlBusy, setRunControlBusy] = useState(false);
+  const runControlRequestKeys = useRef(new Map<string, string>());
   const [authRetryPendingRunId, setAuthRetryPendingRunId] = useState<string | null>(null);
   const authResumeLock = useRef(false);
   const [assignedSmsRunId, setAssignedSmsRunId] = useState<string | null>(null);
@@ -217,7 +224,6 @@ export default function Workspace() {
   const [interventionCursor, setInterventionCursor] = useState<string | null>(null);
   const [loadingMoreInterventions, setLoadingMoreInterventions] = useState(false);
   const [interventionRefreshToken, setInterventionRefreshToken] = useState(0);
-  const [automationHealth, setAutomationHealth] = useState<AutomationHealth | null>(null);
   const [manualValue, setManualValue] = useState("");
   const [manualReason, setManualReason] = useState("");
   const [manualSaving, setManualSaving] = useState(false);
@@ -228,6 +234,21 @@ export default function Workspace() {
   const canDiscoverTool = activeToolAccess?.canDiscover === true;
   const canOperate = activeToolAccess?.canExecute === true;
   const canViewResults = activeToolAccess?.canViewResults === true;
+  const automationHealth = useAutomationHealth(Boolean(authenticated && canDiscoverTool)).data;
+  const canManageRuns = userRole === "admin" || userRole === "manager";
+  const handleSessionExpired = useCallback(() => {
+    setAuthenticated(false);
+    setMobileNavOpen(false);
+    setUserRole(null);
+    setToolAccess([]);
+    setCsrfToken("");
+    setActiveChallenge(null);
+    setSmsModalRunId(null);
+  }, []);
+  const handlePreparationReadyChange = useCallback((ready: boolean) => {
+    setPreparationReadyBatchId(ready ? result?.id ?? null : null);
+  }, [result?.id]);
+  const preparationReady = Boolean(result && preparationReadyBatchId === result.id);
   const canDownloadResults = activeToolAccess?.canDownloadResults === true;
   const canSeeInterventions = Boolean(activeToolAccess && (canOperate || canViewResults));
 
@@ -269,17 +290,20 @@ export default function Workspace() {
 
   useEffect(() => {
     if (!authenticated || !isCatalogLanding) return;
+    const defaultPath = userRole === "auditor" ? "/audit" : userRole === "reviewer" ? "/review" : "/dashboard";
     const target = new URLSearchParams(window.location.search).get("returnTo");
-    if (!target || !target.startsWith("/") || target.startsWith("//") || target.includes("\\")) return;
+    if (!target) { window.location.replace(defaultPath); return; }
+    if (!target.startsWith("/") || target.startsWith("//") || target.includes("\\")) { window.location.replace(defaultPath); return; }
     let parsed: URL;
-    try { parsed = new URL(target, window.location.origin); } catch { return; }
+    try { parsed = new URL(target, window.location.origin); } catch { window.location.replace(defaultPath); return; }
     const validReturn = parsed.origin === window.location.origin && (
-      ["/imports", "/runs", "/results", "/audit", "/tools/oc-policy-verification"].includes(parsed.pathname)
+      ["/imports", "/runs", "/results", "/audit", "/tools", "/tools/oc-policy-verification", "/dashboard", "/notifications", "/my-results", "/team", "/access", "/reports", "/review", "/account"].includes(parsed.pathname)
       || parsed.pathname.startsWith("/imports/") || parsed.pathname.startsWith("/runs/")
+      || parsed.pathname.startsWith("/my-results/") || parsed.pathname.startsWith("/leads/") || parsed.pathname.startsWith("/results/")
     );
-    if (!validReturn) return;
+    if (!validReturn) { window.location.replace(defaultPath); return; }
     window.location.replace(`${parsed.pathname}${parsed.search}${parsed.hash}`);
-  }, [authenticated, isCatalogLanding]);
+  }, [authenticated, isCatalogLanding, userRole]);
 
   useEffect(() => {
     const onPopState = () => {
@@ -332,7 +356,7 @@ export default function Workspace() {
         setAuthenticated(false);
         return;
       }
-      const session = await response.json() as { csrfToken?: string; role?: "admin" | "operator" | "reviewer" | "auditor"; mustChangePassword?: boolean; tools?: ToolAccess[] };
+      const session = await response.json() as { csrfToken?: string; role?: "admin" | "manager" | "operator" | "reviewer" | "auditor"; mustChangePassword?: boolean; tools?: ToolAccess[] };
       if (active) {
         if (session.mustChangePassword) { window.location.assign("/account?required=1"); return; }
         setCsrfToken(typeof session.csrfToken === "string" ? session.csrfToken : "");
@@ -403,42 +427,6 @@ export default function Workspace() {
       window.removeEventListener("online", onResume);
     };
   }, [authenticated, userRole, interventionRefreshToken, canSeeInterventions]);
-
-  useEffect(() => {
-    if (!authenticated || !canDiscoverTool) { setAutomationHealth(null); return; }
-    let active = true;
-    let timer: number | null = null;
-    let controller: AbortController | null = null;
-    let running = false;
-    const poll = async () => {
-      if (!active || running || document.visibilityState !== "visible" || !navigator.onLine) return;
-      running = true;
-      controller = new AbortController();
-      try {
-        const response = await fetch("/api/health/automation", { credentials: "same-origin", signal: controller.signal });
-        const payload = await response.json().catch(() => null) as AutomationHealth | null;
-        if (active && payload && typeof payload.message === "string") setAutomationHealth(payload);
-        else if (active) setAutomationHealth({ automationReady: false, servicesReady: false, worker: "unknown", portalMode: "unknown", portalConfig: "unavailable", message: "Nie udało się odczytać gotowości usług." });
-      } catch {
-        if (active && !controller.signal.aborted) setAutomationHealth({ automationReady: false, servicesReady: false, worker: "unknown", portalMode: "unknown", portalConfig: "unavailable", message: "API nie odpowiada." });
-      } finally {
-        running = false;
-        controller = null;
-        if (active && document.visibilityState === "visible" && navigator.onLine) timer = window.setTimeout(() => void poll(), 15_000);
-      }
-    };
-    const resume = () => { if (timer !== null) window.clearTimeout(timer); timer = null; void poll(); };
-    void poll();
-    document.addEventListener("visibilitychange", resume);
-    window.addEventListener("online", resume);
-    return () => {
-      active = false;
-      if (timer !== null) window.clearTimeout(timer);
-      controller?.abort();
-      document.removeEventListener("visibilitychange", resume);
-      window.removeEventListener("online", resume);
-    };
-  }, [authenticated, canDiscoverTool]);
 
   useEffect(() => {
     if (!authenticated || !canViewResults) return;
@@ -698,6 +686,26 @@ export default function Workspace() {
     return null;
   }
 
+  useEffect(() => {
+    if (!authenticated || !selectedRun?.id || selectedRun.controlState !== "pause_requested") return;
+    let active = true;
+    let timer: number | null = null;
+    const refresh = async () => {
+      try {
+        const response = await fetch(`/api/runs/${selectedRun.id}`, { credentials: "same-origin" });
+        if (response.status === 401) { if (active) await logout(); return; }
+        if (!response.ok) return;
+        const run = await response.json() as Run;
+        if (!active) return;
+        setSelectedRun(run);
+        setRuns((current) => current.map((entry) => entry.id === run.id ? { ...entry, ...run } : entry));
+        if (run.controlState === "pause_requested") timer = window.setTimeout(() => void refresh(), 1000);
+      } catch { /* The row remains in its last confirmed control state. */ }
+    };
+    timer = window.setTimeout(() => void refresh(), 500);
+    return () => { active = false; if (timer !== null) window.clearTimeout(timer); };
+  }, [authenticated, selectedRun?.id, selectedRun?.controlState]);
+
   async function openIntervention(item: Intervention) {
     setInterventionError("");
     smsTriggerRef.current = document.activeElement instanceof HTMLButtonElement ? document.activeElement : null;
@@ -799,6 +807,39 @@ export default function Workspace() {
     } catch (cause) { setRunError(cause instanceof Error ? cause.message : "Nie udało się anulować zadania."); }
   }
 
+  async function controlRun(action: "pause" | "resume") {
+    if (!selectedRun || runControlBusy) return;
+    const targetRunId = selectedRun.id;
+    const expectedRevision = selectedRun.controlRevision ?? "0";
+    const requestIdentity = `${targetRunId}:${action}:${expectedRevision}`;
+    let idempotencyKey = runControlRequestKeys.current.get(requestIdentity);
+    if (!idempotencyKey) {
+      idempotencyKey = `run-control-${crypto.randomUUID()}`;
+      runControlRequestKeys.current.set(requestIdentity, idempotencyKey);
+    }
+    setRunControlBusy(true);
+    setRunError("");
+    try {
+      const response = await fetch(`/api/runs/${targetRunId}/${action}`, {
+        method: "POST", credentials: "same-origin",
+        headers: { "X-CSRF-Token": csrfToken, "Content-Type": "application/json" },
+        body: JSON.stringify({ expectedRevision, idempotencyKey }),
+      });
+      const payload = await response.json().catch(() => ({})) as Run & { message?: string };
+      if (response.status === 401) { await logout(); return; }
+      if (!response.ok) {
+        if (response.status >= 400 && response.status < 500) runControlRequestKeys.current.delete(requestIdentity);
+        throw new Error(payload.message || (action === "pause" ? "Nie udało się wstrzymać zadania." : "Nie udało się wznowić zadania."));
+      }
+      runControlRequestKeys.current.delete(requestIdentity);
+      setSelectedRun(payload);
+      setRuns((current) => current.map((run) => run.id === payload.id ? { ...run, ...payload } : run));
+    } catch (cause) {
+      setRunError(cause instanceof Error ? cause.message : "Nie udało się zmienić sterowania zadaniem.");
+      await showRun(targetRunId);
+    } finally { setRunControlBusy(false); }
+  }
+
   async function resumeAuth(targetRunId = selectedRun?.id) {
     if (!targetRunId || authResumeLock.current || authRetryPendingRunId === targetRunId) return;
     authResumeLock.current = true;
@@ -821,7 +862,7 @@ export default function Workspace() {
 
   async function saveManualData(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!selectedRun?.incident?.fieldCode || userRole !== "admin") return;
+    if (!selectedRun?.incident?.fieldCode || (userRole !== "admin" && userRole !== "manager")) return;
     const fieldByCode: Record<string, string> = {
       ADDRESS: "address", POSTAL_CODE: "postalCode", CITY: "city", COUNTY: "countyCode", EXPECTED_PERSON: "expectedPersonName",
     };
@@ -848,7 +889,7 @@ export default function Workspace() {
   }
 
   async function resumeReview() {
-    if (!selectedRun || userRole !== "admin") return;
+    if (!selectedRun || (userRole !== "admin" && userRole !== "manager")) return;
     setRunError("");
     try {
       const response = await fetch(`/api/runs/${selectedRun.id}/resume-review`, {
@@ -870,11 +911,11 @@ export default function Workspace() {
     setError("");
     try {
       const response = await fetch("/api/auth/login", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password }) });
-      const session = await response.json().catch(() => ({})) as { csrfToken?: string; role?: "admin" | "operator" | "reviewer" | "auditor"; mustChangePassword?: boolean };
+      const session = await response.json().catch(() => ({})) as { csrfToken?: string; role?: "admin" | "manager" | "operator" | "reviewer" | "auditor"; mustChangePassword?: boolean };
       if (!response.ok) throw new Error("Sprawdź login i hasło.");
       if (session.mustChangePassword) { window.location.assign("/account?required=1"); return; }
       const meResponse = await fetch("/api/auth/me", { credentials: "same-origin" });
-      const me = await meResponse.json().catch(() => ({})) as { csrfToken?: string; role?: "admin" | "operator" | "reviewer" | "auditor"; tools?: ToolAccess[] };
+      const me = await meResponse.json().catch(() => ({})) as { csrfToken?: string; role?: "admin" | "manager" | "operator" | "reviewer" | "auditor"; tools?: ToolAccess[] };
       if (!meResponse.ok) throw new Error("Nie udało się odczytać uprawnień konta.");
       setPassword("");
       setCsrfToken(typeof me.csrfToken === "string" ? me.csrfToken : typeof session.csrfToken === "string" ? session.csrfToken : "");
@@ -934,10 +975,10 @@ export default function Workspace() {
     window.history.replaceState(null, "", "/");
   }
 
-  if (authenticated === null) return <main className="loading"><span className="loader" /> Ładowanie panelu…</main>;
-  if (!authenticated) return <main className="login-shell"><section className="login-intro"><GoldisLogo variant="login" priority /><p className="eyebrow">GOLDIS UBEZPIECZENIA</p><h1>Narzędzia dla pracy z danymi.</h1><p>Jedno miejsce do uruchamiania i kontroli automatyzacji.</p><div className="login-rail"><span>01 · Import</span><span>02 · Weryfikacja</span><span>03 · Wynik</span></div></section><section className="login-card"><p className="eyebrow">DOSTĘP DO PANELU</p><h2>Zaloguj się</h2><form onSubmit={login}><label>Użytkownik<input autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} required /></label><label>Hasło<input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>{error && <p className="error" role="alert">{error}</p>}<button type="submit" disabled={working}>{working ? "Logowanie…" : "Przejdź do panelu"}</button></form></section></main>;
+  if (authenticated === null) return <main className="loading" role="status" aria-live="polite"><span className="loader" aria-hidden="true" /> Ładowanie panelu…</main>;
+  if (!authenticated) return <main className="login-shell"><section className="login-intro"><GoldisLogo variant="login" priority /><p className="eyebrow">GOLDIS UBEZPIECZENIA</p><h1>Narzędzia dla pracy z danymi.</h1><p>Jedno miejsce do uruchamiania i kontroli automatyzacji.</p><div className="login-rail"><span>01 · Import</span><span>02 · Weryfikacja</span><span>03 · Wynik</span></div></section><section className="login-card"><p className="eyebrow">DOSTĘP DO PANELU</p><h2>Zaloguj się</h2><form onSubmit={login}><label>Użytkownik<input autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} required /></label><label>Hasło<input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>{error && <p className="error" role="alert">{error}</p>}<button type="submit" disabled={working}>{working ? "Logowanie…" : "Przejdź do panelu"}</button><p className="login-help">Nie pamiętasz hasła? <a href="/odzyskaj-haslo">Wyślij link do resetu</a>. Jeśli odzyskiwanie nie jest włączone, skontaktuj się z administratorem.</p></form></section></main>;
   if (authenticated && isCatalogLanding) return <main className="platform-home">
-    <header><a className="platform-home-brand" href="/"><GoldisLogo variant="header" /><span>Goldis · Platforma automatyzacji</span></a><nav><a href="/account">Moje konto</a>{userRole && ["admin", "reviewer", "auditor"].includes(userRole) && <a href="/audit">Audyt</a>}{userRole === "admin" && <a href="/admin">Administracja</a>}<span className="topbar-user">{userRole ? roleLabels[userRole] : "Użytkownik"}</span><button type="button" onClick={() => void logout()}>Wyloguj</button></nav></header>
+    <header><a className="platform-home-brand" href="/"><GoldisLogo variant="header" /><span>Goldis · Platforma automatyzacji</span></a><nav><a href="/dashboard">Przegląd</a><a href="/notifications">Powiadomienia</a><a href="/account">Moje konto</a>{userRole && ["admin", "manager", "reviewer", "auditor"].includes(userRole) && <a href="/audit">Audyt</a>}{userRole === "admin" && <a href="/admin">Administracja</a>}<span className="topbar-user">{userRole ? roleLabels[userRole] : "Użytkownik"}</span><button type="button" onClick={() => void logout()}>Wyloguj</button></nav></header>
     <div className="platform-home-content"><p className="eyebrow">GOLDIS / KATALOG</p><h1>Wybierz obszar pracy</h1><p>Narzędzia i historie dostępne dla Twojego konta. Zakres dalszych działań zależy od przydzielonych uprawnień.</p>
       {catalogError && <p className="history-error" role="alert">{catalogError}</p>}
       <div className="platform-tool-grid">{catalogItems.map((tool) => {
@@ -950,8 +991,8 @@ export default function Workspace() {
         </article>;
       })}</div>
       {!catalogItems.length && !catalogError && <p className="history-empty">Brak narzędzi z dostępem. Skontaktuj się z administratorem organizacji.</p>}
-      {catalogItems.some((tool) => tool.access.canViewResults) && <nav className="platform-history-links" aria-label="Historie"><a href="/imports">Historia importów</a><a href="/runs">Historia zadań</a><a href="/results">Wyniki OC</a></nav>}
-      {userRole && ["admin", "reviewer", "auditor"].includes(userRole) && <nav className="platform-history-links" aria-label="Bezpieczeństwo"><a href="/audit">Dziennik audytu</a></nav>}
+      {catalogItems.some((tool) => tool.access.canViewResults) && <nav className="platform-history-links" aria-label="Historie"><a href="/imports">Historia importów</a><a href="/runs">Historia zadań</a><a href="/results/oc-policy-verification">Pula wyników OC</a><a href="/my-results">Moje wyniki</a><a href="/results/history">Historia zadań firmowych</a></nav>}
+      {userRole && ["admin", "manager", "reviewer", "auditor"].includes(userRole) && <nav className="platform-history-links" aria-label="Bezpieczeństwo"><a href="/audit">Dziennik audytu</a></nav>}
     </div>
   </main>;
   if (!canDiscoverTool && !canOperate && !canViewResults) return <main className="no-tool-access"><section className="no-tool-card"><GoldisLogo variant="header" /><p className="eyebrow">DOSTĘP DO PLATFORMY</p><h1>Brak dostępu do narzędzia</h1><p>Administrator nie przyznał temu kontu dostępu do narzędzia ani wcześniejszych wyników. Skontaktuj się z administratorem organizacji.</p><div><a href="/account">Moje konto</a><button type="button" onClick={() => void logout()}>Wyloguj</button></div></section></main>;
@@ -994,14 +1035,14 @@ export default function Workspace() {
             <a className={activeNav === "workspace-import" ? "nav-active" : ""} href="#workspace-import" aria-current={activeNav === "workspace-import" ? "page" : undefined} onClick={() => { closeMobileNav(false); window.requestAnimationFrame(() => document.getElementById("workspace-import")?.focus({ preventScroll: true })); }}>Importy</a>
             <a className={activeNav === "workspace-runs" ? "nav-active" : ""} href={result ? "#workspace-runs" : "#workspace-import"} aria-current={activeNav === "workspace-runs" ? "page" : undefined} onClick={() => { closeMobileNav(false); const target = result ? "workspace-runs" : "workspace-import"; window.requestAnimationFrame(() => document.getElementById(target)?.focus({ preventScroll: true })); }}>Zadania</a>
             <a className={activeNav === "workspace-result" ? "nav-active" : ""} href={result ? "#workspace-result" : "#workspace-import"} aria-current={activeNav === "workspace-result" ? "page" : undefined} onClick={() => { closeMobileNav(false); const target = result ? "workspace-result" : "workspace-import"; window.requestAnimationFrame(() => document.getElementById(target)?.focus({ preventScroll: true })); }}>Wyniki</a>
-            <a href="/">Katalog platformy</a><a href="/imports">Historia importów</a><a href="/runs">Historia zadań</a><a href="/results">Wyniki OC</a>
+            <a href="/dashboard">Przegląd</a><a href="/notifications">Powiadomienia</a><a href="/">Katalog platformy</a><a href="/imports">Historia importów</a><a href="/runs">Historia zadań</a><a href="/results/oc-policy-verification">Pula wyników OC</a><a href="/my-results">Moje wyniki</a><a href="/results/history">Historia zadań firmowych</a>
           </nav>
-          <div className="mobile-nav-foot"><a href="/account">Moje konto</a>{userRole && ["admin", "reviewer", "auditor"].includes(userRole) && <a href="/audit">Audyt</a>}{userRole === "admin" && <a href="/admin">Administracja</a>}<span>{userRole ? roleLabels[userRole] : "Użytkownik"}</span><button type="button" onClick={() => void logout()}>Wyloguj</button></div>
+          <div className="mobile-nav-foot"><a href="/account">Moje konto</a>{userRole && ["admin", "manager", "reviewer", "auditor"].includes(userRole) && <a href="/audit">Audyt</a>}{userRole === "admin" && <a href="/admin">Administracja</a>}<span>{userRole ? roleLabels[userRole] : "Użytkownik"}</span><button type="button" onClick={() => void logout()}>Wyloguj</button></div>
         </div>
       </div>
     </aside>
     <main className="main">
-      <header className="topbar"><span>GOLDIS / NARZĘDZIA</span><nav className="workspace-links"><a href="/">Katalog</a><a href="/imports">Importy</a><a href="/runs">Zadania</a><a href="/results">Wyniki</a>{userRole && ["admin", "reviewer", "auditor"].includes(userRole) && <a href="/audit">Audyt</a>}<a href="/account">Moje konto</a>{userRole === "admin" && <a href="/admin">Administracja</a>}<span className="topbar-user">{userRole ? roleLabels[userRole] : "Użytkownik"}</span></nav></header>
+      <header className="topbar"><span>GOLDIS / NARZĘDZIA</span><nav className="workspace-links"><a href="/dashboard">Przegląd</a><a href="/notifications">Powiadomienia</a><a href="/">Katalog</a><a href="/imports">Importy</a><a href="/runs">Zadania</a><a href="/results/oc-policy-verification">Wyniki</a><a href="/my-results">Moje wyniki</a><a href="/results/history">Historia wyników</a>{userRole && ["admin", "manager", "reviewer", "auditor"].includes(userRole) && <a href="/audit">Audyt</a>}<a href="/account">Moje konto</a>{userRole === "admin" && <a href="/admin">Administracja</a>}<span className="topbar-user">{userRole ? roleLabels[userRole] : "Użytkownik"}</span></nav></header>
       <div className="content">
         <section className="intro" id="workspace-start" tabIndex={-1}><p className="eyebrow">NARZĘDZIE 01 / POLISY OC</p><h1>Weryfikacja danych transportowych</h1><p>Przygotuj bazę firm do sprawdzenia w Everest i Compensie. Po imporcie zobaczysz wiersze wymagające poprawy.</p></section>
         {runError && <p className="error" role="alert">{runError}</p>}
@@ -1029,38 +1070,49 @@ export default function Workspace() {
         </section>}
 
         <section className="workspace-grid" id="workspace-import" tabIndex={-1}>
-          {canOperate && <SpotlightCard className="card upload-card" spotlightColor="rgba(217, 182, 95, 0.12)"><div className="section-head"><div><p className="eyebrow">KROK 01</p><h2>Dodaj bazę transportową</h2></div><span className="file-mark">.xlsx</span></div><p>Arkusz „Realizacja” musi zawierać kolumny „Nazwa” i „REGON”. Kolumna „Osoba Decyzyjna” jest opcjonalna. Oryginalny plik pozostaje bez zmian.</p><form onSubmit={upload}><label className="file-input">{file ? file.name : "Wybierz plik Excel"}<input type="file" accept=".xlsx" onChange={(event) => setFile(event.target.files?.[0] || null)} /></label><button type="submit" disabled={!file || working}>{working ? "Sprawdzanie pliku…" : "Sprawdź i zaimportuj"}</button></form>{error && <p className="error" role="alert">{error}</p>}</SpotlightCard>}
-          <div className="card status-card"><p className="eyebrow">STAN NARZĘDZIA</p><h2>{canOperate ? "Import gotowy do użycia" : "Tryb podglądu"}</h2><p>Sprawdzanie portali wymaga lokalnego workera Playwright i potwierdzonych selektorów ekranów.</p><div className="status-line"><span className="status-dot" /> Import i walidacja</div><div className="status-line muted"><span className="status-dot" /> Logowanie i UFG</div></div>
+          {canOperate && <SpotlightCard className="card upload-card" spotlightColor="rgba(217, 182, 95, 0.12)"><div className="section-head"><div><p className="eyebrow">KROK 01</p><h2>Dodaj bazę transportową</h2></div><span className="file-mark">.xlsx</span></div><p>Arkusz „Realizacja” musi zawierać kolumnę „Nazwa” oraz co najmniej jedną z kolumn „NIP” lub „REGON”. Brak REGON-u przy poprawnym NIP-ie oznacza weryfikację w rejestrze. Kolumna „Osoba Decyzyjna” jest opcjonalna. Oryginalny plik pozostaje bez zmian.</p><form onSubmit={upload}><label className="file-input">{file ? file.name : "Wybierz plik Excel"}<input type="file" accept=".xlsx" onChange={(event) => setFile(event.target.files?.[0] || null)} /></label><button type="submit" disabled={!file || working}>{working ? "Sprawdzanie pliku…" : "Sprawdź i zaimportuj"}</button></form>{error && <p className="error" role="alert">{error}</p>}</SpotlightCard>}
+          <div className="card status-card"><p className="eyebrow">STAN NARZĘDZIA</p><h2>{canOperate ? "Import i przygotowanie dostępne" : "Tryb podglądu"}</h2><p>Uruchomienie sprawdzania portali wymaga aktywnego workera Playwright i potwierdzonych selektorów ekranów.</p><div className="status-line"><span className="status-dot" /> Import i walidacja dostępne</div><div className="status-line muted"><span className="status-dot" /> Automatyzacja portali wymaga workera</div></div>
         </section>
 
-        {result && canViewResults && <section id="workspace-result" tabIndex={-1} className="result-section"><div className="section-head"><div><p className="eyebrow">WYNIK IMPORTU</p><h2>Przegląd bazy</h2></div><span className="result-id">{result.id.slice(0, 8)}</span></div><div className="metrics"><div><strong>{result.totalRows.toLocaleString("pl-PL")}</strong><span>wierszy</span></div><div><strong>{result.readyRows.toLocaleString("pl-PL")}</strong><span>gotowych</span></div><div><strong>{result.invalidRows.toLocaleString("pl-PL")}</strong><span>do sprawdzenia</span></div></div><div className="row-tools"><label>Filtr <select value={rowState} onChange={(event) => { setRowState(event.target.value as "all" | "ready" | "review"); setRowPage(1); }}><option value="all">Wszystkie</option><option value="ready">Gotowe</option><option value="review">Do sprawdzenia</option></select></label><span>Strona {rowPage}</span><button type="button" disabled={rowPage === 1} onClick={() => setRowPage((page) => page - 1)}>Poprzednia</button><button type="button" disabled={rows.length < 50} onClick={() => setRowPage((page) => page + 1)}>Następna</button></div><div className="table-wrap" tabIndex={0} role="region" aria-label="Tabela wyników; przewiń w poziomie, aby zobaczyć wszystkie kolumny"><table><thead><tr><th>Wiersz</th><th>Nazwa</th><th>Osoba decyzyjna</th><th>REGON</th><th>Stan</th></tr></thead><tbody>{rows.map((row) => <tr key={row.rowNumber}><td>{row.rowNumber}</td><td>{row.companyName}</td><td>{row.decisionMakerName ?? "—"}</td><td className="mono">{row.regon}</td><td>{row.issues.length ? <span className="pill warn">Do sprawdzenia</span> : <span className="pill good">Gotowy</span>}</td></tr>)}</tbody></table></div><p className="table-note">Podgląd 50 wierszy na stronę. Import nie uruchamia zapytań do portali.</p></section>}
-        {result && canViewResults && <EnrichmentReviewPanel key={result.id} batchId={result.id} csrfToken={csrfToken} canStart={canOperate} />}
+        {result && canViewResults && <section id="workspace-result" tabIndex={-1} className="result-section"><div className="section-head"><div><p className="eyebrow">WYNIK IMPORTU</p><h2>Przegląd bazy</h2></div><span className="result-id">{result.id.slice(0, 8)}</span></div><div className="metrics"><div><strong>{result.totalRows.toLocaleString("pl-PL")}</strong><span>wierszy</span></div><div><strong>{result.readyRows.toLocaleString("pl-PL")}</strong><span>gotowych wstępnie</span></div><div><strong>{result.invalidRows.toLocaleString("pl-PL")}</strong><span>do sprawdzenia lub pominięcia</span></div></div><div className="row-tools"><label>Filtr <select value={rowState} onChange={(event) => { setRowState(event.target.value as "all" | "ready" | "review"); setRowPage(1); }}><option value="all">Wszystkie</option><option value="ready">Gotowe</option><option value="review">Do sprawdzenia</option></select></label><span>Strona {rowPage}</span><button type="button" disabled={rowPage === 1} onClick={() => setRowPage((page) => page - 1)}>Poprzednia</button><button type="button" disabled={rows.length < 50} onClick={() => setRowPage((page) => page + 1)}>Następna</button></div><div className="table-wrap" tabIndex={0} role="region" aria-label="Tabela wyników; przewiń w poziomie, aby zobaczyć wszystkie kolumny"><table><thead><tr><th>Wiersz</th><th>Nazwa</th><th>Osoba decyzyjna</th><th>REGON</th><th>Stan</th></tr></thead><tbody>{rows.map((row) => { const duplicate = row.issues.includes("DUPLICATE_SOURCE_ROW"); const missingRegon = row.issues.includes("REGON_EMPTY"); return <tr key={row.rowNumber}><td>{row.rowNumber}</td><td>{row.companyName}</td><td>{row.decisionMakerName ?? "—"}</td><td className="mono">{row.regon}</td><td>{duplicate ? <span className="pill warn" title="Ten wiersz nie trafi do zestawu roboczego">Duplikat — pominięty</span> : missingRegon ? <span className="pill warn">Wymaga ustalenia REGON-u</span> : row.issues.length ? <span className="pill warn">Do sprawdzenia</span> : <span className="pill good">Gotowy</span>}</td></tr>; })}</tbody></table></div><p className="table-note">Podgląd 50 wierszy na stronę. Duplikat pozostaje w źródłowym imporcie, ale jest pomijany w zestawie roboczym. Import nie uruchamia zapytań do portali.</p></section>}
+        {result && canViewResults && <ImportPreparationPanel key={`preparation-${result.id}`} batchId={result.id} csrfToken={csrfToken}
+          canStart={canOperate} canDownload={canDownloadResults} onUnauthorized={handleSessionExpired} onRunReadyChange={handlePreparationReadyChange} />}
+        {result && canViewResults && <EnrichmentReviewPanel key={`enrichment-${result.id}`} batchId={result.id} csrfToken={csrfToken} canStart={canOperate} onUnauthorized={handleSessionExpired} />}
 
         {result && (canOperate || canViewResults) && <section id="workspace-runs" tabIndex={-1} className="result-section run-section"><div className="section-head"><div><p className="eyebrow">KROK 02 / ZADANIA</p><h2>Kontrola pojedynczego wiersza</h2></div></div><p>Ten etap zapisuje zadanie, sprawdza dane wejściowe i pokazuje historię. Status „Oczekuje na adapter portali” oznacza, że worker portali nie jest aktywny.</p>
-          {canOperate && <form className="run-form" onSubmit={startRun}><label>Numer wiersza w Excelu<input type="number" min="2" step="1" placeholder="np. 18001" value={runNumber} onChange={(event) => setRunNumber(event.target.value)} required /></label><button type="submit" disabled={working || !runNumber}>Sprawdź gotowość wiersza</button></form>}
-          {canOperate && <RunSubmissionLauncher batchId={result.id} csrfToken={csrfToken} />}
+          {canOperate && preparationReady && <form className="run-form" onSubmit={startRun}><label>Numer wiersza w Excelu<input type="number" min="2" step="1" placeholder="np. 18001" value={runNumber} onChange={(event) => setRunNumber(event.target.value)} required /></label><button type="submit" disabled={working || !runNumber}>Sprawdź gotowość wiersza</button></form>}
+          {canOperate && preparationReady && <RunSubmissionLauncher batchId={result.id} csrfToken={csrfToken} />}
+          {canOperate && !preparationReady && <p className="preparation-message">Najpierw zakończ przygotowanie i deduplikację całego importu. Po każdej zmianie danych źródłowych wykonaj nową rewizję.</p>}
           {runError && <p className="error" role="alert">{runError}</p>}
           {canViewResults && runs.length > 0 && <div className="run-list"><h3>Ostatnie zadania</h3>{runs.map((run) => <button key={run.id} type="button" onClick={() => void showRun(run.id)}><span>Wiersz {run.rowNumber}</span><strong>{runLabels[run.status] ?? run.status}</strong><small>{run.referenceDate}</small></button>)}</div>}
           {selectedRun && canViewResults && <div className="run-detail" id="run-detail"><h3>Wiersz {selectedRun.rowNumber}: {runLabels[selectedRun.status] ?? selectedRun.status}</h3><p>Data odniesienia: {selectedRun.referenceDate}{selectedRun.errorCode ? " · " + selectedRun.errorCode : ""}</p>
+            {selectedRun.controlState === "pause_requested" && <p className="submission-notice" role="status">Wstrzymywanie po bieżącej akcji portalu. Akcja już wysłana może się jeszcze zakończyć.</p>}
+            {selectedRun.controlState === "paused" && <p className="submission-notice" role="status">Zadanie wstrzymano przy bezpiecznym punkcie{selectedRun.controlCheckpointStatus ? ` (${runLabels[selectedRun.controlCheckpointStatus] ?? selectedRun.controlCheckpointStatus})` : ""}. Wznowienie kontynuuje ten sam przebieg.</p>}
             {selectedRun.incident && <div className="sms-challenge" role="status">
               <strong>Zadanie wstrzymane — zgłoszenie dla administratora</strong>
               <p>Portal: {selectedRun.incident.portal === "pzu" ? "PZU" : "Compensa"} · Powód: {selectedRun.incident.reasonCode}{selectedRun.incident.fieldCode ? " · Pole: " + (manualFieldLabels[selectedRun.incident.fieldCode] ?? "wymaga uzgodnienia") : ""}</p>
-              {selectedRun.incident.canResumeAuth && canOperate && (userRole === "admin" || userRole === "operator") ? <button type="button" disabled={authResuming || authRetryPendingRunId === selectedRun.id} onClick={() => void resumeAuth()}>{authResuming || authRetryPendingRunId === selectedRun.id ? "Oczekiwanie na ponowienie…" : "Wyślij jeden dodatkowy kod SMS"}</button>
+              {selectedRun.incident.canResumeAuth && canOperate && (userRole === "admin" || userRole === "manager" || userRole === "operator") ? <button type="button" disabled={authResuming || authRetryPendingRunId === selectedRun.id} onClick={() => void resumeAuth()}>{authResuming || authRetryPendingRunId === selectedRun.id ? "Oczekiwanie na ponowienie…" : "Wyślij jeden dodatkowy kod SMS"}</button>
                 : selectedRun.incident.reasonCode === "SMS_TIMEOUT" && selectedRun.incident.portal === "pzu" ? <p>Limit dodatkowej próby SMS PZU został wykorzystany.</p>
                   : <p>Poprawka nie rozwiązuje automatycznie zgłoszenia; wznowienie wymaga ponownego odczytu i kontroli.</p>}
-              {userRole === "admin" && selectedRun.incident.fieldCode && manualFieldLabels[selectedRun.incident.fieldCode] &&
+              {(userRole === "admin" || userRole === "manager") && selectedRun.incident.fieldCode && manualFieldLabels[selectedRun.incident.fieldCode] &&
                 <form className="manual-data-form" onSubmit={saveManualData}>
                   <label>{manualFieldLabels[selectedRun.incident.fieldCode]}<input value={manualValue} onChange={(event) => setManualValue(event.target.value)} maxLength={selectedRun.incident.fieldCode === "ADDRESS" ? 200 : selectedRun.incident.fieldCode === "CITY" ? 100 : selectedRun.incident.fieldCode === "EXPECTED_PERSON" ? 150 : 80} required /></label>
                   {selectedRun.incident.fieldCode === "COUNTY" && <small>Wpisz dokładną wartość opcji z istniejącej listy Compensy. Nie zgaduj powiatu; worker sprawdzi, czy opcja istnieje.</small>}
                   <label>Powód poprawki<textarea value={manualReason} onChange={(event) => setManualReason(event.target.value)} minLength={10} maxLength={300} required /></label>
                   <button type="submit" disabled={manualSaving || !manualValue.trim() || manualReason.trim().length < 10}>{manualSaving ? "Zapisywanie…" : "Zapisz wersjonowaną poprawkę"}</button>
                 </form>}
-              {userRole === "admin" && selectedRun.incident.canResumeReview && <button type="button" onClick={() => void resumeReview()}>Wznów to samo zadanie</button>}
+              {(userRole === "admin" || userRole === "manager") && selectedRun.incident.canResumeReview && <button type="button" onClick={() => void resumeReview()}>Wznów to samo zadanie</button>}
               {selectedRun.incident.fieldCode && !manualFieldLabels[selectedRun.incident.fieldCode] && <p>To zgłoszenie wymaga uzgodnienia z portalem; samo wpisanie numeru sprawy nie odblokowuje kolejnego kliknięcia.</p>}
             </div>}
             {selectedRun.policyCounts && <div className="run-policy-counts" aria-label="Liczba polis"><div><strong>{selectedRun.policyCounts.totalOcCount.toLocaleString("pl-PL")}</strong><span>polis w danych UFG</span></div><div><strong>{selectedRun.policyCounts.currentOcCount.toLocaleString("pl-PL")}</strong><span>aktualnych na {selectedRun.referenceDate}</span></div></div>}
             {selectedRun.status === "no_matching_policies" && <p className="table-note">W zapisanym snapshotcie nie ma polis OC z datą końca obejmującą dzień sprawdzenia.</p>}
             {selectedRun.artifactAvailable && selectedRun.status === "completed" && canDownloadResults && <a className="download-link" href={"/api/runs/" + selectedRun.id + "/artifact"}>Pobierz wynik Excel</a>}
+            {canManageRuns && ["queued", "validating", "awaiting_portal_adapter", "pzu_login", "everest_search", "compensa_login", "compensa_form", "ufg_verification"].includes(selectedRun.status)
+              && <div className="run-control-actions">
+                {selectedRun.controlState === "paused"
+                  ? <button type="button" disabled={runControlBusy || !csrfToken} onClick={() => void controlRun("resume")}>{runControlBusy ? "Wznawianie…" : "Wznów zadanie"}</button>
+                  : <button type="button" disabled={runControlBusy || !csrfToken || selectedRun.controlState === "pause_requested"} onClick={() => void controlRun("pause")}>{selectedRun.controlState === "pause_requested" || runControlBusy ? "Wstrzymywanie…" : "Wstrzymaj po bieżącej akcji"}</button>}
+              </div>}
             {canOperate && (selectedRun.status === "queued" || selectedRun.status === "awaiting_portal_adapter" || selectedRun.status === "waiting_for_sms") && <button className="cancel-run" type="button" onClick={() => void cancelRun()}>Anuluj zadanie</button>}
             {selectedRun.events && <ol>{selectedRun.events.map((item, index) => <li key={item.createdAt + "-" + index}>{runLabels[item.status] ?? item.status} · {new Date(item.createdAt).toLocaleString("pl-PL")}</li>)}</ol>}
           </div>}

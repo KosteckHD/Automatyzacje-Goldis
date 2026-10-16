@@ -1,0 +1,5536 @@
+{
+  "auditDate": "2026-10-09",
+  "customerData": false,
+  "livePortalRequests": 0,
+  "realDatabaseConnections": 0,
+  "setup": "Real Nest controllers/guards/production HTTP bootstrap and real crypto KDF; synthetic services/DB/limiter. Timing is local HTTP, not a deployed VPS measurement.",
+  "routes": [
+    {
+      "controller": "AuthController",
+      "handler": "login",
+      "method": "POST",
+      "template": "/api/auth/login",
+      "endpoint": "/api/auth/login",
+      "protectedBy": "public"
+    },
+    {
+      "controller": "AuthController",
+      "handler": "logout",
+      "method": "POST",
+      "template": "/api/auth/logout",
+      "endpoint": "/api/auth/logout",
+      "protectedBy": "public"
+    },
+    {
+      "controller": "AuthController",
+      "handler": "me",
+      "method": "GET",
+      "template": "/api/auth/me",
+      "endpoint": "/api/auth/me",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AuthController",
+      "handler": "changePassword",
+      "method": "POST",
+      "template": "/api/auth/change-password",
+      "endpoint": "/api/auth/change-password",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AuthController",
+      "handler": "deletionStepUp",
+      "method": "POST",
+      "template": "/api/auth/deletion-step-up",
+      "endpoint": "/api/auth/deletion-step-up",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AuthController",
+      "handler": "sessions",
+      "method": "GET",
+      "template": "/api/auth/sessions",
+      "endpoint": "/api/auth/sessions",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AuthController",
+      "handler": "revokeSession",
+      "method": "DELETE",
+      "template": "/api/auth/sessions/:sessionId",
+      "endpoint": "/api/auth/sessions/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "HealthController",
+      "handler": "live",
+      "method": "GET",
+      "template": "/api/health",
+      "endpoint": "/api/health",
+      "protectedBy": "public"
+    },
+    {
+      "controller": "HealthController",
+      "handler": "liveness",
+      "method": "GET",
+      "template": "/api/health/live",
+      "endpoint": "/api/health/live",
+      "protectedBy": "public"
+    },
+    {
+      "controller": "HealthController",
+      "handler": "readiness",
+      "method": "GET",
+      "template": "/api/health/ready",
+      "endpoint": "/api/health/ready",
+      "protectedBy": "public"
+    },
+    {
+      "controller": "HealthController",
+      "handler": "automation",
+      "method": "GET",
+      "template": "/api/health/automation",
+      "endpoint": "/api/health/automation",
+      "protectedBy": "public"
+    },
+    {
+      "controller": "HealthController",
+      "handler": "enrichment",
+      "method": "GET",
+      "template": "/api/health/enrichment",
+      "endpoint": "/api/health/enrichment",
+      "protectedBy": "public"
+    },
+    {
+      "controller": "ImportController",
+      "handler": "list",
+      "method": "GET",
+      "template": "/api/imports",
+      "endpoint": "/api/imports",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportController",
+      "handler": "create",
+      "method": "POST",
+      "template": "/api/imports",
+      "endpoint": "/api/imports",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportController",
+      "handler": "createForTool",
+      "method": "POST",
+      "template": "/api/imports/tool/:toolId",
+      "endpoint": "/api/imports/tool/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportController",
+      "handler": "get",
+      "method": "GET",
+      "template": "/api/imports/:id",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportController",
+      "handler": "rows",
+      "method": "GET",
+      "template": "/api/imports/:id/rows",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/rows",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportController",
+      "handler": "enrichmentReview",
+      "method": "GET",
+      "template": "/api/imports/:id/enrichment",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/enrichment",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportController",
+      "handler": "proposeRegonCorrection",
+      "method": "PATCH",
+      "template": "/api/imports/:id/rows/:rowNumber",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/rows/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportPreparationController",
+      "handler": "start",
+      "method": "POST",
+      "template": "/api/imports/:batchId/preparations",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/preparations",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportPreparationController",
+      "handler": "list",
+      "method": "GET",
+      "template": "/api/imports/:batchId/preparations",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/preparations",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportPreparationController",
+      "handler": "get",
+      "method": "GET",
+      "template": "/api/imports/:batchId/preparations/:preparationId",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/preparations/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportPreparationController",
+      "handler": "rows",
+      "method": "GET",
+      "template": "/api/imports/:batchId/preparations/:preparationId/rows",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/preparations/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/rows",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportPreparationController",
+      "handler": "export",
+      "method": "GET",
+      "template": "/api/imports/:batchId/preparations/:preparationId/export",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/preparations/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/export",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportPreparationController",
+      "handler": "cancel",
+      "method": "POST",
+      "template": "/api/imports/:batchId/preparations/:preparationId/cancel",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/preparations/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/cancel",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportPreparationWorkflowController",
+      "handler": "start",
+      "method": "POST",
+      "template": "/api/imports/:batchId/preparations/:preparationId/workflow",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/preparations/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/workflow",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportPreparationWorkflowController",
+      "handler": "list",
+      "method": "GET",
+      "template": "/api/imports/:batchId/preparation-workflows",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/preparation-workflows",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportPreparationWorkflowController",
+      "handler": "get",
+      "method": "GET",
+      "template": "/api/imports/:batchId/preparation-workflows/:workflowId",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/preparation-workflows/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ImportPreparationWorkflowController",
+      "handler": "cancel",
+      "method": "POST",
+      "template": "/api/imports/:batchId/preparation-workflows/:workflowId/cancel",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/preparation-workflows/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/cancel",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "PreparedSetExecutionController",
+      "handler": "preview",
+      "method": "GET",
+      "template": "/api/imports/:batchId/prepared-set-executions/preview",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/prepared-set-executions/preview",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "PreparedSetExecutionController",
+      "handler": "start",
+      "method": "POST",
+      "template": "/api/imports/:batchId/prepared-set-executions",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/prepared-set-executions",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "PreparedSetExecutionController",
+      "handler": "get",
+      "method": "GET",
+      "template": "/api/imports/:batchId/prepared-set-executions/:executionId",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/prepared-set-executions/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "PreparedSetExecutionController",
+      "handler": "cancel",
+      "method": "POST",
+      "template": "/api/imports/:batchId/prepared-set-executions/:executionId/cancel",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/prepared-set-executions/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/cancel",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunController",
+      "handler": "create",
+      "method": "POST",
+      "template": "/api/runs",
+      "endpoint": "/api/runs",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunController",
+      "handler": "list",
+      "method": "GET",
+      "template": "/api/runs",
+      "endpoint": "/api/runs",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunController",
+      "handler": "get",
+      "method": "GET",
+      "template": "/api/runs/:id",
+      "endpoint": "/api/runs/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunController",
+      "handler": "artifact",
+      "method": "GET",
+      "template": "/api/runs/:id/artifact",
+      "endpoint": "/api/runs/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/artifact",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunController",
+      "handler": "cancel",
+      "method": "POST",
+      "template": "/api/runs/:id/cancel",
+      "endpoint": "/api/runs/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/cancel",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunController",
+      "handler": "pause",
+      "method": "POST",
+      "template": "/api/runs/:id/pause",
+      "endpoint": "/api/runs/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/pause",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunController",
+      "handler": "resumePaused",
+      "method": "POST",
+      "template": "/api/runs/:id/resume",
+      "endpoint": "/api/runs/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/resume",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunController",
+      "handler": "resumeAuth",
+      "method": "POST",
+      "template": "/api/runs/:id/resume-auth",
+      "endpoint": "/api/runs/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/resume-auth",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunController",
+      "handler": "resumeReview",
+      "method": "POST",
+      "template": "/api/runs/:id/resume-review",
+      "endpoint": "/api/runs/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/resume-review",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunSubmissionController",
+      "handler": "preview",
+      "method": "POST",
+      "template": "/api/imports/:batchId/run-submissions/preview",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/run-submissions/preview",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunSubmissionController",
+      "handler": "create",
+      "method": "POST",
+      "template": "/api/imports/:batchId/run-submissions",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/run-submissions",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunSubmissionController",
+      "handler": "get",
+      "method": "GET",
+      "template": "/api/run-submissions/:id",
+      "endpoint": "/api/run-submissions/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunSubmissionController",
+      "handler": "items",
+      "method": "GET",
+      "template": "/api/run-submissions/:id/items",
+      "endpoint": "/api/run-submissions/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/items",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "RunSubmissionController",
+      "handler": "cancel",
+      "method": "POST",
+      "template": "/api/run-submissions/:id/cancel",
+      "endpoint": "/api/run-submissions/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/cancel",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "HistoryController",
+      "handler": "runs",
+      "method": "GET",
+      "template": "/api/history/runs",
+      "endpoint": "/api/history/runs",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "HistoryController",
+      "handler": "results",
+      "method": "GET",
+      "template": "/api/history/results",
+      "endpoint": "/api/history/results",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ReviewController",
+      "handler": "corrections",
+      "method": "GET",
+      "template": "/api/review/corrections",
+      "endpoint": "/api/review/corrections",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ReviewController",
+      "handler": "myCorrections",
+      "method": "GET",
+      "template": "/api/review/my-corrections",
+      "endpoint": "/api/review/my-corrections",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ReviewController",
+      "handler": "conflicts",
+      "method": "GET",
+      "template": "/api/review/conflicts",
+      "endpoint": "/api/review/conflicts",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ReviewController",
+      "handler": "decideCorrection",
+      "method": "POST",
+      "template": "/api/review/corrections/:id/decision",
+      "endpoint": "/api/review/corrections/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/decision",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ReviewController",
+      "handler": "resolveConflict",
+      "method": "POST",
+      "template": "/api/review/conflicts/:id/resolution",
+      "endpoint": "/api/review/conflicts/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/resolution",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "EnrichmentJobController",
+      "handler": "start",
+      "method": "POST",
+      "template": "/api/imports/:batchId/enrichment-jobs",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/enrichment-jobs",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "EnrichmentJobController",
+      "handler": "listForBatch",
+      "method": "GET",
+      "template": "/api/imports/:batchId/enrichment-jobs",
+      "endpoint": "/api/imports/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/enrichment-jobs",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "EnrichmentJobController",
+      "handler": "get",
+      "method": "GET",
+      "template": "/api/enrichment-jobs/:id",
+      "endpoint": "/api/enrichment-jobs/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "EnrichmentJobController",
+      "handler": "listItems",
+      "method": "GET",
+      "template": "/api/enrichment-jobs/:id/items",
+      "endpoint": "/api/enrichment-jobs/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/items",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "EnrichmentJobController",
+      "handler": "cancel",
+      "method": "POST",
+      "template": "/api/enrichment-jobs/:id/cancel",
+      "endpoint": "/api/enrichment-jobs/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/cancel",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AuthChallengeController",
+      "handler": "getForRun",
+      "method": "GET",
+      "template": "/api/auth-challenges",
+      "endpoint": "/api/auth-challenges",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AuthChallengeController",
+      "handler": "submitCode",
+      "method": "POST",
+      "template": "/api/auth-challenges/:id/code",
+      "endpoint": "/api/auth-challenges/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/code",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "WorkerResultController",
+      "handler": "result",
+      "method": "POST",
+      "template": "/api/internal/worker-runs/:id/result",
+      "endpoint": "/api/internal/worker-runs/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/result",
+      "protectedBy": "service-secret"
+    },
+    {
+      "controller": "InterventionController",
+      "handler": "list",
+      "method": "GET",
+      "template": "/api/interventions",
+      "endpoint": "/api/interventions",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "InterventionController",
+      "handler": "summary",
+      "method": "GET",
+      "template": "/api/interventions/summary",
+      "endpoint": "/api/interventions/summary",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "InterventionController",
+      "handler": "markRead",
+      "method": "POST",
+      "template": "/api/interventions/:id/read",
+      "endpoint": "/api/interventions/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/read",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ManualDataController",
+      "handler": "patch",
+      "method": "PATCH",
+      "template": "/api/runs/:id/manual-data",
+      "endpoint": "/api/runs/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/manual-data",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "overview",
+      "method": "GET",
+      "template": "/api/admin/overview",
+      "endpoint": "/api/admin/overview",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "runtime",
+      "method": "GET",
+      "template": "/api/admin/runtime",
+      "endpoint": "/api/admin/runtime",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "users",
+      "method": "GET",
+      "template": "/api/admin/users",
+      "endpoint": "/api/admin/users",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "createUser",
+      "method": "POST",
+      "template": "/api/admin/users",
+      "endpoint": "/api/admin/users",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "adminTools",
+      "method": "GET",
+      "template": "/api/admin/tools",
+      "endpoint": "/api/admin/tools",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "grants",
+      "method": "GET",
+      "template": "/api/admin/users/:userId/grants",
+      "endpoint": "/api/admin/users/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/grants",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "setGrant",
+      "method": "PUT",
+      "template": "/api/admin/users/:userId/grants/:toolId",
+      "endpoint": "/api/admin/users/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/grants/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "setDeletionGrant",
+      "method": "PUT",
+      "template": "/api/admin/users/:userId/deletion-grant",
+      "endpoint": "/api/admin/users/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/deletion-grant",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "revokeGrant",
+      "method": "POST",
+      "template": "/api/admin/users/:userId/grants/:toolId/revoke",
+      "endpoint": "/api/admin/users/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/grants/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/revoke",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "getSettings",
+      "method": "GET",
+      "template": "/api/admin/tools/:toolId/settings",
+      "endpoint": "/api/admin/tools/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/settings",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "updateSettings",
+      "method": "PATCH",
+      "template": "/api/admin/tools/:toolId/settings",
+      "endpoint": "/api/admin/tools/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/settings",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "operationsSummary",
+      "method": "GET",
+      "template": "/api/admin/operations/summary",
+      "endpoint": "/api/admin/operations/summary",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "operationsRuns",
+      "method": "GET",
+      "template": "/api/admin/operations/runs",
+      "endpoint": "/api/admin/operations/runs",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "adminInterventions",
+      "method": "GET",
+      "template": "/api/admin/interventions",
+      "endpoint": "/api/admin/interventions",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "assignIntervention",
+      "method": "PATCH",
+      "template": "/api/admin/interventions/:id/assignment",
+      "endpoint": "/api/admin/interventions/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/assignment",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "setInterventionPriority",
+      "method": "PATCH",
+      "template": "/api/admin/interventions/:id/priority",
+      "endpoint": "/api/admin/interventions/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/priority",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "interventionActivity",
+      "method": "GET",
+      "template": "/api/admin/interventions/:id/activity",
+      "endpoint": "/api/admin/interventions/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/activity",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "userSessions",
+      "method": "GET",
+      "template": "/api/admin/users/:userId/sessions",
+      "endpoint": "/api/admin/users/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/sessions",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "revokeUserSession",
+      "method": "POST",
+      "template": "/api/admin/users/:userId/sessions/:sessionId/revoke",
+      "endpoint": "/api/admin/users/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/sessions/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/revoke",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "revokeUserSessions",
+      "method": "POST",
+      "template": "/api/admin/users/:userId/revoke-sessions",
+      "endpoint": "/api/admin/users/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/revoke-sessions",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "disableUser",
+      "method": "POST",
+      "template": "/api/admin/users/:userId/disable",
+      "endpoint": "/api/admin/users/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/disable",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "enableUser",
+      "method": "POST",
+      "template": "/api/admin/users/:userId/enable",
+      "endpoint": "/api/admin/users/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/enable",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "updateRole",
+      "method": "PATCH",
+      "template": "/api/admin/users/:userId/role",
+      "endpoint": "/api/admin/users/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/role",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminController",
+      "handler": "resetPassword",
+      "method": "POST",
+      "template": "/api/admin/users/:userId/password",
+      "endpoint": "/api/admin/users/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69/password",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "ToolCatalogController",
+      "handler": "list",
+      "method": "GET",
+      "template": "/api/tools",
+      "endpoint": "/api/tools",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminReportsController",
+      "handler": "overview",
+      "method": "GET",
+      "template": "/api/admin/reports/overview",
+      "endpoint": "/api/admin/reports/overview",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminReportsController",
+      "handler": "failures",
+      "method": "GET",
+      "template": "/api/admin/reports/failures",
+      "endpoint": "/api/admin/reports/failures",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminReportsController",
+      "handler": "interventions",
+      "method": "GET",
+      "template": "/api/admin/reports/interventions",
+      "endpoint": "/api/admin/reports/interventions",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AdminReportsController",
+      "handler": "throughput",
+      "method": "GET",
+      "template": "/api/admin/reports/throughput",
+      "endpoint": "/api/admin/reports/throughput",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "AuditSearchController",
+      "handler": "search",
+      "method": "GET",
+      "template": "/api/audit/events",
+      "endpoint": "/api/audit/events",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "DeletionController",
+      "handler": "preview",
+      "method": "POST",
+      "template": "/api/deletions/preview",
+      "endpoint": "/api/deletions/preview",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "DeletionJobController",
+      "handler": "create",
+      "method": "POST",
+      "template": "/api/deletions/jobs",
+      "endpoint": "/api/deletions/jobs",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "DeletionJobController",
+      "handler": "get",
+      "method": "GET",
+      "template": "/api/deletions/jobs/:jobId",
+      "endpoint": "/api/deletions/jobs/9e3c5db4-2480-4a0a-a70b-3b8949ec5a69",
+      "protectedBy": "session"
+    },
+    {
+      "controller": "DeletionJobController",
+      "handler": "list",
+      "method": "GET",
+      "template": "/api/deletions/jobs",
+      "endpoint": "/api/deletions/jobs",
+      "protectedBy": "session"
+    }
+  ],
+  "protectedRoutes": 93,
+  "checks": [
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/me",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/change-password",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/change-password",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/auth/change-password",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/auth/change-password",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/auth/change-password",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/auth/change-password",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/change-password",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/change-password",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/deletion-step-up",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/deletion-step-up",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/auth/deletion-step-up",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/auth/deletion-step-up",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/auth/deletion-step-up",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/auth/deletion-step-up",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/deletion-step-up",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/deletion-step-up",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/sessions",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/sessions",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/sessions",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/sessions",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/sessions",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/sessions",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/sessions",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/sessions",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/sessions/:sessionId",
+      "method": "DELETE",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/sessions/:sessionId",
+      "method": "DELETE",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/auth/sessions/:sessionId",
+      "method": "DELETE",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/auth/sessions/:sessionId",
+      "method": "DELETE",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/auth/sessions/:sessionId",
+      "method": "DELETE",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/auth/sessions/:sessionId",
+      "method": "DELETE",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/sessions/:sessionId",
+      "method": "DELETE",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/auth/sessions/:sessionId",
+      "method": "DELETE",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/imports",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/imports",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/imports",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/imports",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/tool/:toolId",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/tool/:toolId",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/tool/:toolId",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/tool/:toolId",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/tool/:toolId",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/tool/:toolId",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/tool/:toolId",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/tool/:toolId",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/rows",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/rows",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/rows",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/rows",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/rows",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/rows",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/rows",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/rows",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/enrichment",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/enrichment",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/enrichment",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/enrichment",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/enrichment",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/enrichment",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/enrichment",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/enrichment",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/rows/:rowNumber",
+      "method": "PATCH",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/rows/:rowNumber",
+      "method": "PATCH",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:id/rows/:rowNumber",
+      "method": "PATCH",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:id/rows/:rowNumber",
+      "method": "PATCH",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:id/rows/:rowNumber",
+      "method": "PATCH",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:id/rows/:rowNumber",
+      "method": "PATCH",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/rows/:rowNumber",
+      "method": "PATCH",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:id/rows/:rowNumber",
+      "method": "PATCH",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/rows",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/rows",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/rows",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/rows",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/rows",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/rows",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/rows",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/rows",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/export",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/export",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/export",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/export",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/export",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/export",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/export",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/export",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/cancel",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/cancel",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/cancel",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/cancel",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/cancel",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/cancel",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/cancel",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/cancel",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/workflow",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/workflow",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/workflow",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/workflow",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/workflow",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/workflow",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/workflow",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparations/:preparationId/workflow",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId/cancel",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId/cancel",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId/cancel",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId/cancel",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId/cancel",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId/cancel",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId/cancel",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/preparation-workflows/:workflowId/cancel",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/preview",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/preview",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/preview",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/preview",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/preview",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/preview",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/preview",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/preview",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId/cancel",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId/cancel",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId/cancel",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId/cancel",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId/cancel",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId/cancel",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId/cancel",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/prepared-set-executions/:executionId/cancel",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/runs",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/runs",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/runs",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/runs",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/runs",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/runs",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/runs",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/runs",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/runs",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/runs",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/artifact",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/artifact",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/artifact",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/artifact",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/artifact",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/artifact",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/artifact",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/artifact",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/cancel",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/cancel",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/cancel",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/cancel",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/cancel",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/cancel",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/cancel",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/cancel",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/pause",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/pause",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/pause",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/pause",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/pause",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/pause",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/pause",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/pause",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/resume",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/resume",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/resume",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/resume",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/resume",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/resume",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/resume",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/resume",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/resume-auth",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/resume-auth",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/resume-auth",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/resume-auth",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/resume-auth",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/resume-auth",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/resume-auth",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/resume-auth",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/resume-review",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/resume-review",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/resume-review",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/resume-review",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/resume-review",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/resume-review",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/resume-review",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/resume-review",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions/preview",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions/preview",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions/preview",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions/preview",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions/preview",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions/preview",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions/preview",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions/preview",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/run-submissions",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id/items",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id/items",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id/items",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id/items",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id/items",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id/items",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id/items",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id/items",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id/cancel",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id/cancel",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/run-submissions/:id/cancel",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/run-submissions/:id/cancel",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/run-submissions/:id/cancel",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/run-submissions/:id/cancel",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id/cancel",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/run-submissions/:id/cancel",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/history/runs",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/history/runs",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/history/runs",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/history/runs",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/history/runs",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/history/runs",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/history/runs",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/history/runs",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/history/results",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/history/results",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/history/results",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/history/results",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/history/results",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/history/results",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/history/results",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/history/results",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/review/corrections",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/review/corrections",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/review/corrections",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/review/corrections",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/review/corrections",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/review/corrections",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/review/corrections",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/review/corrections",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/review/my-corrections",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/review/my-corrections",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/review/my-corrections",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/review/my-corrections",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/review/my-corrections",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/review/my-corrections",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/review/my-corrections",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/review/my-corrections",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/review/conflicts",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/review/conflicts",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/review/conflicts",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/review/conflicts",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/review/conflicts",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/review/conflicts",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/review/conflicts",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/review/conflicts",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/review/corrections/:id/decision",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/review/corrections/:id/decision",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/review/corrections/:id/decision",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/review/corrections/:id/decision",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/review/corrections/:id/decision",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/review/corrections/:id/decision",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/review/corrections/:id/decision",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/review/corrections/:id/decision",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/review/conflicts/:id/resolution",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/review/conflicts/:id/resolution",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/review/conflicts/:id/resolution",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/review/conflicts/:id/resolution",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/review/conflicts/:id/resolution",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/review/conflicts/:id/resolution",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/review/conflicts/:id/resolution",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/review/conflicts/:id/resolution",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/imports/:batchId/enrichment-jobs",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/items",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/items",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/items",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/items",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/items",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/items",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/items",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/items",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/cancel",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/cancel",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/cancel",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/cancel",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/cancel",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/cancel",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/cancel",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/enrichment-jobs/:id/cancel",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/auth-challenges",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/auth-challenges",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/auth-challenges",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/auth-challenges",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/auth-challenges",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/auth-challenges",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/auth-challenges",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/auth-challenges",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/auth-challenges/:id/code",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/auth-challenges/:id/code",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/auth-challenges/:id/code",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/auth-challenges/:id/code",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/auth-challenges/:id/code",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/auth-challenges/:id/code",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/auth-challenges/:id/code",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/auth-challenges/:id/code",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/internal/worker-runs/:id/result",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/internal/worker-runs/:id/result",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/internal/worker-runs/:id/result",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/internal/worker-runs/:id/result",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/internal/worker-runs/:id/result",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/internal/worker-runs/:id/result",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 403
+    },
+    {
+      "route": "/api/internal/worker-runs/:id/result",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 403
+    },
+    {
+      "route": "/api/internal/worker-runs/:id/result",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 403
+    },
+    {
+      "route": "/api/interventions",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions/summary",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions/summary",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions/summary",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions/summary",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions/summary",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions/summary",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions/summary",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions/summary",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions/:id/read",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions/:id/read",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/interventions/:id/read",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/interventions/:id/read",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/interventions/:id/read",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/interventions/:id/read",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions/:id/read",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/interventions/:id/read",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/manual-data",
+      "method": "PATCH",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/manual-data",
+      "method": "PATCH",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/manual-data",
+      "method": "PATCH",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/manual-data",
+      "method": "PATCH",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/manual-data",
+      "method": "PATCH",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/runs/:id/manual-data",
+      "method": "PATCH",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/manual-data",
+      "method": "PATCH",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/runs/:id/manual-data",
+      "method": "PATCH",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/overview",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/overview",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/overview",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/overview",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/overview",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/overview",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/overview",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/overview",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/runtime",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/runtime",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/runtime",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/runtime",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/runtime",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/runtime",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/runtime",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/runtime",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId",
+      "method": "PUT",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId",
+      "method": "PUT",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId",
+      "method": "PUT",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId",
+      "method": "PUT",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId",
+      "method": "PUT",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId",
+      "method": "PUT",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId",
+      "method": "PUT",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId",
+      "method": "PUT",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/deletion-grant",
+      "method": "PUT",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/deletion-grant",
+      "method": "PUT",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/deletion-grant",
+      "method": "PUT",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/deletion-grant",
+      "method": "PUT",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/deletion-grant",
+      "method": "PUT",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/deletion-grant",
+      "method": "PUT",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/deletion-grant",
+      "method": "PUT",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/deletion-grant",
+      "method": "PUT",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId/revoke",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId/revoke",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId/revoke",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId/revoke",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId/revoke",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId/revoke",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId/revoke",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/grants/:toolId/revoke",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "PATCH",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "PATCH",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "PATCH",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "PATCH",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "PATCH",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "PATCH",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "PATCH",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/tools/:toolId/settings",
+      "method": "PATCH",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/summary",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/summary",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/summary",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/summary",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/summary",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/summary",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/summary",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/summary",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/runs",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/runs",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/runs",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/runs",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/runs",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/runs",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/runs",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/operations/runs",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/assignment",
+      "method": "PATCH",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/assignment",
+      "method": "PATCH",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/interventions/:id/assignment",
+      "method": "PATCH",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/interventions/:id/assignment",
+      "method": "PATCH",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/interventions/:id/assignment",
+      "method": "PATCH",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/interventions/:id/assignment",
+      "method": "PATCH",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/assignment",
+      "method": "PATCH",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/assignment",
+      "method": "PATCH",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/priority",
+      "method": "PATCH",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/priority",
+      "method": "PATCH",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/interventions/:id/priority",
+      "method": "PATCH",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/interventions/:id/priority",
+      "method": "PATCH",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/interventions/:id/priority",
+      "method": "PATCH",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/interventions/:id/priority",
+      "method": "PATCH",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/priority",
+      "method": "PATCH",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/priority",
+      "method": "PATCH",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/activity",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/activity",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/activity",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/activity",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/activity",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/activity",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/activity",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/interventions/:id/activity",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions/:sessionId/revoke",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions/:sessionId/revoke",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions/:sessionId/revoke",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions/:sessionId/revoke",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions/:sessionId/revoke",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions/:sessionId/revoke",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions/:sessionId/revoke",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/sessions/:sessionId/revoke",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/revoke-sessions",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/revoke-sessions",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/revoke-sessions",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/revoke-sessions",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/revoke-sessions",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/revoke-sessions",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/revoke-sessions",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/revoke-sessions",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/disable",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/disable",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/disable",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/disable",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/disable",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/disable",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/disable",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/disable",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/enable",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/enable",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/enable",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/enable",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/enable",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/enable",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/enable",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/enable",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/role",
+      "method": "PATCH",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/role",
+      "method": "PATCH",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/role",
+      "method": "PATCH",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/role",
+      "method": "PATCH",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/role",
+      "method": "PATCH",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/role",
+      "method": "PATCH",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/role",
+      "method": "PATCH",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/role",
+      "method": "PATCH",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/password",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/password",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/password",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/password",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/password",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/admin/users/:userId/password",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/password",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/users/:userId/password",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/tools",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/tools",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/tools",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/tools",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/tools",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/tools",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/tools",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/tools",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/overview",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/overview",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/overview",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/overview",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/overview",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/overview",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/overview",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/overview",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/failures",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/failures",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/failures",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/failures",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/failures",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/failures",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/failures",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/failures",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/interventions",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/interventions",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/interventions",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/interventions",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/interventions",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/interventions",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/interventions",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/interventions",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/throughput",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/throughput",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/throughput",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/throughput",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/throughput",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/throughput",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/throughput",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/admin/reports/throughput",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/audit/events",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/audit/events",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/audit/events",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/audit/events",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/audit/events",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/audit/events",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/audit/events",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/audit/events",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/preview",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/preview",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/deletions/preview",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/deletions/preview",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/deletions/preview",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/deletions/preview",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/preview",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/preview",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "POST",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "POST",
+      "variant": "empty-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "POST",
+      "variant": "malformed-cookie",
+      "status": 403
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "POST",
+      "variant": "tampered-signature",
+      "status": 403
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "POST",
+      "variant": "expired-token",
+      "status": 403
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "POST",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "POST",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "POST",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs/:jobId",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs/:jobId",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs/:jobId",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs/:jobId",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs/:jobId",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs/:jobId",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs/:jobId",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs/:jobId",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "GET",
+      "variant": "no-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "GET",
+      "variant": "empty-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "GET",
+      "variant": "malformed-cookie",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "GET",
+      "variant": "tampered-signature",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "GET",
+      "variant": "expired-token",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "GET",
+      "variant": "revoked-or-missing-session",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "GET",
+      "variant": "legacy-without-session-registry",
+      "status": 401
+    },
+    {
+      "route": "/api/deletions/jobs",
+      "method": "GET",
+      "variant": "forged-identity-headers",
+      "status": 401
+    }
+  ],
+  "sessionStateChecks": [
+    {
+      "state": "disabled-user",
+      "status": 401
+    },
+    {
+      "state": "revoked-membership",
+      "status": 401
+    },
+    {
+      "state": "changed-credentials",
+      "status": 401
+    },
+    {
+      "state": "database-expired",
+      "status": 401
+    },
+    {
+      "state": "idle-expired",
+      "status": 401
+    },
+    {
+      "state": "database-unavailable",
+      "status": 503
+    }
+  ],
+  "publicChecks": [
+    {
+      "route": "/api/auth/login",
+      "method": "POST",
+      "status": 401,
+      "body": "{\"message\":\"Nieprawidłowy login lub hasło\",\"error\":\"Unauthorized\",\"statusCode\":401}"
+    },
+    {
+      "route": "/api/auth/logout",
+      "method": "POST",
+      "status": 201,
+      "body": "{\"ok\":true}"
+    },
+    {
+      "route": "/api/health",
+      "method": "GET",
+      "status": 200,
+      "body": "{\"status\":\"ok\",\"service\":\"goldis-api\"}"
+    },
+    {
+      "route": "/api/health/live",
+      "method": "GET",
+      "status": 200,
+      "body": "{\"status\":\"alive\",\"service\":\"goldis-api\"}"
+    },
+    {
+      "route": "/api/health/ready",
+      "method": "GET",
+      "status": 503,
+      "body": "{\"status\":\"not_ready\"}"
+    },
+    {
+      "route": "/api/health/automation",
+      "method": "GET",
+      "status": 503,
+      "body": "{\"status\":\"waiting\",\"automationReady\":false,\"servicesReady\":false,\"worker\":\"offline\",\"portalMode\":\"unknown\",\"portalConfig\":\"unavailable\",\"message\":\"Sprawdź dostępność API, bazy i kolejki.\"}"
+    },
+    {
+      "route": "/api/health/enrichment",
+      "method": "GET",
+      "status": 503,
+      "body": "{\"status\":\"not_ready\",\"available\":false,\"worker\":\"offline\",\"provider\":\"unknown\",\"providerName\":null,\"message\":\"Worker wzbogacania nie odpowiada.\"}"
+    }
+  ],
+  "guessedFiles": [
+    "/exports/file.xlsx",
+    "/uploads/file.xlsx",
+    "/artifacts/file.xlsx",
+    "/.env",
+    "/api/.env",
+    "/api/exports/file.xlsx",
+    "/api/imports/%2e%2e/%2e%2e/.env"
+  ],
+  "logoutReplayStatus": 401,
+  "workerUnauthenticatedCases": 3,
+  "identicalFailedStatusAndBody": true,
+  "timing": {
+    "unknown-login-wrong-password": {
+      "samples": 16,
+      "medianMs": 284.96,
+      "p10Ms": 259.66,
+      "p90Ms": 446.96
+    },
+    "current-wrong-prefix-0": {
+      "samples": 16,
+      "medianMs": 284.54,
+      "p10Ms": 251,
+      "p90Ms": 481.75
+    },
+    "current-wrong-prefix-half": {
+      "samples": 16,
+      "medianMs": 280.69,
+      "p10Ms": 255.7,
+      "p90Ms": 437.61
+    },
+    "current-wrong-last-character": {
+      "samples": 16,
+      "medianMs": 287.88,
+      "p10Ms": 263.2,
+      "p90Ms": 440.56
+    },
+    "legacy-wrong-password": {
+      "samples": 16,
+      "medianMs": 37.05,
+      "p10Ms": 33.71,
+      "p90Ms": 69.39
+    },
+    "disabled-wrong-password": {
+      "samples": 16,
+      "medianMs": 285.89,
+      "p10Ms": 259.95,
+      "p90Ms": 473.26
+    },
+    "current-correct-password": {
+      "samples": 16,
+      "medianMs": 290.53,
+      "p10Ms": 260.08,
+      "p90Ms": 393.9
+    }
+  },
+  "timingSamplesMs": {
+    "unknown-login-wrong-password": [
+      335.2626,
+      539.0171000000009,
+      441.3925999999992,
+      362.83330000000205,
+      284.0941000000021,
+      468.9455999999991,
+      446.9605999999985,
+      295.4987000000001,
+      284.962099999997,
+      282.50300000000425,
+      259.6632000000027,
+      300.55569999999716,
+      280.4657999999981,
+      266.7884000000049,
+      260.6863999999987,
+      249.65250000000378
+    ],
+    "current-wrong-prefix-0": [
+      615.5667000000012,
+      686.0792999999976,
+      481.7462999999989,
+      291.7559999999976,
+      427.0723999999973,
+      439.59990000000107,
+      443.66419999999925,
+      275.87409999999727,
+      280.28480000000127,
+      278.65239999999903,
+      262.40269999999873,
+      327.93760000000475,
+      267.02180000000226,
+      284.5361000000048,
+      251.00189999999566,
+      249.74899999999616
+    ],
+    "current-wrong-prefix-half": [
+      394.41869999999835,
+      498.5652000000009,
+      489.1421999999984,
+      267.99329999999827,
+      284.6242999999995,
+      300.8126000000011,
+      437.61119999999937,
+      326.029599999998,
+      266.70300000000134,
+      267.87720000000263,
+      260.18100000000413,
+      255.69989999999962,
+      262.40090000000055,
+      280.6875,
+      254.18649999999616,
+      351.9458999999988
+    ],
+    "current-wrong-last-character": [
+      396.7423999999992,
+      499.6139000000003,
+      442.21860000000015,
+      308.46069999999963,
+      291.130799999999,
+      420.2332000000024,
+      440.5613000000012,
+      287.1885000000002,
+      294.90499999999884,
+      287.87720000000263,
+      284.08410000000003,
+      263.19650000000547,
+      264.26199999999517,
+      266.8127000000022,
+      269.03770000000077,
+      250.22320000000036
+    ],
+    "legacy-wrong-password": [
+      69.84580000000096,
+      56.83179999999993,
+      69.39129999999932,
+      47.697299999999814,
+      36.73459999999977,
+      91.80189999999857,
+      45.41330000000016,
+      34.29449999999997,
+      33.70669999999518,
+      56.20640000000276,
+      35.675999999999476,
+      44.00819999999658,
+      33.952299999997194,
+      33.165899999999965,
+      34.1475999999966,
+      37.05050000000483
+    ],
+    "disabled-wrong-password": [
+      593.7125000000015,
+      872.4700999999986,
+      349.5822999999982,
+      285.8878999999979,
+      290.0656999999992,
+      303.2972000000009,
+      473.2602999999981,
+      378.55149999999776,
+      258.5253999999986,
+      268.6924999999974,
+      281.53659999999945,
+      263.8859999999986,
+      365.8949999999968,
+      259.9537999999957,
+      268.6918000000005,
+      269.7531999999992
+    ],
+    "current-correct-password": [
+      325.27549999999974,
+      519.2687000000005,
+      393.89640000000145,
+      279.52130000000034,
+      277.4968999999983,
+      356.8595000000023,
+      408.9894000000022,
+      300.15590000000157,
+      265.3825999999972,
+      272.8533000000025,
+      259.40580000000045,
+      297.9154999999955,
+      290.52969999999914,
+      299.6440999999977,
+      260.07530000000406,
+      260.3124000000025
+    ]
+  },
+  "conclusions": {
+    "legacyAccountTimingRisk": true,
+    "passwordPrefixOracleProven": false,
+    "allPossibleTimingChannelsRuledOut": false,
+    "successfulAndFailedLoginMayDiffer": "Success additionally creates a session; status already reveals success. This does not by itself expose password prefixes."
+  }
+}

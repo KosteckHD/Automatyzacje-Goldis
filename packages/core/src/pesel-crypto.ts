@@ -1,5 +1,5 @@
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
-import type { IdentityMatchV1 } from "./index";
+import type { IdentityMatchV1 } from "./";
 
 const ACTIVE_VERSION_ENV = "PESEL_ENCRYPTION_ACTIVE_KEY_VERSION";
 const KEYRING_ENV = "PESEL_ENCRYPTION_KEYS_BASE64";

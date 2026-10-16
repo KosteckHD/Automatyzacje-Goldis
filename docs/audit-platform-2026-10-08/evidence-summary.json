@@ -1,0 +1,185 @@
+{
+  "date": "2026-10-08",
+  "scope": "isolated synthetic modules and mocked API UI; no full flow or live provider/portal",
+  "build": "PASS",
+  "suites": [
+    {
+      "name": "core",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 199,
+      "error": null,
+      "tests": 13,
+      "pass": 13,
+      "fail": 0,
+      "skipped": 0
+    },
+    {
+      "name": "api",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 7050,
+      "error": null,
+      "tests": 159,
+      "pass": 159,
+      "fail": 0,
+      "skipped": 0
+    },
+    {
+      "name": "worker",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 1623,
+      "error": null,
+      "tests": 103,
+      "pass": 66,
+      "fail": 0,
+      "skipped": 37
+    },
+    {
+      "name": "preflight",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 168,
+      "error": null,
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "skipped": 0
+    },
+    {
+      "name": "module-runner",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 169,
+      "error": null,
+      "tests": 11,
+      "pass": 11,
+      "fail": 0,
+      "skipped": 0,
+      "firstAttempt": {
+        "status": "FAIL",
+        "reason": "audit harness invoked npm-dependent manifest without npm_execpath"
+      },
+      "correctedEvidence": "module-runner-npm.log"
+    },
+    {
+      "name": "everest-browser",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 7752,
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "skipped": 0,
+      "error": null
+    },
+    {
+      "name": "compensa-browser",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 8278,
+      "tests": 22,
+      "pass": 22,
+      "fail": 0,
+      "skipped": 0,
+      "error": null
+    },
+    {
+      "name": "ufg-browser",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 2053,
+      "tests": 4,
+      "pass": 4,
+      "fail": 0,
+      "skipped": 0,
+      "error": null
+    },
+    {
+      "name": "security-browser",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 5148,
+      "error": null
+    },
+    {
+      "name": "tool-grants-ui",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 4149,
+      "error": null
+    },
+    {
+      "name": "admin-ui",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 6798,
+      "error": null
+    },
+    {
+      "name": "history-ui",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 4658,
+      "error": null
+    },
+    {
+      "name": "review-ui",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 2712,
+      "error": null
+    },
+    {
+      "name": "audit-ui",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 3346,
+      "error": null
+    },
+    {
+      "name": "run-submission-ui",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 4931,
+      "error": null
+    },
+    {
+      "name": "w3-sms-ui",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 9151,
+      "error": null
+    },
+    {
+      "name": "w4-enrichment-ui",
+      "status": "PASS",
+      "exitCode": 0,
+      "durationMs": 2098,
+      "error": null,
+      "firstAttempt": {
+        "status": "FAIL",
+        "reason": "audit screenshot instrumentation broke a conditional screenshot"
+      },
+      "correctedEvidence": "w4-enrichment-ui-confirmation.log"
+    },
+    {
+      "name": "pzu-and-browser-fixtures",
+      "status": "PASS",
+      "exitCode": 0,
+      "tests": 19,
+      "pass": 19,
+      "fail": 0,
+      "skipped": 0,
+      "evidence": "pzu-browser.log"
+    }
+  ],
+  "blocked": [
+    "PostgreSQL migration/integration for current schema 033",
+    "Redis integration/outage/proxy topology",
+    "HTTPS staging",
+    "business/live acceptance"
+  ],
+  "workerBrowserSkips": "All 37 initially skipped browser cases exercised across four isolated browser suites; 48 executions include overlapping non-browser cases."
+}

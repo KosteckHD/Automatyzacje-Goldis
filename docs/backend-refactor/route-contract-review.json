@@ -1,0 +1,1479 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-16",
+  "scope": "Ręczny przegląd kontraktów źródłowych dla wszystkich 130 tras: 12 bez SessionGuard i 118 chronionych w grupach funkcjonalnych. Wpis potwierdza kod/testy i jawne luki; nie zastępuje pełnego testu E2E ani odbioru wszystkich scenariuszy domenowych. Source and test references were refreshed after feature ownership moves.",
+  "entries": [
+    {
+      "method": "POST",
+      "path": "/auth/forgot-password",
+      "controller": "PasswordRecoveryController",
+      "handler": "forgotPassword",
+      "authorization": "Globalny RequestProtectionGuard wymaga skonfigurowanego Origin i odrzuca cross-site; OriginOnly pomija wyłącznie CSRF cookie-sesji. Brak wymogu zalogowania.",
+      "request": "Ścisły JSON z jednym polem email; nadmiarowe pola są odrzucane. Rate limit 429.",
+      "response": "202; jednakowy komunikat dla istniejącego i nieistniejącego konta, z minimalnym czasem odpowiedzi.",
+      "cookiesHeaders": "Nie zapisuje cookies ani nagłówków odpowiedzi.",
+      "sourceEvidence": [
+        "apps/api/src/features/account-recovery/account-recovery.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/account-recovery/account-recovery.http.spec.ts",
+        "apps/api/src/infrastructure/http/request-protection.http.spec.ts",
+        "apps/api/src/features/account-recovery/account-recovery.module.spec.ts"
+      ],
+      "testGap": "HTTP test używa atrapy PasswordRecoveryService; zachowanie anty-enumeracyjne usługi nie ma jeszcze testu izolowanego.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "controller": "AuthController",
+      "handler": "login",
+      "authorization": "Globalny RequestProtectionGuard wymaga dozwolonego Origin i odrzuca cross-site; OriginOnly pomija CSRF cookie-sesji. Logowanie używa rate limitera i weryfikuje hasło oraz aktywne członkostwo.",
+      "request": "JSON username/password; limity 128 i 1024 znaków. Błędne dane lub poświadczenia zwracają 401; rate limit zwraca 429.",
+      "response": "Nest POST domyślnie 201; JSON role/csrfToken/mustChangePassword.",
+      "cookiesHeaders": "Ustawia goldis_session HttpOnly i goldis_csrf dostępne dla klienta; Secure w production, SameSite=Strict, Path=/, wspólny maxAge. Rate limit ustawia Retry-After.",
+      "sourceEvidence": [
+        "apps/api/src/features/auth/auth.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/auth/auth.session.spec.ts",
+        "apps/api/src/features/account-recovery/account-recovery.http.spec.ts",
+        "apps/api/src/infrastructure/http/request-protection.http.spec.ts",
+        "apps/api/src/features/auth/auth.module.spec.ts"
+      ],
+      "testGap": "HTTP test rzeczywistego kontrolera obejmuje logowanie i wylogowanie na syntetycznym modelu, status 201, sesję/cookies CSRF, rolę z aktywnego membership oraz cofnięcie własnej sesji. Nie ma jeszcze integracyjnego testu transakcji logowania na jednorazowym PostgreSQL.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/logout",
+      "controller": "AuthController",
+      "handler": "logout",
+      "authorization": "Globalny RequestProtectionGuard wymaga dozwolonego Origin i odrzuca cross-site; OriginOnly pomija CSRF. Wycofuje poprawną sesję, jeśli cookie jest ważne; brak/niepoprawne cookie nie blokuje wylogowania.",
+      "request": "Bez body.",
+      "response": "Nest POST domyślnie 201; JSON {ok:true}.",
+      "cookiesHeaders": "Czyści goldis_session i goldis_csrf z Path=/.",
+      "sourceEvidence": [
+        "apps/api/src/features/auth/auth.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/account-recovery/account-recovery.http.spec.ts",
+        "apps/api/src/infrastructure/http/request-protection.http.spec.ts",
+        "apps/api/src/features/auth/auth.module.spec.ts",
+        "apps/api/src/features/auth/auth.session.spec.ts"
+      ],
+      "testGap": "HTTP test rzeczywistego kontrolera obejmuje wylogowanie bez sesji, aktywne wycofanie syntetycznej sesji i czyszczenie cookies; transakcja wycofania na PostgreSQL nadal wymaga testu integracyjnego.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/recovery-status",
+      "controller": "PasswordRecoveryController",
+      "handler": "recoveryStatus",
+      "authorization": "Publiczny odczyt konfiguracji dostępności odzyskiwania; bez SessionGuard.",
+      "request": "Bez parametrów i body.",
+      "response": "200; JSON {enabled:boolean}.",
+      "cookiesHeaders": "Nie zapisuje cookies ani nagłówków odpowiedzi.",
+      "sourceEvidence": [
+        "apps/api/src/features/account-recovery/account-recovery.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/account-recovery/account-recovery.http.spec.ts",
+        "apps/api/src/features/account-recovery/auth-mail-config.spec.ts",
+        "apps/api/src/features/account-recovery/account-recovery.module.spec.ts"
+      ],
+      "testGap": "HTTP test sprawdza wyłączony tryb recovery; pełna konfiguracja włączonego dostawcy jest pokryta testami konfiguracji.",
+      "reviewStatus": "source-reviewed"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/reset-password",
+      "controller": "PasswordRecoveryController",
+      "handler": "resetPassword",
+      "authorization": "Publiczny token jednorazowy; globalny RequestProtectionGuard wymaga dozwolonego Origin i odrzuca cross-site; OriginOnly pomija CSRF.",
+      "request": "Ścisły JSON token/newPassword; waliduje typ, limity, politykę hasła, próbę tokenu i przeznaczenie tokenu.",
+      "response": "200; JSON {ok:true}; błędy walidacji/tokenu/rate limitu nie są sukcesem.",
+      "cookiesHeaders": "Po sukcesie czyści goldis_session i goldis_csrf z Path=/.",
+      "sourceEvidence": [
+        "apps/api/src/features/account-recovery/account-recovery.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/account-recovery/account-recovery.http.spec.ts",
+        "apps/api/src/infrastructure/http/request-protection.http.spec.ts",
+        "apps/api/src/features/auth/password-policy.spec.ts",
+        "apps/api/src/features/account-recovery/account-recovery.module.spec.ts"
+      ],
+      "testGap": "HTTP test potwierdza routing, status, odpowiedź i czyszczenie cookies z atrapą usługi; walidacja jednorazowego tokenu wymaga testu usługi/integracji.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/verify-recovery-email",
+      "controller": "PasswordRecoveryController",
+      "handler": "verifyRecoveryEmail",
+      "authorization": "Publiczny token weryfikacyjny; globalny RequestProtectionGuard wymaga dozwolonego Origin i odrzuca cross-site; OriginOnly pomija CSRF.",
+      "request": "Ścisły JSON z tokenem; usługa sprawdza limit prób, cel, ważność i jednorazowe zużycie tokenu.",
+      "response": "200; JSON {ok:true}; błędny lub zużyty token zwraca błąd.",
+      "cookiesHeaders": "Nie zapisuje cookies ani nagłówków odpowiedzi.",
+      "sourceEvidence": [
+        "apps/api/src/features/account-recovery/account-recovery.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/account-recovery/account-recovery.http.spec.ts",
+        "apps/api/src/features/account-recovery/auth-mail-crypto.spec.ts",
+        "apps/api/src/features/account-recovery/account-recovery.module.spec.ts"
+      ],
+      "testGap": "HTTP test potwierdza routing i odpowiedź z atrapą usługi; weryfikacja zużycia tokenu wymaga testu usługi/integracji.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "controller": "HealthController",
+      "handler": "live",
+      "authorization": "Publiczny liveness bez zależności od bazy i workera.",
+      "request": "Bez parametrów i body.",
+      "response": "200; JSON {status:ok,service:goldis-api}.",
+      "cookiesHeaders": "Brak cookies; HTTP bootstrap ustawia Cache-Control: private, no-store oraz nagłówki bezpieczeństwa.",
+      "sourceEvidence": [
+        "apps/api/src/features/health/health.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/health/health.http.spec.ts"
+      ],
+      "testGap": "Obecny HTTP test potwierdza status, body i część nagłówków.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "method": "GET",
+      "path": "/health/live",
+      "controller": "HealthController",
+      "handler": "liveness",
+      "authorization": "Publiczny liveness bez zależności od bazy i workera.",
+      "request": "Bez parametrów i body.",
+      "response": "200; JSON {status:alive,service:goldis-api}.",
+      "cookiesHeaders": "Brak cookies; HTTP bootstrap ustawia Cache-Control: private, no-store oraz nagłówki bezpieczeństwa.",
+      "sourceEvidence": [
+        "apps/api/src/features/health/health.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/health/health.http.spec.ts"
+      ],
+      "testGap": "Obecny HTTP test potwierdza status, body i część nagłówków.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "method": "GET",
+      "path": "/health/ready",
+      "controller": "HealthController",
+      "handler": "readiness",
+      "authorization": "Publiczny status gotowości; sprawdza API database, Redis i dziennik migracji; odpowiedź nie ujawnia szczegółów błędu.",
+      "request": "Bez parametrów i body.",
+      "response": "200 {status:ready} lub 503 {status:not_ready}; readiness cache 3 s, probe timeout 2 s.",
+      "cookiesHeaders": "Brak cookies; HTTP bootstrap ustawia Cache-Control: private, no-store oraz nagłówki bezpieczeństwa.",
+      "sourceEvidence": [
+        "apps/api/src/features/health/health.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/health/health.http.spec.ts",
+        "apps/api/src/features/health/health-probe.spec.ts"
+      ],
+      "testGap": "Test HTTP używa syntetycznego HealthService; probe PostgreSQL/Redis i dziennika migracji pokrywają oddzielne testy jednostkowe.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "method": "GET",
+      "path": "/health/automation",
+      "controller": "HealthController",
+      "handler": "automation",
+      "authorization": "Publiczny status usług i workera portali; zwraca wyłącznie statusy/konfigurację znormalizowaną, bez sekretów.",
+      "request": "Bez parametrów i body.",
+      "response": "200, gdy servicesReady=true; w przeciwnym razie 503. Body zawiera status automatyzacji, usług, workera, tryb portali i opis.",
+      "cookiesHeaders": "Brak cookies; HTTP bootstrap ustawia Cache-Control: private, no-store oraz nagłówki bezpieczeństwa.",
+      "sourceEvidence": [
+        "apps/api/src/features/health/health.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/health/health.http.spec.ts",
+        "apps/api/src/features/health/health-readiness.spec.ts"
+      ],
+      "testGap": "Test HTTP używa syntetycznego HealthService; freshness i gotowość workera są pokryte oddzielnymi testami jednostkowymi.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "method": "GET",
+      "path": "/health/enrichment",
+      "controller": "HealthController",
+      "handler": "enrichment",
+      "authorization": "Publiczny status workera enrichment; zwraca status i znormalizowany provider configured/disabled, bez sekretów.",
+      "request": "Bez parametrów i body.",
+      "response": "200, gdy worker jest świeży i nie ma stanu degraded; w przeciwnym razie 503. Body zawiera status, worker, provider i opis.",
+      "cookiesHeaders": "Brak cookies; HTTP bootstrap ustawia Cache-Control: private, no-store oraz nagłówki bezpieczeństwa.",
+      "sourceEvidence": [
+        "apps/api/src/features/health/health.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/health/health.http.spec.ts",
+        "apps/api/src/features/health/enrichment-worker-health.spec.ts"
+      ],
+      "testGap": "Test HTTP używa syntetycznego HealthService; freshness i status workera są pokryte oddzielnymi testami jednostkowymi.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "method": "POST",
+      "path": "/internal/worker-runs/:id/result",
+      "controller": "WorkerResultController",
+      "handler": "result",
+      "authorization": "WorkerResultGuard wymaga Bearer secret z WORKER_AUTH_SECRET o długości co najmniej 32 znaków; porównuje stałoczasowo skróty SHA-256. Brak SessionGuard celowo.",
+      "request": "Parametr UUID; body musi zawierać dokładnie execution albo identity/snapshot/execution. Waliduje schemat, aktywny run i wykonanie.",
+      "response": "200; tylko outcome i artifactAvailable. Błędny kształt 400, brak/niepoprawny sekret 403, nieaktualny konflikt 409, nieoczekiwany błąd 503.",
+      "cookiesHeaders": "Oczekuje Authorization: Bearer; nie odczytuje ani nie zapisuje cookies.",
+      "sourceEvidence": [
+        "apps/api/src/features/results/worker-result.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/infrastructure/http/http-bootstrap.spec.ts",
+        "apps/api/src/features/results/results.module.spec.ts"
+      ],
+      "testGap": "Jednorazowy smoke wykonuje rzeczywisty HTTP z DB; nie przechodzi przez produkcyjny globalny guard aplikacji.",
+      "reviewStatus": "source-reviewed"
+    }
+  ],
+  "protectedRouteReviews": [
+    {
+      "owner": "teams",
+      "authorizationBoundary": "Każda trasa ma SessionGuard, a funkcja actor() wymaga roli manager lub admin. Mutacje dodatkowo wymagają CSRF; globalny RequestProtectionGuard sprawdza Origin. Nie ma bezpośredniego RequirePermission, więc granicę ustala ręczna kontrola service/controller.",
+      "dataScope": "Operacje ograniczają odczyt i zapis do operatorów w tenantId principal; ponownie blokują aktywność aktora/sesji oraz członkostwo w transakcji. target user musi być operatorem tego samego tenant. Grant dotyczy wyłącznie narzędzia oc-policy-verification.",
+      "transport": "Statusy sukcesu: GET/PUT/PATCH 200; POST create/password 201; POST reset-link/recovery-email 202. Walidacja odrzuca nieznane pola. Statusy błędów wynikają z wyjątków Nest: 400/403/404/409/429/503.",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/team/users",
+          "handler": "list",
+          "input": "Query q; max 128 znaków",
+          "response": "Lista max 200 operatorów w tenant z liczbami sesji/leads i flagą canExecuteOc.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/team/users",
+          "handler": "create",
+          "input": "username, temporaryPassword, confirmationToken, idempotencyKey",
+          "response": "Tworzy aktywnego operatora wymagającego zmiany hasła; zwraca userId, username, role, status, mustChangePassword.",
+          "status": 201
+        },
+        {
+          "method": "PATCH",
+          "path": "/team/users/:userId/status",
+          "handler": "setStatus",
+          "input": "UUID userId; status active/disabled, confirmationToken, idempotencyKey",
+          "response": "Zwraca status i liczbę cofniętych sesji; disable revokuje sesje operatora w bieżącym tenant.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/team/users/:userId/password",
+          "handler": "resetPassword",
+          "input": "UUID userId; temporaryPassword, confirmationToken, idempotencyKey",
+          "response": "Ustawia wymaganie zmiany hasła i cofa sesje; zwraca userId, mustChangePassword, revokedSessions.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/team/users/:userId/password-reset-link",
+          "handler": "requestPasswordResetLink",
+          "input": "UUID userId; strict body walidowany przez PasswordRecoveryService",
+          "response": "Deleguje uprzywilejowane żądanie resetu; Accepted.",
+          "status": 202
+        },
+        {
+          "method": "POST",
+          "path": "/team/users/:userId/recovery-email",
+          "handler": "requestRecoveryEmail",
+          "input": "UUID userId; strict body walidowany przez PasswordRecoveryService",
+          "response": "Deleguje zmianę adresu odzyskiwania managerowi; Accepted.",
+          "status": 202
+        },
+        {
+          "method": "GET",
+          "path": "/team/users/:userId/access",
+          "handler": "access",
+          "input": "UUID userId",
+          "response": "Zwraca grant i wersję wyłącznie dla operatora z tego tenant.",
+          "status": 200
+        },
+        {
+          "method": "PUT",
+          "path": "/team/users/:userId/access",
+          "handler": "setAccess",
+          "input": "UUID userId; canExecute, expectedVersion, confirmationToken, idempotencyKey",
+          "response": "Wersjonuje grant w tenant; odrzuca nieaktywny operator i konflikt expectedVersion.",
+          "status": 200
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/teams/team.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/teams/team.http.spec.ts",
+        "apps/api/src/features/teams/team.module.spec.ts"
+      ],
+      "testGap": "HTTP test kontrolera potwierdza wszystkie 8 tras, role, odmowę operatorowi, izolację tenant A/B, Origin/CSRF i transport. Jednorazowy PostgreSQL pokrywa strict DTO, potwierdzone tworzenie i replay idempotency, tenant scope list/access, optimistic locking grantu, reset hasła i wyłączenie konta z revocation sesji. Pozostają osobne przypadki integracji ścieżek reset-link/recovery-email przez PasswordRecoveryService oraz pozostałe warianty błędów i idempotencji.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "owner": "auth-and-account-recovery",
+      "authorizationBoundary": "AuthController i prywatne trasy PasswordRecoveryController wymagają SessionGuard z aktywną sesją i rolą pobraną z członkostwa. Mutacje muszą przejść globalne Origin/CSRF i dodatkowe verifyCsrfRequest. Claims roli z cookie nie są autorytatywne.",
+      "dataScope": "Profil, hasło i email odzyskiwania dotyczą wyłącznie aktualnego userId/tenantId; lista sesji jest ograniczona do sesji aktora w tenant i max 100. Revoke obejmuje tylko sesję należącą do aktora w tym tenant. Step-up jest związany z jego sesją, podglądem, rolą/grantem i fingerprintem zakresu.",
+      "transport": "GET 200; POST zmiany hasła i step-up 201; PUT recovery-email 202; DELETE sesji 200. Zmiana hasła wydaje nowe cookies sesyjne/CSRF; revoke bieżącej sesji je czyści.",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/auth/me",
+          "handler": "me",
+          "input": "Cookie aktywnej sesji",
+          "response": "Dane własnego profilu, role z membership, canDeleteData i dostęp narzędziowy.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/auth/change-password",
+          "handler": "changePassword",
+          "input": "currentPassword, newPassword; CSRF; limity i polityka hasła",
+          "response": "Zmienia poświadczenia w transakcji, unieważnia stare sesje i wydaje nową sesję; zwraca csrfToken i mustChangePassword.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/auth/deletion-step-up",
+          "handler": "requestStepUp",
+          "input": "currentPassword, previewId, CSRF",
+          "response": "Jednorazowy token step-up powiązany z aktualnym, niezmienionym podglądem; zwraca token i expiresAt.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/auth/sessions",
+          "handler": "sessions",
+          "input": "Cookie aktywnej sesji",
+          "response": "Max 100 własnych sesji w bieżącym tenant; każda ma isCurrent.",
+          "status": 200
+        },
+        {
+          "method": "DELETE",
+          "path": "/auth/sessions/:sessionId",
+          "handler": "revokeSession",
+          "input": "UUID własnej sesji; CSRF",
+          "response": "Cofa wyłącznie sesję danego aktora/tenant; zwraca revoked/currentSession.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/auth/recovery-email",
+          "handler": "recoveryEmail",
+          "input": "Cookie aktywnej sesji",
+          "response": "Własny adres odzyskiwania, stan weryfikacji i pendingEmail.",
+          "status": 200
+        },
+        {
+          "method": "PUT",
+          "path": "/auth/recovery-email",
+          "handler": "setRecoveryEmail",
+          "input": "email, currentPassword; CSRF i ponowne uwierzytelnienie",
+          "response": "Wysyła własny adres do weryfikacji; zwraca status pending_verification.",
+          "status": 202
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/auth/auth.controller.ts",
+        "apps/api/src/features/deletions/deletion-step-up.controller.ts",
+        "apps/api/src/features/account-recovery/account-recovery.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/auth/session.guard.spec.ts",
+        "apps/api/src/features/auth/auth.session.spec.ts",
+        "apps/api/src/features/account-recovery/account-recovery.http.spec.ts",
+        "apps/api/src/features/account-recovery/account-recovery.module.spec.ts",
+        "apps/api/src/features/auth/auth.module.spec.ts",
+        "apps/api/src/features/deletions/deletion-step-up.controller.spec.ts",
+        "apps/api/src/features/deletions/deletion-step-up.module.spec.ts"
+      ],
+      "testGap": "Testy sprawdzają SessionGuard/CSRF i częściowo routing, lecz brak sukcesowych HTTP/DB testów zmiany hasła, step-up, własnych sesji i recovery-email.",
+      "reviewStatus": "source-reviewed"
+    },
+    {
+      "owner": "deletions",
+      "authorizationBoundary": "Każda trasa ma SessionGuard; operacje zmieniające stan wymagają Origin i CSRF. Preview sprawdza aktywne członkostwo, canDeleteTarget i zakres roli/grantu. Utworzenie joba wymaga jednorazowego step-up tokenu powiązanego z preview.",
+      "dataScope": "Preview i job są wiązane z tenantId, aktorem i sessionId. Nie-admin widzi wyłącznie własne joby, admin tylko w swoim tenant; GET pojedynczego joba zwraca 404 poza tą granicą. Job może obejmować import, run lub artifact, ale nie usunięcie całego tenant.",
+      "transport": "POST preview 201; POST jobs 202; GET list/detail 200. Odpowiedź joba używa safeJob i zwraca status/liczniki bez ścieżek plików, payloadów ani tokenów.",
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/deletions/preview",
+          "handler": "preview",
+          "input": "targetType i targetId (bez targetId dla tenant); SessionGuard, CSRF",
+          "response": "Krótko ważny preview z fingerprintem zakresu, summary/blokadami i requiresStepUp.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/deletions/jobs",
+          "handler": "create",
+          "input": "previewId, stepUpToken, idempotencyKey; strict allowlist, CSRF",
+          "response": "Idempotentnie tworzy job w obrębie tenant/aktora; token jest porównywany z grantem związanym z preview.",
+          "status": 202
+        },
+        {
+          "method": "GET",
+          "path": "/deletions/jobs",
+          "handler": "list",
+          "input": "Cookie aktywnej sesji",
+          "response": "Max 25 jobów: własne dla nie-admina, wszystkie w tenant dla admina; safeJob ogranicza pola.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/deletions/jobs/:jobId",
+          "handler": "get",
+          "input": "UUID jobId",
+          "response": "Szczegóły wyłącznie w tym tenant i dla aktora albo admina tego tenant; poza zakresem 404.",
+          "status": 200
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/deletions/deletions.controller.ts",
+        "apps/api/src/features/deletions/deletion-jobs.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/deletions/deletion-step-up.controller.spec.ts",
+        "apps/api/src/features/deletions/deletion-step-up.service.spec.ts",
+        "apps/api/src/features/deletions/deletion-step-up.spec.ts",
+        "apps/api/src/features/deletions/deletion-jobs.contract.ts",
+        "apps/api/src/features/deletions/deletions.module.spec.ts"
+      ],
+      "testGap": "DB smoke obejmuje reguły domenowe, ale brakuje HTTP testu obu kontrolerów z dwoma tenantami, rolami i weryfikacją dokładnych odpowiedzi safeJob.",
+      "reviewStatus": "source-reviewed"
+    },
+    {
+      "owner": "audit-reporting-interventions",
+      "authorizationBoundary": "SessionGuard jest połączony z PermissionGuard dla audytu, interwencji, SMS challenge i manual-data; wymagane akcje/zasoby są route-specific. Raporty operacyjne mają OperationalReportsGuard (manager/admin). Potwierdzenie uprzywilejowane wymaga CSRF, dozwolonej pary rola/akcja i ponownego hasła w aktywnej sesji.",
+      "dataScope": "Audyt i raporty filtrują bieżący tenant; reviewer audit ma dodatkowe allowlisty zdarzeń i widzi tylko zasoby w aktualnych grantach. Interwencje respektują tenant, właściciela/przypisanie i grant widoku. Challenge GET wymaga runu uruchomionego przez aktora; POST wiąże challenge, run, aktora i tenant. Manual-data wymaga własnego runu, bieżącego tenant, aktualnej wersji i otwartej interwencji.",
+      "transport": "Wszystkie GET 200; POST /admin/privileged-confirmations 201; POST auth challenge 202; POST intervention read i PATCH manual-data 200. Challenge ma Cache-Control/Pragma no-store. CSRF wymagany dla wszystkich mutacji.",
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/admin/privileged-confirmations",
+          "handler": "create",
+          "input": "action, targetId, payload, currentPassword, idempotencyKey; CSRF",
+          "response": "Krótko ważny token powiązany z tenant, aktorem, sesją, credential revision, akcją i fingerprintem payloadu.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/audit/events",
+          "handler": "search",
+          "input": "Filtry ISO from/to, actor/action/resource/outcome/tool, limit i cursor",
+          "response": "Stronicowane zdarzenia bieżącego tenant; reviewer ma ograniczony zakres eventów i grantów.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/admin/reports/overview",
+          "handler": "overview",
+          "input": "from, to, toolId; zakres do 366 dni",
+          "response": "Agregaty operacyjne tenant: wolumen, statusy, czasy i interwencje.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/admin/reports/failures",
+          "handler": "failures",
+          "input": "from, to, toolId; zakres do 366 dni",
+          "response": "Zagregowane niepowodzenia z bieżącego tenant.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/admin/reports/interventions",
+          "handler": "interventions",
+          "input": "from, to, toolId; zakres do 366 dni",
+          "response": "Zagregowany czas/status interwencji bieżącego tenant.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/admin/reports/throughput",
+          "handler": "throughput",
+          "input": "from, to, toolId; zakres do 366 dni",
+          "response": "Agregaty przepustowości i statusów runów bieżącego tenant.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/interventions",
+          "handler": "list",
+          "input": "Filtry query z query object; PermissionGuard dla listy",
+          "response": "Lista interwencji w tenant filtrowana dostępem roli/właściciela/przypisania/grantu.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/interventions/summary",
+          "handler": "summary",
+          "input": "Bieżąca sesja",
+          "response": "Liczby zgłoszeń widocznych dla aktora w tenant.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/interventions/:id/read",
+          "handler": "markRead",
+          "input": "UUID intervention; puste body; CSRF",
+          "response": "Oznacza jako przeczytane w granicy aktora; status jawnie 200.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/auth-challenges",
+          "handler": "getForRun",
+          "input": "Query runId; query-run permission",
+          "response": "Challenge tylko do runu uruchomionego przez aktora w stanie oczekiwania; nie zwraca kodu SMS; no-store.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/auth-challenges/:id/code",
+          "handler": "submitCode",
+          "input": "runId i code; body strict allowlist, CSRF",
+          "response": "Przekazuje kod raz do worker; zwraca accepted/challengeId/attemptCount, cache no-store.",
+          "status": 202
+        },
+        {
+          "method": "PATCH",
+          "path": "/runs/:id/manual-data",
+          "handler": "patch",
+          "input": "expectedVersion, jedno dozwolone field, reason; CSRF",
+          "response": "Poprawia wyłącznie dane własnego runu w oczekiwanym stanie i wersji.",
+          "status": 200
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/privileged-actions/privileged-actions.service.ts",
+        "apps/api/src/features/reports/admin-reports.controller.ts",
+        "apps/api/src/features/interventions/interventions.controller.ts",
+        "apps/api/src/features/interventions/auth-challenge.controller.ts",
+        "apps/api/src/features/interventions/manual-data.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/privileged-actions/privileged-actions.spec.ts",
+        "apps/api/src/features/reports/audit-search.http.spec.ts",
+        "apps/api/src/features/interventions/auth-challenges.http.spec.ts",
+        "apps/api/src/features/interventions/manual-data.spec.ts",
+        "apps/api/src/features/interventions/interventions.module.spec.ts",
+        "apps/api/src/features/privileged-actions/privileged-actions.module.spec.ts",
+        "apps/api/src/features/reports/reports.module.spec.ts"
+      ],
+      "testGap": "Brak HTTP/DB testów czterech raportów operacyjnych i całej listy interwencji; testy manual-data/challenge częściowo pokrywają usługę oraz granicę HTTP.",
+      "reviewStatus": "source-reviewed"
+    },
+    {
+      "owner": "enrichment-jobs",
+      "authorizationBoundary": "Wszystkie pięć tras ma SessionGuard i PermissionGuard, z wymaganiem permission per route/resource. Globalny RequestProtectionGuard wymaga Origin i CSRF dla POST. PermissionGuard rozstrzyga tenant/owner przez resolver zasobu; serwis ponownie sprawdza tenant, rolę i grant narzędzia przy rozpoczęciu/anulowaniu oraz podczas claim/commit joba.",
+      "dataScope": "Joby są filtrowane tenantId; operator może odczytywać i anulować wyłącznie joby dla własnego batcha. Reviewer może odczytywać joby, ale nie uruchamiać ani anulować. Lista batcha ma limit 20; lista elementów limit 50, bez danych NIP/REGON i identyfikatorów źródłowych. Start ogranicza wybór do 500 unikalnych wierszy należących do batcha; blokuje korekty, konflikty, istniejące runy i rekordy niekwalifikujące się.",
+      "transport": "GET 200. POST start 201; odpowiedź safe publicJob plus replayed. POST cancel 201; wymaga expectedVersion i zwraca publicJob. Lista batcha zwraca {items}; elementy zwracają {items,nextCursor,hasMore,limit}. Wyjątki Nest odpowiadają 400/403/404/409.",
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/imports/:batchId/enrichment-jobs",
+          "handler": "start",
+          "input": "Ścisły body: idempotencyKey oraz rowNumbers albo fromRow/toRow; 1–500 unikalnych wierszy, minimum numeru 2",
+          "response": "Utworzony albo odtworzony idempotentnie job; publicJob nie ujawnia danych źródłowych.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/imports/:batchId/enrichment-jobs",
+          "handler": "listForBatch",
+          "input": "UUID batchId; aktywna sesja i permission read dla batcha",
+          "response": "Do 20 jobów batcha bieżącego tenant, od najnowszych.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/enrichment-jobs/:id",
+          "handler": "get",
+          "input": "UUID jobId; permission read dla joba",
+          "response": "publicJob plus pendingCount; wyłącznie tenant i dozwolony owner.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/enrichment-jobs/:id/items",
+          "handler": "listItems",
+          "input": "UUID jobId; opcjonalny cursor 1–1000000",
+          "response": "Do 50 bezpiecznych statusów elementów oraz nextCursor/hasMore/limit; bez danych osobowych.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/enrichment-jobs/:id/cancel",
+          "handler": "cancel",
+          "input": "UUID jobId; ścisły body {expectedVersion}; permission cancel, Origin i CSRF",
+          "response": "Anuluje aktywny job i zwraca publicJob; zakończony job lub nieaktualna wersja daje 409.",
+          "status": 201
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/enrichment/enrichment-job.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/enrichment/enrichment-jobs.http.spec.ts",
+        "apps/api/src/features/enrichment/enrichment.module.spec.ts"
+      ],
+      "testGap": "HTTP test pokrywa statusy, role, tenant/owner resolver, Origin/CSRF i przekazanie aktora, ale kontroler używa atrapy serwisu. Brakuje testów DB/usługi dla idempotencji, wyścigów expectedVersion, filtrów tenantowych oraz bezpiecznego kształtu publicJob i elementów.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "owner": "workspace-and-notifications",
+      "authorizationBoundary": "Dashboard i lista powiadomień mają SessionGuard. Dane dashboardu są filtrowane grantem view_results i principalem. Mark-read ma CSRF i szuka powiadomienia po jednoczesnym tenantId oraz recipientUserId aktora.",
+      "dataScope": "Dashboard pokazuje ostatnie operacje aktora, jego przydzielone leady, a liczniki zespołu wyłącznie dla manager/admin w bieżącym tenant. Powiadomienia należą do jednego odbiorcy/tenant i są ukrywane dla importów w toku kasowania; status read jest idempotentny.",
+      "transport": "GET 200. POST mark-read domyślnie 201 i przyjmuje pusty body; błędny CSRF 403, cudze/nieistniejące powiadomienie 404. Lista powiadomień ma limit 1–100 (domyślnie 30) i strict true/false dla unreadOnly.",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/dashboard",
+          "handler": "get",
+          "input": "Cookie aktywnej sesji",
+          "response": "Role, narzędzia i uprawnienia, liczniki własnych operacji/leadów, metryki zespołu dla manager/admin, ostatnie operacje i unreadNotifications.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/notifications",
+          "handler": "list",
+          "input": "Query limit 1–100, unreadOnly true/false",
+          "response": "Licznik nieprzeczytanych oraz lista do limit powiadomień odbiorcy, bez danych poza jego tenant.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/notifications/:id/read",
+          "handler": "markRead",
+          "input": "UUID powiadomienia; cookie sesji i CSRF; puste body",
+          "response": "Oznacza własne powiadomienie jako przeczytane i zwraca id/readAt.",
+          "status": 201
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/reports/dashboard.controller.ts",
+        "apps/api/src/features/notifications/notifications.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/notifications/notifications.module.spec.ts",
+        "apps/api/src/features/reports/reports.module.spec.ts"
+      ],
+      "testGap": "Brak testów HTTP/DB dashboardu i tras powiadomień. Dodać testy z dwoma tenantami i odbiorcami, bez grantu narzędzia, nieaktywnym membership, tombstone importu, CSRF oraz idempotentnym mark-read.",
+      "reviewStatus": "source-reviewed"
+    },
+    {
+      "owner": "contact-reports",
+      "authorizationBoundary": "SessionGuard chroni trasę. Serwis dopuszcza wyłącznie manager/admin oraz dodatkowo sprawdza grant view_results do oc-policy-verification.",
+      "dataScope": "Zapytanie ogranicza wyniki do tenant aktora, narzędzia OC, zakończonych result sets, gotowych leadów i importów nieobjętych aktywnym tombstone. Opcjonalny resultSetId jest UUID i nadal podlega tenant scope.",
+      "transport": "GET 200; wymagane from/to ISO, zakres rosnący do 366 dni; opcjonalny resultSetId. Odpowiedź zawiera period, resultSetId, summary i agregaty employees; niedozwolona rola/grant daje 403.",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/contact-reports/overview",
+          "handler": "overview",
+          "input": "Query from, to ISO oraz opcjonalny resultSetId UUID",
+          "response": "Agregaty kontaktu i pracowników w bieżącym tenant wraz z opisem, że filtr dat dotyczy lead.created_at, a status jest bieżący.",
+          "status": 200
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/reports/contact-report.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/reports/reports.module.spec.ts"
+      ],
+      "testGap": "Brak testu HTTP/DB raportu kontaktów; dodać role/grant, zakres dat, tenant A/B, resultSetId i tombstone importu.",
+      "reviewStatus": "source-reviewed"
+    },
+    {
+      "owner": "business-leads",
+      "authorizationBoundary": "Wszystkie dziewięć tras wymaga SessionGuard. Serwis ponownie sprawdza rolę i grant view_results; download wymaga download_results, a alokacja jest tylko dla manager/admin. Mutacje allocation/status/release wymagają CSRF. Operacje statusu i release używają expectedVersion; alokacja ma idempotency key i blokadę transakcyjną.",
+      "dataScope": "Każde zapytanie i zapis ogranicza leady do tenant aktora i narzędzia oc-policy-verification; zakres pool/mine, własność przypisanego leada oraz tombstones źródłowych importów są jawnie weryfikowane. Snapshot pobierze tylko przypisany lead i snapshot z właściwą granicą źródłowego ownera. Eksport limituje liczbę do 50000 rekordów.",
+      "transport": "GET 200; POST alokacja/release 201; PATCH status 200. Eksporty zwracają XLSX z Content-Disposition i Cache-Control no-store. Mutacje wymagają Origin/CSRF; błędy wejścia 400, brak zakresu 404, zmiana wersji/puli 409, brak roli/grantu 403.",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/leads",
+          "handler": "list",
+          "input": "Query scope pool/mine, contactStatus, resultSetId, search, cursor, limit 1–50",
+          "response": "Stronicowane do 50 gotowych leadów w tenant ze szczegółami firmy/kontaktu, assignment/contact status i snapshotami.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/leads/:id",
+          "handler": "get",
+          "input": "UUID leadId",
+          "response": "Szczegóły dostępnego leada w tenant; źródłowe wiersze są sanitizowane, a wynik zachowany ma osobny warunek przypisania.",
+          "status": 200
+        },
+        {
+          "method": "PATCH",
+          "path": "/leads/:id/contact-status",
+          "handler": "updateContactStatus",
+          "input": "status not_contacted/offer_accepted/not_interested, expectedVersion; CSRF",
+          "response": "Zmienia status wyłącznie własnego przypisanego leada i zwiększa wersję.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/leads/:id/release-assignment",
+          "handler": "releaseAssignment",
+          "input": "expectedVersion; CSRF",
+          "response": "Zwalnia własne przypisanie gotowego leada i zwraca nową assignmentVersion.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/leads/:id/snapshots/:runId/workbook",
+          "handler": "downloadSnapshot",
+          "input": "UUID leadId i runId; prawo download_results",
+          "response": "Pobiera zachowany workbook tylko dla własnego przypisania i spełnionego warunku snapshotu; XLSX no-store.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/leads/allocation-summary",
+          "handler": "allocationSummary",
+          "input": "Opcjonalny query resultSetId UUID; manager/admin i view_results",
+          "response": "Liczba nieprzydzielonych gotowych leadów w tenant i czas sprawdzenia.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/leads/allocations",
+          "handler": "allocate",
+          "input": "recipientUserId, count 1–5000, opcjonalny resultSetId, idempotencyKey; manager/admin, CSRF",
+          "response": "Przydziela dokładną liczbę wolnych leadów atomowo albo 409, gdy pula się zmieniła; zwraca replayed.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/leads/export",
+          "handler": "export",
+          "input": "Cookie sesji i grant download_results",
+          "response": "Workbook XLSX do 50000 leadów z kontaktami; plik oznaczony no-store.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/leads/recipients",
+          "handler": "recipients",
+          "input": "Cookie sesji; manager/admin i view_results",
+          "response": "Aktywni operatorzy/managerowie tego tenant jako odbiorcy przydziału.",
+          "status": 200
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/leads/business-leads.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/leads/business-leads.http.spec.ts",
+        "apps/api/src/features/leads/leads.module.spec.ts"
+      ],
+      "testGap": "HTTP test pokrywa wybrane role, zakresy, walidację i pobieranie, a DB smoke pokrywa wybrane ścieżki bazy; pełna macierz tenant/ról, idempotentny retry alokacji, wyścig wersji kontaktu i snapshot po tombstone nadal wymaga testów integracyjnych.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "owner": "imports",
+      "authorizationBoundary": "ImportController ma SessionGuard i PermissionGuard z akcjami batch:create/read, enrichment:read i correction:propose. Upload i korekta wymagają CSRF; upload jest multipart z dokładnie jednym plikiem, maksymalnie 16 MiB. Kontroler przekazuje tenant/aktora z sesji, a korekta wiąże actorRef z claims sesji.",
+      "dataScope": "Historia/import i wiersze są filtrowane przez tenant/grant resource resolver oraz ImportService/HistoryService; tworzenie przypisuje tenantId i ownerUserId z principal. Wiersze przechodzą walidację stanu i paginację; odpowiedź enrichment jest widokiem wyłącznie zakresu aktualnego batcha.",
+      "transport": "GET 200; POST multipart 201; PATCH correction 200. Upload limituje file size 16 MiB/files 1/fields 0/parts 1. Lista/rows akceptują paginację i filtry; błędne body/filtry 400, brak zasobu w tenant 404, brak grantu 403.",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/imports",
+          "handler": "list",
+          "input": "Query toolId, dataState, from, to, cursor, limit",
+          "response": "Stronicowana historia importów bieżącego tenant z bezpieczną nazwą pliku i licznikami/review summary.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/imports",
+          "handler": "create",
+          "input": "Multipart field file; jeden plik do 16 MiB; batch:create, CSRF",
+          "response": "Tworzy batch dla domyślnego narzędzia OC i zwraca publiczny opis importu.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/imports/tool/:toolId",
+          "handler": "createForTool",
+          "input": "Multipart field file do 16 MiB i toolId; batch:create, CSRF",
+          "response": "Tworzy batch przypisany do dozwolonego narzędzia i aktora z sesji.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/imports/:id",
+          "handler": "get",
+          "input": "UUID batchId; batch:read",
+          "response": "Metadane i liczniki importu w dozwolonym zakresie batcha.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/imports/:id/rows",
+          "handler": "rows",
+          "input": "UUID batchId; query page 1–100000 i state all/ready/review",
+          "response": "Stronicowane wiersze importu z filtrem stanu.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/imports/:id/enrichment",
+          "handler": "enrichmentReview",
+          "input": "UUID batchId; query page 1–100000; enrichment:read",
+          "response": "Stronicowane statusy REGON/enrichment dla batcha.",
+          "status": 200
+        },
+        {
+          "method": "PATCH",
+          "path": "/imports/:id/rows/:rowNumber",
+          "handler": "proposeRegonCorrection",
+          "input": "UUID batchId, rowNumber ≥2, RegonCorrectionRequest; correction:propose i CSRF",
+          "response": "Rejestruje propozycję korekty autora z sesji, z kontrolą wersji i tenant scope.",
+          "status": 200
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/imports/import.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/imports/imports.http.spec.ts",
+        "apps/api/src/features/reports/history.spec.ts",
+        "apps/api/src/features/imports/imports.module.spec.ts"
+      ],
+      "testGap": "HTTP test pokrywa wyłącznie trasę korekty; history.test obejmuje odczyt/importy, ale nie rzeczywisty upload. Brakuje HTTP testów multipart, limitu pliku, permission/tenant odczytu wierszy i integracji parsera.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "owner": "preparations-and-workflows",
+      "authorizationBoundary": "Kontrolery Preparation, PreparationWorkflow i PreparedSetExecution mają SessionGuard plus PermissionGuard i route-batch permission. Start/cancel mutują stan i wymagają CSRF; eksport wymaga artifact:download. Serwisy dodatkowo sprawdzają tenant, grant do batcha, aktualność zapieczętowanej rewizji, expectedVersion i idempotencyKey.",
+      "dataScope": "Każdy zasób jest związany z batchId i tenant aktora; operator podlega owner batcha. Przygotowanie i workflow zwracają ograniczone statusy/liczniki, eksport tylko bieżący sealed snapshot. Prepared set wiąże execution z preparation fingerprint, aktorem, tenantem i batch; listy chunków są ograniczone kursorami.",
+      "transport": "GET 200; POST start/cancel 201; export jawnie 200 i bezpieczne nagłówki pliku. Body mutacji jest walidowane ścisłym allowlist, start idempotentny; nieaktualna rewizja lub konflikt aktywnego procesu daje 409, brak zasobu 404.",
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/imports/:batchId/preparations",
+          "handler": "start",
+          "input": "UUID batchId; body idempotencyKey; enrichment:start i CSRF",
+          "response": "Tworzy lub idempotentnie odtwarza job analizy/preparation dla batcha.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/imports/:batchId/preparations",
+          "handler": "list",
+          "input": "UUID batchId; enrichment:read",
+          "response": "Ostatnie rewizje/statusy preparation dla batcha.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/imports/:batchId/preparations/:preparationId",
+          "handler": "get",
+          "input": "UUID batchId i preparationId; enrichment:read",
+          "response": "Publiczny status i liczniki konkretnej rewizji przygotowania.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/imports/:batchId/preparations/:preparationId/rows",
+          "handler": "rows",
+          "input": "UUID batch/preparation; page 1–100000 i opcjonalny state",
+          "response": "Stronicowane wiersze/oceny wskazanej rewizji w zakresie batcha.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/imports/:batchId/preparations/:preparationId/export",
+          "handler": "export",
+          "input": "UUID batch/preparation; artifact:download",
+          "response": "Pobiera XLSX przygotowanego sealed zbioru, zapisuje audit i ustawia nagłówki bezpiecznego download.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/imports/:batchId/preparations/:preparationId/cancel",
+          "handler": "cancel",
+          "input": "Body expectedVersion; enrichment:cancel i CSRF",
+          "response": "Anuluje aktywne przygotowanie z kontrolą wersji.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/imports/:batchId/preparations/:preparationId/workflow",
+          "handler": "start",
+          "input": "Body idempotencyKey; enrichment:start i CSRF",
+          "response": "Uruchamia automatyzację enrichment/reanalysis najnowszego zamkniętego preparation.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/imports/:batchId/preparation-workflows",
+          "handler": "list",
+          "input": "UUID batchId; enrichment:read",
+          "response": "Do 20 ostatnich workflow z jobami registry i liczbami reanalysis.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/imports/:batchId/preparation-workflows/:workflowId",
+          "handler": "get",
+          "input": "UUID batch/workflow; enrichment:read",
+          "response": "Status workflow, powiązane registry jobs i wynik reanalysis.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/imports/:batchId/preparation-workflows/:workflowId/cancel",
+          "handler": "cancel",
+          "input": "Body expectedVersion; enrichment:cancel i CSRF",
+          "response": "Anuluje workflow z kontrolą wersji i zwraca jego bezpieczny status.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/imports/:batchId/prepared-set-executions",
+          "handler": "start",
+          "input": "Body preparationId, snapshotFingerprint, idempotencyKey; run:create i CSRF",
+          "response": "Tworzy idempotentne wykonanie całego sealed preparation oraz result set.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/imports/:batchId/prepared-set-executions/:executionId",
+          "handler": "get",
+          "input": "UUID batch/execution; opcjonalny afterOrdinal",
+          "response": "Status/liczniki execution i do 20 chunków po ordinal cursor.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/imports/:batchId/prepared-set-executions/:executionId/cancel",
+          "handler": "cancel",
+          "input": "Ścisły body expectedVersion; run:create i CSRF",
+          "response": "Anuluje wykonanie, aktualny chunk i result set w tenant; nieaktualna wersja 409.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/imports/:batchId/prepared-set-executions/preview",
+          "handler": "preview",
+          "input": "UUID batchId; run:create",
+          "response": "Podgląd najnowszego sealed preparation, fingerprintu, daty i liczników ready/review/duplicate.",
+          "status": 200
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/preparations/preparations.controller.ts",
+        "apps/api/src/features/preparations/preparation-workflows.controller.ts",
+        "apps/api/src/features/submissions/prepared-set-executions.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/preparations/import-preparations.http.spec.ts",
+        "apps/api/src/features/preparations/preparation-analysis.spec.ts",
+        "apps/api/src/features/preparations/preparation-export.spec.ts",
+        "apps/api/src/features/preparations/preparation-workflows.service.spec.ts",
+        "apps/api/src/features/preparations/preparations.module.spec.ts",
+        "apps/api/src/features/submissions/submissions.module.spec.ts"
+      ],
+      "testGap": "HTTP test pokrywa guardy i kontrolę kilku workflow controls, a unit testy analizę/eksport. Brakuje HTTP/DB testów list/get/cancel workflow i prepared-set start/get/cancel, konkurencji idempotency/version oraz rzeczywistego download z audytem.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "owner": "review",
+      "authorizationBoundary": "Wszystkie trasy mają SessionGuard i PermissionGuard z correction/conflict permission per collection/resource. POST decision/resolution wymaga CSRF. Serwis sprawdza tenant i kwalifikacje aktora ponownie przed zapisem.",
+      "dataScope": "Kolejki zwracają wyłącznie korekty/konflikty widoczne dla aktora tenant i jego roli/grantów; my-corrections ogranicza do autora. Decyzje wiążą resource, tenant, reviewer, stan i expected version w transakcji.",
+      "transport": "GET 200; POST 201 domyślnie. Query list ma filtry/paginację walidowane przez service; mutacje wymagają CSRF, body jest walidowane przez service. Obcy/brakujący resource jest ukrywany 404, brak uprawnienia 403, nieaktualny stan 409.",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/review/corrections",
+          "handler": "corrections",
+          "input": "Query parametrów kolejki i paginacji",
+          "response": "Kolejka korekt widocznych do decyzji dla aktora.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/review/my-corrections",
+          "handler": "myCorrections",
+          "input": "Query parametrów kolejki i paginacji",
+          "response": "Własne korekty aktora do śledzenia statusu.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/review/conflicts",
+          "handler": "conflicts",
+          "input": "Query parametrów kolejki i paginacji",
+          "response": "Konflikty grupowania dostępne do rozstrzygnięcia w tenant.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/review/corrections/:id/decision",
+          "handler": "decideCorrection",
+          "input": "UUID correction; body decyzji z expected version i CSRF",
+          "response": "Zatwierdza albo odrzuca korektę z audytem i optimistic locking.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/review/conflicts/:id/resolution",
+          "handler": "resolveConflict",
+          "input": "UUID conflict; body rozstrzygnięcia i CSRF",
+          "response": "Rozstrzyga konflikt grupowania dla aktora uprawnionego.",
+          "status": 201
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/review/review.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/review/review.http.spec.ts",
+        "apps/api/src/features/review/review.module.spec.ts"
+      ],
+      "testGap": "HTTP test pokrywa odmowy sesji/role/tenant/CSRF oraz forwarding na atrapy; brakuje testów DB dla sukcesowej decyzji, konflikту expectedVersion i trwałego audytu.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "owner": "history",
+      "authorizationBoundary": "Obie trasy mają SessionGuard i PermissionGuard: run:read albo batch:read na kolekcji; operationalCollectionScope i resolver uprawnień dopasowują widoczny zakres do roli/grantu.",
+      "dataScope": "Zapytania filtrują tenant aktora, dostępny tool/batch, status i aktywne tombstones. Filtry dat, statusów, UUID, limitu i stabilny cursor są walidowane, a odpowiedź usuwa wrażliwe dane i nie pokazuje zasobów spoza zakresu.",
+      "transport": "GET 200; query toolId, batchId, status, from, to, cursor, limit; odpowiedzi stronicowane z nextCursor i jawnie bezpiecznymi polami. Błędny filtr/kursor 400, brak dostępu 403/404.",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/history/runs",
+          "handler": "runs",
+          "input": "HistoryQuery: toolId, batchId, status, from/to, cursor, limit",
+          "response": "Stronicowana historia runów w dozwolonym tenant/tool scope.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/history/results",
+          "handler": "results",
+          "input": "HistoryQuery: toolId, batchId, status, from/to, cursor, limit",
+          "response": "Stronicowana historia result sets w dozwolonym tenant/tool scope; jawne liczniki i safe fields.",
+          "status": 200
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/reports/history.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/reports/history.spec.ts",
+        "apps/api/src/features/reports/reports.module.spec.ts"
+      ],
+      "testGap": "Testy jednostkowe history pokrywają query/SQL, zero wyników i kursor; brak HTTP testu kontrolera i pełnej macierzy ról/grantów.",
+      "reviewStatus": "source-reviewed"
+    },
+    {
+      "owner": "runs-and-submissions",
+      "authorizationBoundary": "Run i RunSubmission mają SessionGuard plus PermissionGuard z akcjami run:create/read/cancel/resume/manual_data i submission:read/cancel. Wszystkie mutacje wymagają CSRF. Run i submission service ponownie weryfikują aktywność sesji/grantu, tenant, właściciela batcha, snapshot/revision, wersję i idempotencję. Download artefaktu wymaga artifact:download i audytuje pobranie przed odpowiedzią.",
+      "dataScope": "Submission jest wiązany z tenantem/aktorem/batchem i zwraca ograniczone statusy/items; run detail/artifact opierają zakres na route-run PermissionGuard, a kolekcja /runs na query-batch. Start akceptuje 1–500 wybranych wierszy lub zakres i tylko wiersze aktualnej zapieczętowanej rewizji; kontrole serwisu sprawdzają owner/grant. Artefakt wydawany jest dopiero po autoryzacji i zapisie audytu.",
+      "transport": "GET 200; POST create/preview/cancel/pause/resume zwykle 201; pobranie artifact 200 z no-store/bezpiecznymi nagłówkami. CSRF dotyczy każdej mutacji. Start submission wymaga ścisłego wyboru, fingerprint/idempotency; cancel wymaga expectedVersion; sterowanie runem używa requestu wersji i klucza. Błędne wejście 400, cudzy zasób ukrywany 404, konflikt wersji/stanu 409.",
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/imports/:batchId/run-submissions/preview",
+          "handler": "preview",
+          "input": "1–500 rowNumbers albo fromRow/toRow; CSRF",
+          "response": "Preview selection fingerprint, statusów ready/review/excluded i powiązanych grup.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/imports/:batchId/run-submissions",
+          "handler": "create",
+          "input": "Wybór wierszy, selectionFingerprint, idempotencyKey; CSRF",
+          "response": "Idempotentne przyjęcie submission i bezpieczne summary.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/run-submissions/:id",
+          "handler": "get",
+          "input": "UUID submission; submission:read",
+          "response": "Bezpieczne summary stanu grup i liczników z tenant/owner scope.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/run-submissions/:id/cancel",
+          "handler": "cancel",
+          "input": "Ścisły body expectedVersion; submission:cancel i CSRF",
+          "response": "Anuluje submission z optimistic locking i zwraca aktualne summary.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/run-submissions/:id/items",
+          "handler": "items",
+          "input": "UUID submission; opcjonalny cursor",
+          "response": "Stronicowane bezpieczne pozycje submission bez surowych danych źródłowych.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/runs",
+          "handler": "list",
+          "input": "Query batchId; run:read dla batcha",
+          "response": "Do 50 najnowszych runów wskazanego batcha.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/runs",
+          "handler": "create",
+          "input": "Body batchId i rowNumber; run:create oraz CSRF",
+          "response": "Tworzy albo odnajduje run grupy kanonicznej i zwraca summary.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/runs/:id",
+          "handler": "get",
+          "input": "UUID runId; route-run permission",
+          "response": "Stan runu, wynik/liczniki, bezpieczne informacje o interwencji i kontrolach dostępnych aktorowi.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/runs/:id/artifact",
+          "handler": "artifact",
+          "input": "UUID runId; artifact:download",
+          "response": "Pobiera gotowy artefakt po zapisie zdarzenia audytu; storage/audit error daje 503.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/runs/:id/cancel",
+          "handler": "cancel",
+          "input": "UUID runId; run:cancel i CSRF",
+          "response": "Anuluje run w tenant zgodnie z kontrolą stanu i lease.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/runs/:id/pause",
+          "handler": "pause",
+          "input": "RunControlRequest expected revision/idempotency; run:cancel i CSRF",
+          "response": "Żąda bezpiecznej pauzy i zwraca kontrolny stan/revision.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/runs/:id/resume",
+          "handler": "resumePaused",
+          "input": "RunControlRequest expected revision/idempotency; run:resume i CSRF",
+          "response": "Wznawia bezpiecznie wstrzymany run.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/runs/:id/resume-auth",
+          "handler": "resumeAuth",
+          "input": "UUID runId; run:resume i CSRF",
+          "response": "Ponawia dozwolone wznowienie po kroku uwierzytelnienia.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/runs/:id/resume-review",
+          "handler": "resumeReview",
+          "input": "UUID runId; run:manual_data i CSRF",
+          "response": "Kontynuuje run po dozwolonym przeglądzie danych.",
+          "status": 201
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/submissions/run-submissions.controller.ts",
+        "apps/api/src/features/runs/runs.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/submissions/run-submissions.http.spec.ts",
+        "apps/api/src/features/runs/run-cancel.http.spec.ts",
+        "apps/api/src/features/runs/runs.module.spec.ts",
+        "apps/api/src/features/submissions/submissions.module.spec.ts"
+      ],
+      "testGap": "RunSubmission HTTP obejmuje preview/create/tenant/pagination/cancel z atrapą, run-cancel testuje pojedynczy endpoint, a DB smoke kontrolę run-control. Brakuje HTTP testów wszystkich operacji Run, testów wyników/artefaktów, macierzy tenant i testów wyścigów dispatch/lease w jednym kontrakcie.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "owner": "admin-management",
+      "authorizationBoundary": "Każda trasa ma SessionGuard i AdminOnlyGuard; drugi wymaga roli admin z bieżącego principal, a mutacje dodatkowo sprawdzają CSRF przy handlerze i przechodzą globalną ochronę Origin. Operacje użytkowników/grantów używają runConfirmedPrivilegedAction, tokenu związanego z akcją/celem/payloadem i idempotency key. Zmiana ustawień narzędzia i interwencji używa optimistic locking przez expectedVersion/expectedRevision.",
+      "dataScope": "Dane użytkowników, sesji, grantów, ustawień, runów i interwencji są ograniczane tenantId aktora; serwis blokuje równoległe zmiany administracyjne tenanta. Część techniczna /admin/runtime (wersja migracji/build) jest globalna, a licznik katalogu narzędzi odzwierciedla globalny katalog. Endpointy nie zwracają hashy haseł ani sekretów; sesje nie zawierają tokenów sesyjnych.",
+      "transport": "GET 200; PUT/PATCH 200; POST zwykle 201, z wyjątkiem żądań reset-link i recovery-email (202). Mutacje wymagają Origin/CSRF. Walidacja ścisłego body, identyfikatorów, wersji i filtrów odrzuca błędne wejście; konflikty rewizji/idempotencji zwracają 409, brak zasobu spoza tenant 404.",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/admin/overview",
+          "handler": "overview",
+          "input": "Bieżąca sesja administratora",
+          "response": "Liczby aktywnych członków, katalogu narzędzi, otwartych interwencji i aktywnych runów; część agregatów ograniczona do tenant.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/admin/runtime",
+          "handler": "runtime",
+          "input": "Bieżąca sesja administratora",
+          "response": "Build manifest, wersja/liczba migracji i snapshot operacji enrichment bieżącego tenant; niedostępny odczyt migracji daje 503.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/admin/users",
+          "handler": "users",
+          "input": "Query q, limit, cursor; q max 128 znaków, kursor powiązany z filtrem",
+          "response": "Stronicowana lista członków bieżącego tenant z rolą/statusami i liczbą aktywnych sesji; kolejna strona przez nextCursor.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/admin/users",
+          "handler": "createUser",
+          "input": "Ścisły body username, password, role, confirmationToken, idempotencyKey; CSRF",
+          "response": "Tworzy konto i membership tenant, wymusza zmianę hasła; zwraca userId, username, role, status i mustChangePassword.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/admin/tools",
+          "handler": "adminTools",
+          "input": "Bieżąca sesja administratora",
+          "response": "Globalny katalog narzędzi: identyfikator, nazwa, opis i status.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/admin/users/:userId/grants",
+          "handler": "grants",
+          "input": "UUID członka tenant",
+          "response": "Rola, grant kasowania i granty narzędzi członka tenant z wersjami.",
+          "status": 200
+        },
+        {
+          "method": "PUT",
+          "path": "/admin/users/:userId/grants/:toolId",
+          "handler": "setGrant",
+          "input": "Boolean canDiscover/canExecute/canViewResults/canDownloadResults, expectedVersion, confirmationToken, idempotencyKey; CSRF",
+          "response": "Zapisuje wersjonowany grant w tenant; może cofnąć przypisanie interwencji po utracie uprawnienia.",
+          "status": 200
+        },
+        {
+          "method": "PUT",
+          "path": "/admin/users/:userId/deletion-grant",
+          "handler": "setDeletionGrant",
+          "input": "canDeleteData, expectedVersion, confirmationToken, idempotencyKey; CSRF",
+          "response": "Ustawia wersjonowany grant kasowania; grant można nadać tylko aktywnemu managerowi.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/admin/users/:userId/grants/:toolId/revoke",
+          "handler": "revokeGrant",
+          "input": "expectedVersion, confirmationToken, idempotencyKey; CSRF",
+          "response": "Cofa grant narzędzia w tenant i zwraca stan revoke oraz ewentualne odpięte interwencje.",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/admin/tools/:toolId/settings",
+          "handler": "getSettings",
+          "input": "Identyfikator narzędzia",
+          "response": "Ustawienia uruchomień narzędzia w tenant wraz z wersją.",
+          "status": 200
+        },
+        {
+          "method": "PATCH",
+          "path": "/admin/tools/:toolId/settings",
+          "handler": "updateSettings",
+          "input": "Ścisły body: enabledForNewRuns, maxNewRunsPerHour, allowedLocalStart/End, timezone, expectedVersion; CSRF",
+          "response": "Zapisuje ustawienia i zwiększa wersję; nieaktualna wersja zwraca 409.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/admin/operations/summary",
+          "handler": "operationsSummary",
+          "input": "Bieżąca sesja administratora",
+          "response": "Agregaty runów, dispatch, submissions, interwencji, maila, Redis/workera i enrichment; zakres tenant dla danych biznesowych.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/admin/operations/runs",
+          "handler": "operationsRuns",
+          "input": "Opcjonalne query toolId, status i page 1–100000",
+          "response": "Do 50 najnowszych runów bieżącego tenant wraz z hasMore.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/admin/interventions",
+          "handler": "adminInterventions",
+          "input": "Query status, assigneeUserId, toolId, priority, page",
+          "response": "Do 50 interwencji bieżącego tenant, filtrowanych statusem/przypisaniem/narzędziem/priorytetem.",
+          "status": 200
+        },
+        {
+          "method": "PATCH",
+          "path": "/admin/interventions/:id/assignment",
+          "handler": "assignIntervention",
+          "input": "assigneeUserId, dueAt, expectedRevision; CSRF",
+          "response": "Przypisuje albo odpina aktywną interwencję w tenant; wymaga aktywnego odbiorcy z właściwą rolą/grantem i aktualnej rewizji.",
+          "status": 200
+        },
+        {
+          "method": "PATCH",
+          "path": "/admin/interventions/:id/priority",
+          "handler": "setInterventionPriority",
+          "input": "priority normal/high, expectedRevision; CSRF",
+          "response": "Ustawia priorytet otwartej interwencji w tenant i zwiększa rewizję.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/admin/interventions/:id/activity",
+          "handler": "interventionActivity",
+          "input": "UUID interwencji",
+          "response": "Do 100 najnowszych zdarzeń przypisania/priorytetu interwencji w tenant.",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/admin/users/:userId/sessions",
+          "handler": "userSessions",
+          "input": "UUID członka tenant",
+          "response": "Do 100 sesji członka bez tokenów sesyjnych; oznacza sesję bieżącą.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/admin/users/:userId/sessions/:sessionId/revoke",
+          "handler": "revokeUserSession",
+          "input": "UUID użytkownika i sesji; confirmationToken, idempotencyKey; CSRF",
+          "response": "Cofa jedną aktywną sesję członka tenant i zwraca revoked/currentSession.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/admin/users/:userId/revoke-sessions",
+          "handler": "revokeUserSessions",
+          "input": "UUID użytkownika; confirmationToken, idempotencyKey; CSRF",
+          "response": "Cofa aktywne sesje członka tenant i zwraca revokedCount.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/admin/users/:userId/disable",
+          "handler": "disableUser",
+          "input": "status=disabled, confirmationToken, idempotencyKey; CSRF",
+          "response": "Wyłącza membership i konto, cofa sesje, kasuje grant kasowania i odpina interwencje; chroni ostatniego aktywnego admina.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/admin/users/:userId/enable",
+          "handler": "enableUser",
+          "input": "status=active, confirmationToken, idempotencyKey; CSRF",
+          "response": "Włącza konto i membership w tenant.",
+          "status": 201
+        },
+        {
+          "method": "PATCH",
+          "path": "/admin/users/:userId/role",
+          "handler": "updateRole",
+          "input": "role, confirmationToken, idempotencyKey; CSRF",
+          "response": "Zmienia rolę członka tenant, cofa jego sesje i niepasujące granty/przypisania; chroni ostatniego aktywnego admina.",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/admin/users/:userId/password",
+          "handler": "resetPassword",
+          "input": "temporaryPassword, confirmationToken, idempotencyKey; CSRF; polityka hasła",
+          "response": "Resetuje hasło z wymuszeniem zmiany i unieważnia stare sesje.",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/admin/users/:userId/password-reset-link",
+          "handler": "requestPasswordResetLink",
+          "input": "Body przekazywane do ścisłej walidacji PasswordRecoveryService; CSRF",
+          "response": "Kolejkuje uprzywilejowany link resetujący.",
+          "status": 202
+        },
+        {
+          "method": "POST",
+          "path": "/admin/users/:userId/recovery-email",
+          "handler": "requestUserRecoveryEmail",
+          "input": "Body przekazywane do ścisłej walidacji PasswordRecoveryService; CSRF",
+          "response": "Kolejkuje zmianę/weryfikację adresu odzyskiwania członka tenant.",
+          "status": 202
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/admin/admin-overview.controller.ts",
+        "apps/api/src/features/admin/admin-users.controller.ts",
+        "apps/api/src/features/admin/admin-tools.controller.ts",
+        "apps/api/src/features/admin/admin-operations.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/admin/admin.http.spec.ts",
+        "apps/api/src/features/privileged-actions/privileged-actions.spec.ts",
+        "apps/api/src/features/auth/offline-admin-password-reset.spec.ts",
+        "apps/api/src/features/admin/admin.controllers.spec.ts",
+        "apps/api/src/features/admin/admin.module.spec.ts"
+      ],
+      "testGap": "HTTP test rzeczywistego kontrolera i guardów sprawdza brak sesji, odmowę managerowi, walidację admina, globalne CSRF i sukcesowy GET /admin/runtime z atrapą query providera DB. Nadal brakuje sukcesowych HTTP/DB testów tenant A/B dla większości z 26 tras, idempotencji, optimistic locking i dokładnych kształtów odpowiedzi.",
+      "reviewStatus": "source-and-http-tested"
+    },
+    {
+      "owner": "tool-catalog",
+      "authorizationBoundary": "GET /tools ma SessionGuard, bez AdminOnlyGuard; pobiera principal z aktywnej sesji i używa listToolAccess do odfiltrowania narzędzi dostępnych aktorowi.",
+      "dataScope": "Odpowiedź zawiera tylko narzędzia, do których bieżący aktor ma grant w swoim tenant, wraz z prawami; szczegóły katalogu narzędzi są współdzielone.",
+      "transport": "GET 200; brak parametrów/body; brak modyfikacji cookies. Brak grantów zwraca {items:[]}.",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/tools",
+          "handler": "list",
+          "input": "Cookie aktywnej sesji",
+          "response": "Lista narzędzi z metadanymi katalogu i grantami bieżącego aktora.",
+          "status": 200
+        }
+      ],
+      "sourceEvidence": [
+        "apps/api/src/features/tools/tool-catalog.controller.ts"
+      ],
+      "testEvidence": [
+        "apps/api/src/features/authorization/tool-access.spec.ts",
+        "apps/api/src/features/tools/tools.module.spec.ts"
+      ],
+      "testGap": "Brak testu HTTP kontrolera; test tool-access pokrywa selekcję grantów oddzielnie.",
+      "reviewStatus": "source-reviewed"
+    }
+  ]
+}

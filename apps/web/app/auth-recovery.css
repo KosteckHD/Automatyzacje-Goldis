@@ -1,0 +1,32 @@
+.auth-recovery-shell{--recovery-ink:#10283f;--recovery-paper:#f4f7fa;--recovery-blue:#087da2;--recovery-rule:#bad0de;min-height:100svh;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);background:var(--recovery-paper);color:#172b44}
+.auth-recovery-brand{position:relative;display:flex;flex-direction:column;justify-content:center;min-height:100svh;overflow:hidden;padding:clamp(34px,7vw,104px);background:var(--recovery-ink);color:#fff}
+.auth-recovery-brand:after{position:absolute;right:-9vw;bottom:-18vw;width:46vw;height:46vw;border:1px solid #34516a;border-radius:50%;content:"";pointer-events:none}
+.auth-recovery-logo{display:flex;align-items:center;gap:11px;margin-bottom:clamp(65px,11vh,130px);color:#f5fbff;text-decoration:none;font-size:.82rem;font-weight:850;letter-spacing:.14em}
+.auth-recovery-logo img{width:39px;height:39px;object-fit:contain}
+.auth-recovery-brand .eyebrow{color:#6ac0dc}
+.auth-recovery-brand h1{position:relative;z-index:1;max-width:690px;margin:0;font-family:var(--font-display,"Newsreader",Georgia,serif);font-size:clamp(3rem,6.5vw,6.5rem);font-weight:430;letter-spacing:-.055em;line-height:.98}
+.auth-recovery-brand h1 em{color:#91ccdc;font-weight:350}
+.auth-recovery-brand>p:not(.eyebrow){max-width:410px;margin:25px 0 0;color:#bad0de;font-size:.95rem;line-height:1.65}
+.auth-recovery-rule{position:relative;z-index:1;display:flex;align-items:center;gap:13px;margin-top:clamp(55px,11vh,120px);padding-top:15px;border-top:1px solid #34516a;color:#9ab4c3}
+.auth-recovery-rule span{display:grid;place-items:center;width:27px;height:27px;border:1px solid #4d8198;color:#9bd3e2;font-family:var(--font-display,Georgia,serif);font-size:1.12rem}
+.auth-recovery-rule small{font:700 .63rem var(--font-data,monospace);letter-spacing:.12em}
+.auth-recovery-panel{align-self:center;width:min(460px,calc(100% - 64px));margin:0 auto;padding:42px 0}
+.auth-recovery-panel h2{margin:0;color:#172b44;font-family:var(--font-display,"Newsreader",Georgia,serif);font-size:clamp(2.2rem,4vw,3.5rem);font-weight:500;letter-spacing:-.045em;line-height:1.05}
+.auth-recovery-description{max-width:390px;margin:14px 0 28px;color:#607389;font-size:.88rem;line-height:1.6}
+.auth-recovery-form{display:grid;gap:15px}
+.auth-recovery-form label{display:grid;gap:7px;color:#314b60;font-size:.78rem;font-weight:750}
+.auth-recovery-form input{width:100%;min-height:47px;padding:11px 12px;border:1px solid #b8c8d2;border-radius:5px;background:#fff;color:#172b44;font:inherit}
+.auth-recovery-form input:focus-visible{outline:3px solid #66b4d0;outline-offset:2px}
+.auth-recovery-form button{min-height:47px;margin-top:3px;padding:11px 15px;border:1px solid #006d91;border-radius:5px;background:#006d91;color:white;font-size:.82rem;font-weight:800}
+.auth-recovery-form button:hover:not(:disabled){background:#005777}
+.auth-recovery-form button:focus-visible,.auth-recovery-back a:focus-visible{outline:3px solid #66b4d0;outline-offset:3px}
+.auth-recovery-form button:disabled{opacity:.55;cursor:not-allowed}
+.auth-recovery-form small,.auth-recovery-muted{color:#718697;font-size:.74rem;line-height:1.55}
+.auth-recovery-alert,.auth-recovery-notice{margin:0 0 16px;padding:11px 13px;border-left:3px solid #b8493e;background:#fff0ef;color:#873c34;font-size:.79rem;line-height:1.5}
+.auth-recovery-notice{border-color:#238467;background:#e8f5f0;color:#17684f}
+.auth-recovery-muted{margin:15px 0;padding:12px 13px;border-left:2px solid #91a8b7;background:#eaf0f4}
+.auth-recovery-back{margin:30px 0 0;padding-top:17px;border-top:1px solid #dce5ec}
+.auth-recovery-back a{color:#08779c;text-decoration:none;font-size:.78rem;font-weight:750}
+.auth-recovery-back a:hover{text-decoration:underline}
+@media(max-width:760px){.auth-recovery-shell{grid-template-columns:1fr}.auth-recovery-brand{min-height:auto;padding:27px 25px 34px}.auth-recovery-brand:after{right:-150px;bottom:-210px;width:360px;height:360px}.auth-recovery-logo{margin-bottom:42px}.auth-recovery-brand h1{font-size:clamp(2.6rem,10vw,4.2rem)}.auth-recovery-brand>p:not(.eyebrow){margin-top:15px}.auth-recovery-rule{margin-top:33px}.auth-recovery-panel{width:min(460px,calc(100% - 42px));padding:38px 0 52px}}
+@media(prefers-reduced-motion:reduce){.auth-recovery-shell *{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}

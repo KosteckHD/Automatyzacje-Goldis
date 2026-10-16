@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-09",
+  "source": "configured-worker-profile-live-login-form",
+  "allowedOrigins": ["https://cportal.compensa.pl"],
+  "session": {
+    "authenticated": "a.tg-btnLogout:visible",
+    "loginForm": "input#login",
+    "usernameInput": "input#login",
+    "passwordInput": "input#password",
+    "loginSubmit": "button#submitLogin",
+    "smsChallenge": "input[autocomplete=\"one-time-code\"]",
+    "accessDenied": "text=\"Brak dostępu\"",
+    "optionalOverlay": {
+      "container": "ux-dialog.tm-modal-news:has(ux-dialog-header p:text-is(\"Przerwa techniczna\")):has(ux-dialog-body:has-text(\"będzie niedostępna\"))",
+      "dismissButton": "button:has-text(\"Zamknij\")"
+    }
+  },
+  "verification": {
+    "observedFields": ["loginForm", "usernameInput", "passwordInput", "loginSubmit", "authenticated"],
+    "pendingFields": ["smsChallenge", "accessDenied"],
+    "endToEndAccepted": false,
+    "productionConfigApproved": false,
+    "maintenanceNotice": {
+      "observedAt": "2026-10-15",
+      "title": "Przerwa techniczna",
+      "dismissalVerifiedLive": true,
+      "communicationDialogVerifiedAfterDismissal": true,
+      "dynamicButtonIdIgnored": true
+    }
+  }
+}

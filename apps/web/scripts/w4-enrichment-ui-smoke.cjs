@@ -1,11 +1,14 @@
 const assert = require("node:assert/strict");
 const { spawn } = require("node:child_process");
 const { createServer } = require("node:net");
-const { resolve } = require("node:path");
+const { resolve, join } = require("node:path");
+const { mkdtempSync } = require("node:fs");
+const { tmpdir } = require("node:os");
 const { chromium } = require("playwright");
 
 const batchId = "33333333-3333-4333-8333-333333333333";
 const csrfToken = "synthetic-csrf-token-for-w4-enrichment-ui-smoke-123456";
+const screenshotDir = process.env.GOLDIS_UI_SCREENSHOTS === "1" ? mkdtempSync(join(tmpdir(), "goldis-w4-ui-")) : null;
 const portProbe = createServer();
 
 async function freePort() {
@@ -46,10 +49,24 @@ async function main() {
     const pageErrors = [];
     const reviewRequests = [];
     let correctionRequest = null;
+    const correctionRequests = [];
     let correctionSaved = false;
+    let correctionConflictOnce = true;
+    let correctionVersion = 1;
     let enrichmentJob = null;
     let enrichmentJobRequest = null;
     let enrichmentCancelRequest = null;
+    const enrichmentCancelRequests = [];
+    let staleCancelOnce = true;
+    let expireJobListOnce = false;
+    const itemCursors = [];
+    const historicalJob = {
+      id: "synthetic-history-job", batchId, status: "completed", selectedCount: 1,
+      completedCount: 1, excludedCount: 0, failedCount: 0, cancelledCount: 0, version: 1,
+      errorCode: null, createdAt: "2026-10-05T10:00:00.000Z", updatedAt: "2026-10-05T10:01:00.000Z", finishedAt: "2026-10-05T10:01:00.000Z",
+    };
+    let runtimeHealth = { status: "ready", available: true, worker: "ready", provider: "configured", providerName: "gus-bir", message: "Worker wzbogacania odpowiada." };
+    let runtimeHealthFailure = false;
     page.on("pageerror", (error) => pageErrors.push(error.message));
     await page.route("**/api/**", async (route) => {
       const request = route.request();
@@ -57,26 +74,61 @@ async function main() {
       const method = request.method();
       let body;
       let status = 200;
-      if (url.pathname === "/api/auth/me") {
+      if (url.pathname === "/api/auth/login" && method === "POST") {
+        body = { role: "admin", csrfToken };
+      } else if (url.pathname === "/api/auth/me") {
         body = { role: "admin", csrfToken, tools: [{ toolId: "oc-policy-verification", canDiscover: true, canExecute: true, canViewResults: true, canDownloadResults: true }] };
+      } else if (url.pathname === "/api/health/enrichment") {
+        body = runtimeHealthFailure ? { message: "synthetic-health-network-failure" } : runtimeHealth;
+        status = runtimeHealthFailure ? 503 : 200;
       } else if (url.pathname === `/api/imports/${batchId}`) {
         body = { id: batchId, totalRows: 2, invalidRows: 0, readyRows: 2, sha256: "a".repeat(64) };
       } else if (url.pathname === `/api/imports/${batchId}/enrichment-jobs` && method === "GET") {
-        body = { items: enrichmentJob ? [enrichmentJob] : [] };
+        if (expireJobListOnce) {
+          expireJobListOnce = false;
+          body = { message: "synthetic-session-expired" };
+          status = 401;
+        } else {
+          body = { items: enrichmentJob ? [historicalJob, enrichmentJob] : [historicalJob] };
+        }
       } else if (url.pathname === `/api/imports/${batchId}/enrichment-jobs` && method === "POST") {
         enrichmentJobRequest = { headers: request.headers(), body: request.postDataJSON() };
         enrichmentJob = {
-          id: "synthetic-enrichment-job", batchId, status: "queued", selectedCount: 2,
+          id: "synthetic-enrichment-job", batchId, status: "queued", selectedCount: 52,
           completedCount: 0, excludedCount: 0, failedCount: 0, cancelledCount: 0,
           version: 2, errorCode: null, createdAt: "2026-10-06T10:00:00.000Z", updatedAt: "2026-10-06T10:00:00.000Z", finishedAt: null,
         };
         body = enrichmentJob;
-      } else if (url.pathname === `/api/enrichment-jobs/synthetic-enrichment-job/items` && method === "GET") {
-        body = { items: [18001, 18002].map((rowNumber) => ({ rowNumber, status: "pending", reasonCode: null, errorCode: null, attemptCount: 0, nextAttemptAt: null })), nextCursor: null, hasMore: false, limit: 50 };
+      } else if (/^\/api\/enrichment-jobs\/[^/]+\/items$/.test(url.pathname) && method === "GET") {
+        const jobId = url.pathname.split("/")[3];
+        const cursor = url.searchParams.get("cursor");
+        itemCursors.push({ jobId, cursor });
+        if (jobId === "synthetic-history-job") {
+          body = { items: [{ rowNumber: 18000, status: "matched", reasonCode: null, errorCode: null, attemptCount: 1, nextAttemptAt: null }], nextCursor: null };
+        } else if (cursor) {
+          body = { items: [18051, 18052].map((rowNumber) => ({ rowNumber, status: "pending", reasonCode: null, errorCode: null, attemptCount: 0, nextAttemptAt: null })), nextCursor: null };
+        } else {
+          body = {
+            items: Array.from({ length: 50 }, (_, index) => {
+              const rowNumber = 18001 + index;
+              return { rowNumber, status: "pending", reasonCode: null, errorCode: index === 0 ? "RATE_LIMITED" : null,
+                attemptCount: index === 0 ? 1 : 0, nextAttemptAt: index === 0 ? "2026-10-07T12:30:00.000Z" : null };
+            }),
+            nextCursor: "18051", hasMore: true, limit: 50,
+          };
+        }
       } else if (url.pathname === `/api/enrichment-jobs/synthetic-enrichment-job/cancel` && method === "POST") {
         enrichmentCancelRequest = { headers: request.headers(), body: request.postDataJSON() };
-        enrichmentJob = { ...enrichmentJob, status: "cancelled", cancelledCount: 2, version: 3 };
-        body = enrichmentJob;
+        enrichmentCancelRequests.push(enrichmentCancelRequest);
+        if (staleCancelOnce) {
+          staleCancelOnce = false;
+          enrichmentJob = { ...enrichmentJob, status: "processing", version: 3 };
+          body = { message: "synthetic-version-conflict" };
+          status = 409;
+        } else {
+          enrichmentJob = { ...enrichmentJob, status: "cancelled", cancelledCount: 52, version: 4 };
+          body = enrichmentJob;
+        }
       } else if (url.pathname === `/api/imports/${batchId}/rows`) {
         body = [
           { rowNumber: 18001, companyName: "Firma syntetyczna Alfa", decisionMakerName: "Osoba testowa", regon: "", issues: [] },
@@ -96,7 +148,7 @@ async function main() {
               decisionMakerName: "Osoba testowa",
               regonRaw: "",
               effectiveRegon: null,
-              rowVersion: correctionSaved ? 2 : 1,
+              rowVersion: correctionSaved ? 3 : correctionVersion,
               issues: [],
               state: correctionSaved ? "correction_pending" : "missing_regon",
               source: "missing",
@@ -122,8 +174,17 @@ async function main() {
         };
       } else if (url.pathname === `/api/imports/${batchId}/rows/18001` && method === "PATCH") {
         correctionRequest = { headers: request.headers(), body: request.postDataJSON() };
-        correctionSaved = true;
-        body = { correctionId: "synthetic-correction", rowNumber: 18001, status: "pending", rowVersion: 2 };
+        correctionRequests.push(correctionRequest);
+        if (correctionConflictOnce) {
+          correctionConflictOnce = false;
+          correctionVersion = 2;
+          body = { message: "synthetic-row-version-conflict" };
+          status = 409;
+        } else {
+          correctionSaved = true;
+          correctionVersion = 3;
+          body = { correctionId: "synthetic-correction", rowNumber: 18001, status: "pending", rowVersion: 3 };
+        }
       } else if (url.pathname === "/api/runs" && url.searchParams.get("batchId") === batchId) {
         body = [];
       } else {
@@ -137,37 +198,106 @@ async function main() {
     await page.getByRole("heading", { name: "Uzupełnianie i korekty danych" }).waitFor({ state: "visible" });
     await page.getByText("Ten sam NIP wskazuje różne numery REGON.").waitFor({ state: "visible" });
     await page.getByText(/Brak wyniku/).waitFor({ state: "visible" });
+    await page.getByText("GUS BIR — rejestr REGON").waitFor({ state: "visible" });
+    await page.getByText(/produkcyjne użycie wymaga klucza wydanego przez GUS/).waitFor({ state: "visible" });
+    if (screenshotDir) await page.screenshot({ path: join(screenshotDir, "provider-ready-desktop.png"), fullPage: true });
+    await page.getByRole("button", { name: "Zaproponuj korektę" }).first().click();
+    await page.getByLabel("Proponowany REGON dla wiersza 18001").fill("012345678");
+    await page.getByLabel("Powód").fill("Potwierdzenie w fikcyjnym źródle");
+    await page.getByRole("button", { name: "Zapisz propozycję" }).click();
+    await page.getByText(/Wiersz zmienił się od czasu odczytu/).waitFor({ state: "visible" });
+    assert.deepEqual(correctionRequests[0]?.body, { proposedRegon: "012345678", reason: "Potwierdzenie w fikcyjnym źródle", expectedVersion: 1 });
     await page.getByRole("button", { name: "Zaproponuj korektę" }).first().click();
     await page.getByLabel("Proponowany REGON dla wiersza 18001").fill("012345678");
     await page.getByLabel("Powód").fill("Potwierdzenie w fikcyjnym źródle");
     await page.getByRole("button", { name: "Zapisz propozycję" }).click();
     await page.getByText(/Propozycja 012345678 oczekuje na rozstrzygnięcie/).waitFor({ state: "visible" });
+    const correctionTrackingLink = page.getByRole("link", { name: "Zobacz moje korekty" });
+    await correctionTrackingLink.waitFor({ state: "visible" });
+    assert.equal(await correctionTrackingLink.getAttribute("href"), `/review?batchId=${batchId}&toolId=oc-policy-verification`,
+      "saved correction keeps its import context and links to the personal review queue");
+    await page.reload();
+    await page.getByRole("heading", { name: "Uzupełnianie i korekty danych" }).waitFor({ state: "visible" });
+    await page.getByRole("link", { name: "Zobacz moje korekty" }).waitFor({ state: "visible" });
     assert.equal(correctionRequest?.headers["x-csrf-token"], csrfToken);
-    assert.deepEqual(correctionRequest?.body, { proposedRegon: "012345678", reason: "Potwierdzenie w fikcyjnym źródle", expectedVersion: 1 });
-    assert.ok(reviewRequests.length >= 2, "zapis odświeża źródła i stan korekty");
+    assert.deepEqual(correctionRequest?.body, { proposedRegon: "012345678", reason: "Potwierdzenie w fikcyjnym źródle", expectedVersion: 2 });
+    assert.equal(correctionRequests.length, 2, "konflikt wersji nie powoduje automatycznego ponowienia PATCH");
+    assert.ok(reviewRequests.length >= 3, "zapis i konflikt odświeżają źródła oraz wersję wiersza");
     assert.equal(await page.getByText("Osoba fizyczna", { exact: true }).count(), 0, "panel nie ujawnia danych osoby fizycznej");
 
     const enrichmentPanel = page.locator(".enrichment-job-panel");
     await enrichmentPanel.getByLabel("Od wiersza").fill("18001");
     await enrichmentPanel.getByLabel("Do wiersza").fill("18002");
     await enrichmentPanel.getByRole("button", { name: "Dodaj zadanie" }).click();
-    await page.getByText("Oczekuje na workera").waitFor({ state: "visible" });
+    await page.getByText("Oczekuje na workera", { exact: true }).waitFor({ state: "visible" });
     assert.equal(enrichmentJobRequest?.headers["x-csrf-token"], csrfToken);
     assert.deepEqual({ ...enrichmentJobRequest?.body, idempotencyKey: "synthetic" }, {
       idempotencyKey: "synthetic", fromRow: 18001, toRow: 18002,
     });
     assert.match(enrichmentJobRequest?.body.idempotencyKey ?? "", /^[0-9a-f-]{36}$/i);
+    const jobHistory = page.getByRole("navigation", { name: "Historia zadań rejestru" });
+    await jobHistory.getByRole("button", { name: /Zakończono/ }).click();
+    await page.getByText("Wiersz 18000").waitFor({ state: "visible" });
+    await jobHistory.getByRole("button", { name: /Oczekuje na workera/ }).click();
+    await page.getByText(/Dostawca ograniczył liczbę zapytań/).waitFor({ state: "visible" });
+    await page.getByText(/Następna próba po/).waitFor({ state: "visible" });
+    assert.equal(await page.getByText("Wiersz 18050").count(), 1, "pierwsza strona zawiera 50 pozycji");
+    await page.getByRole("button", { name: "Pokaż następne 50" }).click();
+    await page.getByText("Wiersz 18052").waitFor({ state: "visible" });
+    assert.equal(itemCursors.some((item) => item.jobId === "synthetic-enrichment-job" && item.cursor === "18051"), true,
+      "kolejna strona pozycji używa kursora backendu");
+    await page.getByRole("button", { name: "Anuluj zadanie" }).click();
+    await page.getByText(/Zadanie zmieniło się w innej karcie/).waitFor({ state: "visible" });
+    await page.getByText("W trakcie", { exact: true }).waitFor({ state: "visible" });
+    assert.equal(enrichmentCancelRequests.length, 1, "409 nie powoduje automatycznego ponowienia mutacji");
+    assert.deepEqual(enrichmentCancelRequests[0].body, { expectedVersion: 2 });
     await page.getByRole("button", { name: "Anuluj zadanie" }).click();
     await page.getByText("Anulowano", { exact: true }).waitFor({ state: "visible" });
     assert.equal(enrichmentCancelRequest?.headers["x-csrf-token"], csrfToken);
-    assert.deepEqual(enrichmentCancelRequest?.body, { expectedVersion: 2 });
+    assert.deepEqual(enrichmentCancelRequest?.body, { expectedVersion: 3 });
+    await jobHistory.getByRole("button", { name: /Zakończono/ }).click();
+    await page.getByText("Wiersz 18000").waitFor({ state: "visible" });
+    await jobHistory.getByRole("button", { name: /Anulowano/ }).click();
+    await page.getByText("Anulowano", { exact: true }).waitFor({ state: "visible" });
 
-    await page.setViewportSize({ width: 390, height: 844 });
-    const mobileOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
-    assert.equal(mobileOverflow, false, "widok mobilny nie przewija całej strony poziomo");
+    const viewportChecks = [
+      { width: 320, height: 760, file: "mobile-narrow.png" },
+      { width: 390, height: 844, file: "mobile.png" },
+      { width: 768, height: 1024, file: "tablet.png" },
+      { width: 1920, height: 1080, file: "desktop-wide.png" },
+    ];
+    for (const viewport of viewportChecks) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+      if (hasOverflow) console.error("W4_ENRICHMENT_OVERFLOW_DEBUG", JSON.stringify(await page.evaluate(() => Array.from(document.querySelectorAll("body *"))
+        .filter((element) => element.scrollWidth > element.clientWidth + 2)
+        .slice(0, 12).map((element) => ({ tag: element.tagName, className: typeof element.className === "string" ? element.className : "",
+          width: element.clientWidth, scrollWidth: element.scrollWidth, text: element.textContent?.trim().slice(0, 70) })))));
+      assert.equal(hasOverflow, false, `widok ${viewport.width}px nie przewija całej strony poziomo`);
+      if (screenshotDir) await page.screenshot({ path: join(screenshotDir, viewport.file), fullPage: true });
+    }
+
+    runtimeHealth = { status: "not_ready", available: false, worker: "offline", provider: "unknown", providerName: null, message: "Worker wzbogacania nie odpowiada." };
+    await page.reload();
+    await page.getByText("Anulowano", { exact: true }).waitFor({ state: "visible" });
+    await page.getByText("worker nie odpowiada").waitFor({ state: "visible" });
+    await page.getByText("Dostawca: status konfiguracji niedostępny").waitFor({ state: "visible" });
+    if (screenshotDir) await page.screenshot({ path: join(screenshotDir, "worker-offline.png"), fullPage: true });
+
+    runtimeHealthFailure = true;
+    await page.reload();
+    await page.getByText("Status rejestru jest chwilowo niedostępny.").waitFor({ state: "visible" });
+    if (screenshotDir) await page.screenshot({ path: join(screenshotDir, "health-unavailable.png"), fullPage: true });
+    expireJobListOnce = true;
+    await page.reload();
+    await page.getByRole("heading", { name: "Zaloguj się" }).waitFor({ state: "visible" });
+    await page.getByLabel("Użytkownik").fill("synthetic.admin");
+    await page.getByLabel("Hasło").fill("synthetic-password");
+    await page.getByRole("button", { name: "Przejdź do panelu" }).click();
+    await page.getByText("Anulowano", { exact: true }).waitFor({ state: "visible" });
     assert.deepEqual(pageErrors, [], "brak błędów JavaScript w przeglądarce");
 
-    console.log("W4_ENRICHMENT_UI_SMOKE_PASS provenance=true registryStatus=true conflictReason=true correctionCsrf=true jobRange=true jobCsrf=true jobCancelCAS=true refresh=true mobileNoPageOverflow=true syntheticOnly=true");
+    console.log(`W4_ENRICHMENT_UI_SMOKE_PASS provenance=true registryStatus=true conflictReason=true correctionCsrf=true jobRange=true jobCsrf=true jobCancelCAS=true refresh=true jobPagination=50+2 cooldown=true f5State=true reauthRecovery=true healthOffline=true healthNetworkError=true viewportChecks=320,390,768,1920 screenshotDir=${screenshotDir ?? "disabled"} syntheticOnly=true`);
   } finally {
     if (browser) await browser.close();
     if (server.exitCode === null) {

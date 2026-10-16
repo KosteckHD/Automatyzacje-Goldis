@@ -1,0 +1,14 @@
+[
+  {
+    "LocalAddress": "::",
+    "LocalPort": 3000
+  },
+  {
+    "LocalAddress": "127.0.0.1",
+    "LocalPort": 3022
+  },
+  {
+    "LocalAddress": "0.0.0.0",
+    "LocalPort": 3001
+  }
+]

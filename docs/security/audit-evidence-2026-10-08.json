@@ -1,0 +1,71 @@
+{
+  "auditDate": "2026-10-08",
+  "scope": "synthetic evidence; no real DB/Redis or portals",
+  "results": [
+    {
+      "id": "AUTHZ-SUBMISSION",
+      "executeWithoutView": "allowed",
+      "viewWithoutExecute": "403",
+      "method": "real guard + controller + service, DB stubs"
+    },
+    {
+      "id": "AUTHZ-ASSIGNMENT-TENANT",
+      "crossTenantAssignedRun": "allowed",
+      "method": "real guard, synthetic resolver; conditional inconsistent assignment"
+    },
+    {
+      "id": "AUTHZ-GRANT-ASSIGNMENTS",
+      "executeAndViewRemoved": true,
+      "unassignmentFunctionNotCalled": true,
+      "method": "real admin controller + mutable Sequelize-instance stub; actual grant guard still denies further protected actions"
+    },
+    {
+      "id": "AUTH-RATE-ACCOUNT",
+      "sameUsernameDifferentIpsAllowed": 60,
+      "sixthAttemptSameIp": "blocked",
+      "redisKeys": 24,
+      "method": "real limiter, in-memory Redis counter model"
+    },
+    {
+      "id": "AUTH-PASSWORD-RETRIES",
+      "attemptsReachingPasswordVerification": 12,
+      "statuses": "12 x 401, no 429",
+      "method": "real controller, scrypt + valid synthetic CSRF, user stub"
+    },
+    {
+      "id": "AUTH-TIMING",
+      "missingMedianMs": 0.1,
+      "existingMedianMs": 28.99,
+      "method": "12 samples per branch, actual scrypt, DB + limiter stubs; not a network measurement"
+    },
+    {
+      "id": "AUTH-PASSWORD-RESET-RACE",
+      "committedAdminResetOverwritten": true,
+      "revokedOldSession": true,
+      "newActiveSession": true,
+      "mustChangePasswordCleared": true,
+      "method": "real controller + hashes, DB stubs with explicit deterministic reset interleaving; not PostgreSQL concurrency test"
+    },
+    {
+      "id": "AUTH-BOOTSTRAP",
+      "oneCharacterAdminPassword": "accepted",
+      "forcesPasswordChange": false,
+      "method": "real bootstrap + hash, DB stubs; no real account created"
+    },
+    {
+      "id": "HTTP-HEALTH-LIMITS",
+      "unauthenticatedResponses200": 65,
+      "dbCalls": 65,
+      "redisProbeCalls": 65,
+      "method": "loopback HTTP + production bootstrap/guard/controller, dependency stubs; not a load test"
+    },
+    {
+      "id": "CONTROLS",
+      "roleAndTenantDenials": "passed",
+      "revokedSessionDenied": true,
+      "reactTextEscaped": true,
+      "sqlPayloadQuoted": true,
+      "method": "actual policy/guards + React renderer + Sequelize replacements; not browser/DB end-to-end"
+    }
+  ]
+}

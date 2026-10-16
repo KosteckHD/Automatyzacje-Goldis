@@ -1,0 +1,92 @@
+{
+  "auditDate": "2026-10-14",
+  "report": "docs/AUDYT_BEZPIECZENSTWA_KONT_DANYCH_ADMINA_2026-10-14.md",
+  "reportSha256": "7ace228f40066283a63236e5190409fc97a40c23ffd157a10f3230665abe4d8d",
+  "files": [
+    {
+      "file": "auth-tests.log",
+      "bytes": 2860,
+      "sha256": "3d1773f442aa28839693dfb8164705b3b77a9d219916c7f05aaf8ea3d58c2024"
+    },
+    {
+      "file": "config-metadata.jsonl",
+      "bytes": 3222,
+      "sha256": "470d915504d780c4f0221203200b72aeccbaefb00dea15bcb7b73395bfe0da7d"
+    },
+    {
+      "file": "env-acl.json",
+      "bytes": 1316,
+      "sha256": "221eb191a012c806e14b08fb97feb92e245decc2f41a21db5ac30727c166f567"
+    },
+    {
+      "file": "npm-audit-production.json",
+      "bytes": 4417,
+      "sha256": "d53abcc38b4a7942932f7b09c054363abd9b3ca5f320adf3bd232aa0771a2144"
+    },
+    {
+      "file": "probes.cjs",
+      "bytes": 5784,
+      "sha256": "f549474fb55278bd2d44570d78feed7783de1106ee4ea46bde93969e1644c3cd"
+    },
+    {
+      "file": "probes.json",
+      "bytes": 709,
+      "sha256": "3f8cfd8751dbd62767bfd472b51bb44c122d3e22f92964729eb285886427658e"
+    },
+    {
+      "file": "production-compose.log",
+      "bytes": 38,
+      "sha256": "4b941b241a2ef325abc9c536f2d892f6617dc011cf148966703cda67709610f6"
+    },
+    {
+      "file": "results-tests.log",
+      "bytes": 2973,
+      "sha256": "0af202ea490c0b4313bed1eae99dbc6192d0fee438ac81770b63d7f6a53a1667"
+    },
+    {
+      "file": "runtime-db-migrations.log",
+      "bytes": 9077,
+      "sha256": "228341b343431db0ec97cf1738a622dbe57f87680f63b822ffea88017839c60e"
+    },
+    {
+      "file": "runtime-db-permissions-script.log",
+      "bytes": 289,
+      "sha256": "f47750c0e60410c3695979ce0054730ea5f1d221c76ccfed37775d5f4bc04b7c"
+    },
+    {
+      "file": "runtime-db-probe.cjs",
+      "bytes": 9873,
+      "sha256": "0fab1f39a36e91559052f64cf0588951049ec7c7b7f58f01f0da8ec9a75bcf51"
+    },
+    {
+      "file": "runtime-db-probe.log",
+      "bytes": 2319,
+      "sha256": "3b949f565a70a400dd48228135ee2993dddcdc805f5821d331fa25ac301a296c"
+    },
+    {
+      "file": "runtime-db-unmodified.log",
+      "bytes": 239,
+      "sha256": "8815d2492d4f7446060816bf7474f10d25bd11aef18f3eb38ecc51b8e1013b6e"
+    },
+    {
+      "file": "security-browser.log",
+      "bytes": 1427,
+      "sha256": "a1583c636ca4f5012dfe65fd57d8dfd722521a8c537ab272bae1f2973a484a60"
+    },
+    {
+      "file": "security-db.log",
+      "bytes": 732,
+      "sha256": "d93b2480b6d377fdbe233757d5d0c5beb18ed48629ff918f63e8d7c51bd83c12"
+    },
+    {
+      "file": "security-redis.log",
+      "bytes": 407,
+      "sha256": "ad28e916a33911c191288bc4bd0230d7c3cd783ac56506c2bef9f5f937d2d4a5"
+    },
+    {
+      "file": "security-tests.log",
+      "bytes": 6856,
+      "sha256": "4e1a53eb2737e8f58eaf1f1fc4069975f5f0e9de505085d2c88ea2a85d143819"
+    }
+  ]
+}

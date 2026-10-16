@@ -1,0 +1,23 @@
+.reports-page { display: grid; gap: 22px; }
+.reports-filter { display: grid; grid-template-columns: minmax(170px, 230px) minmax(170px, 230px) auto 1fr; align-items: end; gap: 14px; padding: 18px; }
+.reports-filter .admin-field { display: grid; gap: 7px; font-size: 13px; }
+.reports-filter input { min-height: 42px; padding: 8px 10px; border: 1px solid #393a3d; border-radius: 8px; background: #141516; color: #f1f0ec; font: inherit; }
+.reports-filter .lead-primary { min-height: 42px; padding: 0 15px; white-space: nowrap; }
+.reports-filter > p { margin: 0 0 3px; color: #a8a9ae; font-size: 12px; line-height: 1.5; }
+.reports-section { display: grid; gap: 13px; }
+.reports-section > .lead-section-heading { align-items: end; margin: 0; }
+.reports-section h2 { margin: 6px 0 0; font-size: 19px; }
+.reports-kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 11px; }
+.reports-kpis article { min-height: 118px; padding: 17px; border: 1px solid #303135; border-radius: 10px; background: #191b1e; }
+.reports-kpis article span, .reports-kpis article strong, .reports-kpis article small { display: block; }
+.reports-kpis article span { color: #b8b7b2; font-size: 12px; }
+.reports-kpis article strong { margin-top: 16px; color: #f1f0ec; font: 500 28px/1 var(--font-data, monospace); }
+.reports-kpis article small { margin-top: 8px; color: #a8a9ae; font-size: 11px; }
+.reports-table-panel { padding: 20px; }
+.reports-table-panel .lead-section-heading { margin-bottom: 12px; }
+.reports-table-panel h3 { margin: 0; font-size: 15px; }
+.reports-table-panel p { margin: 5px 0 0; color: #a8a9ae; font-size: 12px; }
+.reports-footnote { margin: 0; color: #a8a9ae; font-size: 12px; }
+.reports-operational-kpis { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+@media (max-width: 1050px) { .reports-filter { grid-template-columns: repeat(2,minmax(0,1fr)); } .reports-filter > p { grid-column: 1 / -1; } .reports-kpis, .reports-operational-kpis { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (max-width: 600px) { .reports-filter { grid-template-columns: 1fr; } .reports-filter > p { grid-column: auto; } .reports-kpis, .reports-operational-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); } .reports-kpis article { min-height: 100px; padding: 13px; } .reports-kpis article strong { font-size: 24px; } }

@@ -1,0 +1,114 @@
+{
+  "auditDate": "2026-10-13",
+  "timezone": "Europe/Warsaw",
+  "head": "e3a507ea8e534f06d698289bf1165f79691e5a6d",
+  "scope": "working tree including uncommitted files; synthetic offline probes; no live portals or VPS",
+  "build": "PASS",
+  "mainRegression": {
+    "fail": 0,
+    "skip": 54,
+    "workerPass": 99,
+    "apiPass": 208,
+    "pass": 329,
+    "preflightPass": 9,
+    "corePass": 13
+  },
+  "browserFixtures": {
+    "ufg": 14,
+    "fail": 0,
+    "compensa": 29,
+    "pzu": 18,
+    "everest": 8
+  },
+  "uiSmokes": {
+    "pass": 6,
+    "api": "synthetic or stubbed",
+    "fail": 0
+  },
+  "moduleRunner": {
+    "reason": "Expected module list omits leads",
+    "pass": 11,
+    "fail": 1
+  },
+  "backupCrypto": {
+    "pass": 1,
+    "fail": 0
+  },
+  "dependencyAudit": {
+    "critical": 0,
+    "moderate": 7,
+    "high": 0
+  },
+  "dbRedisContainerVerification": "NOT_RUN_DOCKER_ENGINE_UNAVAILABLE",
+  "liveVerification": "NOT_RUN",
+  "sourceHashes": [
+    {
+      "path": "package.json",
+      "sha256": "2f7725c4677868b1eb06e25c08cf81f798efdd9fb8746ab3078a479f98f17c2d"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "099accfa5d43a2b918cfda0b26e0a7f579707b9531b7ca9d8b580153c98cbe5c"
+    },
+    {
+      "path": "compose.yaml",
+      "sha256": "20acebe9bf0ad6c60fd95bc3c414ac221952aabc41c42cb046ee75de54ba82e5"
+    },
+    {
+      "path": "apps/api/src/workbook-archive.ts",
+      "sha256": "078ccb388674e3f706cc8893a7892fac3b91e1d58a5b93ed03cf1f1281dcaa63"
+    },
+    {
+      "path": "apps/api/src/artifact-crypto.ts",
+      "sha256": "5cd91c27dc49673eae517ce05ab4d08b81b203fb45409a987ccdf73b90074bf6"
+    },
+    {
+      "path": "apps/api/src/main.ts",
+      "sha256": "a4e793c065d25f9b172a52c5c0d5888839967087457fed389580c90fff9713d1"
+    },
+    {
+      "path": "apps/worker/src/live-run.ts",
+      "sha256": "1152e2b7046626bc0c204393db850bd5ee76bfb735b68db7b2f4baf84fc84e37"
+    },
+    {
+      "path": "apps/api/src/run-submissions.ts",
+      "sha256": "a84ca4368aef89da2c90b606b83df9a0e175415032a04b0bd7e66cd59e597697"
+    },
+    {
+      "path": "apps/api/src/prepared-set-executions.ts",
+      "sha256": "080860d2eb861fa3d9d72a0128e65687bd1a5d7ea8b9f40b42932f1701884c05"
+    },
+    {
+      "path": "docker/postgres/ensure-runtime-roles.sh",
+      "sha256": "dd9e0f0339a06f272461cbbd4deb42455fa828e4437b04699738cb092fae66ad"
+    },
+    {
+      "path": "scripts/test-module.cjs",
+      "sha256": "713772d05805bd659ac436e34f4a621579cf43d467999ac660b60b7046c834d3"
+    },
+    {
+      "path": "scripts/test-module.test.cjs",
+      "sha256": "d30f12b2064b267653f9767afa9f6066d5cebb52835c93dba73013aa862bdd40"
+    }
+  ],
+  "evidenceFiles": [
+    "backup-crypto.log",
+    "bounded-audit-probes.cjs",
+    "bounded-audit-probes.log",
+    "build.log",
+    "compensa-browser.log",
+    "deletion-history-ui.log",
+    "docker-runtime.log",
+    "everest-browser.log",
+    "lead-ui.log",
+    "manager-ui.log",
+    "module-runner.log",
+    "npm-audit-production.json",
+    "pzu-browser.log",
+    "review-ui.log",
+    "run-submission-ui.log",
+    "security-browser.log",
+    "ufg-browser.log",
+    "unit-tests.log"
+  ]
+}

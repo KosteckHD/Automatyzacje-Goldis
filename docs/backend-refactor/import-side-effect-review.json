@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-16",
+  "scope": "Production TypeScript source files categorized as source in inventory.json. Test files and migration files are excluded. Scanner checks selected top-level environment reads, client construction, timers, process creation, listeners, connection/start calls and dynamic imports. It does not prove absence of every possible JavaScript side effect or inspect effects inside imported functions.",
+  "candidateFiles": []
+}

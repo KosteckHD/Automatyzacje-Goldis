@@ -4,23 +4,16 @@ Worker utrzymuje jeden dedykowany profil Chromium i jest jego jedynym właścici
 
 ## Konfiguracja Windows
 
-1. Skopiuj `.env.windows.example` do prywatnego `.env.local`, uzupełnij lokalne hasła i klucze oraz ustaw ścieżki na swoim komputerze. Przykładowe klucze są placeholderami; wygeneruj własne losowe sekrety. Nie zapisuj `.env.local`, profilu Chromium ani plików staging w Git.
-2. Na potrzeby trybu lokalnego uruchom PostgreSQL i Redis na portach loopback:
+1. Uruchom `npm ci`, a następnie `npm run setup:local`. Skrypt tworzy `.env.local` z losowymi sekretami, ogranicza jego ACL do bieżącego użytkownika, SYSTEM i administratorów lokalnych oraz odmawia nadpisania istniejącego pliku. Hasło pierwszego administratora znajduje się w `.env.local`; pierwsze logowanie wymusza jego zmianę. Dostawcy rejestru i portale są wyłączeni. Nie zapisuj `.env.local`, profilu Chromium ani plików staging w Git.
+2. Uruchom panel, API i widocznego workera:
 
    ```powershell
-   docker compose --env-file .env.local -f compose.yaml -f compose.local-browser.yaml up -d postgres redis
+   npm run start:local
    ```
 
-3. Uruchom API, panel i jeden widoczny worker z repozytorium:
+   Skrypt automatycznie uruchamia tylko PostgreSQL i Redis w odizolowanym projekcie Compose `goldis-local`, buduje workspace’y, wykonuje preflight bez ujawniania wartości środowiska, uruchamia migracje, ponawia preflight schematu i dopiero potem startuje API, panel oraz workery. `Ctrl+C` zamyka procesy aplikacji wraz z ich potomkami; kontenery bazy/Redis i ich dane pozostają. Logi usług trafiają do `%LOCALAPPDATA%\Goldis\logs`. Aby pominąć start kontenerów, użyj `npm run start:local -- -SkipDataServices`.
 
-   ```powershell
-   npm ci
-   npm run start:local -- -EnvFile .env.local
-   ```
-
-   Skrypt buduje workspace’y, wykonuje preflight bez ujawniania wartości środowiska, uruchamia migracje, ponawia preflight schematu i dopiero potem startuje trzy własne procesy. `Ctrl+C` zamyka tylko te procesy wraz z ich potomkami; nie wyszukuje ani nie kończy obcych Node/Chrome. Logi usług trafiają do `%LOCALAPPDATA%\Goldis\logs`.
-
-4. Otwórz `http://localhost:3000`. Panel rozróżnia dostępność API/DB/Redis, heartbeat workera i stan „Portale wyłączone”. `/api/health/live` to liveness, `/api/health/ready` sprawdza DB/Redis, a `/api/health/automation` pokazuje bezpieczny stan workera/configu bez sekretów i ścieżek.
+3. Otwórz `http://127.0.0.1:3000`. Panel rozróżnia dostępność API/DB/Redis, heartbeat workera i stan „Portale wyłączone”. `/api/health/live` to liveness, `/api/health/ready` sprawdza DB/Redis, a `/api/health/automation` pokazuje bezpieczny stan workera/configu bez sekretów i ścieżek.
 
 W trybie `off` nie są wymagane loginy i hasła portali, ale wymagane są dostępne usługi, klucz szyfrowania PESEL, sekret wewnętrznego kanału i prywatny trwały katalog profilu. Runy zostają w stanie oczekiwania na adapter i nie otwierają portali.
 

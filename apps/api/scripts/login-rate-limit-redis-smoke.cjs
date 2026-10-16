@@ -1,33 +1,49 @@
 const assert = require("node:assert/strict");
 const { randomUUID } = require("node:crypto");
+let smokePhase = "startup";
 
 async function main() {
   const redisUrl = process.env.REDIS_URL;
-  if (!redisUrl) throw new Error("REDIS_URL is required; use an isolated test Redis");
+  if (!redisUrl || process.env.GOLDIS_TEST_REDIS_DISPOSABLE !== "1") {
+    throw new Error("GOLDIS_TEST_REDIS_DISPOSABLE_REQUIRED");
+  }
+  const parsedRedisUrl = new URL(redisUrl);
+  if (!new Set(["127.0.0.1", "localhost", "::1"]).has(parsedRedisUrl.hostname.replace(/^\[|\]$/g, ""))
+    || parsedRedisUrl.protocol !== "redis:" || parsedRedisUrl.username || parsedRedisUrl.password) {
+    throw new Error("LOCAL_DISPOSABLE_REDIS_REQUIRED");
+  }
 
   const prefix = `goldis:auth:login:smoke:${process.pid}:${randomUUID()}`;
   process.env.SESSION_SECRET = "synthetic-login-rate-limit-redis-smoke-secret";
   process.env.LOGIN_RATE_LIMIT_KEY_PREFIX = prefix;
   const RedisModule = require("ioredis");
   const Redis = RedisModule.default || RedisModule;
-  const { LoginRateLimiter } = require("../dist/login-rate-limiter.js");
+  const { LoginRateLimiter } = require("../dist/features/auth");
   const limiter = new LoginRateLimiter();
   const cleanup = new Redis(redisUrl, { maxRetriesPerRequest: 1 });
 
   try {
+    let lastAllowed;
     for (let attempt = 0; attempt < 5; attempt += 1) {
-      assert.equal((await limiter.consumeAttempt("synthetic.user", "203.0.113.77")).allowed, true);
+      smokePhase = `pair-attempt-${attempt + 1}`;
+      lastAllowed = await limiter.consumeAttempt("synthetic.user", "203.0.113.77");
+      assert.equal(lastAllowed.allowed, true);
     }
+    smokePhase = "pair-limit-denial";
     const blockedPair = await limiter.consumeAttempt("SYNTHETIC.USER", "203.0.113.77");
     assert.equal(blockedPair.allowed, false);
     assert.ok(blockedPair.retryAfterSeconds > 0);
 
-    await limiter.clearPair("synthetic.user", "203.0.113.77");
+    smokePhase = "clear-pair";
+    await limiter.clearPair("synthetic.user", "203.0.113.77", lastAllowed);
+    smokePhase = "pair-clear-follow-up";
     assert.equal((await limiter.consumeAttempt("synthetic.user", "203.0.113.77")).allowed, true);
 
     for (let attempt = 0; attempt < 60; attempt += 1) {
+      smokePhase = `ip-attempt-${attempt + 1}`;
       assert.equal((await limiter.consumeAttempt(`synthetic-${attempt}`, "203.0.113.78")).allowed, true);
     }
+    smokePhase = "ip-limit-denial";
     const blockedIp = await limiter.consumeAttempt("synthetic-last", "203.0.113.78");
     assert.equal(blockedIp.allowed, false);
     assert.ok(blockedIp.retryAfterSeconds > 0);
@@ -44,6 +60,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  process.stderr.write(`LOGIN_RATE_LIMIT_REDIS_SMOKE_FAIL ${error instanceof Error ? error.message : "unknown"}\n`);
+  process.stderr.write(`LOGIN_RATE_LIMIT_REDIS_SMOKE_FAIL phase=${smokePhase} ${error instanceof Error ? error.message : "unknown"}\n`);
   process.exitCode = 1;
 });

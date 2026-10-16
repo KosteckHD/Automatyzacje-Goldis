@@ -1,0 +1,1752 @@
+[
+  {
+    "file": "ui-_-1280.json",
+    "text": "ZADANIA REJESTRU",
+    "className": "eyebrow",
+    "color": "rgb(217, 182, 95)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "10.88px",
+    "contrast": 1.892
+  },
+  {
+    "file": "ui-_-1280.json",
+    "text": "Wzbogacanie NIP → REGON",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "16.8px",
+    "contrast": 1.127
+  },
+  {
+    "file": "ui-_-1280.json",
+    "text": "Wybierz zakres numerów wierszy z arkusza. Wybór nie zależy od aktualnej strony tabeli.",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "15px",
+    "contrast": 1.127
+  },
+  {
+    "file": "ui-_-1280.json",
+    "text": "5.10.2026, 12:00:00",
+    "className": "review-subline",
+    "color": "rgb(166, 163, 154)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "11.52px",
+    "contrast": 2.455
+  },
+  {
+    "file": "ui-_-1280.json",
+    "text": "Wiersz 18000",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "ZADANIA REJESTRU",
+    "className": "eyebrow",
+    "color": "rgb(217, 182, 95)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "10.88px",
+    "contrast": 1.892
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wzbogacanie NIP → REGON",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "16.8px",
+    "contrast": 1.127
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wybierz zakres numerów wierszy z arkusza. Wybór nie zależy od aktualnej strony tabeli.",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "15px",
+    "contrast": 1.127
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "6.10.2026, 12:00:00",
+    "className": "review-subline",
+    "color": "rgb(166, 163, 154)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "11.52px",
+    "contrast": 2.455
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18001",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18002",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18003",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18004",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18005",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18006",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18007",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18008",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18009",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18010",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18011",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18012",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18013",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18014",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18015",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18016",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18017",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18018",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18019",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18020",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18021",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18022",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18023",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18024",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18025",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18026",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18027",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18028",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18029",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18030",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18031",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18032",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18033",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18034",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18035",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18036",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18037",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18038",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18039",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18040",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18041",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18042",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18043",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18044",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18045",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18046",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18047",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18048",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18049",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Wiersz 18050",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-1920.json",
+    "text": "Załadowano 50 z 52 pozycji",
+    "className": "",
+    "color": "rgb(166, 163, 154)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "12px",
+    "contrast": 2.455
+  },
+  {
+    "file": "ui-_-320.json",
+    "text": "ZADANIA REJESTRU",
+    "className": "eyebrow",
+    "color": "rgb(217, 182, 95)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "10.88px",
+    "contrast": 1.892
+  },
+  {
+    "file": "ui-_-320.json",
+    "text": "Wzbogacanie NIP → REGON",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "16.8px",
+    "contrast": 1.127
+  },
+  {
+    "file": "ui-_-320.json",
+    "text": "Wybierz zakres numerów wierszy z arkusza. Wybór nie zależy od aktualnej strony tabeli.",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "15px",
+    "contrast": 1.127
+  },
+  {
+    "file": "ui-_-320.json",
+    "text": "6.10.2026, 12:00:00",
+    "className": "review-subline",
+    "color": "rgb(166, 163, 154)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "11.52px",
+    "contrast": 2.455
+  },
+  {
+    "file": "ui-_-320.json",
+    "text": "Wiersz 18000",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "ZADANIA REJESTRU",
+    "className": "eyebrow",
+    "color": "rgb(217, 182, 95)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "10.88px",
+    "contrast": 1.892
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wzbogacanie NIP → REGON",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "16.8px",
+    "contrast": 1.127
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wybierz zakres numerów wierszy z arkusza. Wybór nie zależy od aktualnej strony tabeli.",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "15px",
+    "contrast": 1.127
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "6.10.2026, 12:00:00",
+    "className": "review-subline",
+    "color": "rgb(166, 163, 154)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "11.52px",
+    "contrast": 2.455
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18001",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18002",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18003",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18004",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18005",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18006",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18007",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18008",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18009",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18010",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18011",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18012",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18013",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18014",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18015",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18016",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18017",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18018",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18019",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18020",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18021",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18022",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18023",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18024",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18025",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18026",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18027",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18028",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18029",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18030",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18031",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18032",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18033",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18034",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18035",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18036",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18037",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18038",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18039",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18040",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18041",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18042",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18043",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18044",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18045",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18046",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18047",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18048",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18049",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Wiersz 18050",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-390.json",
+    "text": "Załadowano 50 z 52 pozycji",
+    "className": "",
+    "color": "rgb(166, 163, 154)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "12px",
+    "contrast": 2.455
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "ZADANIA REJESTRU",
+    "className": "eyebrow",
+    "color": "rgb(217, 182, 95)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "10.88px",
+    "contrast": 1.892
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wzbogacanie NIP → REGON",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "16.8px",
+    "contrast": 1.127
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wybierz zakres numerów wierszy z arkusza. Wybór nie zależy od aktualnej strony tabeli.",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "15px",
+    "contrast": 1.127
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "6.10.2026, 12:00:00",
+    "className": "review-subline",
+    "color": "rgb(166, 163, 154)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "11.52px",
+    "contrast": 2.455
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18001",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18002",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18003",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18004",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18005",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18006",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18007",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18008",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18009",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18010",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18011",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18012",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18013",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18014",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18015",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18016",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18017",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18018",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18019",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18020",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18021",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18022",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18023",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18024",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18025",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18026",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18027",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18028",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18029",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18030",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18031",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18032",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18033",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18034",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18035",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18036",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18037",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18038",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18039",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18040",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18041",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18042",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18043",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18044",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18045",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18046",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18047",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18048",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18049",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Wiersz 18050",
+    "className": "",
+    "color": "rgb(242, 238, 229)",
+    "background": "rgb(255, 255, 255)",
+    "backgroundClass": "",
+    "fontSize": "11.84px",
+    "contrast": 1.158
+  },
+  {
+    "file": "ui-_-768.json",
+    "text": "Załadowano 50 z 52 pozycji",
+    "className": "",
+    "color": "rgb(166, 163, 154)",
+    "background": "rgb(251, 252, 253)",
+    "backgroundClass": "enrichment-job-panel",
+    "fontSize": "12px",
+    "contrast": 2.455
+  }
+]

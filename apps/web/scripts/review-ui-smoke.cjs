@@ -46,6 +46,9 @@ async function main() {
     let conflictResolutions = 0;
     let correctionStatus = "pending";
     let correctionQueueRevision = 0;
+    let operatorCorrectionStatus = "approved";
+    const operatorQueueQueries = [];
+    const queueReads = [];
     let role = "reviewer";
     page.on("pageerror", (error) => pageErrors.push(error.message));
     await page.route("**/api/**", async (route) => {
@@ -55,12 +58,13 @@ async function main() {
       let status = 200;
       let body;
       if (url.pathname === "/api/auth/me") {
-        body = { role, username: "synthetic.reviewer", csrfToken, mustChangePassword: false };
+        body = { role, username: "synthetic.reviewer", userId: "11111111-1111-4111-8111-111111111111", tenantId: "99999999-9999-4999-8999-999999999999", csrfToken, mustChangePassword: false };
       } else if (url.pathname === "/api/review/corrections") {
+        queueReads.push(url.pathname);
         correctionQueueRevision += 1;
         body = { items: correctionStatus === "pending" ? [{
           id: correctionId, status: correctionStatus, createdAt: "2026-09-30T10:00:00.000Z", previousRegon: "012345678",
-          proposedRegon: "987654321", reason: "Potwierdzono dokument syntetyczny", rowNumber: 18001, rowVersion: correctionQueueRevision > 1 ? 5 : 4,
+          proposedRegon: "987654321", reason: "Potwierdzono dokument syntetyczny", rowNumber: 18001, rowVersion: correctionDecisions > 0 ? 5 : 4,
           companyName: "Firma testowa Alfa", batchId: "33333333-3333-4333-8333-333333333333", toolId: "oc-policy-verification",
         }] : [], nextCursor: null, hasMore: false, limit: 50 };
       } else if (url.pathname === `/api/review/corrections/${correctionId}/decision` && method === "POST") {
@@ -69,6 +73,7 @@ async function main() {
         if (correctionDecisions === 1) { status = 409; body = { message: "stale" }; }
         else { correctionStatus = request.postDataJSON().decision; body = { decision: correctionStatus, rowVersion: 5 }; }
       } else if (url.pathname === "/api/review/conflicts") {
+        queueReads.push(url.pathname);
         body = { items: [{
           id: conflictId, status: "open", createdAt: "2026-09-30T11:00:00.000Z", reasonCode: "SAME_NIP_DIFFERENT_REGON",
           rowNumber: 18002, rowVersion: 8, companyName: "Firma testowa Beta", effectiveRegon: "123456789",
@@ -80,11 +85,17 @@ async function main() {
         conflictResolutions += 1;
         body = { decision: request.postDataJSON().action, rowVersion: 9 };
       } else if (url.pathname === "/api/review/my-corrections") {
+        queueReads.push(url.pathname);
+        operatorQueueQueries.push(Object.fromEntries(url.searchParams.entries()));
         body = { items: [{
-          id: correctionId, status: "pending", createdAt: "2026-09-30T10:00:00.000Z", previousRegon: null,
+          id: correctionId, status: operatorCorrectionStatus, createdAt: "2026-09-30T10:00:00.000Z", previousRegon: null,
           proposedRegon: "987654321", reason: "Moja syntetyczna propozycja", rowNumber: 18001, rowVersion: 4,
           companyName: "Firma testowa Alfa", batchId: "33333333-3333-4333-8333-333333333333", toolId: "oc-policy-verification",
+          reviewedAt: operatorCorrectionStatus === "pending" ? null : "2026-09-30T12:00:00.000Z",
+          reviewReason: operatorCorrectionStatus === "pending" ? null : operatorCorrectionStatus === "rejected" ? "OTHER" : "REGISTRY_MATCH_VERIFIED",
         }], nextCursor: null, hasMore: false, limit: 50 };
+      } else if (url.pathname === "/api/leads") {
+        body = { items: [], nextCursor: null };
       } else {
         status = 404; body = { message: "unexpected synthetic request" };
       }
@@ -93,6 +104,9 @@ async function main() {
 
     await page.goto(`${baseUrl}/review`);
     await page.getByRole("heading", { name: "Korekty REGON" }).waitFor({ state: "visible" });
+    await page.locator(".lead-sidebar").waitFor({ state: "visible" });
+    assert.equal(await page.locator(".lead-sidebar").count(), 1, "review route uses the shared role navigation once");
+    assert.equal(await page.locator(".admin-rail").count(), 0, "review content does not render a second global navigation");
     await page.getByRole("button", { name: "Rozpatrz korektę" }).click();
     await page.getByRole("button", { name: "Zatwierdź" }).click();
     await page.getByRole("alert").getByText(/Wiersz zmienił się/).waitFor({ state: "visible" });
@@ -117,16 +131,42 @@ async function main() {
     assert.deepEqual(requests.at(-1).body, { action: "link_existing", expectedRowVersion: 8, reasonCode: "IDENTIFIERS_VERIFIED", canonicalEntityId: candidateId });
 
     role = "operator";
-    await page.goto(`${baseUrl}/review`);
+    await page.goto(`${baseUrl}/my-results`);
+    await page.getByRole("heading", { name: "Moje wyniki" }).waitFor({ state: "visible" });
+    await page.getByRole("link", { name: "Moje korekty" }).click();
+    await page.getByRole("heading", { name: "Moje propozycje korekt" }).waitFor({ state: "visible" });
+    await page.goto(`${baseUrl}/review?tab=conflicts&status=resolved&batchId=33333333-3333-4333-8333-333333333333`);
     await page.getByRole("heading", { name: "Moje propozycje korekt" }).waitFor({ state: "visible" });
     await page.getByText("Moja syntetyczna propozycja").waitFor({ state: "visible" });
+    await page.getByText("Potwierdzono zgodność z rejestrem").waitFor({ state: "visible" });
+    await page.getByRole("link", { name: "Otwórz import" }).waitFor({ state: "visible" });
+    await page.locator(".review-decision-meta").getByText(/Decyzja z/).waitFor({ state: "visible" });
+    await page.waitForFunction(() => new URLSearchParams(window.location.search).get("tab") === "corrections"
+      && !new URLSearchParams(window.location.search).has("status"));
+    assert.equal(operatorQueueQueries.at(-1).batchId, "33333333-3333-4333-8333-333333333333", "operator's correction link retains its import filter");
+    assert.equal(operatorQueueQueries.at(-1).status, undefined, "operator cannot send conflict statuses to the corrections endpoint");
     assert.equal(await page.getByRole("button", { name: "Rozpatrz korektę" }).count(), 0, "operator widzi status bez kontrolki decyzji");
     assert.equal(requests.filter((request) => request.path.endsWith("/decision")).length, 2);
+
+    operatorCorrectionStatus = "pending";
+    await page.reload();
+    await page.getByText("Oczekuje na weryfikację", { exact: true }).waitFor({ state: "visible" });
+    assert.equal(await page.locator(".review-decision-meta").count(), 0, "pending correction has no decision date or reason");
+    operatorCorrectionStatus = "rejected";
+    await page.reload();
+    await page.getByText("Odrzucona", { exact: true }).waitFor({ state: "visible" });
+    await page.getByText("Inny udokumentowany powód").waitFor({ state: "visible" });
+    await page.locator(".review-decision-meta").getByText(/Decyzja z/).waitFor({ state: "visible" });
 
     await page.setViewportSize({ width: 375, height: 812 });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false, "brak overflow poziomego przy 375 px");
     assert.deepEqual(pageErrors, [], "brak błędów JavaScript");
     assert.ok(correctionQueueRevision >= 3, "po konflikcie wersji kolejka została odczytana ponownie po ręcznym odświeżeniu");
+    const queueReadsBeforeAuditor = queueReads.length;
+    role = "auditor";
+    await page.goto(`${baseUrl}/review`);
+    await page.getByRole("heading", { name: "Brak dostępu do danych operacyjnych" }).waitFor({ state: "visible" });
+    assert.equal(queueReads.length, queueReadsBeforeAuditor, "auditor does not request review queue data");
     console.log("REVIEW_UI_SMOKE_PASS correction=409-no-retry-then-approved conflict=tenant-candidate-linked csrf=true operator=status-only mobile=375-no-overflow synthetic-only=true api=stubbed");
   } finally {
     if (browser) await browser.close();

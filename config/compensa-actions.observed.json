@@ -1,0 +1,8 @@
+{
+  "source": "user-provided-dom-2026-10-10-and-live-client-choice-2026-10-15",
+  "customerMatches": "ux-dialog .tm-grid-customer-matches-dialog",
+  "customerMatchSelect": "button:has-text(\"Wybierz Klienta\")",
+  "saveButton": "insured-section button:has(span.i-save):has-text(\"Zapisz\"):visible",
+  "verifyUfgButton": "button[id^=\"VerificationStatus\"]:has(span.i-accept):has-text(\"Weryfikacja\"):has-text(\"UFG\"):visible",
+  "openUfgSummary": "button:has(span.i-search):has-text(\"Szczegóły\"):has-text(\"weryfikacji\"):has-text(\"UFG\"):visible"
+}

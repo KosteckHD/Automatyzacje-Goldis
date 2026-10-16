@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 
 type PreviewItem = { rowNumber: number; state: "ready" | "review" | "excluded"; reasonCode: string | null; alreadyActive: boolean };
 type Preview = {
@@ -9,8 +9,30 @@ type Preview = {
   counts: { selected: number; ready: number; needsReview: number; excluded: number; uniqueGroups: number; alreadyActive: number };
   items: PreviewItem[];
 };
+type WholePreview = {
+  preparationId: string;
+  revision: number;
+  snapshotFingerprint: string;
+  totalRows: number;
+  referenceDate: string;
+  counts: { ready: number; review: number; duplicates: number; skippedNoIdentifiers: number; waitingRegistry: number };
+};
+type WholeExecution = {
+  executionId: string;
+  status: "queued" | "running" | "waiting_attention" | "pause_requested" | "paused" | "completed" | "cancelled" | "failed";
+  version: number;
+  referenceDate: string;
+  totalRows: number;
+  chunkCount: number;
+  progress: { generatedChunks: number; completedChunks: number; activeChunks: number; waitingChunks: number; failedChunks: number; cancelledChunks: number };
+  chunks?: { ordinal: number; firstRowNumber: number; lastRowNumber: number; rowCount: number;
+    status: string; childSubmissionId: string | null; finishedAt: string | null }[];
+  chunkPage?: { nextAfterOrdinal: number | null };
+  errorCode: string | null;
+};
 
 const reasons: Record<string, string> = {
+  DUPLICATE_SOURCE_ROW: "duplikat — pominięty w zestawie roboczym; źródłowy import pozostaje zachowany",
   PENDING_REGON_CORRECTION: "oczekuje korekta REGON",
   OPEN_ENTITY_CONFLICT: "otwarty konflikt grupowania",
   REGON_REQUIRED: "brak REGON-u",
@@ -22,6 +44,10 @@ const reasons: Record<string, string> = {
   NAME_MISMATCH: "nazwa firmy wymaga sprawdzenia",
   SOURCE_LINK_MISMATCH: "powiązanie firmy wymaga sprawdzenia",
   ACTIVE_RUN_REFERENCE_DATE_MISMATCH: "aktywne zadanie ma inną datę odniesienia",
+};
+const chunkStatusLabels: Record<string, string> = {
+  queued: "w kolejce", submitting: "przekazywana", running: "w toku", waiting_attention: "wymaga uwagi",
+  completed: "zakończona", cancelled: "anulowana", failed: "błąd",
 };
 
 function parseRows(value: string): number[] {
@@ -53,6 +79,96 @@ export default function RunSubmissionLauncher({ batchId, csrfToken }: { batchId:
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const idempotencyKey = useRef("");
+  const wholeIdempotencyKey = useRef("");
+  const [wholePreview, setWholePreview] = useState<WholePreview | null>(null);
+  const [wholeExecution, setWholeExecution] = useState<WholeExecution | null>(null);
+  const [chunkAfterOrdinal, setChunkAfterOrdinal] = useState(0);
+  const [wholeConfirmed, setWholeConfirmed] = useState(false);
+  const [wholeBusy, setWholeBusy] = useState(false);
+  const [wholeError, setWholeError] = useState("");
+  const [wholeNotice, setWholeNotice] = useState("");
+
+  useEffect(() => {
+    if (!wholeExecution || ["paused", "completed", "cancelled", "failed"].includes(wholeExecution.status)) return;
+    let stopped = false;
+    let inFlight = false;
+    const poll = async () => {
+      if (inFlight || stopped) return;
+      inFlight = true;
+      try {
+        const cursor = chunkAfterOrdinal > 0 ? `?afterOrdinal=${chunkAfterOrdinal}` : "";
+        const response = await fetch(`/api/imports/${batchId}/prepared-set-executions/${wholeExecution.executionId}${cursor}`, { credentials: "same-origin" });
+        const current = await readPayload<WholeExecution>(response);
+        if (!stopped) { setWholeExecution(current); setWholeError(""); }
+      } catch (cause) {
+        if (!stopped) setWholeError(cause instanceof Error ? cause.message : "Nie udało się odświeżyć stanu całego importu.");
+      } finally { inFlight = false; }
+    };
+    void poll();
+    const timer = window.setInterval(() => void poll(), 3_000);
+    return () => { stopped = true; window.clearInterval(timer); };
+  }, [batchId, wholeExecution?.executionId, wholeExecution?.status, chunkAfterOrdinal]);
+
+  async function previewWholeImport() {
+    if (wholeBusy) return;
+    setWholeBusy(true); setWholeError(""); setWholeNotice(""); setWholePreview(null); setWholeConfirmed(false);
+    try {
+      const response = await fetch(`/api/imports/${batchId}/prepared-set-executions/preview`, { credentials: "same-origin" });
+      setWholePreview(await readPayload<WholePreview>(response));
+      wholeIdempotencyKey.current = "";
+      setWholeNotice("Podgląd obejmuje całą najnowszą, zakończoną rewizję przygotowania. Żadne zadanie nie zostało jeszcze uruchomione.");
+    } catch (cause) { setWholeError(cause instanceof Error ? cause.message : "Nie udało się przygotować podglądu całego importu."); }
+    finally { setWholeBusy(false); }
+  }
+
+  async function startWholeImport() {
+    if (!wholePreview || !wholeConfirmed || wholeBusy) return;
+    setWholeBusy(true); setWholeError(""); setWholeNotice("");
+    try {
+      if (!csrfToken) throw new Error("Brak tokenu bezpieczeństwa sesji. Odśwież stronę.");
+      if (!wholeIdempotencyKey.current) wholeIdempotencyKey.current = crypto.randomUUID();
+      const response = await fetch(`/api/imports/${batchId}/prepared-set-executions`, {
+        method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+        body: JSON.stringify({ idempotencyKey: wholeIdempotencyKey.current,
+          preparationId: wholePreview.preparationId, snapshotFingerprint: wholePreview.snapshotFingerprint }),
+      });
+      setWholeExecution(await readPayload<WholeExecution>(response));
+      setChunkAfterOrdinal(0);
+      setWholePreview(null); setWholeConfirmed(false);
+      setWholeNotice("Cały zestaw zapisano. Postęp aktualizuje się automatycznie; ponowienie żądania nie tworzy drugiego zestawu.");
+    } catch (cause) { setWholeError(cause instanceof Error ? cause.message : "Nie udało się uruchomić całego importu."); }
+    finally { setWholeBusy(false); }
+  }
+
+  async function cancelWholeImport() {
+    if (!wholeExecution || wholeBusy || !csrfToken) return;
+    setWholeBusy(true); setWholeError("");
+    try {
+      const response = await fetch(`/api/imports/${batchId}/prepared-set-executions/${wholeExecution.executionId}/cancel`, {
+        method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+        body: JSON.stringify({ expectedVersion: wholeExecution.version }),
+      });
+      setWholeExecution(await readPayload<WholeExecution>(response));
+      setChunkAfterOrdinal(0);
+    } catch (cause) { setWholeError(cause instanceof Error ? cause.message : "Nie udało się anulować całego importu."); }
+    finally { setWholeBusy(false); }
+  }
+
+  async function setWholeImportControl(action: "pause" | "resume") {
+    if (!wholeExecution || wholeBusy || !csrfToken) return;
+    setWholeBusy(true); setWholeError("");
+    try {
+      const response = await fetch(`/api/imports/${batchId}/prepared-set-executions/${wholeExecution.executionId}/${action}`, {
+        method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+        body: JSON.stringify({ expectedVersion: wholeExecution.version }),
+      });
+      setWholeExecution(await readPayload<WholeExecution>(response));
+      setChunkAfterOrdinal(0);
+    } catch (cause) { setWholeError(cause instanceof Error ? cause.message : action === "pause" ? "Nie udało się wstrzymać całego importu." : "Nie udało się wznowić całego importu."); }
+    finally { setWholeBusy(false); }
+  }
+
+  const wholeExecutionTerminal = wholeExecution && ["completed", "cancelled", "failed"].includes(wholeExecution.status);
 
   async function requestPreview(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -95,6 +211,54 @@ export default function RunSubmissionLauncher({ batchId, csrfToken }: { batchId:
   return <section className="result-section submission-launcher" aria-labelledby="submission-launch-title">
     <div className="section-head"><div><p className="eyebrow">URUCHOMIENIE PARTII</p><h2 id="submission-launch-title">Sprawdź wiele wierszy</h2></div></div>
     <p>Najpierw zobaczysz, które wiersze są gotowe, wymagają kontroli lub zostaną pominięte. Zadania powstaną dopiero po osobnym potwierdzeniu.</p>
+    <div className="prepared-set-control" aria-labelledby="prepared-set-title">
+      <div><h3 id="prepared-set-title">Uruchom cały przygotowany import</h3>
+        <p>System użyje najnowszej zakończonej rewizji, zachowa rozliczenie duplikatów i podzieli wszystkie wiersze na porcje do 500. Przed startem pokaże podsumowanie gotowości. Pauza czeka na bezpieczny koniec przyjętej porcji; anulowanie kończy dalsze porcje.</p></div>
+      {(!wholeExecution || wholeExecutionTerminal) && <button className="submission-primary" type="button" onClick={() => void previewWholeImport()} disabled={wholeBusy || !csrfToken}>
+        {wholeBusy ? "Sprawdzam przygotowanie…" : wholeExecution ? "Przygotuj nowe wykonanie" : "Pokaż podsumowanie całego importu"}
+      </button>}
+      {wholeError && <p className="error" role="alert">{wholeError}</p>}
+      {wholeNotice && !wholeError && <p className="submission-notice" role="status">{wholeNotice}</p>}
+      {wholePreview && <div className="prepared-set-preview">
+        <h4>Rewizja {wholePreview.revision} · data {wholePreview.referenceDate}</h4>
+        <dl className="submission-counts">
+          <div><dt>Wszystkie wiersze</dt><dd>{wholePreview.totalRows}</dd></div>
+          <div><dt>Gotowe do sprawdzenia</dt><dd>{wholePreview.counts.ready}</dd></div>
+          <div><dt>Do kontroli</dt><dd>{wholePreview.counts.review}</dd></div>
+          <div><dt>Duplikaty</dt><dd>{wholePreview.counts.duplicates}</dd></div>
+          <div><dt>Bez NIP i REGON</dt><dd>{wholePreview.counts.skippedNoIdentifiers}</dd></div>
+          <div><dt>Oczekuje REGON</dt><dd>{wholePreview.counts.waitingRegistry}</dd></div>
+        </dl>
+        {wholePreview.counts.ready > 0 ? <>
+          <label className="submission-confirm"><input type="checkbox" checked={wholeConfirmed} onChange={(event) => setWholeConfirmed(event.target.checked)} />Potwierdzam uruchomienie wszystkich {wholePreview.counts.ready} gotowych wierszy z tej rewizji.</label>
+          <button className="submission-primary" type="button" onClick={() => void startWholeImport()} disabled={wholeBusy || !wholeConfirmed}>
+            {wholeBusy ? "Zapisuję zestaw…" : "Potwierdź i uruchom cały import"}
+          </button>
+        </> : <p className="submission-notice">Nie ma gotowych wierszy. Rozstrzygnij problemy lub uzupełnij REGON, a potem przygotuj nową rewizję.</p>}
+      </div>}
+      {wholeExecution && <div className="prepared-set-progress" aria-live="polite">
+        <div className="prepared-set-progress-head"><h4>Cały import · {wholeExecution.status === "queued" ? "w kolejce" : wholeExecution.status === "running" ? "w toku" : wholeExecution.status === "waiting_attention" ? "wymaga uwagi" : wholeExecution.status === "pause_requested" ? "wstrzymywanie" : wholeExecution.status === "paused" ? "wstrzymany" : wholeExecution.status === "completed" ? "zakończony" : wholeExecution.status === "cancelled" ? "anulowany" : "błąd"}</h4>
+          {wholeExecution.status !== "paused" && wholeExecution.status !== "pause_requested" && wholeExecution.status !== "completed" && wholeExecution.status !== "cancelled" && wholeExecution.status !== "failed" && <button type="button" onClick={() => void setWholeImportControl("pause")} disabled={wholeBusy || !csrfToken}>Wstrzymaj po bieżącej porcji</button>}
+          {wholeExecution.status === "paused" && <button type="button" onClick={() => void setWholeImportControl("resume")} disabled={wholeBusy || !csrfToken}>Wznów import</button>}
+          {!(["completed", "cancelled", "failed"].includes(wholeExecution.status)) && <button type="button" onClick={() => void cancelWholeImport()} disabled={wholeBusy || !csrfToken}>Anuluj cały zestaw</button>}
+        </div>
+        <p>{wholeExecution.progress.completedChunks} z {wholeExecution.chunkCount || "…"} porcji zakończonych; {wholeExecution.progress.generatedChunks} utworzonych, {wholeExecution.totalRows} wierszy w zestawie.</p>
+        {wholeExecution.status === "pause_requested" && <p className="submission-notice">Nowe porcje nie będą uruchamiane. Bieżąca porcja dojdzie do bezpiecznego punktu; zewnętrznych działań już wysłanych nie można cofnąć.</p>}
+        {wholeExecution.status === "paused" && <p className="submission-notice">Wykonanie jest wstrzymane. Wznowienie kontynuuje od zapisanej porcji i nie tworzy drugiego zestawu.</p>}
+        {wholeExecution.status === "waiting_attention" && <p className="submission-notice">System wstrzymał kolejne porcje do czasu rozwiązania problemu: {wholeExecution.errorCode ?? "wymagana kontrola"}.</p>}
+        {!!wholeExecution.chunks?.length && <div className="prepared-set-chunks" aria-label="Porcje wykonania">
+          <ul>{wholeExecution.chunks.map((chunk) => <li key={chunk.ordinal}><strong>Porcja {chunk.ordinal}</strong>
+            <span>wiersze {chunk.firstRowNumber}–{chunk.lastRowNumber} · {chunk.rowCount} rekordów</span>
+            <small>{chunkStatusLabels[chunk.status] ?? "stan nieznany"}</small></li>)}</ul>
+          <div>
+            {chunkAfterOrdinal > 0 && <button type="button" onClick={() => setChunkAfterOrdinal(0)}>Pokaż pierwsze porcje</button>}
+            {wholeExecution.chunkPage?.nextAfterOrdinal !== null && wholeExecution.chunkPage?.nextAfterOrdinal !== undefined
+              && <button type="button" onClick={() => setChunkAfterOrdinal(wholeExecution.chunkPage!.nextAfterOrdinal!)}>Pokaż kolejne porcje</button>}
+          </div>
+        </div>}
+        {wholeExecution.errorCode === "PREPARATION_CHANGED" && <p className="error" role="alert">Dane zmieniły się po przygotowaniu. Utwórz nową rewizję i uruchom ją ponownie.</p>}
+      </div>}
+    </div>
     <form className="submission-selection" onSubmit={requestPreview}>
       <div className="submission-mode" role="group" aria-label="Sposób wyboru wierszy">
         <button type="button" aria-pressed={mode === "range"} onClick={() => { setMode("range"); setPreview(null); setConfirmed(false); }}>Zakres</button>

@@ -1,0 +1,2342 @@
+{
+  "pathname": "/admin",
+  "width": 1440,
+  "overflow": false,
+  "headings": [
+    {
+      "level": "H1",
+      "text": "Dostęp i jakość pracypod kontrolą."
+    },
+    {
+      "level": "H2",
+      "text": "Dostęp do narzędzi"
+    },
+    {
+      "level": "H3",
+      "text": "Konta i przypisane uprawnienia"
+    },
+    {
+      "level": "H3",
+      "text": "Katalog narzędzi"
+    },
+    {
+      "level": "H2",
+      "text": "Konta i bezpieczeństwo"
+    },
+    {
+      "level": "H3",
+      "text": "Dodaj konto"
+    },
+    {
+      "level": "H3",
+      "text": "Zarządzaj kontem"
+    },
+    {
+      "level": "H3",
+      "text": "Sesje użytkownika"
+    },
+    {
+      "level": "H2",
+      "text": "Centrum operacyjne"
+    },
+    {
+      "level": "H3",
+      "text": "Ostatnie zadania"
+    },
+    {
+      "level": "H3",
+      "text": "Kolejka interwencji"
+    },
+    {
+      "level": "H2",
+      "text": "Ustawienia automatyzacji"
+    },
+    {
+      "level": "H2",
+      "text": "Audyt z wyszukiwaniem"
+    },
+    {
+      "level": "H2",
+      "text": "Raporty i jakość pracy"
+    },
+    {
+      "level": "H3",
+      "text": "Przepustowość dzienna"
+    },
+    {
+      "level": "H3",
+      "text": "Czas i skuteczność"
+    },
+    {
+      "level": "H3",
+      "text": "Kody błędów"
+    },
+    {
+      "level": "H3",
+      "text": "Interwencje"
+    },
+    {
+      "level": "H3",
+      "text": "Tempo obsługi"
+    }
+  ],
+  "unnamed": [],
+  "smallTargets": [
+    {
+      "tag": "INPUT",
+      "text": "",
+      "width": 13,
+      "height": 13
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "width": 13,
+      "height": 13
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "width": 13,
+      "height": 13
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "width": 13,
+      "height": 13
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "width": 19,
+      "height": 19
+    }
+  ],
+  "textStyles": [
+    {
+      "text": "GOLDISpanel administracyjny",
+      "className": "admin-brand",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "admin-rail",
+      "fontSize": "15px"
+    },
+    {
+      "text": "",
+      "className": "goldis-logo goldis-logo--sidebar",
+      "color": "rgb(255, 255, 255)",
+      "background": "rgb(22, 130, 168)",
+      "backgroundClass": "goldis-logo goldis-logo--sidebar",
+      "fontSize": "23.2px"
+    },
+    {
+      "text": "panel administracyjny",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "admin-rail",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Dostępy do narzędzi",
+      "className": "",
+      "color": "rgb(182, 178, 170)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "admin-rail",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Konta i sesje",
+      "className": "",
+      "color": "rgb(182, 178, 170)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "admin-rail",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Centrum operacyjne",
+      "className": "",
+      "color": "rgb(182, 178, 170)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "admin-rail",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Przydział pracy",
+      "className": "",
+      "color": "rgb(182, 178, 170)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "admin-rail",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Automatyzacja",
+      "className": "",
+      "color": "rgb(182, 178, 170)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "admin-rail",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Audyt",
+      "className": "",
+      "color": "rgb(182, 178, 170)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "admin-rail",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Raporty jakości",
+      "className": "admin-nav-active",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgba(217, 182, 95, 0.08)",
+      "backgroundClass": "admin-nav-active",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Organizacja Goldis",
+      "className": "",
+      "color": "rgb(142, 168, 185)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "admin-rail",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Moje konto",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "admin-rail",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Powrót do narzędzi",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "admin-rail",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "OPERACJE / USTAWIENIA ORGANIZACJI",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(8, 8, 12, 0.94)",
+      "backgroundClass": "admin-topbar",
+      "fontSize": "11.04px"
+    },
+    {
+      "text": "admin.demo · administrator",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(8, 8, 12, 0.94)",
+      "backgroundClass": "admin-topbar",
+      "fontSize": "11.04px"
+    },
+    {
+      "text": "PANEL KONTROLI PLATFORMY",
+      "className": "eyebrow",
+      "color": "rgb(125, 209, 225)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Przydzielaj narzędzia, pilnuj zgłoszeń i sprawdzaj, co dzieje się z wynikami.",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "14.72px"
+    },
+    {
+      "text": "",
+      "className": "goldis-logo goldis-logo--header",
+      "color": "rgb(233, 243, 247)",
+      "background": "rgb(3, 1, 13)",
+      "backgroundClass": "goldis-logo goldis-logo--header",
+      "fontSize": "86.4px"
+    },
+    {
+      "text": "Ustawienia automatyzacji zapisane.",
+      "className": "admin-notice",
+      "color": "rgb(172, 205, 180)",
+      "background": "rgb(20, 27, 22)",
+      "backgroundClass": "admin-notice",
+      "fontSize": "13.12px"
+    },
+    {
+      "text": "AKTYWNE KONTA",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "22",
+      "className": "rb-goldis-count",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "2",
+      "className": "sr-only",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "2",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "członkowie organizacji",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "OTWARTE ZGŁOSZENIA",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "11",
+      "className": "rb-goldis-count",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "1",
+      "className": "sr-only",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "1",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "czekają na obsługę",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "ZADANIA W TOKU",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "11",
+      "className": "rb-goldis-count",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "1",
+      "className": "sr-only",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "1",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "przyjęte do realizacji",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "NARZĘDZIA",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "11",
+      "className": "rb-goldis-count",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "1",
+      "className": "sr-only",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "1",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "w katalogu platformy",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "ZAKRES DOSTĘPU",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Dostęp do narzędzi",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "32px"
+    },
+    {
+      "text": "Każdy grant określa, co dana osoba może zrobić. Brak grantu oznacza brak dostępu.",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Konta i przypisane uprawnienia",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Wybierz konto, aby edytować dostęp do poszczególnych narzędzi.",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Odśwież",
+      "className": "admin-quiet",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-quiet",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Użytkownikadmin.demo · admin · activeoperator.demo · reviewer · activeoperator.member.003 ",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Wczytaj kolejnych użytkowników",
+      "className": "admin-quiet admin-load-more",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-quiet admin-load-more",
+      "fontSize": "12px"
+    },
+    {
+      "text": "oc-policy-verification · Dostępne",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "10.56px"
+    },
+    {
+      "text": "Widoczność",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Uruchamianie",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Odczyt wyników",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Pobieranie plików",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Wersja 3",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "10.56px"
+    },
+    {
+      "text": "Zapisz grant",
+      "className": "admin-button small",
+      "color": "rgb(23, 18, 10)",
+      "background": "rgb(217, 182, 95)",
+      "backgroundClass": "admin-button small",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Cofnij dostęp",
+      "className": "admin-quiet danger",
+      "color": "rgb(239, 183, 176)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-quiet danger",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Katalog narzędzi",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-tool-list",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Lista zawiera wyłącznie narzędzia zarejestrowane w platformie.",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-tool-list",
+      "fontSize": "12px"
+    },
+    {
+      "text": "",
+      "className": "status-dot ",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(172, 205, 180)",
+      "backgroundClass": "status-dot ",
+      "fontSize": "15px"
+    },
+    {
+      "text": "oc-policy-verification",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-tool-list",
+      "fontSize": "10.08px"
+    },
+    {
+      "text": "Dostępne",
+      "className": "admin-status",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-tool-list",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "TOŻSAMOŚĆ I SESJE",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Konta i bezpieczeństwo",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "32px"
+    },
+    {
+      "text": "Hasła tymczasowe pokazuj użytkownikowi bezpiecznym kanałem. Aplikacja ich nie wysyła.",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Dodaj konto",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Login",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Hasło tymczasoweMinimum 15 znaków. Użytkownik zmieni je przy pierwszym logowaniu.",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Minimum 15 znaków. Użytkownik zmieni je przy pierwszym logowaniu.",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "10.72px"
+    },
+    {
+      "text": "RolaOperatorRecenzentAudytorAdministrator",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Utwórz konto",
+      "className": "admin-button",
+      "color": "rgb(23, 18, 10)",
+      "background": "rgb(217, 182, 95)",
+      "backgroundClass": "admin-button",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Zarządzaj kontem",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Wybierz konto w sekcji dostępów.",
+      "className": "admin-muted",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Sesje użytkownika",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Sesje są sprawdzane przy każdym żądaniu.",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "0 aktywnych",
+      "className": "admin-counter",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgba(217, 182, 95, 0.07)",
+      "backgroundClass": "admin-counter",
+      "fontSize": "10.72px"
+    },
+    {
+      "text": "Przeglądarka",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Utworzona",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Ostatnia aktywność",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Wygasa",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Status",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Chrome · Windows",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "2.10.2026, 07:00",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "2.10.2026, 08:00",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "2.10.2026, 15:00",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Wygasła",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "BIEŻĄCA PRACA",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Centrum operacyjne",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "32px"
+    },
+    {
+      "text": "Odśwież stan",
+      "className": "admin-quiet",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-quiet",
+      "fontSize": "12px"
+    },
+    {
+      "text": "API Online",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-service-strip",
+      "fontSize": "9.76px"
+    },
+    {
+      "text": "Baza Online",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-service-strip",
+      "fontSize": "9.76px"
+    },
+    {
+      "text": "Redis Online",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-service-strip",
+      "fontSize": "9.76px"
+    },
+    {
+      "text": "Worker Offline",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-service-strip",
+      "fontSize": "9.76px"
+    },
+    {
+      "text": "Portale Wyłączona · valid",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-service-strip",
+      "fontSize": "9.76px"
+    },
+    {
+      "text": "Dispatcher 0 oczekujących",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-service-strip",
+      "fontSize": "9.76px"
+    },
+    {
+      "text": "Submissiony W kolejce 1 · Zakończone 2",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-service-strip",
+      "fontSize": "9.76px"
+    },
+    {
+      "text": "Grupy zgłoszeń 3 oczekujących · najstarsze 6.10.2026, 07:00DISPATCH_CAPACITY × 2 · SOURCE_",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-service-strip",
+      "fontSize": "9.76px"
+    },
+    {
+      "text": "DISPATCH_CAPACITY × 2 · SOURCE_CONFLICT × 1",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-service-strip",
+      "fontSize": "8.13333px"
+    },
+    {
+      "text": "Wersja API 0.1.0-test",
+      "className": "",
+      "color": "rgb(93, 113, 129)",
+      "background": "rgb(245, 248, 250)",
+      "backgroundClass": "admin-runtime-manifest",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Commit abcdef123456",
+      "className": "",
+      "color": "rgb(93, 113, 129)",
+      "background": "rgb(245, 248, 250)",
+      "backgroundClass": "admin-runtime-manifest",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Digest obrazu nie podano",
+      "className": "",
+      "color": "rgb(93, 113, 129)",
+      "background": "rgb(245, 248, 250)",
+      "backgroundClass": "admin-runtime-manifest",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Schemat 029-registry-result-cache · 29 migracji",
+      "className": "",
+      "color": "rgb(93, 113, 129)",
+      "background": "rgb(245, 248, 250)",
+      "backgroundClass": "admin-runtime-manifest",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Worker rejestru Offline · API workera niedostępne",
+      "className": "",
+      "color": "rgb(93, 113, 129)",
+      "background": "rgb(245, 248, 250)",
+      "backgroundClass": "admin-enrichment-strip",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Dostawca Wyłączone",
+      "className": "",
+      "color": "rgb(93, 113, 129)",
+      "background": "rgb(245, 248, 250)",
+      "backgroundClass": "admin-enrichment-strip",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Joby oczekujące 2 · najstarszy 6.10.2026, 08:00",
+      "className": "",
+      "color": "rgb(93, 113, 129)",
+      "background": "rgb(245, 248, 250)",
+      "backgroundClass": "admin-enrichment-strip",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Budżet dzienny mf-vat: 100/100 · limit · reset 8.10.2026, 00:00 (Europe/Warsaw) · gus-bir:",
+      "className": "",
+      "color": "rgb(93, 113, 129)",
+      "background": "rgb(245, 248, 250)",
+      "backgroundClass": "admin-enrichment-strip",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Worker wzbogacania jest offline",
+      "className": "",
+      "color": "rgb(104, 126, 142)",
+      "background": "rgb(245, 248, 250)",
+      "backgroundClass": "admin-enrichment-strip",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Ostatnie zadania",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Strona po 50 rekordów. Filtry są niezależne od ustawień narzędzia i raportów.",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Filtruj zadania",
+      "className": "admin-quiet",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-quiet",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Narzędzie",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Zadanie",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Status",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Krok",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Utworzono",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Błąd",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "oc-policy-verification",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "33333333-333",
+      "className": "mono",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "waiting for sms",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "waiting for sms",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "2.10.2026, 08:00",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "—",
+      "className": "mono",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Poprzednia",
+      "className": "admin-quiet",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-quiet",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Strona 1",
+      "className": "",
+      "color": "rgb(104, 126, 142)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Następna",
+      "className": "admin-quiet",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-quiet",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Kolejka interwencji",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Przydział nie zmienia stanu zadania. Konflikt rewizji trzeba odświeżyć przed kolejną zmian",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Znajdź odbiorcę przydziału",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Filtruj zgłoszenia",
+      "className": "admin-quiet",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-quiet",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Priorytet / zgłoszenie",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Zadanie",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Osoba",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Termin",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Rewizja",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Akcje",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Normalnysms · SMS_TIMEOUT · wiersz 18002",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Normalny",
+      "className": "priority-chip normal",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(37, 36, 42)",
+      "backgroundClass": "priority-chip normal",
+      "fontSize": "10.24px"
+    },
+    {
+      "text": "sms · SMS_TIMEOUT · wiersz 18002",
+      "className": "admin-cell-sub",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "10.24px"
+    },
+    {
+      "text": "33333333oc-policy-verification · waiting_for_sms",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "33333333",
+      "className": "mono",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "oc-policy-verification · waiting_for_sms",
+      "className": "admin-cell-sub",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "10.24px"
+    },
+    {
+      "text": "Nieprzypisaneadmin.demo · adminoperator.demo · revieweroperator.member.003 · operatoropera",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Europe/Warsaw. Nieedytowany termin zachowuje dokładny zapis.",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Europe/Warsaw. Nieedytowany termin zachowuje dokładny zapis.",
+      "className": "",
+      "color": "rgb(104, 126, 142)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "2",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "ZapiszHistoria",
+      "className": "admin-action-cell",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Zapisz",
+      "className": "admin-button small",
+      "color": "rgb(23, 18, 10)",
+      "background": "rgb(217, 182, 95)",
+      "backgroundClass": "admin-button small",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Historia",
+      "className": "admin-quiet",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-quiet",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Poprzednia",
+      "className": "admin-quiet",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-quiet",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Strona 1",
+      "className": "",
+      "color": "rgb(104, 126, 142)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "11.52px"
+    },
+    {
+      "text": "Następna",
+      "className": "admin-quiet",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "admin-quiet",
+      "fontSize": "12px"
+    },
+    {
+      "text": "NOWE URUCHOMIENIA",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Ustawienia automatyzacji",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "32px"
+    },
+    {
+      "text": "Zmiany wpływają na tworzenie nowych zadań. Już przyjęte zadania zachowują swój przebieg.",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Przyjmuj nowe zadaniaWyłączenie zatrzymuje nowe starty, nie przerywa zadań w toku.",
+      "className": "admin-toggle",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(217, 182, 95, 0.047)",
+      "backgroundClass": "admin-toggle",
+      "fontSize": "15px"
+    },
+    {
+      "text": "Przyjmuj nowe zadaniaWyłączenie zatrzymuje nowe starty, nie przerywa zadań w toku.",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgba(217, 182, 95, 0.047)",
+      "backgroundClass": "admin-toggle",
+      "fontSize": "15px"
+    },
+    {
+      "text": "Wyłączenie zatrzymuje nowe starty, nie przerywa zadań w toku.",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgba(217, 182, 95, 0.047)",
+      "backgroundClass": "admin-toggle",
+      "fontSize": "11.36px"
+    },
+    {
+      "text": "NarzędzieWeryfikacja polis OC",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-settings",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Limit startów na godzinę",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-settings",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Początek okna pracy",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-settings",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Koniec okna pracy",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-settings",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Strefa czasowa",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-settings",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Strefa zapisu: Europe/Warsaw · wersja 3 · zapisano 2.10.2026, 08:05",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-settings",
+      "fontSize": "10.72px"
+    },
+    {
+      "text": "Zapisz ustawienia",
+      "className": "admin-button",
+      "color": "rgb(23, 18, 10)",
+      "background": "rgb(217, 182, 95)",
+      "backgroundClass": "admin-button",
+      "fontSize": "12px"
+    },
+    {
+      "text": "ZDARZENIA ORGANIZACJI",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Audyt z wyszukiwaniem",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "32px"
+    },
+    {
+      "text": "Wyniki są stronicowane. Metadane mogące zawierać dane klienta nie są zwracane.",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Od",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-filter-form",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Do (wyłącznie)",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-filter-form",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Aktor ID",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-filter-form",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Czynność",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-filter-form",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Rodzaj zasobu",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-filter-form",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "ID zasobu",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-filter-form",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "WynikDowolnyPowodzenieBłądOdmowa",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-filter-form",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "NarzędzieDowolneWeryfikacja polis OC",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-filter-form",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Szukaj zdarzeń",
+      "className": "admin-button",
+      "color": "rgb(23, 18, 10)",
+      "background": "rgb(217, 182, 95)",
+      "backgroundClass": "admin-button",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Czas",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Aktor",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Czynność",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Zasób",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "ID zasobu",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Wynik",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "2.10.2026, 08:00",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "admin.demo",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "tool.grant.updated",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "tool",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "oc-policy-verification",
+      "className": "mono",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Powodzenie",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "WYNIKI I CZAS OBSŁUGI",
+      "className": "eyebrow",
+      "color": "rgb(217, 182, 95)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "10.88px"
+    },
+    {
+      "text": "Raporty i jakość pracy",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "32px"
+    },
+    {
+      "text": "Miary ukończenia liczą wyniki po czasie zakończenia. „Brak polis” pozostaje osobną kategor",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(8, 8, 12)",
+      "backgroundClass": "admin-main",
+      "fontSize": "12.8px"
+    },
+    {
+      "text": "Od",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-filter-form report-filter",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Do (wyłącznie)",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-filter-form report-filter",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "NarzędzieWszystkieWeryfikacja polis OC",
+      "className": "admin-field",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-filter-form report-filter",
+      "fontSize": "11.68px"
+    },
+    {
+      "text": "Przelicz zakres",
+      "className": "admin-button",
+      "color": "rgb(22, 17, 9)",
+      "background": "rgb(225, 193, 108)",
+      "backgroundClass": "admin-button",
+      "fontSize": "12px"
+    },
+    {
+      "text": "WIERSZE ŹRÓDŁOWE",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "400",
+      "className": "rb-goldis-count",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "40",
+      "className": "sr-only",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "0",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "PODMIOTY KANONICZNE",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "120",
+      "className": "rb-goldis-count",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "12",
+      "className": "sr-only",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "0",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "ZGŁOSZENIA",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "50",
+      "className": "rb-goldis-count",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "5",
+      "className": "sr-only",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "0",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "WYKONANIA",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "40",
+      "className": "rb-goldis-count",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "4",
+      "className": "sr-only",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "0",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "UKOŃCZONE",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "20",
+      "className": "rb-goldis-count",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "2",
+      "className": "sr-only",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "0",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "BRAK PASUJĄCYCH POLIS",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "10",
+      "className": "rb-goldis-count",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "1",
+      "className": "sr-only",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "0",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "BŁĘDY",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "10",
+      "className": "rb-goldis-count",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "1",
+      "className": "sr-only",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "0",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "W TOKU",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "00",
+      "className": "rb-goldis-count",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "0",
+      "className": "sr-only",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "0",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "POBRANE PLIKI",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "30",
+      "className": "rb-goldis-count",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "3",
+      "className": "sr-only",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "0",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "WYGENEROWANE PLIKI",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "20",
+      "className": "rb-goldis-count",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "2",
+      "className": "sr-only",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "0",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "OTWARTE INTERWENCJE",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "9.92px"
+    },
+    {
+      "text": "10",
+      "className": "rb-goldis-count",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "1",
+      "className": "sr-only",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "0",
+      "className": "rb-goldis-count-live",
+      "color": "rgb(242, 216, 137)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "",
+      "fontSize": "24px"
+    },
+    {
+      "text": "Przepustowość dzienna",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Nowe zadania według dnia w strefie Europe/Warsaw.",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(217, 182, 95)",
+      "backgroundClass": "",
+      "fontSize": "15px"
+    },
+    {
+      "text": "10-02",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "9.28px"
+    },
+    {
+      "text": "Czas i skuteczność",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Kody błędów",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Kod",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Status",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Liczba",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Pierwszy",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Ostatni",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "W tym zakresie nie ma błędów.",
+      "className": "admin-empty",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12.48px"
+    },
+    {
+      "text": "Interwencje",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Typ",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Powód",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Status",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Liczba",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Mediana rozwiązania",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Otwarte",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "sms",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "SMS_TIMEOUT",
+      "className": "mono",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Otwarte",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "1",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "—",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "1",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Tempo obsługi",
+      "className": "",
+      "color": "rgb(242, 238, 229)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Agregaty według dnia utworzenia w Europe/Warsaw.",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "Dzień",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Utworzone",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Ukończone",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Bez polis",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Błędy",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "Mediana",
+      "className": "",
+      "color": "rgb(166, 163, 154)",
+      "background": "rgb(25, 25, 31)",
+      "backgroundClass": "",
+      "fontSize": "11.2px"
+    },
+    {
+      "text": "2.10.2026, 00:00",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "4",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "2",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "1",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "1",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    },
+    {
+      "text": "5 min",
+      "className": "",
+      "color": "rgb(228, 223, 213)",
+      "background": "rgb(17, 17, 22)",
+      "backgroundClass": "admin-card admin-table-card",
+      "fontSize": "12px"
+    }
+  ]
+}

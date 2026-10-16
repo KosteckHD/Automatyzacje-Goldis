@@ -5,8 +5,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "test": "npm run build && node --test dist/*.test.js"
+    "clean": "node ../../scripts/clean-workspace-dist.cjs @goldis/core",
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "test": "npm run build && node ../../scripts/run-node-tests.cjs dist",
+    "test:unit": "npm run build && node ../../scripts/run-node-tests.cjs dist unit"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

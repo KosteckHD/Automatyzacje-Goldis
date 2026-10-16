@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { GoldisLogo } from "../../components/brand/GoldisLogo";
 
 type Account = { username: string; role: string; csrfToken: string; mustChangePassword: boolean };
+type RecoveryEmail = { enabled: boolean; recoveryEmail: string | null; verifiedAt: string | null; pendingEmail: string | null };
 type Session = { sessionId: string; createdAt: string; lastSeenAt: string; expiresAt: string; revokedAt: string | null; browserLabel: string; isCurrent: boolean };
 
 async function readJson<T>(response: Response): Promise<T> {
@@ -15,6 +16,8 @@ async function readJson<T>(response: Response): Promise<T> {
 export default function AccountPage() {
   const [account, setAccount] = useState<Account | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [recoveryEmail, setRecoveryEmail] = useState<RecoveryEmail | null>(null);
+  const [recoveryEmailDraft, setRecoveryEmailDraft] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -26,8 +29,11 @@ export default function AccountPage() {
     try {
       const me = await readJson<Account>(await fetch("/api/auth/me", { credentials: "same-origin" }));
       setAccount(me);
-      const page = await readJson<{ items: Session[] }>(await fetch("/api/auth/sessions", { credentials: "same-origin" }));
-      setSessions(page.items);
+      const [page, recovery] = await Promise.all([
+        readJson<{ items: Session[] }>(await fetch("/api/auth/sessions", { credentials: "same-origin" })),
+        readJson<RecoveryEmail>(await fetch("/api/auth/recovery-email", { credentials: "same-origin", cache: "no-store" })),
+      ]);
+      setSessions(page.items); setRecoveryEmail(recovery);
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Nie udało się odczytać bezpieczeństwa konta."); }
   }
 
@@ -36,7 +42,7 @@ export default function AccountPage() {
   async function changePassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(""); setNotice("");
     if (newPassword !== confirmPassword) { setError("Nowe hasła nie są zgodne."); return; }
-    if (newPassword.length < 14) { setError("Nowe hasło musi mieć co najmniej 14 znaków."); return; }
+    if ([...newPassword].length < 15) { setError("Nowe hasło musi mieć co najmniej 15 znaków."); return; }
     if (!account?.csrfToken) { setError("Brak tokenu bezpieczeństwa. Odśwież stronę."); return; }
     setBusy(true);
     try {
@@ -65,14 +71,36 @@ export default function AccountPage() {
     finally { setBusy(false); }
   }
 
+  async function requestRecoveryEmail(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setError(""); setNotice("");
+    if (!account?.csrfToken) { setError("Brak tokenu bezpieczeństwa. Odśwież stronę."); return; }
+    setBusy(true);
+    try {
+      await readJson(await fetch("/api/auth/recovery-email", {
+        method: "PUT", credentials: "same-origin", cache: "no-store",
+        headers: { "Content-Type": "application/json", "X-CSRF-Token": account.csrfToken },
+        body: JSON.stringify({ email: recoveryEmailDraft, currentPassword }),
+      }));
+      setCurrentPassword(""); setRecoveryEmailDraft("");
+      setNotice("Wysłaliśmy link potwierdzający. Dotychczasowy adres pozostaje aktywny do czasu potwierdzenia nowego.");
+      setRecoveryEmail(await readJson<RecoveryEmail>(await fetch("/api/auth/recovery-email", { credentials: "same-origin", cache: "no-store" })));
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Nie udało się zlecić zmiany adresu."); }
+    finally { setBusy(false); }
+  }
+
   return <main className="account-shell">
     <header className="account-header"><a href="/" className="account-brand"><GoldisLogo variant="header" /><span className="account-brand-name">GOLDIS</span></a><nav><a href="/">Narzędzia</a>{account?.role === "admin" && <a href="/admin">Administracja</a>}</nav></header>
     <div className="account-content">
       <p className="eyebrow">KONTO I BEZPIECZEŃSTWO</p><h1>Twoje sesje,<br /><em>Twoje hasło.</em></h1>
       {error && <p className="admin-alert" role="alert">{error}</p>}{notice && <p className="admin-notice" role="status">{notice}</p>}
       {account?.mustChangePassword && <div className="account-required" role="alert"><strong>Wymagana zmiana hasła</strong><span>To konto ma hasło tymczasowe. Zmień je, aby korzystać z narzędzi.</span></div>}
-      <section className="account-card"><div className="admin-card-head"><div><h2>Zmień hasło</h2><p>Minimum 14 znaków. Po zmianie pozostałe sesje zostaną wylogowane.</p></div><span className="admin-counter">{account?.username ?? "Ładowanie konta…"}</span></div>
-        <form className="admin-form" onSubmit={changePassword}><label className="admin-field">Obecne hasło<input type="password" autoComplete="current-password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} required /></label><div className="account-password-row"><label className="admin-field">Nowe hasło<input type="password" autoComplete="new-password" minLength={14} maxLength={1024} value={newPassword} onChange={(event) => setNewPassword(event.target.value)} required /></label><label className="admin-field">Powtórz nowe hasło<input type="password" autoComplete="new-password" minLength={14} maxLength={1024} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required /></label></div><button className="admin-button" disabled={busy || !account}>Zapisz nowe hasło</button></form>
+      {recoveryEmail?.enabled && <section className="account-card"><div className="admin-card-head"><div><h2>Adres odzyskiwania</h2><p>Adres musi należeć do Ciebie. Link potwierdzający jest ważny 24 godziny.</p></div><span className="admin-counter">{recoveryEmail.verifiedAt ? "Zweryfikowany" : "Niezweryfikowany"}</span></div>
+        <p className="admin-muted">{recoveryEmail.recoveryEmail ? `Aktywny: ${recoveryEmail.recoveryEmail}` : "Nie przypisano jeszcze adresu."}{recoveryEmail.pendingEmail ? ` · Oczekuje na potwierdzenie: ${recoveryEmail.pendingEmail}` : ""}</p>
+        <form className="admin-form" onSubmit={(event) => void requestRecoveryEmail(event)}><label className="admin-field">Nowy adres e-mail<input type="email" autoComplete="email" maxLength={254} value={recoveryEmailDraft} onChange={(event) => setRecoveryEmailDraft(event.target.value)} required /></label><label className="admin-field">Obecne hasło<input type="password" autoComplete="current-password" maxLength={1024} value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} required /></label><button className="admin-button" disabled={busy || !account}>Wyślij link potwierdzający</button></form>
+      </section>}
+      {recoveryEmail && !recoveryEmail.enabled && <section className="account-card"><div className="admin-card-head"><div><h2>Adres odzyskiwania</h2><p>Administrator nie włączył jeszcze odzyskiwania hasła dla platformy.</p></div></div></section>}
+      <section className="account-card"><div className="admin-card-head"><div><h2>Zmień hasło</h2><p>Minimum 15 znaków. Po zmianie pozostałe sesje zostaną wylogowane.</p></div><span className="admin-counter">{account?.username ?? "Ładowanie konta…"}</span></div>
+        <form className="admin-form" onSubmit={changePassword}><label className="admin-field">Obecne hasło<input type="password" autoComplete="current-password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} required /></label><div className="account-password-row"><label className="admin-field">Nowe hasło<input type="password" autoComplete="new-password" minLength={15} maxLength={1024} value={newPassword} onChange={(event) => setNewPassword(event.target.value)} required /></label><label className="admin-field">Powtórz nowe hasło<input type="password" autoComplete="new-password" minLength={15} maxLength={1024} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required /></label></div><button className="admin-button" disabled={busy || !account}>Zapisz nowe hasło</button></form>
       </section>
       <section className="account-card"><div className="admin-card-head"><div><h2>Aktywne sesje</h2><p>Każda sesja jest sprawdzana po stronie serwera. Cofnięcie działa od następnego żądania.</p></div><span className="admin-counter">{sessions.filter((item) => !item.revokedAt && Date.parse(item.expiresAt) > Date.now()).length} aktywnych</span></div>
         <div className="admin-table-wrap" tabIndex={0} role="region" aria-label="Sesje bieżącego konta; przewiń w poziomie, aby zobaczyć wszystkie kolumny"><table><thead><tr><th>Urządzenie i przeglądarka</th><th>Utworzona</th><th>Ostatnia aktywność</th><th>Wygasa</th><th>Status</th><th /></tr></thead><tbody>{sessions.map((item) => <tr key={item.sessionId}><td>{item.browserLabel}</td><td>{new Date(item.createdAt).toLocaleString("pl-PL")}</td><td>{new Date(item.lastSeenAt).toLocaleString("pl-PL")}</td><td>{new Date(item.expiresAt).toLocaleString("pl-PL")}</td><td>{item.revokedAt ? "Cofnięta" : Date.parse(item.expiresAt) <= Date.now() ? "Wygasła" : item.isCurrent ? "Bieżąca sesja" : "Aktywna"}</td><td>{!item.isCurrent && !item.revokedAt && Date.parse(item.expiresAt) > Date.now() && <button className="admin-quiet danger" disabled={busy} onClick={() => void revoke(item)}>Cofnij sesję</button>}</td></tr>)}</tbody></table>{sessions.length === 0 && <p className="admin-empty">Nie znaleziono sesji.</p>}</div>

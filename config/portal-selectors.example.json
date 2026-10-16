@@ -72,6 +72,8 @@
       "postalCodeInput": "UNVERIFIED_POSTAL_CODE_INPUT",
       "cityInput": "UNVERIFIED_CITY_INPUT",
       "countyInput": "UNVERIFIED_COUNTY_INPUT",
+      "customerMatches": "ux-dialog .tm-grid-customer-matches-dialog",
+      "customerMatchSelect": "button:has-text(\"Wybierz Klienta\")",
       "saveButton": "UNVERIFIED_SAVE_BUTTON"
     },
     "save": {
