@@ -1,0 +1,326 @@
+# Audyt UI, UX i user flow aplikacji Goldis
+
+Data: 22 października 2026. Odbiorcy: pracownicy ubezpieczalni, osoby uruchamiające weryfikację OC i menedżerowie.
+
+Metoda: dwie niezależne oceny — A: `/root/audit_design`, B: `/root/audit_technical` — oraz dodatkowe sprawdzenie przepływu OC i odzyskiwania kontekstu przez agenta głównego. Ocena A została zakończona przed odczytaniem wyników detektora przez autora syntezy. Zastosowano Impeccable, UI/UX Pro Max oraz webapp-testing.
+
+## Werdykt
+
+Goldis ma spójny fundament wizualny i funkcjonalny. Logo, czarno-złota paleta, podpisana nawigacja oraz podział procesu OC na etapy pasują do produktu. Największej poprawy wymaga wiarygodność stanów i ciągłość codziennej pracy: zakres eksportu, reakcja na błędy, powrót do przefiltrowanej listy i jasne wskazanie następnego działania.
+
+**Ocena użyteczności: 21/40.** Jest to ekspercka ocena heurystyczna, nie wynik badania z pracownikami. Fundament pozwala kontynuować rozwój, ale istotne problemy trzeba rozwiązać przed szerszym wdrożeniem pracowniczym. W badanym zakresie nie potwierdzono defektu P0 uniemożliwiającego cały główny proces. Nie jest to odbiór integracji ani deklaracja zgodności całej aplikacji z WCAG.
+
+**17 ustaleń: 0 P0, 7 P1, 10 P2, 0 P3.** Pięć najważniejszych tematów wdrożenia: zgodność eksportu, prawdziwe stany danych i błędów, ciągłość kolejki firm, poprawna obsługa kroków OC i czytelność/dostępność kontrolek. Liczby nie obejmują odrzuconych ostrzeżeń detektora ani hipotez o przyszłych funkcjach.
+
+Rekomendowany kierunek: zachować identyfikację Goldis, a interfejs mocniej oprzeć na zadaniu pracownika: **moja firma → kontakt i wynik OC → status rozmowy → następna firma**. Złożoność przygotowania danych pokazywać wtedy, gdy pracownik rzeczywiście uruchamia automatyzację.
+
+## Zakres i granice dowodów
+
+- Badano bieżący kod, w tym istniejące niezacommitowane zmiany. Nie modyfikowano kodu aplikacji.
+- Uruchomiono świeży Next.js 16.4 / React 19.2 w trybie development na osobnym porcie 3210. Nie korzystano do oceny wizualnej ze starego buildu produkcyjnego.
+- Chromium przez Playwright, osobne konteksty, dane i odpowiedzi API syntetyczne. Portale ubezpieczycieli i rzeczywiste operacje nie były uruchamiane. Syntetyczne POST służyły wyłącznie podglądowi zakresu i symulacji błędu oznaczenia powiadomienia.
+- Desktop: szerokości 1366 i 1440 px; mobile: 390 px. Mobilny viewport jest emulacją, nie testem fizycznego telefonu ani dowodem działania gestów dotykowych.
+- Przegląd wizualny i interakcyjny: logowanie, dashboard, katalog narzędzi, osiem etapów OC, wyniki partii, pula firm, moje firmy, detal firmy, przydział, powiadomienia, błędy, puste stany i wygaśnięcie sesji. Pozostałe obszary administracyjne, historia, korekty, raporty i konto zostały objęte przeglądem źródeł; nie deklarujemy pełnego przejścia wszystkich ich działań.
+- Nie zmierzono produkcyjnych Core Web Vitals, pracy przy realnej dużej bazie, jakości integracji, rzeczywistego pliku eksportu ani pełnej obsługi czytnikiem ekranu. Dowód rozbieżności eksportu pochodzi z UI i kontraktu/zapytania API.
+- Historyczny `docs/design/goldis/mvp-2026-10-11/PRODUCT.md` pomaga zrozumieć założenia, ale dotyczy prototypu. Brak notatek i dodatkowych statusów kontaktu nie jest raportowany jako defekt, ponieważ to świadomy zakres MVP.
+
+Materiały dowodowe: `output/ui-ux-audit-2026-10-22/`. Oznaczenia: **[B]** odtworzone w przeglądarce, **[K]** potwierdzone w kodzie, **[H]** hipoteza/kierunek do walidacji z pracownikami.
+
+## Ocena heurystyczna
+
+Skala 0–4: 0 — brak wsparcia, 2 — częściowe, 3 — dobre, 4 — bardzo dobre. Wszystkie dziesięć heurystyk ma zastosowanie.
+
+| Heurystyka | Ocena | Najważniejsze ustalenie |
+|---|---:|---|
+| Widoczność stanu systemu | 2/4 | Są etapy i statusy, ale błąd listy współistnieje z „Dane aktualne”. |
+| Język i model pracy użytkownika | 2/4 | Firmy i kontakt są zrozumiałe; Worker, snapshot, rewizja i kilka znaczeń „wyników” utrudniają naukę. |
+| Kontrola i swoboda | 2/4 | Jest powrót i dostęp do kroków, ale kontekst listy nie jest zachowywany. |
+| Spójność i standardy | 3/4 | Wspólna rama, nazwy nawigacji i standardowe kontrolki dają dobrą bazę. |
+| Zapobieganie błędom | 2/4 | Przydział ma podsumowanie; eksport nie ujawnia odmiennego zakresu. |
+| Rozpoznawanie zamiast pamiętania | 2/4 | Użytkownik pamięta zakres Excela, filtry i relacje między operacją, zadaniem i firmą. |
+| Elastyczność i efektywność | 2/4 | Są filtry, zbiorczy przydział i status inline; seryjna obsługa firm traci ciągłość. |
+| Estetyka i minimalizm | 3/4 | Spójny wygląd; metadane i duplikowane nagłówki zabierają przestrzeń roboczą. |
+| Rozpoznanie i naprawa błędów | 1/4 | Sprzeczne stany i brak lokalnego ponowienia zwiększają niepewność. |
+| Pomoc i instrukcje | 2/4 | Dobre wymagania pliku; brakuje krótkiego objaśnienia całego obiegu pracy. |
+| **Razem** | **21/40** | **Znaczące usprawnienia potrzebne.** |
+
+Niezależna ocena techniczna B: **12/20**. Nie należy sumować obu skal.
+
+| Wymiar techniczny | Ocena | Podstawa |
+|---|---:|---|
+| Dostępność | 2/4 | Poprawne etykiety i obsługa menu; potwierdzone braki kontrastu części pól i instrukcji |
+| Wydajność implementacji | 3/4 | Lokalne fonty, cleanup, polling zależny od widoczności; wyłącznie przegląd kodu, bez pomiaru produkcyjnego |
+| Motyw i tokeny | 2/4 | Tokeny istnieją, lecz lokalne palety i nadpisania omijają wspólne korekty |
+| Responsywność | 2/4 | Brak overflow całej strony przy 390 px; potwierdzone przycinanie na desktopie i krótki sidebar |
+| Spójność implementacji | 3/4 | Wspólny język produktu, miejscowe rozbieżności układu i kaskady CSS |
+| **Razem** | **12/20** | **Istotne poprawki potrzebne** |
+
+## Ustalenia wymagające poprawy
+
+Priorytety: P0 — blokuje główny proces; P1 — duża trudność, pomyłka lub potwierdzony istotny problem dostępności; P2 — utrudnienie z obejściem; P3 — kosmetyka. Nie mnożono osobnych zgłoszeń dla każdego wystąpienia tego samego wzorca.
+
+### F01 · P1 · Eksport nie odpowiada zakresowi listy [B, K]
+
+**Miejsce:** `apps/web/app/leads/LeadWorkspace.tsx:77`, `:205`; `apps/api/src/features/leads/business-leads.controller.ts:42`; `business-leads.service.ts:590`.
+
+Lista respektuje moje firmy/pulę, zestaw wyników, wyszukiwanie i status kontaktu. „Pobierz Excel” zawsze prowadzi do `/api/leads/export`. Endpoint nie przyjmuje tych filtrów, a zapytanie wybiera całą dozwoloną pulę OC. Nie chodzi tu o stwierdzone obejście uprawnień; problemem jest inny zakres niż sugeruje miejsce przycisku.
+
+**Skutek:** pracownik może zapisać lub przekazać zestaw innych firm niż wybrany na ekranie. Dodatkowo backend przy przekroczeniu limitu radzi zawęzić wyniki do automatyzacji, choć ten eksport nie przyjmuje takiego zawężenia.
+
+**Poprawa:** przekazywać i walidować ten sam zakres po obu stronach; etykieta „Eksportuj moje firmy” / „Eksportuj przefiltrowaną pulę”. Eksport całej dozwolonej puli jako osobny jawny wybór.
+
+**Odbiór:** inny zakres mine/pool, zestaw, fraza i status dają odpowiedni zbiór w pliku; UI wskazuje zakres i limit. **Komenda:** `$impeccable harden`.
+
+### F02 · P1 · Błąd, brak danych i aktualność są ze sobą sprzeczne [B, K]
+
+**Miejsce:** `LeadWorkspace.tsx:200`, `:201`, `:207`, `:209`, `:212`; analogiczny wzorzec w `tools/tool-catalog.tsx:32`.
+
+Po syntetycznym 503 lista nadal ma zielone „Dane aktualne”, zerowe metryki i wyjaśnienie „Po zakończeniu automatyzacji firmy pojawią się na tej liście”. Błąd bywa wyświetlany dwa razy. Nie ma lokalnego „Spróbuj ponownie”. Brak dopasowania po wyszukiwaniu otrzymuje ten sam komunikat co rzeczywiście pusta baza. Katalog po błędzie potrafi jednocześnie informować o braku dostępnych narzędzi.
+
+**Skutek:** pracownik nie wie, czy nie ma firm, nie ma przydziału, filtr niczego nie znalazł czy system nie odpowiedział. Może błędnie uruchamiać nowy proces albo uznać pracę za wykonaną.
+
+**Poprawa:** osobne stany error/empty/no-match/no-assignment; aktualność dopiero po udanym odczycie, przy zachowanych danych „Nie udało się odświeżyć; pokazujemy stan z…”. Lokalny przycisk ponowienia, wyczyszczenie filtrów, informacja o przydziale. Dashboard już zawiera dobry wzorzec błędu z ponowieniem.
+
+**Odbiór:** 503, zero wyników, brak dopasowania i brak przydziału dają cztery odpowiednie komunikaty i działania. **Komendy:** `$impeccable harden`, `$impeccable clarify`.
+
+### F03 · P1 · Powrót z firmy gubi kontekst kolejki [K; widok detalu B]
+
+**Miejsce:** `LeadWorkspace.tsx:60`, `:184`, `:209`, `:210`.
+
+Filtry i stos kursorów istnieją w lokalnym stanie. Link do firmy zawiera samo ID; „Wróć” prowadzi do stałego adresu bez wyszukiwania, statusu, strony i `resultSetId`. Wniosek o utracie kontekstu opiera się na href/state; dodatkowa próba dynamicznego powrotu nie została ukończona i nie jest przedstawiana jako pomiar.
+
+**Skutek:** po każdym otwarciu szczegółów pracownik musi ponownie odnajdywać firmę lub kolejkę. Koszt powtarza się przy dziesiątkach kontaktów.
+
+**Poprawa:** zachować parametry listy w URL i zapamiętać scroll; powrót do dokładnego zakresu. Dla seryjnej obsługi dodać „Poprzednia / następna firma” w bieżącej kolejce.
+
+**Odbiór:** wyszukanie + status + druga strona → firma → powrót odtwarza ten sam widok; zakres pojedynczej operacji nie zamienia się w całą pulę. **Komendy:** `$impeccable harden`, `$impeccable shape`.
+
+### F04 · P1 · Wyniki bez wybranej operacji udają niekończące się ładowanie [B, K]
+
+**Miejsce:** `result-set-workspace.tsx:94`, `:180`; `workspace.tsx:1268`.
+
+Można przejść do kroku 8 bez operacji lub importu. Komponent nie ma identyfikatora, więc nie pobiera zestawu, ale stale pokazuje „Otwieram zapisany zestaw wyników…”, aktywne wyszukiwanie i filtr.
+
+**Skutek:** użytkownik czeka na coś, co nie jest ładowane. Nie otrzymuje jasnej drogi do wyboru operacji.
+
+**Poprawa:** rozróżnić brak wybranej operacji od ładowania i pustego wyniku. „Nie wybrano operacji — otwórz zakończone sprawdzanie” z odsyłaczem do historii. Filtry dopiero po wybraniu zestawu.
+
+**Odbiór:** wejście na `?step=results` kończy się stanem wymagającym wyboru, bez fałszywego komunikatu ładowania. **Komendy:** `$impeccable harden`, `$impeccable onboard`.
+
+### F05 · P1 · Zapis przeczytania powiadomienia blokuje otwarcie sprawy [B, K]
+
+**Miejsce:** `notifications/NotificationWorkspace.tsx:53`, `:85`.
+
+Kliknięcie „Otwórz” dla nowego powiadomienia najpierw wymaga udanego POST oznaczającego je jako przeczytane. Syntetyczne 503 tego pomocniczego zapisu pozostawia użytkownika na liście, bez przejścia do sprawy wymagającej SMS.
+
+**Skutek:** awaria licznika/przeczytania odcina główną akcję. Istnieje obejście przez inne części nawigacji, więc nie klasyfikujemy tego jako globalnego P0.
+
+**Poprawa:** nawigację wykonać niezależnie; oznaczenie przeczytania potraktować jako osobny zapis z możliwością ponowienia. Respektować też standardowe otwieranie linku w nowej karcie.
+
+**Odbiór:** przy 503 zapisu nadal otwiera się właściwa operacja; licznik może pozostać niezmieniony z odpowiednim komunikatem. **Komenda:** `$impeccable harden`.
+
+### F06 · P2 · „Dalej” i statusy etapów nie prowadzą przez realne warunki gotowości [B, K]
+
+**Miejsce:** `automation-workspace.tsx:127`, `:133`, `:154`; `workspace.tsx:1175`, `:1181`; `run-submission-launcher.tsx:386`.
+
+Krok 6 zawsze deklaruje „Gotowe do sprawdzenia”, również bez pliku albo podglądu. Dolne „Dalej: podsumowanie i start” w kroku 5 tylko zmienia ekran; właściwy podgląd przygotowuje osobny przycisk w formularzu. Można przejść dalej, zobaczyć brak podglądu, a następnie przejść do pustego postępu.
+
+**Skutek:** interfejs wygląda jak kreator, ale przyciski przejścia nie wykonują oczekiwanej czynności. Użytkownik nie wie, czy pominął konieczny zapis.
+
+**Poprawa:** oddzielić swobodne przeglądanie kroków od głównego działania. Główne „Sprawdź wybrany zakres i przejdź dalej” przygotowuje podgląd. Statusy wynikają z danych: „Brak zakresu”, „Podsumowanie gotowe”, „Uruchomiono”.
+
+**Odbiór:** główny przycisk w kroku 5 przygotowuje krok 6 lub wskazuje konkretny brak; nigdy nie deklaruje gotowości bez danych. **Komendy:** `$impeccable clarify`, `$impeccable shape`.
+
+### F07 · P2 · Odświeżenie usuwa wybrany zakres i podgląd [B, K]
+
+**Miejsce:** `run-submission-launcher.tsx:101`; `workspace.tsx:1228`.
+
+Po wskazaniu wierszy 2–3 i uzyskaniu podsumowania odświeżenie pozostawia URL kroku 6, ale usuwa podgląd i zakres. Nie usuwa utrwalonego importu ani już uruchomionych zadań. Nazwa wcześniejszego pliku jest dodatkowo zastępowana technicznym „Import 33333333”.
+
+**Skutek:** przerwanie pracy oznacza ponowne odtwarzanie wyboru; pracownik może nie rozpoznać swojej bazy.
+
+**Poprawa:** odtwarzać bezpieczny szkic zakresu powiązany z importem/rewizją; zawsze ponownie zweryfikować aktualność podglądu przed startem. Nie utrwalać samej zgody checkboxa. Nazwę pliku pobierać z metadanych importu.
+
+**Odbiór:** reload przywraca zakres i nazwę pliku, wymaga aktualnego podsumowania i ponownego potwierdzenia startu. **Komenda:** `$impeccable harden`.
+
+### F08 · P2 · Wybór numerów wierszy wymaga pamiętania danych z innego ekranu [B, K]
+
+**Miejsce:** `run-submission-launcher.tsx:354`, `:359`, `:380`.
+
+Przy wyborze części importu użytkownik wpisuje numery z Excela, a podsumowanie ponownie pokazuje numery zamiast nazw firm. Brakuje obok listy pozwalającej rozpoznać wybrane podmioty. Opcja sprawdzenia całego importu jest przydatna i powinna pozostać szybką ścieżką.
+
+**Skutek:** pomyłka w numerze jest trudna do zauważenia, a pracownik przenosi uwagę między Excelem, kontrolą danych i formularzem zakresu.
+
+**Poprawa:** w podsumowaniu pokazać firmę i NIP/REGON przy numerze. Dla wyboru części zapewnić wyszukiwanie/zaznaczanie firm; zakres numeryczny zachować jako opcję zaawansowaną.
+
+**Odbiór:** przed startem da się ustalić, jakie firmy zostaną sprawdzone, bez powrotu do Excela. **Komendy:** `$impeccable shape`, `$impeccable clarify`.
+
+### F09 · P2 · Nawigacja opisuje moduły, ale słabo wyjaśnia zadania pracownika [B, K, H]
+
+**Miejsce:** `leads/LeadSidebar.tsx:33`; `dashboard/DashboardWorkspace.tsx:79`, `:106`; `tools/tool-catalog.tsx:40`; `workspace.tsx:1248`; `result-set-workspace.tsx:198`.
+
+Równoległe „Wyniki”, „Moje wyniki”, „Zadania”, „Twoje operacje”, „Pula wyników OC” i „Raporty” wymagają poznania modelu aplikacji. W zwykłym UI pojawiają się `oc-policy-verification`, Worker, lookup, rewizja i snapshot. Dla osoby z prawem startu główną akcją dashboardu jest import, niezależnie od liczby firm do kontaktu.
+
+**Skutek:** początkujący musi znać architekturę narzędzia, żeby wybrać właściwą drogę. To nie jest argument za mechanicznym ograniczeniem menu do dowolnej liczby pozycji.
+
+**Poprawa:** „Moje firmy” — przydzielone do kontaktu; „Pula firm” — wszystkie dostępne; „Sprawdzanie OC” — przygotowanie i wykonanie. Techniczne diagnozy pod „Szczegóły”. CTA startowe dopasować do dominującej pracy i uprawnień; hierarchię potwierdzić z pracownikami.
+
+**Odbiór:** nowa osoba potrafi odróżnić sprawdzanie OC od pracy z przydzielonymi firmami na podstawie nazw i jednego zdania objaśnienia. **Komendy:** `$impeccable clarify`, `$impeccable onboard`.
+
+### F10 · P2 · Lista i detal słabo wspierają szybką serię kontaktów [B, K]
+
+**Miejsce:** `LeadWorkspace.tsx:188`, `:190`, `:191`, `:209`; `leads/leads.css:111`, `:117`, `:124`, `:222`.
+
+Telefon i e-mail w tabeli są tekstem; dopiero detal ma `tel:`/`mailto:`. „Moje wyniki” powtarzają przydział do mnie, ID i liczbę zadań. Wynik polis kryje się pod „Zadanie firmowe…”. W mobilnym widoku 390×844 pierwszy rekord jest poniżej pierwszego ekranu, a zmiana statusu wymaga przewijania tabeli w bok. Małe opisy mają często około 10–12 px.
+
+**Skutek:** czynność kontakt → wynik → decyzja wymaga więcej odszukiwania i przejść niż konieczne. Identyfikatory techniczne konkurują z danymi przydatnymi w rozmowie.
+
+**Poprawa:** priorytet firma/kontakt/status/wynik OC; klikalny kontakt na liście; szczegóły techniczne w rozwinięciu. Na mobile karty lub kompaktowa lista z widoczną decyzją. Użyteczny tekst zwiększyć do 14–16 px, metadane co najmniej 12–13 px jako cel ergonomiczny, nie samodzielne kryterium WCAG.
+
+**Odbiór:** kontakt i decyzja są dostępne bez poziomego przewijania wąskiego widoku; pełna etykieta statusu jest czytelna. **Komendy:** `$impeccable distill`, `$impeccable adapt`, `$impeccable typeset`.
+
+### F11 · P2 · Powrót po logowaniu jest niespójny [B, K]
+
+**Miejsce:** `notifications/NotificationWorkspace.tsx:72`; `leads/LeadWorkspace.tsx:171`; `dashboard/DashboardWorkspace.tsx:101`; dobry wzorzec: `history/HistoryList.tsx:401` i `workspace.tsx:389`.
+
+W historii działa `returnTo`. Po wygaśnięciu sesji w powiadomieniach, firmach lub dashboardzie link prowadzi tylko do `/`. Potwierdzono dla powiadomień. Po logowaniu domyślne przekierowanie wraca do dashboardu, a nie oczekującej sprawy.
+
+**Skutek:** użytkownik musi ponownie odnaleźć firmę lub alert po przerwie.
+
+**Poprawa:** jeden wzorzec wznowienia sesji z bezpiecznym `returnTo`, zachowującym aktualną ścieżkę i dozwolone parametry. Błąd sieci przy sprawdzaniu sesji odróżnić od potwierdzonego wylogowania.
+
+**Odbiór:** wygaśnięcie w detalu i alertach → logowanie → ten sam kontekst; walidacja adresu powrotu pozostaje aktywna. **Komenda:** `$impeccable harden`.
+
+### F12 · P2 · Metryki kolejki liczą tylko bieżącą stronę [B, K]
+
+**Miejsce:** `LeadWorkspace.tsx:201`.
+
+„Do kontaktu” i „Pozytywna decyzja” liczą `items` z bieżącej strony (25 firm). Tylko „Widoczne firmy” wyjaśnia „Na tej stronie”. Przy zmianie strony wartości wyglądają jak zmiana całej kolejki.
+
+**Skutek:** pracownik błędnie ocenia liczbę firm wymagających obsługi.
+
+**Poprawa:** albo liczniki całego aktywnego zakresu z API, albo jawne „Na tej stronie” przy każdej liczbie. Rozróżnić zakres filtrowania od paginacji.
+
+**Odbiór:** metryki nie zmieniają znaczenia przy przejściu między stronami. **Komenda:** `$impeccable clarify`.
+
+### F13 · P1 · Granice części pól formularzy są zbyt słabo widoczne [B, K]
+
+**Miejsce:** `leads/leads.css:94`; `team/team.css:6`.
+
+Puste pola formularzy nie mają dostatecznie widocznego odcięcia od otaczającego panelu. Dla obrysu `#47454b` na panelu `#111116` obliczono **1,99:1**, a dla `#393a3d` na tym panelu **1,66:1**. Pomiar względem wnętrza pola daje odpowiednio 2,05:1 i 1,61:1 — również niewystarczająco. Tła pól są zbliżone do panelu, więc nie zapewniają alternatywnego wyraźnego odcięcia.
+
+**Skutek:** osoba ze słabszym wzrokiem trudniej odnajduje miejsce wpisywania, zanim ustawi fokus. Obecny widoczny fokus jest zaletą, lecz nie rozwiązuje identyfikacji pustego pola w spoczynku.
+
+**Poprawa:** zastosować wspólny token granicy pola, zweryfikowany względem obu sąsiadujących powierzchni. Wymagane wizualne wskazówki identyfikujące komponent mają próg 3:1; nie oznacza to obowiązku nadawania takiego kontrastu każdemu dekoracyjnemu obrysowi. [WCAG 1.4.11 — Non-text Contrast](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html).
+
+**Odbiór:** rozpoznawalne puste pola i wyraźny fokus na formularzu przydziału, wyszukiwania i pracowników. **Komendy:** `$impeccable harden`, `$impeccable colorize`.
+
+### F14 · P1 · Część drobnego tekstu nie spełnia minimalnego kontrastu [B, K]
+
+**Miejsce:** `leads/leads.css:27`; `tools/oc-policy-verification/automation.css:47`.
+
+Etykiety PRACA/ORGANIZACJA: `#787780` na `#0b0b10`, około 10,08 px, **4,44:1**. Instrukcja „Wybierz dowolny krok, aby zobaczyć szczegóły”: `#77747b` na `#111116`, około 10,4 px, **4,10:1**. Są to zwykłe informacyjne teksty, a nie duże nagłówki. Tekst metryk `#85818a` na `#111116` ma około 4,93:1 i nie został zgłoszony jako naruszenie kontrastu.
+
+**Skutek:** pomoc w orientacji jest mniej czytelna dokładnie dla osób potrzebujących jej najbardziej.
+
+**Poprawa:** skorzystać z jaśniejszego tokena muted i powiększyć użyteczne opisy. Dla zwykłego tekstu próg wynosi 4,5:1; wartości granicznej nie zaokrągla się w górę do zgodności. [WCAG 1.4.3 — Contrast Minimum](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html).
+
+**Odbiór:** obliczony kontrast wszystkich informacyjnych tekstów co najmniej 4,5:1, z zapasem dla małych etykiet. **Komendy:** `$impeccable colorize`, `$impeccable typeset`.
+
+### F15 · P2 · Wiersz operacji jest obcinany na desktopie [B, K]
+
+**Miejsce:** `leads/platform-pages.css:21`, `:23`, `:75`, `:117`.
+
+Przy 1366×768 panel „Twoje operacje” ma około **484 px**, a sztywna siatka wiersza **755 px**. `overflow:hidden` ukrywa datę, strzałkę i część licznika. Problem występuje również przy 1440 px. Kontrola samego `scrollWidth` całej strony go nie wykrywa, bo przepełnienie jest obcięte wewnątrz karty.
+
+**Skutek:** znika część informacji o operacji i wizualne wskazanie przejścia do szczegółów. Sam wiersz nadal jest klikalny.
+
+**Poprawa:** układać wiersz względem dostępnej szerokości panelu; wcześniej przełączać dashboard na jedną kolumnę lub przenosić datę pod nazwę. Nie maskować informacji przepełnieniem.
+
+**Odbiór:** pełne istotne informacje widoczne przy 1366×768 oraz 1440 px, także z długą nazwą pliku. **Komendy:** `$impeccable adapt`, `$impeccable layout`.
+
+### F16 · P2 · Dolna część nawigacji znika na niskim ekranie laptopa [B, K]
+
+**Miejsce:** `leads/leads.css:19`, `:36`; `leads/LeadSidebar.tsx:64`.
+
+Dla menedżera przy wysokości 768 px „Moje konto” zajmuje y≈758–802, a „Zwiń nawigację” y≈819–861. Sidebar ma `height:100vh` i `overflow:hidden`, bez dostępnego dla myszy przewijania. Programowe ustawienie fokusu ujawniło link konta, więc nie stwierdzono pełnej pułapki klawiatury ani automatycznego naruszenia kryterium niewidocznego fokusu.
+
+**Skutek:** część funkcji jest niewidoczna dla osoby pracującej myszą na typowym laptopie. Dostęp przez inny link lub klawiaturę nie usuwa problemu odkrywalności.
+
+**Poprawa:** przewijalny obszar linków między stałą marką a stałym dołem, z zachowaniem widocznego fokusu i działania zwijania.
+
+**Odbiór:** cała nawigacja dostępna myszą i klawiaturą na wysokościach 640–768 px, bez ukrytych akcji. **Komenda:** `$impeccable adapt`.
+
+### F17 · P2 · Część celów dotykowych jest mała [B, K]
+
+**Miejsce:** `leads/leads.css:58`, `:82`, `:124`, `:128`; `team/team.css:21`.
+
+W mobilnym viewporcie zmierzono m.in. Konto około 30×17,6 px, strzałkę detalu 31×31 px, Odśwież dostępność 124,8×32 px, Zarządzaj 79,2×36 px. Główne pola i przyciski często mają 42–44 px.
+
+**Skutek:** trudniejsze trafienie kciukiem, szczególnie przy powtarzanych działaniach i gorszej precyzji ruchowej.
+
+**Poprawa:** zwiększyć aktywny obszar ważnych działań do około 44×44 px; zachować odpowiednie odstępy. To cel ergonomiczny. Samo zejście poniżej 44 px **nie dowodzi naruszenia WCAG AA**: kryterium 2.5.8 wymaga 24×24 px lub spełnienia odpowiednich wyjątków, m.in. odstępów. W tym audycie nie zgłoszono odrębnego naruszenia 2.5.8. [WCAG — Target Size Minimum](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html).
+
+**Odbiór:** istotne akcje łatwo uruchomić bez przypadkowego trafienia sąsiada; sprawdzić także na fizycznym urządzeniu. **Komenda:** `$impeccable adapt`.
+
+## Wzorce systemowe i wynik detektora
+
+Powtarzają się trzy źródła problemów: stan odczytu jest modelowany oddzielnie od treści i znaczników aktualności; kontekst zadania ginie między lokalnymi komponentami; współdzielone tokeny są nadpisywane lokalnymi paletami i sztywnymi siatkami. Jedna korekta wzorca ma większą wartość niż niezależne poprawianie każdego ekranu.
+
+Detektor uruchomiono **raz** dla `apps/web/app`: **16 ostrzeżeń**, w tym 15 `side-tab` i 1 `border-accent-on-rounded`. Przejrzano kontekst każdego trafienia. Piętnaście dotyczy m.in. aktywnej nawigacji, alertów, interwencji albo starych nadpisanych stylów i nie uzasadnia automatycznie usterki. Jedno trafienie zaokrąglonej karty z obrysem pozostaje wizualnie niepotwierdzone. **Nie dodano żadnego zgłoszenia wyłącznie na podstawie tych ostrzeżeń.** Pełne rozliczenie plików i linii znajduje się w `technical-b/report.md`.
+
+Nie znaleziono podstaw do twierdzenia, że brak jasnego motywu jest błędem, że aplikacja ma złe produkcyjne CWV lub że każdy akcent na brzegu karty jest szkodliwy. Główny wynik audytu opiera się na obserwowalnym wpływie na zadania pracownika.
+
+## Perspektywa pracownika
+
+- **Nowa osoba:** może nie wiedzieć, czy wejść w Wyniki, Moje wyniki czy Zadania. Pusty stan odsyła ją do automatyzacji nawet wtedy, gdy potrzebne jest wyczyszczenie filtrów lub przydział. Pomogą zadaniowe nazwy i krótkie objaśnienie obiegu pracy.
+- **Doświadczony doradca:** najbardziej odczuje gubienie kolejki po detalu, brak klikalnego telefonu na liście i niejawny zakres eksportu. Dodatkowy onboarding nie zastąpi sprawnego powrotu i kolejnej firmy.
+- **Osoba używająca klawiatury lub ze słabszym wzrokiem:** ma już poprawne etykiety i mobilne zarządzanie focusem, lecz potrzebuje wyraźniejszych konturów, tekstów pomocniczych i dostępnej całej nawigacji. Pełna sesja z czytnikiem ekranu pozostaje do wykonania.
+
+## Docelowy model pracy
+
+To propozycja struktury informacji do sprawdzenia z zespołem, bez dodawania nieuzgodnionych funkcji biznesowych.
+
+| Użytkownik / zadanie | Główna ścieżka | Najważniejsze informacje |
+|---|---|---|
+| Pracownik obsługujący firmy | Moje firmy → firma → kontakt i wynik OC → decyzja → następna firma | Co mam obsłużyć, z kim rozmawiam, jaki jest wynik, czy status zapisano |
+| Osoba sprawdzająca OC | Plik → przygotowanie danych → zakres i start → postęp i wyniki | Jaki plik, ile firm jest gotowych, co zostanie pominięte, czy operacja już ruszyła |
+| Menedżer | Pula firm → zakres → odbiorca i liczba → podsumowanie → przydziel | Liczba dostępnych firm, odbiorca, reguła wyboru, potwierdzenie zakresu |
+
+Osiem obecnych etapów OC można zachować jako podetapy czterech faz: **Plik**, **Przygotowanie** (kontrola, REGON, duplikaty), **Zakres i start**, **Postęp i wyniki**. Najpierw naprawić ich statusy i CTA; samo zmniejszenie liczby etykiet nie naprawi procesu.
+
+Każdy ekran narzędzia powinien odpowiadać kolejno: **na czym pracuję → co jest gotowe → co wymaga działania → co zrobi główny przycisk**. Wyjaśnienia techniczne powinny być dostępne po rozwinięciu.
+
+## Co zachować
+
+1. Oficjalne logo i paletę Goldis. Ocena nie uzasadnia pełnego rebrandingu. Serif w nagłówkach jest wyborem marki; problemem jest czytelność i ilość przestrzeni w ekranach roboczych, nie samo użycie szeryfów.
+2. Wspólną ramę, podpisane ikony, aktywny stan nawigacji, mobilne menu z Escape i zarządzaniem focusem.
+3. Wymagania Excela, opis arkusza i kolumn, informację o zachowaniu oryginału i rozdzielenie importu od uruchamiania portali.
+4. Podsumowanie przed przydziałem i przed startem, jawne rozliczenie pominiętych wierszy oraz odróżnienie braku polis od błędu.
+5. Zmianę statusu bezpośrednio na liście i dostęp do źródłowego importu. Warto rozwinąć efektywność tego modelu zamiast dodawać obowiązkowe formularze.
+
+## Kolejność wdrożenia i odbioru
+
+**Etap 1 — wiarygodność i dostęp.** Naprawić P1: zgodność eksportu z listą, jednoznaczne stany błędu, kontekst kolejki, brak wybranej operacji, niezależne otwarcie powiadomienia oraz potwierdzone problemy dostępności. Odbierać konkretnymi scenariuszami, także 401/403/503 i zerem wyników. Pomocne: `$impeccable harden`.
+
+**Etap 2 — codzienna praca.** Zachować filtry, zakres i pozycję; uporządkować nazwy; powiązać główny CTA z realną gotowością; pokazać firmy w podsumowaniu; uprzywilejować kontakt i decyzję w liście/detalu. Pomocne: `$impeccable shape`, `$impeccable clarify`, `$impeccable distill`.
+
+**Etap 3 — czytelność i spójność.** Poprawić kontrast, typografię, kontrolki, widok 1366×768 i wąski ekran. Konsolidować tokeny przy okazji rzeczywistych zmian, bez niepotrzebnego przebudowywania całego wyglądu. Pomocne: `$impeccable adapt`, `$impeccable typeset`; na końcu `$impeccable polish` i powtórny `$impeccable audit`.
+
+Po poprawkach przeprowadzić krótkie sesje z nowymi i doświadczonymi pracownikami oraz menedżerem. Zadania: znaleźć swoje firmy bez szkolenia, otworzyć i obsłużyć firmę z drugiej strony przefiltrowanej listy, pobrać dokładnie wybrany zakres, przygotować mały import i wrócić po odświeżeniu, obsłużyć alert z błędem pomocniczego zapisu. Zmierzyć powodzenie, liczbę pomyłek, powroty i pytania o pomoc. Czasy ustalić z pierwszego pomiaru — audyt nie zawiera badań rzeczywistych pracowników.
+
+## Dowody i odtwarzanie
+
+- `output/ui-ux-audit-2026-10-22/design-a/assessment-a.md` — niezależna ocena projektowa, źródła i ograniczenia.
+- `design-a/results-error.png` — błąd listy wraz z deklaracją aktualności.
+- `design-a/empty-after-search.png` — brak dopasowania kierujący do automatyzacji.
+- `design-a/my-results-viewport.png`, `company-detail-viewport.png` — hierarchia codziennej pracy.
+- `flow/03-empty-results.png` — pozorne ładowanie bez wybranej operacji.
+- `flow/04-selection.png`, `05-launch-preview.png`, `06-launch-after-reload.png` — zakres, podsumowanie i utrata szkicu po odświeżeniu.
+- `flow/09-mobile-selection.png` — struktura procesu przy 390 px.
+- `recovery/notification-read-failure.png`, `recovery/report.json` — brak przejścia po błędzie oznaczenia przeczytania i brak `returnTo`.
+- `technical-b/` — skan mechaniczny, pomiary DOM i zrzuty technicznego przeglądu.
+
+Próba pomocniczej nakładki Impeccable zakończyła się timeoutem startu jej serwera. Nakładka nie została wstrzyknięta i nie jest widoczna użytkownikowi. Zastępczy materiał dowodowy stanowią zrzuty, computed styles i pomiary geometrii DOM. Osierocony proces tej próby został zidentyfikowany i zamknięty przez ocenę B.
+
+Skrypty `capture-flow.cjs`, `capture-recovery.cjs` i skrypty ocen A/B zachowano jako materiał odtwarzający audyt. Wymagają lokalnego serwera na wskazanym porcie i zależności Playwright istniejącej w repozytorium. Syntetyczne odpowiedzi nie stanowią testu rzeczywistego backendu. Nie ma potrzeby traktować błędów celowo wywołanych w fixture jako awarii środowiska produkcyjnego.

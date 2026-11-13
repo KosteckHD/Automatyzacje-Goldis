@@ -1,0 +1,433 @@
+{
+  "skippedInDefaultWorkerSuite": 85,
+  "matchedPassedFixtures": 85,
+  "remaining": [],
+  "cases": [
+    {
+      "title": "profil Chromium zachowuje sesję, a tabela OC jest czytana w całości",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/ufg-browser.log"
+    },
+    {
+      "title": "wirtualizowana tabela OC przewijana wewnątrz modalu zwraca wszystkie rekordy albo jawny błąd",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/ufg-browser.log"
+    },
+    {
+      "title": "zero OC without a details button produces an empty complete snapshot",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/ufg-browser.log"
+    },
+    {
+      "title": "summary ignores hidden stale tables and rejects ambiguous or unsafe counts",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/ufg-browser.log"
+    },
+    {
+      "title": "Compensa chooses a business card by type and identifiers: matched",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-browser-coverage/extra-browser-coverage.log"
+    },
+    {
+      "title": "Compensa chooses a business card by type and identifiers: wrong-regon",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-browser-coverage/extra-browser-coverage.log"
+    },
+    {
+      "title": "Compensa chooses a business card by type and identifiers: wrong-pesel",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-browser-coverage/extra-browser-coverage.log"
+    },
+    {
+      "title": "Compensa chooses a business card by type and identifiers: ambiguous",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-browser-coverage/extra-browser-coverage.log"
+    },
+    {
+      "title": "client-card selection never fills or opens the home Client 360 search",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-browser-coverage/extra-browser-coverage.log"
+    },
+    {
+      "title": "observed Compensa exception payer never accepts customer data, saves, or queries UFG",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "observed Compensa exception wrong_payer never accepts customer data, saves, or queries UFG",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "observed Compensa exception existing_payer never accepts customer data, saves, or queries UFG",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "observed Compensa exception incomplete_customer never accepts customer data, saves, or queries UFG",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "observed Compensa exception payer_with_draft never accepts customer data, saves, or queries UFG",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "a fresh row navigates home even when the previous row left an authenticated open case",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa chooses the matching business card before waiting for the new insured form",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "missing contact keeps the normal Communication, PESEL, registration, then business-card order",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "a collapsed customer editor opens once only after the current draft is confirmed: true",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "a collapsed customer editor opens once only after the current draft is confirmed: false",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "a unique Everest PESEL obtains names only from the Communication form: true",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "a unique Everest PESEL obtains names only from the Communication form: false",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "a company enters Communication with REGON and verifies the prefilled business: true",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "a company enters Communication with REGON and verifies the prefilled business: false",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa CEP: delayed, bez ponawiania rozpoczęcia",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa CEP: late-reference, bez ponawiania rozpoczęcia",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa CEP: timeout, bez ponawiania rozpoczęcia",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa CEP: ambiguous-start, bez ponawiania rozpoczęcia",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa form wybiera Ubezpieczającego, podaje PESEL i tablicę, zachowuje dane i nie klika Zapisz",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa zaznacza rolę Ubezpieczający, gdy portal pokazuje przycisk radio",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa wybiera Ubezpieczającego w oknie startowym przed wpisaniem danych",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa uzupełnia tylko puste pola z tego samego wiersza, a brak powiatu wymaga operatora",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa wybiera wyłącznie istniejącą opcję powiatu z zatwierdzonej poprawki",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa zatrzymuje formularz przy konflikcie osoby przed zapisem",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa zatrzymuje produkcyjny przebieg, gdy wyszukiwanie nie wypełni danych osoby",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "wznowienie otwartego szkicu nie rozpoczyna drugiej oferty, gdy formularz zniknął",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "wznowienie zapisu po zniknięciu formularza: potwierdzenie=true, bez nowego kliknięcia",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "wznowienie zapisu po zniknięciu formularza: potwierdzenie=false, bez nowego kliknięcia",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa Save intent zapisuje jedną akcję i retry zwraca already_saved",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa normalizuje odstępy w numerze oferty przed checkpointem",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "po niepotwierdzonym timeoutcie Compensa retry najpierw uzgadnia portal i nie klika drugi raz",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "nierozstrzygnięty wynik lookup zatrzymuje run przed drugim kliknięciem Zapisz",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "retry klika ponownie dopiero po autorytatywnym potwierdzeniu braku zapisu dla tej samej sprawy",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "anulowanie po trwałym zamiarze, ale przed akcją portalu nie klika Zapisz",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "syntetyczny CPortal otwiera Compensa Komunikacja i pokazuje Dane ubezpieczonych",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa dismisses a planned-maintenance notice before continuing, delay=0",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa dismisses a planned-maintenance notice before continuing, delay=250",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa never guesses between duplicate notice close buttons",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "an active maintenance page is not dismissed as a future announcement",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "Compensa waits for the SPA login screen before sending credentials once",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "a confirmed successful login permits authentication again after a fresh application entry",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "aktywna sesja Compensy jest używana ponownie, a ekran MFA tylko zgłasza interwencję",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/compensa-browser.log"
+    },
+    {
+      "title": "verified zero OC returns a complete empty snapshot without opening unavailable details",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/ufg-browser.log"
+    },
+    {
+      "title": "widoczna tabela przed odpowiedzią UFG nie jest potwierdzeniem wykonanej weryfikacji",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/ufg-browser.log"
+    },
+    {
+      "title": "UFG weryfikuje raz, zbiera pełny snapshot i filtr daty pozostawia osobnym krokiem",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/ufg-browser.log"
+    },
+    {
+      "title": "UFG wymaga zatwierdzenia niepewnej weryfikacji, właściwego case i pełnej liczby rekordów",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/ufg-browser.log"
+    },
+    {
+      "title": "a unique PESEL without a contact defers names to the Communication form without looking up another portal",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "Firma uses the exact returned REGON and name ordering does not create a false ambiguity",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "the observed no-result marker accepts the searched identifier suffix and a following successful search",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "Everest never chooses the first of ambiguous navigation buttons or search inputs",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "Everest waits for the new REGON render and ignores unrelated page mutations",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "Everest pobiera PESEL z wiersza osoby fizycznej po wyszukaniu REGON",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "ambiguous login targets never receive credentials or a submit click",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "manual login or a closed MFA tab cannot be recorded as an accepted platform code",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "observed PZU selectors submit through the SMS frame and remember the device",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "PZU does not submit an expired code, including expiry immediately before the browser action",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "observed PZU resend waits for a delayed link and never falls back to login",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "sesja Everest rozpoznaje istniejące logowanie i ekrany wymagające interwencji na fikcyjnej stronie",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "logowanie jest pojedynczą próbą i zatrzymuje się na prawdziwym ekranie SMS",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "kod SMS z bufora ręcznego jest wysłany raz, a bufor zostaje wyzerowany",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "kod SMS w ramce PZU jest podawany do właściwej ramki i zerowany",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "PZU zaznacza zapamiętanie urządzenia przed przekazaniem SMS, gdy portal pokazuje tę opcję",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "PZU nie klika przycisku SMS, gdy selektor obejmuje więcej niż jedną akcję",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "utrzymany formularz SMS bez jawnego markera jest niepewny, a markery odróżniają błędny i wygasły kod",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "po timeoutcie PZU otwiera nowy cykl logowania zamiast używać starego formularza SMS",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "PZU ponawia SMS tylko przez jednoznaczny przycisk dostępny po timeoutcie",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "po SMS-ie sesja przechodzi ze strony usług SSO do Everest bez drugiego logowania",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "brak poświadczeń nie powoduje wpisywania ani wysłania pustego formularza",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "błąd nawigacji kończy sprawdzenie sesji kodem bez retry ani obejścia TLS",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "Secfense non-SMS methods with the same code fields are not reported as SMS",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-browser-coverage/extra-browser-coverage.log"
+    },
+    {
+      "title": "an empty or ambiguous Secfense frame cannot create an SMS challenge",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-browser-coverage/extra-browser-coverage.log"
+    },
+    {
+      "title": "the confirmed SMS route and visible code form are recognized without submitting anything",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-browser-coverage/extra-browser-coverage.log"
+    },
+    {
+      "title": "SMS recognition waits for the code form inside a loading Secfense frame",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-browser-coverage/extra-browser-coverage.log"
+    },
+    {
+      "title": "browser blocks foreign_origin before its fixture receives a navigation and fences subsequent actions",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "browser blocks unrelated_path before its fixture receives a navigation and fences subsequent actions",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    },
+    {
+      "title": "browser blocks popup before its fixture receives a navigation and fences subsequent actions",
+      "status": "PASS_FIXTURE",
+      "fixtureEvidence": "docs/acceptance/2026-11-06-extra/everest-browser.log"
+    }
+  ],
+  "limits": "Local fixtures, not live portals."
+}

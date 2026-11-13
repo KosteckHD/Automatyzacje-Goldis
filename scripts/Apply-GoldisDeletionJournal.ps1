@@ -33,7 +33,7 @@ try {
   }
   $activeGoldisWorkers = @(Get-CimInstance Win32_Process | Where-Object {
     $commandLine = ([string]$_.CommandLine).Replace('\', '/')
-    $commandLine -match 'apps/(worker/dist/run-worker|api/dist/enrichment-worker|api/dist/main)\.js'
+    $commandLine -match 'apps/(worker/dist/run-worker|api/dist/(enrichment-worker|commission-worker|main))\.js'
   })
   if ($activeGoldisWorkers.Count -gt 0) { throw "RESTORE_STOP_API_WEB_AND_WORKERS_FIRST" }
 

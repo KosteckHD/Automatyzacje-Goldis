@@ -180,13 +180,6 @@ async function main() {
         report.portalDiagnostics.push(diagnostic); console.log(JSON.stringify(diagnostic)); }
       return selected;
     };
-    const resolvePersonName = CompensaClientChoice.prototype.resolvePersonName;
-    CompensaClientChoice.prototype.resolvePersonName = async function (...args) {
-      const name = await resolvePersonName.apply(this, args);
-      const diagnostic = { portal: "compensa", businessPersonNameResolved: Boolean(name) };
-      report.portalDiagnostics.push(diagnostic); console.log(JSON.stringify(diagnostic));
-      return name;
-    };
     const { startRunWorker } = require("../apps/worker/dist/run-worker.js");
     runtime = await startRunWorker({ startPaused: true });
     const browserContext = await runtime.browser.open();

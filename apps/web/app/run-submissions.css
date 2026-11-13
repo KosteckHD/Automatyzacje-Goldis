@@ -69,6 +69,14 @@
 .submission-actions button:hover:not(:disabled) { border-color: var(--color-gold); color: var(--color-gold-hover); }
 .submission-actions button:last-child:not(:first-child) { color: var(--color-danger); }
 .submission-detail-counts { margin: 14px 0; }
+.submission-progress-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:14px 0; }
+.submission-progress-summary article { display:grid; gap:7px; padding:16px; border:1px solid var(--color-border); border-radius:7px; background:var(--color-surface); }
+.submission-progress-summary article span { color:var(--color-text-muted); font-size:.76rem; }
+.submission-progress-summary article strong { color:var(--color-gold-hover); font:500 1.65rem var(--font-data),Consolas,monospace; font-variant-numeric:tabular-nums; }
+.submission-progress-summary article small { color:var(--color-text-muted); font-size:.7rem; }
+.submission-secondary-counts { grid-column:1/-1; margin:0; padding:11px 14px; border-left:2px solid var(--color-border); color:var(--color-text-muted); font-size:.75rem; line-height:1.5; }
+.submission-detail-counts>summary { min-height:44px; display:flex; align-items:center; color:var(--color-text-muted); cursor:pointer; }
+.submission-detail-counts[open]>.submission-counts { margin-top:8px; }
 .submission-items-section { margin-top: 25px; }
 .submission-items { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,230px),1fr)); gap: 8px; margin-top: 14px; }
 .submission-item { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 5px 10px; min-width: 0; padding: 11px 12px; border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-surface); }
@@ -90,6 +98,8 @@
   .submission-actions { display: grid; grid-template-columns: 1fr; }
   .submission-actions button { width: 100%; }
   .submission-counts { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .submission-progress-summary { grid-template-columns:1fr; }
+  .submission-secondary-counts { grid-column:auto; }
   .prepared-set-progress-head { align-items: stretch; flex-direction: column; }
   .prepared-set-progress-head button { width: 100%; }
 }

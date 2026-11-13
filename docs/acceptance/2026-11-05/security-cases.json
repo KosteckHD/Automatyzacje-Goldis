@@ -1,0 +1,1212 @@
+[
+  {
+    "id": "SEC01",
+    "category": "security",
+    "gate": "G0",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Manifest zakresu bezpieczeństwa i kompletna powierzchnia bieżącego wydania",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Zidentyfikować pełny snapshot tracked i untracked, lockfile npm/Python, migracje do aktualnej końcówki oraz digesty wszystkich obrazów; nie przypisywać mu wyników starszego drzewa.",
+      "Zinwentaryzować faktyczne trasy, procesy, role DB, kolejki, pliki i granice zaufania dla OC oraz rzeczywistego commission-comparison: migracji 066, commission-worker, prywatnego Python engine, słownika i eksportów.",
+      "Przygotować syntetyczne konta wszystkich ról, operatorów A/B, drugi tenant, osobne granty OC/prowizji/słownika i prywatny tool fixture; potwierdzić kontrolą dodatnią działanie canary HTTP/DNS/mail.",
+      "Zapisać zakres wyłączeń; nawet przy deklaracji OC-only objąć testami wspólne migracje, role, sieci, sekrety i usługi prowizji obecne w paczce. Ukrycie karty nie jest dowodem wyłączenia API."
+    ],
+    "passCriteria": [
+      "Manifest jednoznacznie wiąże każdy późniejszy wynik ze źródłem, obrazami, konfiguracją, seedem i środowiskiem; inwentaryzacja obejmuje wszystkie zarejestrowane trasy.",
+      "Każda granica ma dozwolony i zabroniony przypadek, a odbiorniki testowe działają i nie kierują ruchu do usług klienta lub dostawców.",
+      "Bieżące prowizje są objęte zakresem jako rzeczywisty moduł; ewentualne N/A dotyczy udowodnionego zakresu funkcji, nie pominięcia wspólnej powierzchni runtime."
+    ],
+    "evidence": [
+      "Manifest przebiegu z hashami źródła, migracji, lockfile i digestami obrazów, bez sekretów.",
+      "Macierz tras, aktorów, grantów, procesów i przepływów danych wraz z listą seedów.",
+      "Wyniki dodatniej kontroli canary i zaakceptowany zakres własnych celów oraz wyłączeń."
+    ],
+    "entryPoints": [
+      "scripts/create-release-manifest.cjs",
+      "scripts/backend-refactor-inventory.cjs",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT00-01",
+      "PT00-02",
+      "PT00-03",
+      "PT00-04",
+      "PT00-05",
+      "compose.yaml",
+      "compose.production.yaml",
+      "apps/api/src/infrastructure/database/migrations/066-commission-comparison.ts",
+      "docs/porownywarka-prowizji/IMPLEMENTATION_STATUS.md"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC02",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P1",
+    "title": "Enumeracja kont, limity logowania i wiarygodny adres klienta",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Przy wcześniej opisanej, ograniczonej próbie porównać błędny login istniejącego i nieistniejącego konta: status, treść, cookies oraz rozkład czasu; losować kolejność i zapisać kryterium oceny przed próbą.",
+      "Sprawdzić progi loginu, ponownego uwierzytelnienia i budżetu API oraz kontrolowany brak Redis; potwierdzić ograniczenie kosztu KDF i kolejki oczekujących.",
+      "Powtórzyć ograniczone próby przez testowe HTTPS/proxy z podmienianymi Forwarded i X-Forwarded-For; przy aktywnym recovery sprawdzić też ogólną odpowiedź i limit wiadomości do lokalnej skrzynki."
+    ],
+    "passCriteria": [
+      "Nie występuje użyteczne, powtarzalne rozróżnienie istnienia konta według wcześniej zapisanej metody oceny.",
+      "Limity wykorzystują wiarygodny adres klienta, ograniczają koszt i nie pozwalają obejść blokady przez dowolny nagłówek; awaria licznika nie otwiera dostępu."
+    ],
+    "evidence": [
+      "Zredagowane próbki odpowiedzi, opis próby i wyniki pomiarów czasu.",
+      "Liczniki prób, KDF i lokalnych wiadomości oraz odpowiedzi limitera z testowego proxy.",
+      "Log kontrolowanej awarii Redis i potwierdzenie braku skutku biznesowego."
+    ],
+    "entryPoints": [
+      "npm run test:module:auth",
+      "npm run test:module:security-redis",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT01-01",
+      "PT02-01",
+      "PT14-02",
+      "apps/api/src/features/auth/login-rate-limiter.ts",
+      "apps/api/src/features/auth/password-hash.ts",
+      "apps/api/src/infrastructure/http/http-bootstrap.ts"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC03",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Sesje, podpis, wygaśnięcie i natychmiastowa utrata dostępu",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Użyć uszkodzonego podpisu i claims, legacy tokenu, Bearer zamiast sesji, cudzej cookie CSRF i fałszywego nagłówka roli na poprawnych żądaniach OC oraz prowizji.",
+      "Wykonać login, logout, revoke sesji, zmianę hasła i blokadę konta; po zatwierdzeniu zmiany ponowić wcześniejszy token i sprawdzić również dostęp do plików oraz słownika prowizji.",
+      "Sprawdzić timeout bezczynności i absolutny, polling bez aktywności, sygnał aktywności, wymuszoną zmianę hasła oraz zmianę roli/członkostwa bez ponownego logowania.",
+      "Przy recovery mailowym off sprawdź publiczne i administracyjne akcje inicjujące link odzyskiwania: brak skutecznego tokenu, wysyłki i aktywnego outboxu; stare linki nie przywracają dostępu. Dozwolony bezpośredni reset administracyjny pozostaje osobnym przypadkiem OPS03."
+    ],
+    "passCriteria": [
+      "Podrobiona, nieważna, wygasła lub cofnięta sesja nie autoryzuje nowej niedozwolonej operacji żadnego narzędzia.",
+      "Rotacja, oba timeouty i mustChangePassword odpowiadają zapisanej polityce; sam polling nie utrzymuje sesji bez końca.",
+      "Odmowa nie wywołuje skutku biznesowego, a poprawna kontrola uprawnionego konta działa.",
+      "Wyłączenie recovery jest egzekwowane skutkami, także przez bezpośrednie API; ogólna odpowiedź nie zastępuje kontroli tokenów/outboxu, a sam brak403 nie jest automatycznie błędem."
+    ],
+    "evidence": [
+      "Macierz wariantów sesji i zredagowane request/response.",
+      "Stan user_sessions, credential revisions i członkostwa oraz timeline zatwierdzenia cofnięcia.",
+      "Odczyt skutków DB/plików dla OC i prowizji oraz browser trace timeoutu."
+    ],
+    "entryPoints": [
+      "npm run test:module:auth",
+      "npm run test:module:security",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT01-02",
+      "PT01-03",
+      "PT01-04",
+      "PT01-05",
+      "apps/api/src/features/auth/session-principal.ts",
+      "apps/api/src/features/identity/identity-session-policy.ts",
+      "apps/api/src/features/commissions/commissions.controller.ts"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC04",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "recovery_mail",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Odzyskiwanie konta, weryfikacja adresu i ochrona tokenów",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "W testowej skrzynce przygotować reset i weryfikację adresu; sprawdzić token uszkodzony, wygasły, innego purpose/użytkownika i powiązany ze starą rewizją adresu lub hasła.",
+      "Wysłać dwa równoległe użycia tego samego tokenu, następnie replay; równolegle zmienić adres/hasło oraz sprawdzić unieważnienie poprzednich sesji i tokenów.",
+      "Podmienić Host i forwarding headers przy generowaniu linku; sprawdzić URL, Referer, cache, logi API/proxy/mail oraz próby zmiany adresu bez hasła, CSRF i właściwej roli."
+    ],
+    "passCriteria": [
+      "Jeden token powoduje co najwyżej jeden właściwy trwały skutek, tylko dla zgodnego konta, celu, rewizji i zweryfikowanego adresu.",
+      "Link ma zatwierdzony origin; token i treść outboxu nie trafiają jawnie do nieuprawnionych odbiorników ani logów.",
+      "Reset i zmiana adresu unieważniają dostęp według polityki bez możliwości przejęcia konta przez wyścig."
+    ],
+    "evidence": [
+      "Zredagowany log testowej skrzynki, request/response i adresy linków bez surowych tokenów.",
+      "Stan tokenów, szyfrowanego outboxu, rewizji i sesji po próbach oraz licznik trwałych skutków.",
+      "Browser trace oraz kontrola logów/cache/referer z zapisanym zakresem wyszukiwania."
+    ],
+    "entryPoints": [
+      "npm run test:module:password-recovery",
+      "npm run test:module:auth",
+      "npm run test:module:security-browser",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT02-01",
+      "PT02-02",
+      "PT02-03",
+      "PT02-04",
+      "PT02-05",
+      "apps/api/src/features/account-recovery/account-recovery-tokens.ts",
+      "apps/api/src/features/account-recovery/auth-mail-dispatcher.ts"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC05",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Macierz dostępu do wszystkich bieżących funkcji API",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Dla każdej trasy z SEC01 wysłać bez UI poprawny payload jako anon, każda rola i konto z cofniętą sesją; włączyć wszystkie trasy commissions, admin grantów słownika i funkcje OC.",
+      "Wykazać działającą kontrolę dodatnią i odmowę niedozwolonej funkcji z obserwacją wywołania use case oraz skutków DB/plików/kolejki; nie traktować błędu walidacji payloadu jako testu autoryzacji.",
+      "Sprawdzić stosowne warianty HEAD/OPTIONS, metod, kodowania, slash/case i override headers przez bramę oraz dopasować wyjątki publiczne do aktualnego inventory."
+    ],
+    "passCriteria": [
+      "Każda chroniona trasa ma rozstrzygnięte przypadki dla wymaganych ról; niedozwolony aktor nie uruchamia funkcji biznesowej.",
+      "Wariant routingu nie pomija ochrony, a rzeczywiście publiczne endpointy mają udokumentowany bezpieczny kontrakt.",
+      "Macierz obejmuje backend prowizji także przy ukrytym UI lub planowanym wydaniu OC-only."
+    ],
+    "evidence": [
+      "Macierz route × metoda × rola × stan × expected/actual z identyfikatorem snapshotu.",
+      "Zredagowane request/response i licznik biznesowych wywołań oraz kontrola braku skutku.",
+      "Różnice między inventory, historycznym harness-em i nowymi trasami wraz z rozliczonym pokryciem."
+    ],
+    "entryPoints": [
+      "scripts/security-boundary-audit-2026-10-17.cjs",
+      "npm run test:module:security",
+      "npm run test:module:app-module",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT03-01",
+      "PT03-02",
+      "PT03-05",
+      "apps/api/src/features/commissions/commissions.controller.ts",
+      "apps/api/src/composition/module.ts"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC06",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "IDOR, granica tenanta i zgodność rodzic–dziecko obu narzędzi",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Zamienić IDs A na B i obcy tenant dla import/run/submission/resultSet/lead/artifact/intervention/enrichment-job/session oraz prowizyjnych fileId/versionId/entryId/runId/exportId/resolution.",
+      "Mieszać rodzic–dziecko, listę plików różnych tenantów, wersję słownika z inną analizą i identyfikatory OC z prowizjami; wykonywać poprawne odczyty i mutacje w każdej dozwolonej roli, także admina.",
+      "Porównać stan przed/po i dane odpowiedzi z uzgodnioną polityką: wspólny odczyt OC, własność importu, starter runu i oddzielny grant słownika prowizji."
+    ],
+    "passCriteria": [
+      "Znajomość identyfikatora nie daje niedozwolonego odczytu ani zapisu; każdy rodzic i dziecko są w uprawnionym zakresie, a admin nie przekracza tenanta.",
+      "Celowo współdzielone OC działa bez rozszerzenia tego wyjątku na poufne pliki, słowniki i wyniki prowizji.",
+      "Nie występuje wyciek metadanych ani skutek biznesowy przez błędnie połączone zasoby."
+    ],
+    "evidence": [
+      "Macierz obiektów, właścicieli, tenantów, ról i zasad współdzielenia.",
+      "Zredagowane pary dozwolony/zabroniony request oraz odpowiedzi.",
+      "Diff DB i plików, liczniki fixture i kontrola spójności relacji po mutacjach."
+    ],
+    "entryPoints": [
+      "npm run test:module:tenant-scope",
+      "npm run test:module:security-db",
+      "npm run test:module:results",
+      "npm run test:module:teams-db",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT03-03",
+      "PT03-04",
+      "apps/api/src/features/authorization/authorization.repository.ts",
+      "apps/api/src/features/commissions/commissions.service.ts",
+      "apps/api/src/features/commissions/commissions.repository.ts"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC07",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Granty narzędzi i słownika, retest metadanych oraz rzeczywisty download",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Retestować historyczne ustalenia SEC-01 i SEC-02 na prywatnym tool fixture i rzeczywistych prowizjach: brak grantu, discover, execute, view_results i download_results w dozwolonych kombinacjach.",
+      "Dla available/maintenance/disabled sprawdzić katalog, dashboard, listy, szczegóły, import, analizę, eksport oraz zmianę słownika; oddzielić grant narzędzia prowizji od uprawnienia edycji słownika.",
+      "Utworzyć świeżego pracownika przez managera i porównać tekst panelu, Team API, aktualny grant i faktyczne pobranie wyniku; ponowić po zmianie praw."
+    ],
+    "passCriteria": [
+      "Nieuprawnione narzędzie nie ujawnia metadanych list/dashboardu; legalny wyjątek OC jest zachowany, a nie przeniesiony na prowizje.",
+      "UI, odpowiedzi o uprawnieniach i backend egzekwują tę samą zapisaną politykę pobrań i stanów narzędzia.",
+      "Samo execute lub view narzędzia nie daje automatycznie prawa edycji/publikacji słownika, jeśli polityka wymaga osobnego grantu."
+    ],
+    "evidence": [
+      "Tabela grant × stan narzędzia × operacja z expected/actual.",
+      "Odpowiedzi HTTP i obrazy panelu świeżego pracownika wraz z wynikiem rzeczywistego pobrania.",
+      "Wynik regresji historycznych SEC-01/SEC-02 i kontrola braku danych prowizyjnych w odpowiedziach OC."
+    ],
+    "entryPoints": [
+      "npm run test:module:reports",
+      "npm run test:module:runtime-roles",
+      "apps/api/scripts/security-resource-scope-db-smoke.cjs",
+      "apps/web/scripts/tool-grants-ui-smoke.cjs",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT04-01",
+      "PT04-02",
+      "PT04-03",
+      "apps/api/src/features/authorization/tool-access.ts",
+      "apps/api/src/features/teams/team.service.ts",
+      "apps/api/src/features/commissions/commissions.controller.ts",
+      "docs/security/remediation-2026-10-17/IMPLEMENTATION_REPORT.md"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC08",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Cofnięcie praw, stare kursory i autoryzacja przed paginacją",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Dla OC i prowizji odebrać odpowiedni grant narzędzia/słownika, rolę lub członkostwo, po commit użyć starej sesji i ponowić listę, szczegół, pobranie oraz mutację.",
+      "Ponowić stare kursory, filtry i strony; sprawdzić total/count/agregacje, listy plików i słowników, dashboard, historię i powiadomienia przy danych dozwolonych i zabronionych.",
+      "Sterowaną barierą przeprowadzić revoke równolegle z mutacją; zapisać punkt serializacji i rozstrzygnąć wynik niepewnego commitu odczytem lub idempotencją."
+    ],
+    "passCriteria": [
+      "Po zatwierdzonym cofnięciu nowe niedozwolone żądanie nie powoduje skutku; punkt kontroli praw i commit mają jednoznaczny kontrakt.",
+      "Nieuprawnione rekordy są wyłączone przed count, agregacją, sortowaniem i paginacją; stary cursor nie przywraca dostępu.",
+      "Cofnięcie grantu słownika jest egzekwowane niezależnie od ważnego grantu samego narzędzia."
+    ],
+    "evidence": [
+      "Timeline request/revoke/commit i stan grantów oraz rewizji.",
+      "Zredagowane strony, liczniki i odpowiedzi po odwołaniu oraz kontrola braku nowej mutacji.",
+      "Wynik sterowanego wyścigu i stan końcowy, bez wnioskowania tylko z kodu HTTP."
+    ],
+    "entryPoints": [
+      "npm run test:module:reports",
+      "npm run test:module:security",
+      "apps/api/scripts/security-resource-scope-db-smoke.cjs",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT04-04",
+      "PT08-04",
+      "CH-04",
+      "apps/api/src/features/authorization/resource-scope.ts",
+      "apps/api/src/features/commissions/commissions.repository.ts"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC09",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Mass assignment, ścisłe DTO i minimalne pola odpowiedzi",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Do poprawnych payloadów dopisać role, tenantId, owner, status, version oraz nieznane pola, w tym do createRun, resolutions i edycji słownika prowizji.",
+      "Zamienić skalary na obiekty/tablice/null, powtórzyć parametry i zbadać liczby graniczne, zbyt długie wartości oraz niebezpieczne klucze obiektu.",
+      "Porównać pola odpowiedzi i błędów dla ról; sprawdzić API, logi i kontrakt Node/Python pod kątem sekretów, PESEL i nadmiarowych pól słownika lub snapshotu."
+    ],
+    "passCriteria": [
+      "Dodatkowe pola i typy nie zmieniają uprawnień, własności, stanu domeny ani prototypów; wejście przechodzi jawny, ograniczony kontrakt.",
+      "Odpowiedzi zawierają wyłącznie pola dopuszczone dla aktora i nie ujawniają sekretów lub wewnętrznego stanu procesu.",
+      "Kontrola dodatnia działa, a odmowa nie jest pozornym sukcesem ani częściowym zapisem."
+    ],
+    "evidence": [
+      "Rejestr payloadów i wyników walidacji z mapowaniem do DTO/kontraktu.",
+      "Diff DB przed/po i porównanie schematów odpowiedzi dla ról.",
+      "Zredagowane próbki błędów i logów z kontrolą ujawnienia danych."
+    ],
+    "entryPoints": [
+      "npm run test:module:security",
+      "npm run test:module:auth",
+      "apps/api/src/infrastructure/http/public-output.spec.ts",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT04-05",
+      "PT06-03",
+      "apps/api/src/features/commissions/commissions.controller.ts",
+      "packages/core/src/commissions/engine-contract.ts",
+      "services/commission-engine/src/goldis_commissions/transport/schemas.py"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC10",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Rzeczywista przeglądarka, CORS i CSRF przez HTTPS",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Z kontrolowanych obcych domen, subdomeny, innego portu i null origin wykonać fetch/preflight/form w przeglądarce z sesją testową przez HTTPS/proxy.",
+      "Dla każdej klasy mutacji obu narzędzi użyć brakującego, złego i obcego CSRF/Origin/Fetch-Site; objąć upload, zmianę słownika, start/cancel prowizji i tworzenie eksportu.",
+      "Wykonać dozwolone kontrole dodatnie i sprawdzić skutki w DB/kolejce/plikach, a także rzeczywisty dostęp JavaScript do odpowiedzi; osobno ocenić jawne wyjątki OriginOnly."
+    ],
+    "passCriteria": [
+      "Obca strona nie odczytuje prywatnej odpowiedzi i nie powoduje niedozwolonej mutacji.",
+      "Właściwy origin i CSRF umożliwiają legalną operację, a wyjątki są zgodne z kontraktem; samo HTTP 200 lub brak nagłówka nie zastępują testu przeglądarkowego."
+    ],
+    "evidence": [
+      "Zredagowany HAR/Playwright trace z rzeczywistymi originami i wynikami odczytu JavaScript.",
+      "Stan skutków biznesowych i licznik wywołań fixture dla dodatnich oraz ujemnych prób.",
+      "Nagłówki proxy/API i lista zbadanych klas mutacji, łącznie z prowizjami."
+    ],
+    "entryPoints": [
+      "npm run test:module:security-browser",
+      "apps/api/src/infrastructure/http/request-protection.http.spec.ts",
+      "scripts/security-boundary-audit-2026-10-17.cjs",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT05-01",
+      "PT05-02",
+      "apps/api/src/infrastructure/http/request-protection.ts",
+      "apps/api/src/features/commissions/commissions.controller.ts",
+      "deploy/nginx/goldis.conf.example"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC11",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "XSS, polityki przeglądarki i brak cudzych danych po zmianie konta",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Wprowadzić nieszkodliwe markery stored/reflected/DOM XSS przez nazwy plików i firm, uwagi i błędy integracji, słownik, findings i resolutions prowizji; obejrzeć właściwe widoki operatora, managera i admina.",
+      "Na produkcyjnym buildzie przez HTTPS sprawdzić CSP/nonce, clickjacking i cookie Secure/HttpOnly/SameSite oraz zachowanie stron błędu.",
+      "Wykonać odczyt prywatnych danych konta A, logout i login B; sprawdzić back/forward, RSC/API/Next/proxy cache i ponowne pobranie OC/prowizji."
+    ],
+    "passCriteria": [
+      "Marker pozostaje danymi i nie wykonuje kodu, także po przejściu przez DB/engine do innego panelu.",
+      "Polityki działają w przeglądarce, a konto B i nowa prywatna odpowiedź po logout nie dostają danych A z cache."
+    ],
+    "evidence": [
+      "Playwright trace, obrazy istotnych widoków i licznik wykonania markera.",
+      "Nagłówki CSP/cache/cookies na stronach poprawnych i błędach.",
+      "Sekwencja żądań dwóch kont z kontrolą prywatnych markerów w RSC/API i cache."
+    ],
+    "entryPoints": [
+      "npm run test:module:security-browser",
+      "apps/web/scripts/security-browser-smoke.cjs",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT05-03",
+      "PT05-04",
+      "PT05-05",
+      "PT06-02",
+      "CH-01",
+      "apps/web/app/tools/commission-comparison/workspace.tsx",
+      "apps/api/src/infrastructure/http/public-output.ts"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC12",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Celowane injection w SQL, ścieżki, procesy, szablony i nagłówki",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Na podstawie inventory sinków zastosować bezpieczne markery SQL i second-order w search/filter/sort/cursor/IDs, nazwach i zapisanych danych obu narzędzi; każdą próbę powiązać z konkretnym sinkiem.",
+      "Sprawdzić traversal, command/template/header injection w filename, eksportach, argumentach i danych wejściowych supervisora Python oraz szablonach maila; używać tylko własnych canary i plików-markerów.",
+      "Wysłać niepoprawny JSON/XML/Content-Type i CRLF; porównać kontrolę dodatnią, odpowiedź oraz stan bazy, katalogów i liczniki procesów."
+    ],
+    "passCriteria": [
+      "Wejście pozostaje wartością, nie zmienia zakresu zapytania, polecenia, ścieżki ani nagłówka i nie uruchamia nieplanowanego kodu.",
+      "Błędy są kontrolowane i nie ujawniają SQL, stack trace, ścieżek, sekretów ani treści klienta.",
+      "Zbadane sinki i nieobjęte miejsca są jawnie rozliczone; brak wyniku skanera nie stanowi samodzielnego PASS."
+    ],
+    "evidence": [
+      "Mapa wejście → trwały zapis → sink z zastosowanym markerem i expected/actual.",
+      "Zredagowane request/response i kontrola stanu DB/plików/canary.",
+      "Log supervisora i procesu potomnego bez payloadów tajnych oraz raport niepokrytych sinków."
+    ],
+    "entryPoints": [
+      "apps/api/src/infrastructure/http/public-output.spec.ts",
+      "apps/api/src/features/imports/workbook.spec.ts",
+      "services/commission-engine/tests/unit/test_process_supervisor.py",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT06-01",
+      "PT06-02",
+      "PT06-03",
+      "PT06-04",
+      "PT06-05",
+      "services/commission-engine/src/goldis_commissions/transport/process_supervisor.py",
+      "apps/api/src/features/commissions/commissions.repository.ts"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC13",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Nieufny Excel, ograniczenie zasobów i odzyskanie parsera",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Dla importu OC, uploadu CRM/ASF/WARTA i słownika prowizji sprawdzić niezgodność rozszerzenia/MIME/treści, uszkodzony ZIP/XML i nadmiarowe części multipart; nie zakładać identycznej listy formatów obu parserów.",
+      "W kontenerach z limitami sprawdzić niewielkie kontrolowane przekroczenia rozmiaru skompresowanego/rozpakowanego, wpisów, komórek, tekstu i sumy plików oraz DTD/XXE, relacje zewnętrzne i nazwy ZIP z traversal.",
+      "Wymusić timeout, rozłączenie klienta, crash, zajętość parsera i problem potoku/stdout dla parsera OC i supervisora Python; następnie przesłać poprawny plik i sprawdzić stan trwały."
+    ],
+    "passCriteria": [
+      "Nieufny plik nie odczytuje pliku canary ani nie wykonuje niedozwolonego połączenia; koszt CPU/RAM/czas jest ograniczony.",
+      "Nie powstaje częściowy import lub wynik udający sukces; po błędzie proces i slot są zwalniane, a następny legalny plik działa.",
+      "Wszystkie faktycznie obsługiwane formaty, w tym słownik prowizji, mają osobno sprawdzone zasady walidacji."
+    ],
+    "evidence": [
+      "Manifest bezpiecznych fixture z hashami i rozmiarami oraz rezultaty kontroli formatu.",
+      "Peak RAM/CPU, timeout i process tree, log canary HTTP/plikowego.",
+      "Diff DB/plików i udany kontrolny odczyt po każdej awarii parsera."
+    ],
+    "entryPoints": [
+      "apps/api/src/features/imports/workbook.spec.ts",
+      "apps/api/src/features/imports/import-parser.spec.ts",
+      "services/commission-engine/tests/unit/test_dictionary_import.py",
+      "services/commission-engine/tests/unit/test_process_supervisor.py",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT07-01",
+      "PT07-02",
+      "PT07-03",
+      "PT07-04",
+      "apps/api/src/features/commissions/commissions.controller.ts",
+      "services/commission-engine/src/goldis_commissions/importers/workbook.py",
+      "services/commission-engine/src/goldis_commissions/transport/app.py"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC14",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Prywatny parser i Python engine: tożsamość, sieć i minimalne sekrety",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Wywołać parser OC i /internal/v1/dictionary/import, compare, export oraz cancel silnika prowizji bez tokenu, z błędnym i z tokenem innej usługi, stosując poprawny payload i dodatnią kontrolę.",
+      "Z klienta publicznej bramy i niedozwolonej sieci kontenerowej spróbować dotrzeć do obu usług; sprawdzić rzeczywiste mounty i przydział tokenów, w tym czy parser OC nie otrzymuje zbędnego commission_engine_secret.",
+      "Sprawdzić środowisko i argumenty procesu potomnego Python/parsera pod kątem sekretów Goldis i możliwości sterowania poleceniem przez dokument; dane sekretne porównywać bez ich wypisywania."
+    ],
+    "passCriteria": [
+      "Brak lub obcy sekret nie uruchamia parsowania/obliczeń/anulowania; sekret jednej granicy nie uwierzytelnia na drugiej.",
+      "Usługi prywatne nie są osiągalne z publicznej ścieżki ani niedozwolonej sieci; sekrety są dostępne tylko procesom, które ich potrzebują.",
+      "Potomny proces dostaje ograniczone środowisko i dane, bez dostępu do haseł/tokenów platformy lub interpretacji zawartości jako polecenia."
+    ],
+    "evidence": [
+      "Wyniki prób publicznych i wewnętrznych oraz liczniki uruchomień parsera/engine.",
+      "Zredagowany docker inspect, mapa mountów/sekretów i sieci bez wartości tajnych.",
+      "Opis kontroli env/argv procesu potomnego oraz potwierdzenie odmowy przed wykonaniem kosztownej pracy."
+    ],
+    "entryPoints": [
+      "apps/api/src/features/imports/import-parser.spec.ts",
+      "npm run test:production-compose",
+      "services/commission-engine/tests/unit/test_process_supervisor.py",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT07-05",
+      "PT11-01",
+      "PT11-02",
+      "CH-06",
+      "apps/api/src/features/commissions/commission-engine-client.ts",
+      "services/commission-engine/src/goldis_commissions/transport/app.py",
+      "compose.yaml"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC15",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Role DB, migracja 066, ograniczenia relacji i transakcyjny audyt",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Na docelowej wersji PostgreSQL sprawdzić świeżą instalację i aktualizację do końcówki snapshotu, co najmniej migracji 066; po nałożeniu runtime grants sprawdzić role rzeczywiście używane przez wszystkie procesy.",
+      "Jako goldis_api, goldis_worker, goldis_enrichment i goldis_commission wykonać dozwolone/zabronione odczyty, zapisy, kolumny, funkcje, DDL i SET ROLE; sprawdzić brak PUBLIC oraz brak konta migratora w runtime.",
+      "Sprawdzić mismatch tenant/FK i wymusić błąd domeny/audytu w połowie importu, review, grantu, przydziału, słownika, prowizyjnego zlecenia i finalizacji; spróbować modyfikować historię audytu kontem runtime."
+    ],
+    "passCriteria": [
+      "Każdy proces ma wyłącznie jawne uprawnienia; konto komisji nie czyta kont/sesji ani danych OC poza uzgodnionym kontraktem, a worker OC nie czyta prywatnych prowizji.",
+      "Migracja i ponowne grants nie rozszerzają PUBLIC/runtime; niegotowy schemat nie przyjmuje ruchu, a relacje tenantowe są spójne.",
+      "Awaria audytu/domeny rollbackuje uzgodniony skutek; runtime nie nadpisuje ani usuwa logów audytu. Brak RLS nie jest przedstawiany jako działająca izolacja DB."
+    ],
+    "evidence": [
+      "Ledger migracji, katalog grants i tożsamości procesów bez haseł, z wynikami pozytywnych i negatywnych operacji.",
+      "Stan przed/po rollbacku i relacji tenantowych, obejmujący tabele commission_*.",
+      "Log fresh/upgrade na PostgreSQL 17 i kontrola niezmienności audytu."
+    ],
+    "entryPoints": [
+      "npm run test:module:runtime-roles",
+      "npm run test:module:security-db",
+      "npm run test:module:migrations",
+      "npm run test:module:migrations-upgrade",
+      "npm run test:transaction-audit",
+      "apps/api/scripts/commission-db-smoke.cjs",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT08-01",
+      "PT08-02",
+      "PT08-03",
+      "PT08-04",
+      "PT08-05",
+      "PT15-04",
+      "docker/postgres/apply-runtime-grants.sql",
+      "apps/api/src/infrastructure/database/migrations/066-commission-comparison.ts"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC16",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Potwierdzenia uprzywilejowane, eskalacja i ostatni administrator",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Pominąć albo podmienić confirmation/step-up/preview w operacjach team/admin/usuwania i nadaniu grantu słownika prowizji; użyć innej sesji, celu, body, rewizji oraz wygasłego tokenu.",
+      "Wykonać concurrent consume/replay i użycie tego samego klucza do innej mutacji; sprawdzić wynik i historię jednego trwałego skutku.",
+      "Jako manager/operator spróbować nadać admina, sobie szersze prawa lub grant słownika; równolegle zdegradować/zablokować ostatnich aktywnych administratorów."
+    ],
+    "passCriteria": [
+      "Operacja wymaga aktualnego potwierdzenia związanego z aktorem, sesją, payloadem i celem, a replay nie rozszerza uprawnienia.",
+      "Brak samodzielnej eskalacji i utraty wymaganej liczby aktywnych administratorów; concurrent consume powoduje jeden właściwy skutek.",
+      "Grant słownika prowizji jest objęty tym samym rzeczywistym egzekwowaniem potwierdzeń co pozostałe uprzywilejowane zmiany."
+    ],
+    "evidence": [
+      "Zredagowane przypadki token/payload/aktor i odpowiedzi odmowy.",
+      "Stan confirmations, membership/grant revisions i audytu po replay oraz wyścigu.",
+      "Kontrola liczby aktywnych administratorów i trwałych skutków przed/po."
+    ],
+    "entryPoints": [
+      "npm run test:module:deletion-step-up",
+      "npm run test:module:teams-db",
+      "npm run test:module:admin-users-db",
+      "npm run test:module:security",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT09-01",
+      "PT09-02",
+      "PT09-03",
+      "PT09-04",
+      "apps/api/src/features/privileged-actions/privileged-actions.service.ts",
+      "apps/api/src/features/admin/admin-users.service.ts",
+      "apps/api/src/features/commissions/commissions.service.ts"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC17",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Usuwanie, spóźnione zapisy i ochrona cudzych zachowanych wyników",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Usunąć import OC podczas pobrania/finalizacji/dispatchu/przydziału i dostarczyć spóźniony wynik workera; sprawdzić osobno wynik przydzielony drugiemu użytkownikowi i brak automatycznego TTL.",
+      "Zinwentaryzować uzgodniony zakres usuwania tenantów i danych prowizji; sprawdzić kasowanie pliku nieużytego oraz pliku związanego z analizą, słownikiem lub eksportem, włącznie z równoległym odczytem.",
+      "Przerwać job usuwania/zapis journalu na kontrolowanej granicy, uruchomić ponownie i sprawdzić tombstone, fence, graf zależności i stan plików bez ręcznego ustawiania completed."
+    ],
+    "passCriteria": [
+      "Usunięty lub blokowany zasób nie odzyskuje dostępu przez spóźniony zapis, a wynik B pozostaje legalnie dostępny z niezależnego snapshotu.",
+      "Zakres prowizji jest jawnie rozliczony; referencje, pliki i wyniki są usuwane lub chronione zgodnie z zatwierdzonym grafem, bez cichego pozostawienia danych.",
+      "Przerwanie jest odzyskiwalne, nie daje pozornego sukcesu i nie wprowadza automatycznego purge sprzecznego z przyjętą polityką retencji."
+    ],
+    "evidence": [
+      "Graf danych i stan DB/plików/journalu przed i po usunięciu.",
+      "Timeline spóźnionego workera i prób pobrania A/B oraz kontroli danych prowizji.",
+      "Log restartu joba, stan tombstones i potwierdzenie zgodności journal head."
+    ],
+    "entryPoints": [
+      "npm run test:module:deletion",
+      "npm run test:module:deletion-jobs",
+      "npm run test:module:results",
+      "apps/api/src/features/deletions/deletion-journal.spec.ts",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT09-05",
+      "PT13-05",
+      "CH-05",
+      "apps/api/src/features/commissions/commission-file-store.ts",
+      "apps/api/src/features/commissions/commissions.service.ts",
+      "apps/api/src/features/deletions/deletion-journal-admission.ts"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC18",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Idempotencja, wyścigi, kolejki i restart obu wykonawców",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Dla OC i prowizji ponowić/równolegle wysłać start, użyć tego samego klucza z innym body i innym aktorem; ominąć wymagane przygotowanie/stan, podmienić pliki lub rewizję słownika.",
+      "Uruchomić konkurujące procesory, dostarczyć stary lease/executionId OC i stary active_attempt_token prowizji, a następnie wykonać cancel/pause/resume i replay z nieaktualną rewizją.",
+      "W izolacji przerwać proces po zapisie DB przed enqueue i po enqueue przed potwierdzeniem outbox, osobno dla run_dispatch_outbox i commission_dispatches/kolejki commission-comparison; po restarcie zmierzyć faktyczne skutki fixture."
+    ],
+    "passCriteria": [
+      "Prawa, stan i wersje są weryfikowane przez backend, a idempotencja ma właściwy scope i hash; brak nieuprawnionego duplikatu.",
+      "Stary wykonawca nie nadpisuje aktualnego wyniku; zakończony/anulowany/usunięty run nie jest bezprawnie wznawiany.",
+      "Restart nie gubi pracy ani nie powiela nieodwracalnego skutku; niepewny wynik jest jawny i rozstrzygany odczytem, nie liczbą samych jobów."
+    ],
+    "evidence": [
+      "Timeline DB/outbox/Redis/worker/engine z identyfikatorami prób bez sekretów.",
+      "Liczniki skutków fixture oraz stan runów, dispatches, snapshots i kontroli wersji po każdej awarii.",
+      "Rejestr punktów fault injection i wynik poprawnego kontrolnego przebiegu po restarcie."
+    ],
+    "entryPoints": [
+      "npm run test:module:submission",
+      "npm run test:module:run-control",
+      "npm run test:module:worker-lifecycle",
+      "npm run test:module:runs",
+      "services/commission-engine/tests/unit/test_process_supervisor.py",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT10-01",
+      "PT10-02",
+      "PT10-03",
+      "PT10-04",
+      "PT10-05",
+      "apps/api/src/commission-worker.ts",
+      "apps/api/src/features/commissions/commissions.service.ts",
+      "apps/api/src/features/runs/run-dispatch.service.ts"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC19",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Wynik workera i kontrakt engine nie zastępują autoryzacji wykonania",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Z bramy publicznej i dozwolonej sieci wewnętrznej wywołać private worker result z brakującym, błędnym, obcym i starym sekretem po kontrolowanej rotacji; wykonać dodatnią kontrolę właściwego procesu.",
+      "Z poprawnym sekretem podać cudzy run/execution, niepełny payload i replay OC; dla prowizji podać niezgodny kontrakt/result schema, executionId/requestId lub attemptToken oraz opóźniony wynik starego wykonania.",
+      "Sprawdzić finalny zapis snapshotu/eksportu i anulowanie: sekret usługi nie może znosić fence, tenant scope, walidacji lub stanu runu; objąć także bezpośrednią próbę cancel Python engine cudzym tokenem próby."
+    ],
+    "passCriteria": [
+      "Publiczna ścieżka nie daje dostępu do private API; sesja użytkownika i sekret innej usługi nie zastępują właściwej tożsamości.",
+      "Poprawny sekret nie umożliwia zapisu wyniku lub anulowania niezgodnego wykonania, a replay/stary wynik nie nadpisują aktualnego snapshotu.",
+      "Kontrakt Node/Python i bieżący token próby są egzekwowane przed trwałym skutkiem, nie tylko po odpowiedzi HTTP."
+    ],
+    "evidence": [
+      "Zredagowane próby z obu punktów sieci i wynik kontrolnej rotacji bez wartości kluczy.",
+      "Hash i stan snapshots/exports/runs przed i po niepoprawnym oraz spóźnionym wyniku.",
+      "Liczniki zapisów/anulowań fixture i rezultaty walidacji Node/Python."
+    ],
+    "entryPoints": [
+      "apps/api/scripts/worker-result-smoke.cjs",
+      "npm run test:module:results",
+      "apps/api/src/contracts/worker-execution.spec.ts",
+      "services/commission-engine/tests/unit/test_process_supervisor.py",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT11-01",
+      "PT11-02",
+      "PT11-03",
+      "CH-06",
+      "packages/core/src/commissions/engine-contract.ts",
+      "apps/api/src/commission-worker.ts",
+      "services/commission-engine/src/goldis_commissions/transport/app.py"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC20",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "SMS tylko dla właściwego startera, challenge i bieżącego cyklu",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Na fixture runu rozpoczętego przez B sprawdzić odczyt/metadane i podanie kodu przez A jako ownera importu, assignee, managera i admina oraz poprawnego startera B; nie traktować roli admin jako domyślnego prawa przejęcia SMS.",
+      "Podać błędny run, portal, challenge, kod wygasły lub już użyty; sprawdzić trwałość limitu retry po restarcie i nowym cyklu logowania.",
+      "Anulować run podczas przekazywania kodu, następnie sprawdzić brak późniejszego użycia i brak surowych kodów w DB/Redis/logach oraz brak dostępu z procesów prowizji."
+    ],
+    "passCriteria": [
+      "Backend egzekwuje uzgodnioną regułę startera runu, z jawnymi zasadami metadanych i bez niezamierzonego przejęcia przez ownera/assignee/admina.",
+      "Kod jest jednokrotny, związany z runem, portalem, challenge i czasem; retry jest trwały, a cancel odcina dalszy skutek.",
+      "Kod ani sekret kanału nie są ujawniane logom, trwałym rekordom lub procesom nieuczestniczącym w obsłudze SMS."
+    ],
+    "evidence": [
+      "Macierz aktorów i zredagowane odpowiedzi dla metadanych oraz submit kodu.",
+      "Stan challenge/run/cyklu i licznik użyć fixture przed/po restarcie oraz cancel.",
+      "Wyniki kontroli DB/Redis/logów i praw procesu goldis_commission bez wypisania kodów."
+    ],
+    "entryPoints": [
+      "npm run test:module:sms",
+      "npm run test:module:interventions",
+      "npm run test:module:security-redis",
+      "npm run test:module:run-control",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT11-04",
+      "PT11-05",
+      "apps/api/src/features/interventions/auth-challenge.controller.ts",
+      "apps/api/src/features/interventions/worker-code-forwarder.ts",
+      "docker/redis/start-with-acl.sh"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC21",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "SSRF, redirect, wyjścia sieciowe i izolacja przeglądarki oraz engine",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Z dodatnią kontrolą własnego HTTP/DNS canary sprawdzić redirect, userinfo, port, schemat i zmianę DNS oraz próbę prywatnego celu/metadata; sprawdzić przenoszenie Authorization na inny host w klientach integracji, parsera i CommissionEngineClient.",
+      "Podać kontrolowane błędne/duże/ucięte odpowiedzi, opóźnienia i Retry-After dla adapterów rejestru oraz Python engine; sprawdzić walidację końcowego celu, rozmiaru odpowiedzi, schematu i timeout.",
+      "Rzeczywistym kliknięciem wywołać popup/redirect/download; po próbie niedozwolonej nawigacji sprawdzić blokadę kolejnej akcji oraz niezależność drugiego portalu i profilu; przetestować nieszkodliwy dostęp strony/engine do canary mountów i usług wewnętrznych."
+    ],
+    "passCriteria": [
+      "Niedozwolony ruch i sekrety nie docierają do canary, mimo działającej kontroli dodatniej; wejście nie steruje dowolnym celem ani nie przenosi credentials między hostami.",
+      "Próba przekroczenia nawigacji zatrzymuje właściwy run przed kolejną akcją; profile, cookie, pliki i dane nie przechodzą między niedozwolonymi kontekstami.",
+      "Sieć, sandbox i limity ograniczają worker/engine, a złośliwa odpowiedź nie staje się HTML, poleceniem lub nieograniczonym payloadem."
+    ],
+    "evidence": [
+      "Log canary HTTP/DNS, ograniczony capture egress oraz wynik kontroli dodatniej.",
+      "Playwright trace popupu i licznik następnej akcji wraz z kontrolą drugiego portalu.",
+      "Logi timeout/response-limit, kontraktu Node/Python i runtime mount/network/sandbox bez sekretów."
+    ],
+    "entryPoints": [
+      "apps/worker/src/portals/shared/portal-navigation.spec.ts",
+      "npm run test:module:everest-browser",
+      "npm run test:module:compensa-browser",
+      "npm run test:module:registry",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT12-01",
+      "PT12-02",
+      "PT12-03",
+      "PT12-04",
+      "PT12-05",
+      "apps/api/src/features/commissions/commission-engine-client.ts",
+      "services/commission-engine/src/goldis_commissions/transport/app.py",
+      "docs/security/remediation-2026-10-17/retest-scenarios.json"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC22",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Pobrania, XLSX, kryptografia i rotacja danych OC oraz prowizji",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Dla artefaktów OC, zachowanych lead snapshots i prowizyjnych files/dictionary snapshots/run snapshots/exports sprawdzić download bez grantu, podmienione ID, traversal i próbę statycznego storage URL.",
+      "Wprowadzić do eksportów nieufne formuły/linki/nazwy, obejrzeć XML wynikowego XLSX i sprawdzić zachowanie pliku bez wykonywania aktywnych formuł na danych klienta.",
+      "Podmienić ciphertext/tag/AAD/keyVersion, zastosować zły lub brakujący klucz i plaintext; przeprowadzić poprawną rotację z zachowaniem starszych wersji oraz równoległe pobranie/finalizację i problem stagingu."
+    ],
+    "passCriteria": [
+      "Autoryzacja poprzedza odczyt, ścieżki nie wychodzą poza prywatny magazyn, a storage nie jest publicznie serwowany.",
+      "Nieufne wartości pozostają tekstem bez niezamierzonych formuł/relacji; uszkodzony lub niezgodny ciphertext jest odrzucony bez fallback do plaintext.",
+      "Po poprawnej rotacji stare legalne dane pozostają czytelne, a błąd klucza/stagingu/finalizacji nie publikuje częściowego lub fałszywie gotowego wyniku."
+    ],
+    "evidence": [
+      "Macierz pobrań z odpowiedziami i kontrolą braku bezpośredniego dostępu do storage.",
+      "Hash i bezpieczna inspekcja XML XLSX oraz plików zaszyfrowanych.",
+      "Zredagowane wyniki macierzy crypto/rotacji/race i stan DB/plików/stagingu."
+    ],
+    "entryPoints": [
+      "npm run test:module:results",
+      "apps/api/src/features/results/pesel-crypto.spec.ts",
+      "apps/api/src/features/results/artifact-crypto.spec.ts",
+      "apps/worker/src/infrastructure/staging/result-staging.spec.ts",
+      "services/commission-engine/src/goldis_commissions/exporters/xlsx.py",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT13-01",
+      "PT13-02",
+      "PT13-03",
+      "PT13-04",
+      "apps/api/src/features/commissions/commission-file-store.ts",
+      "apps/api/src/features/commissions/commissions.service.ts",
+      "apps/api/src/features/results/export-finalization.service.ts"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC23",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Integralność backupu i restore bez przywrócenia usuniętego dostępu",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Zmodyfikować kopię lub manifest i zastosować błędne hasło/klucz na testowych backupach; potwierdzić odmowę przed odtworzeniem.",
+      "Do pustej izolowanej instalacji odtworzyć starą spójną kopię DB i plików OC/prowizji, słowników, snapshotów oraz eksportów z potrzebnymi wersjami kluczy; nie usuwać nowszego journalu usunięć.",
+      "Sprawdzić blokadę startu/readiness przed replay najnowszego journalu, wykonać replay i zweryfikować nieodwrócenie usunięcia oraz legalne pobranie pozostałych danych obu narzędzi pod właściwymi rolami."
+    ],
+    "passCriteria": [
+      "Zmodyfikowany/nieodszyfrowywalny backup nie jest użyty, a restore odbywa się wyłącznie na pustej własnej instalacji.",
+      "Najświeższy journal i stare wersje kluczy są częścią procedury; usunięte dane nie odzyskują dostępu po restore.",
+      "Odtworzone prowizje, role i pliki działają zgodnie z zakresem snapshotu; brak komponentu kopii jest jawnym błędem, nie pominięciem."
+    ],
+    "evidence": [
+      "Manifest i hashe kopii oraz wyniki verify dla poprawnych i uszkodzonych wariantów.",
+      "Zredagowane logi restore/journal replay/readiness i katalog przywróconych składników bez treści klienta.",
+      "Kontrole autoryzowanego i zabronionego odczytu OC/prowizji po odtworzeniu oraz powiązanie z przypadkami DR."
+    ],
+    "entryPoints": [
+      "npm run test:backup-crypto",
+      "npm run test:backup-manifest",
+      "npm run test:module:backup-restore",
+      "deploy/backup/verify.sh",
+      "deploy/backup/restore.sh",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT13-05",
+      "CH-05",
+      "apps/api/src/features/deletions/deletion-journal-admission.ts",
+      "apps/api/src/infrastructure/database/migrations/066-commission-comparison.ts",
+      "deploy/backup/README.md"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC24",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A",
+      "B"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Rzeczywista izolacja runtime, Redis, proxy i fail-closed",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "W A z punktu zewnętrznego i wnętrza sieci porównać topologię z rzeczywistymi listenerami i publikacją portów; sprawdzić DB/Redis/parser/portal worker/Python engine oraz brak publicznej drogi do endpointów prywatnych.",
+      "Zweryfikować TLS/certyfikat/origin/Host/forwarding headers i ograniczone anomalie framingu wyłącznie na izolowanym proxy; sprawdzić konfigurację APP_ENV/NODE_ENV, brak sekretów/złą rolę DB i kontrolowane awarie DB/Redis/storage/parsera/engine.",
+      "Jako anonymous, goldis_api, goldis_worker i goldis_commission sprawdzić Redis keys/pubsub/komendy admin, w tym krzyżowy dostęp bull:oc-verification:* i bull:commission-comparison:*; sprawdzić UID/capabilities/seccomp/mounty/docker.sock i minimalne sekrety wszystkich procesów.",
+      "W B powtórzyć tylko bezpieczny smoke zależny od hosta, certyfikatu, portów, ACL i uprawnień bez fault injection, aktywnych prób framingu i ataków na używaną bazę klienta; zapisać osobne wykonanie."
+    ],
+    "passCriteria": [
+      "Deklarowana topologia i least privilege są egzekwowane runtime; brak niepotrzebnych portów, uprawnień/sekretów i krzyżowego dostępu kolejek OC/prowizji.",
+      "Niebezpieczna konfiguracja nie startuje w deklarowanym trybie produkcyjnym, proxy nie pozwala sterować tożsamością klienta, a awarie powodują kontrolowany fail-closed i ograniczone retry.",
+      "Instalacja B ma własny dowód kontroli hosta/originu, bez przenoszenia PASS TLS i sieci ze środowiska A."
+    ],
+    "evidence": [
+      "Zredagowane runtime inspect/procesy/mounty, macierz prób połączeń i wyniki ACL z obu punktów sieci.",
+      "Raport TLS/forwarding, uruchomień z błędną konfiguracją oraz kontrolowanych awarii i retry w A.",
+      "Osobny log bezpiecznego smoke B z hostem, czasem, digestami i wynikami kont na właściwej instalacji."
+    ],
+    "entryPoints": [
+      "npm run validate:production-compose",
+      "npm run test:production-compose",
+      "npm run test:module:security-redis",
+      "apps/api/src/infrastructure/config/runtime-startup-config.spec.ts",
+      "scripts/chromium-sandbox-smoke.cjs",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT14-01",
+      "PT14-02",
+      "PT14-03",
+      "PT14-04",
+      "PT14-05",
+      "PT15-05",
+      "docker/redis/start-with-acl.sh",
+      "compose.yaml",
+      "compose.production.yaml",
+      "services/commission-engine/Dockerfile"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "SEC25",
+    "category": "security",
+    "gate": "G4",
+    "phases": [
+      "A"
+    ],
+    "applicability": "common",
+    "owner": "osoba od bezpieczeństwa",
+    "priority": "P0",
+    "title": "Supply chain, sekrety, CI i bezpieczeństwo audytu wydania",
+    "prerequisites": [
+      "REL01",
+      "REL02"
+    ],
+    "steps": [
+      "Wykonać świeże SCA/SBOM dla dokładnego npm lockfile, requirements.lock Python i wszystkich obrazów release; każde istotne zgłoszenie ocenić pod kątem wersji, osiągalności, wpływu i wymaganej poprawki/retestu.",
+      "Przeprowadzić redacted secret scan Git/historii, bundle/source maps, obrazów, backupów, logów i eksportów; sklasyfikować kandydatów bez publikowania wartości i dla potwierdzonego ujawnienia wykazać rotację oraz usunięcie drogi dystrybucji.",
+      "Przejrzeć permissions, actions/dependencies i publikację CI pod kątem niezaufanego PR oraz pochodzenia artefaktu; sprawdzić audit actor/target/outcome i brak tajnych danych dla auth, grantów, resetów, pobrań, usuwania i działań prowizji."
+    ],
+    "passCriteria": [
+      "Każde istotne znalezisko ma aktualny triage i wynik wymaganej poprawki; liczba CVE nie jest utożsamiana z liczbą exploitów, a historyczny raport nie jest nowym skanem.",
+      "Dystrybuowane artefakty nie zawierają aktywnych sekretów; potwierdzone ujawnienia mają dowód rotacji, a niezaufana zmiana nie otrzymuje sekretów lub prawa wdrożenia.",
+      "Artefakt ma udokumentowane pochodzenie, a audyt obu narzędzi przypisuje właściwego aktora i cel bez haseł, tokenów, SMS, PESEL i niepotrzebnej treści klienta."
+    ],
+    "evidence": [
+      "SBOM, redacted wyniki skanerów z wersją bazy/narzędzi i triage powiązany z digestami release.",
+      "Rejestr kandydatów sekretów i odwołania do dowodów rotacji bez wartości tajnych.",
+      "Review workflow i pochodzenia artefaktów oraz zredagowane próbki audytu i wynik kontroli brakujących zdarzeń."
+    ],
+    "entryPoints": [
+      ".github/workflows/backend-checks.yml",
+      "npm run test:module:audit-reports",
+      "apps/api/src/features/audit/audit.spec.ts",
+      "NOWY HARNESS — do przygotowania"
+    ],
+    "references": [
+      "PT15-01",
+      "PT15-02",
+      "PT15-03",
+      "PT15-04",
+      "services/commission-engine/requirements.lock",
+      "services/commission-engine/pyproject.toml",
+      "apps/api/src/features/audit/audit.repository.ts",
+      "docs/security/remediation-2026-10-17/IMPLEMENTATION_REPORT.md"
+    ],
+    "status": "NOT_RUN",
+    "executions": []
+  }
+]

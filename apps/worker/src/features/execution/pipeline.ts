@@ -122,7 +122,7 @@ export async function runPipeline(runId: string, dependencies: PipelineDependenc
       || comparable(identity.companyName) !== comparable(context.source.companyName)) {
       return fail("INPUT_INVALID");
     }
-    if (context.source.decisionMakerName
+    if (identity.matchMethod === "regon_company_name_decision_maker" && context.source.decisionMakerName
       && comparable(`${identity.firstName} ${identity.lastName}`) !== comparable(context.source.decisionMakerName)) {
       if (!(await transition("identity_review"))) return { kind: "state_conflict" };
       return { kind: "identity_review", reason: "name_mismatch" };
@@ -139,7 +139,7 @@ export async function runPipeline(runId: string, dependencies: PipelineDependenc
     if (identity.sourceRowId !== context.source.id
       || identity.regon !== context.source.effectiveRegon
       || comparable(identity.companyName) !== comparable(context.source.companyName)
-      || (context.source.decisionMakerName
+      || (identity.matchMethod === "regon_company_name_decision_maker" && context.source.decisionMakerName
         && comparable(`${identity.firstName} ${identity.lastName}`) !== comparable(context.source.decisionMakerName))) {
       return fail("INPUT_INVALID");
     }

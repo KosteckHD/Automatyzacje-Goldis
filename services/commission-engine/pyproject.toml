@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "goldis-commission-engine"
+version = "0.1.0"
+description = "Private Python engine for the Goldis commission comparison tool"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi==0.162.0",
+  "openpyxl==3.1.5",
+  "uvicorn==0.35.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+goldis_commissions = ["dictionary-v7-mapping.json"]

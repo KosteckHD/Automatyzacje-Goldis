@@ -22,10 +22,11 @@ import { NotificationsModule } from "../features/notifications/public";
 import { PrivilegedActionsModule } from "../features/privileged-actions/public";
 import { InterventionsModule } from "../features/interventions/public";
 import { ResultsModule } from "../features/results/public";
+import { CommissionsModule } from "../features/commissions/public";
 import { PublicExceptionFilter, PublicOutputInterceptor, RequestProtectionGuard } from "../infrastructure/http";
 
 @Module({
-  imports: [DatabaseModule, HealthModule, AuthModule, AccountRecoveryModule, AuthorizationModule, DeletionsModule, InterventionsModule, ResultsModule, TeamModule, ToolsModule, AuditModule, AdminModule, ReportsModule, ImportsModule, PreparationsModule, GroupingModule, ReviewModule, PrivilegedActionsModule, RunsModule, SubmissionsModule, LeadsModule, NotificationsModule],
+  imports: [DatabaseModule, HealthModule, AuthModule, AccountRecoveryModule, AuthorizationModule, DeletionsModule, InterventionsModule, ResultsModule, CommissionsModule, TeamModule, ToolsModule, AuditModule, AdminModule, ReportsModule, ImportsModule, PreparationsModule, GroupingModule, ReviewModule, PrivilegedActionsModule, RunsModule, SubmissionsModule, LeadsModule, NotificationsModule],
   providers: [
     { provide: APP_GUARD, useClass: RequestProtectionGuard },
     { provide: APP_INTERCEPTOR, useClass: PublicOutputInterceptor },

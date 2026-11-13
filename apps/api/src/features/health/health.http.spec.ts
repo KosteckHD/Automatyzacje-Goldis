@@ -17,7 +17,7 @@ const healthyAutomation = {
   worker: "online",
   portalMode: "live",
   portalConfig: "valid",
-  message: "Automatyzacja gotowa.",
+  message: "Worker i konfiguracja portali są gotowe. Portal może poprosić o logowanie lub kod SMS.",
 };
 const healthyEnrichment = {
   status: "ready",

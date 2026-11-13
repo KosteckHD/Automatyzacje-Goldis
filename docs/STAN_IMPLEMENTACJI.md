@@ -1,5 +1,45 @@
 # Goldis — stan implementacji i przekazanie dalszych prac
 
+## Obsługa nowych przypadków 18024/18025 — 17 października 2026
+
+Na decyzję użytkownika wdrożono anulowanie dodatkowego dialogu „Ubezpieczający” i pomijanie wiersza z kodem `COMPENSA_PAYER_DATA_SKIPPED`, bez zapisu/UFG. UI pokazuje „Pominięto”, liczniki submission oddzielają pominięcia od błędów, a kolejka przechodzi dalej. Błędny identyfikator lub już istniejący draft nie podlegają tej regule. Rozpoznany komunikat niekompletnych danych Compensy i zablokowane pola, jak w 18014/18024, mają osobny kod `COMPENSA_CUSTOMER_DATA_INCOMPLETE` i kończą tylko bieżący wiersz. Historycznych wyników nie przepisano.
+
+Regresja: worker/adaptery 67/67, core 16/16, konfiguracja/liczniki API 6/6, runner 10/10 PASS. Pełny zestaw na jednorazowej bazie (`users`, migracje 001–063) przeszedł **9 scenariuszy E2E**, w tym pominięcie z anulowaniem bez akceptacji, opis UI i kolejne poprawne zadanie. Build API/workera/Next.js PASS. Macierz wszystkich napotkanych przypadków, semantyka kodów i granice odbioru: [ODBIOR_AUTOMATYZACJI_2026-10-17.md](ODBIOR_AUTOMATYZACJI_2026-10-17.md).
+
+Osobna rzeczywista próba 18025 po zmianie potwierdziła `COMPENSA_PAYER_DATA_SKIPPED`: jedno rozpoczęcie, bez draftu, intencji zapisu, zapisu i UFG. Brak otwartej interwencji, snapshotu, świeżego workera i oczekujących dispatchy; poprzedni run zachowany. Prywatne dowody: `exports/acceptance-18025-skip-policy-20261017`. Ograniczenie odzyskiwania niezapisanego formularza po zamknięciu sesji nadal obowiązuje.
+
+## Dodatkowa próba 18020–18030 — 17 października 2026
+
+Na zlecenie użytkownika wykonano wszystkie 11 wierszy w oddzielnym imporcie i nowych zadaniach. 18020 powtórzono świadomie, zachowując poprzedni ukończony run. Osiem pełnych przebiegów z pobranym i porównanym XLSX: 18020, 18021, 18022, 18023, 18026, 18027, 18028 i 18030; łącznie 1253 odczytane polisy / 118 wyeksportowanych. 18024 zatrzymany na komunikacie Compensy „Dane Klienta są niekompletne.” przy zablokowanym kodzie pocztowym i powiecie; 18029 ma brak wyników Everest. Żaden z tych wierszy nie przeszedł do zapisu/UFG.
+
+**Nowe ograniczenie adaptera: 18025.** Compensa po prawidłowym wejściu przez Komunikację pokazała dodatkowy dialog „Ubezpieczający” wymagający imienia, nazwiska i kodu pocztowego. Adapter go nie zatwierdza. Zachowano nieudany run i dowody, potwierdzono brak draftu, zapisu i UFG; wykonano pozostałe niepodjęte wiersze bez ponowienia 18025. Rozszerzony zakres ujawnił więc brakujący stan portalu, który wymaga obsługi i testu przed deklaracją pełnej bezobsługowości. Wcześniejszy odbiór dotyczył wcześniej sprawdzonego zakresu.
+
+Testy zabezpieczeń runnera 9/9 PASS. Końcowa kontrola DB potwierdziła pojedyncze akcje każdego udanego zadania, zachowanie poprzedniego 18020 i brak świeżego workera/oczekujących dispatchy. Nie zmieniano produkcyjnego kodu adapterów ani nie przebudowywano `dist` w trakcie próby. Pełny opis i macierz: [TEST_FLOW_18020_18030_2026-10-17.md](TEST_FLOW_18020_18030_2026-10-17.md).
+
+## Domknięcie testów odbiorowych 18012/18014 — 17 października 2026
+
+Pełny zestaw `Test-GoldisDatabase.ps1 -Automation`, ograniczony do `GOLDIS_TEST_DB_MODES=users`, zakończył się PASS bez równoległej przebudowy Dockera. Migracje 001–063, HTTP/DB wyników, UI i siedem scenariuszy E2E (authenticated, SMS, rejected reentry, rejected resend, timeout, retry limit, not found) przeszły. Ten wynik zastępuje wcześniejszy niezaliczony timeout, którego historię zachowano.
+
+Nie udało się znaleźć poprzednich formularzy 18012 i 18014 w obu zakładkach listy ofert Compensy. Użytkownik jawnie zaakceptował **nowe próby obu wierszy**, z nowymi numerami formularzy i zachowaniem wcześniejszych wyników. Nie oznaczono ich jako wznowienia starych ofert. Rewizja 5, oddzielny import, zakres wyłącznie 18012/18014: 18012 `completed`, 552 polisy odczytane / 49 w pobranym i porównanym XLSX. Kontrola DB potwierdza dokładnie jedno rozpoczęcie, zapis i UFG w nowym zadaniu.
+
+18014 ponownie zatrzymany przed zapisem i UFG. Potwierdzony komunikat Compensy: **„Dane Klienta są niekompletne.”** Kod pocztowy i powiat w formularzu są puste oraz zablokowane; źródłowy kod pocztowy jest dostępny. Zrzut i DOM potwierdzają zablokowanie obu pól. Jest to rozpoznany warunek wymagający poprawienia danych klienta w Compensie; nie zaliczać go jako poprawnego eksportu ani diagnozować jako niejednoznaczną osobę.
+
+Uzgodniony zakres można przekazać do odbioru użytkownika z wyjątkiem wymagającym korekty danych Compensy. Automatyczne odzyskanie niezapisanego formularza po zamknięciu sesji na podstawie samego numeru pozostaje niepotwierdzone. Wszystkie wcześniejsze próby zachowano. Worker odbiorowy został wyłączony po próbie, główny lokalny worker pozostaje z portalami off. Panel nowego importu przeszedł HTTP 200, odczyt obu wierszy i zero błędów JS. Prywatne dowody: `exports/acceptance-18010-18020-20261017/closure` i `closure-runs`.
+
+## Korekta po ręcznej analizie 18011–18020 — 17 października 2026
+
+Uwzględniono typ **Firma** z Everest: dokładny REGON i zgodna nazwa prowadzą do Compensa Komunikacja z REGON-em zamiast PESEL-u. Firma ma puste dane osoby i brak szyfrogramu PESEL; migracja 063 wprowadza kontrolowane wyjątki w zapisach tożsamości i zachowanych wyników. Eksport zachowuje REGON i puste pole PESEL. Nie podstawiać fikcyjnego numeru osoby.
+
+Wiele kont z tym samym prawidłowym PESEL-em nie stanowi kilku osób. Dopasowanie uwzględnia kolejność słów i polskie znaki. Jeżeli nazwy osoby nie można wyodrębnić z wyniku Everest, zapisywany jest jednoznaczny PESEL, a imię i nazwisko są potwierdzane dopiero na właściwym formularzu Komunikacji, przy identycznym PESEL-u. Do tego potwierdzenia zapis ubezpieczonego i eksport pozostają zablokowane. Rzeczywiste różne identyfikatory i jawny wybór osoby przez operatora nadal wymagają zgodności. Nie przywracać Klient 360.
+
+18011 pozostaje błędem REGON potwierdzonym przez użytkownika; 18018 ma rzeczywisty brak wyników. 18014 ma przejść do Compensy i zachować jej rzeczywisty błąd. Ponowna próba obejmuje wyłącznie 18012, 18013, 18014, 18015, 18017, 18018, 18019 i 18020 w oddzielnej rewizji; pierwotnych prób i eksportów 18010/18016 nie zmieniono. Bieżący dowód wykonania: prywatny katalog `exports/acceptance-18010-18020-20261017/retest-v3`; sam opis poprawki nie jest zaliczeniem live.
+
+## Korekta ścieżki Compensy — decyzja użytkownika, 17 października 2026
+
+Właściwa kolejność to strona główna po zalogowaniu → **Compensa Komunikacja** → PESEL odczytany z Everest i skonfigurowany numer rejestracyjny → rozpoczęcie. Usunięto awaryjne ustalanie nazwiska przez pole PESEL/REGON i przycisk „Przejdź do Klient 360”, wywołanie tego obejścia z głównego workera oraz jego wersje diagnostyczne. Karty klienta mogą być wybierane dopiero wtedy, gdy pokażą się po rozpoczęciu Komunikacji. Nie odtwarzać dawnej ścieżki na podstawie historycznych opisów lub testów.
+
+Jeżeli dane z wejścia i Everest nie pozwalają jednoznacznie ustalić osoby, adapter kieruje wiersz do kontroli tożsamości, bez dodatkowego wyszukiwania w Compensie. Testy regresji Everest/formularza/kart klienta/głównego procesora: **48/48 PASS**, bez pominięć. Test kolejności zawiera pole i przycisk Klient 360 jako pułapkę i potwierdza, że pozostają nietknięte. Szczegóły kampanii 11 wierszy: [TEST_FLOW_18010_18020_2026-10-17.md](TEST_FLOW_18010_18020_2026-10-17.md).
+
 ## Najnowsza aktualizacja — REG-05/06, raporty, wydajność i restore — 7 października 2026
 
 `TRUST_PROXY_HOPS` domyślnie wynosi 0 i chroni przed spoofingiem `X-Forwarded-For`. REG-05 ma teraz testową macierz start/list/read/items/cancel dla obcego tenant i operatora niebędącego właścicielem, bez zmian jobu/audytu; test wyścigu korekty potwierdza blokadę korekty oczekującej oraz ochronę ręcznie zatwierdzonego REGON przed spóźnioną odpowiedzią. REG-06 przechodzi dwa oddzielne procesy: drugi odzyskuje trwały job po restarcie workera. API health zwraca limit i reset o północy Europe/Warsaw; panel pokazuje czas resetu, a UI smoke to sprawdza. REP-02 ma teraz wspólny rzeczywisty HTTP→DB smoke z dwoma tenantami (brak sesji 401; obaj admini widzą wyłącznie własne agregaty). PERF-01 w syntetycznym workloadzie pomierzył 25 SQL dla dwóch pasujących wierszy i 443 SQL dla grupy 40; najnowszy resolver 52,74 ms; to lokalny pomiar, nie SLA. `test:module:backup-restore` wykonał dump/restore DB 030 oraz syntetyczne archiwum exportu z weryfikacją SHA-256; najnowszy pomiar 384/691 ms, wyłącznie disposable PostgreSQL. Pełne `docker compose --env-file .env.compose.local up -d --build --wait` po implementacji zakończyło się sukcesem: cztery obrazy aplikacyjne przebudowane, wszystkie sześć usług healthy/running, PostgreSQL i Redis oraz ich wolumeny bez restartu. `/api/health/ready` zwraca 200 (`database=true`, `redis=true`), `/api/health/enrichment` zwraca 200 z `worker=disabled` i `provider=disabled`, `/admin` zwraca 200, niezalogowane `/api/admin/operations/summary` zwraca 401, a `SequelizeMeta` kończy się na `030-source-row-nip-index.js`. Nie wykonano wspólnego przepływu ani żadnego lookupu/portalu live.

@@ -4,7 +4,7 @@ import { Sequelize } from "sequelize";
 import { configureDefaultDatabaseUrl } from "./db";
 import { createApiDatabase, releaseApiDatabase } from "./database.factory";
 
-test("database import is inert; the factory binds the 48 models once and shares same-config leases", async () => {
+test("database import is inert; the factory binds the 58 models once and shares same-config leases", async () => {
   const previousUrl = process.env.DATABASE_URL;
   delete process.env.DATABASE_URL;
 
@@ -25,7 +25,7 @@ test("database import is inert; the factory binds the 48 models once and shares 
     leases += 1;
 
     assert.strictEqual(secondLease, connection);
-    assert.equal(Object.keys(connection.models).length, 48);
+    assert.equal(Object.keys(connection.models).length, 58);
     assert.equal(connection.models.Tenant.getTableName(), "tenants");
     assert.deepEqual(Object.values(connection.models.Tenant.getAttributes()).map((attribute) => attribute.field), [
       "tenant_id", "slug", "display_name", "created_at",

@@ -1,0 +1,668 @@
+[
+  {
+    "id": "FUN01",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P1",
+    "title": "Nowe konto, pierwsze hasło, wejście do pracy",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Utworzyć świeże syntetyczne konto pracownika przez odebraną ścieżkę administratora lub menedżera i ustalić oczekiwane prawa odkrywania, wykonania, podglądu i pobierania.",
+      "Zalogować pracownika, przejść wymuszoną zmianę hasła i otworzyć katalog, pulę firm oraz dostępne działania.",
+      "Spróbować podglądu i pobrania przed i po jawnej zmianie odpowiedniego grantu; porównać komunikaty menedżera, sesję i odpowiedzi API."
+    ],
+    "passCriteria": [
+      "Pierwsze logowanie i wymuszona zmiana hasła prowadzą do właściwego obszaru pracy bez pomocy programisty.",
+      "Widoczność i skuteczne wykonanie działań odpowiadają uzgodnionym prawom; tekst o pobieraniu nie obiecuje uprawnienia, którego backend nie przyznał."
+    ],
+    "evidence": ["Macierz świeżego konta i grantów przed/po, bez wartości sekretów.", "Zredagowane zrzuty pierwszego wejścia i komunikatów oraz statusy odpowiedzi podglądu/pobierania."],
+    "entryPoints": ["npm run test:manager-ui-smoke -w @goldis/web", "npm run test:tool-grants-ui-smoke -w @goldis/web", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U01", "A5", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/web/app/access/AccessWorkspace.tsx", "apps/web/app/workspace.tsx", "apps/api/src/features/authorization/tool-access.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN02",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Import z duplikatem, złym NIP, brakiem REGON i konfliktem",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Przygotować syntetyczny XLSX z ręcznie rozpisanymi oczekiwaniami: poprawna firma, duplikat, zły NIP, brak REGON i konflikt grupowania.",
+      "Wgrać plik przez rzeczywisty interfejs i parser, przejść kontrolę danych, lookup oraz przygotowanie zestawu.",
+      "Porównać liczniki, źródłowe wiersze i kolejki decyzji przed oraz po dozwolonej korekcie; nie uruchamiać portali."
+    ],
+    "passCriteria": [
+      "Liczniki odpowiadają oczekiwanym jednostkom, źródła pozostają zachowane, a problemy mają zrozumiały status i dozwolony następny krok.",
+      "Import nie uruchamia samoczynnie zadań i nie łączy niejednoznacznych firm bez wymaganej decyzji."
+    ],
+    "evidence": ["Hash kontrolnego XLSX i tabela oczekiwanych statusów/liczników.", "Odpowiedzi realnego API i bezpieczny wykaz powiązań źródła, przygotowania oraz korekt."],
+    "entryPoints": ["npm run test:oc-workspace-ui-smoke -w @goldis/web", "npm run test:module:review", "npm run test:module:tenant-scope", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U02", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/web/app/import-preparation-panel.tsx", "apps/web/app/enrichment-review.tsx", "apps/api/src/features/imports/import.service.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN03",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P1",
+    "title": "Wybór na kilku stronach/filtrach, F5 i zmiana danych po preview",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Wybrać firmy na co najmniej dwóch stronach oraz po wyszukiwaniu; zapisać oczekiwany zakres i przygotować preview.",
+      "Przejść między etapami i wykonać F5; sprawdzić zakres i brak samoczynnego uruchomienia.",
+      "Zmienić dozwolone dane lub rewizję przygotowania w drugim kontekście i wrócić do wcześniejszego preview oraz zaznaczonej zgody.",
+      "Spróbować startu starego podsumowania, a następnie utworzyć i zatwierdzić nowe."
+    ],
+    "passCriteria": [
+      "Wybór pozostaje zgodny z przyjętym kontraktem szkicu i nie rozszerza się przez zmianę strony, filtra lub reload.",
+      "Zmiana rewizji unieważnia stare preview i zgodę; start wymaga aktualnego podsumowania oraz nowego świadomego potwierdzenia."
+    ],
+    "evidence": ["Lista wybranych syntetycznych wierszy oraz identyfikatory rewizji/fingerprintów przed i po zmianie.", "Sekwencja UI z F5 i odpowiedź odmowy użycia starego preview."],
+    "entryPoints": ["npm run test:oc-workspace-ui-smoke -w @goldis/web", "npm run test:run-submission-ui-smoke -w @goldis/web", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U03", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/web/app/tools/oc-policy-verification/CompanySelection.tsx", "apps/web/app/tools/oc-policy-verification/automation-draft.ts", "apps/web/app/run-submission-launcher.tsx"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN04",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Niepewna odpowiedź po Start, ponowienie kliknięcia",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Na izolowanym harnessie zatwierdzić znany zakres i przerwać dostarczenie odpowiedzi po przyjęciu Start przez backend.",
+      "Sprawdzić komunikat niepewności, wykonać reload i użyć dozwolonego ponowienia tej samej próby.",
+      "Porównać zakres, klucz idempotencji, zgłoszenia, grupy i dopuszczone runy w trwałym stanie oraz w kolejce."
+    ],
+    "passCriteria": [
+      "UI nie przedstawia braku odpowiedzi jako pewnego nieprzyjęcia i zachowuje tę samą próbę oraz jej zakres.",
+      "Ponowienie nie tworzy drugiego zgłoszenia ani drugiego dopuszczonego runu dla tej samej grupy i próby."
+    ],
+    "evidence": ["Ślad kontrolowanego przerwania oraz bezpieczne identyfikatory tej samej próby.", "Liczniki i powiązania DB/outbox/kolejki potwierdzające brak duplikacji."],
+    "entryPoints": ["npm run test:run-submission-ui-smoke -w @goldis/web", "npm run test:module:submission", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U04", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/web/app/run-submission-launcher.tsx", "apps/web/app/tools/oc-policy-verification/automation-draft.ts", "apps/api/src/features/submissions/run-submissions.service.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN05",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P1",
+    "title": "Aktualizacja aktywnego procesu",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Otworzyć aktywny zestaw w krokach postępu i wyników, z co najmniej dwoma widocznymi wierszami oraz drugą stroną wyników.",
+      "Na fixture przeprowadzić zadania przez queued, running, interwencję i wynik końcowy, bez F5 ani zmiany filtrów w obserwowanym widoku.",
+      "Porównać summary, statusy wierszy, liczbę polis i dostępny eksport; sprawdzić także powrót do karty po jej ukryciu."
+    ],
+    "passCriteria": [
+      "Widoczne wiersze i liczniki odświeżają się do zgodnego stanu bez wymuszania reloadu lub manipulacji filtrem.",
+      "Starsza odpowiedź nie nadpisuje nowszego stanu, a aktualizacja nie gubi zakresu i paginacji."
+    ],
+    "evidence": ["Zredagowana sekwencja czasowa UI oraz odpowiadające jej odpowiedzi summary/rows.", "Porównanie końcowych liczników, stanów wierszy i kontrolnego eksportu."],
+    "entryPoints": ["npm run test:oc-workspace-ui-smoke -w @goldis/web", "npm run test:run-submission-ui-smoke -w @goldis/web", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U05", "A4", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/web/app/result-set-workspace.tsx", "apps/web/app/run-submission-launcher.tsx"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN06",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Poprawna osoba, brak osoby i niejednoznaczna osoba",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Przygotować syntetyczne przypadki jednoznacznej właściwej osoby, braku oczekiwanej osoby oraz co najmniej dwóch kandydatów.",
+      "Uruchomić każdy przypadek przez ten sam produkcyjny procesor na lokalnych fixture i sprawdzić status widoczny w panelu.",
+      "Wykonać wyłącznie dozwoloną czynność dla danej sytuacji i sprawdzić dalszą ścieżkę oraz powiązanie firmy i osoby."
+    ],
+    "passCriteria": [
+      "Proces nie wybiera arbitralnie pierwszej osoby ani nie traktuje braku dopasowania jako poprawnej tożsamości.",
+      "Każdy wariant daje zgodny z kontraktem wynik lub wykonalną ścieżkę kontroli, z zachowaniem właściwej firmy i osoby."
+    ],
+    "evidence": ["Kontrolny zestaw oczekiwanych dopasowań bez rzeczywistych tożsamości.", "Historia runu i decyzji oraz zredagowany widok następnego kroku."],
+    "entryPoints": ["npm run test:module:everest-browser", "npm run test:module:review", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U06", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/worker/src/portals/pzu/everest-identity-provider.ts", "apps/worker/src/features/execution/live-run.ts", "apps/web/app/workspace.tsx"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN07",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Dodatnie OC, puste UFG, stare polisy i przyszły początek",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Ustalić datę odniesienia i ręcznie rozpisać oczekiwania dla aktualnych, zakończonych i przyszłych polis oraz potwierdzonej pustej tabeli.",
+      "Przeprowadzić przypadki przez procesor na fixture i odczytać snapshot, widok wyniku oraz XLSX.",
+      "Porównać liczbę, zakres dat i status każdej polisy z uzgodnionym filtrem biznesowym."
+    ],
+    "passCriteria": [
+      "Snapshot, UI i eksport odpowiadają dokładnie źródłu oraz przyjętej definicji aktualnej polisy na datę odniesienia.",
+      "Poprawne zero jest jawnie rozpoznane i pozostaje odróżnione od błędu lub niepełnego odczytu."
+    ],
+    "evidence": ["Tabela referencyjna polis i dat z oczekiwanym wynikiem.", "Hash snapshotu i raportu oraz zestawienie expected/actual liczników i dat."],
+    "entryPoints": ["npm run test:module:ufg-browser", "npm run test:module:results", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U07", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/worker/src/portals/compensa/compensa-ufg.ts", "apps/api/src/features/results/run-export.ts", "apps/web/app/result-set-workspace.tsx"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN08",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Niepełny odczyt tabeli/błąd portalu",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Na syntetycznym portalu wymusić brak strony tabeli, rozbieżność liczby rekordów oraz jawny błąd portalu.",
+      "Przejść przez produkcyjny procesor i sprawdzić stan runu, ewentualną interwencję, wynik w panelu oraz możliwość pobrania raportu.",
+      "Postąpić według wskazanego w interfejsie następnego kroku lub procedury eskalacji."
+    ],
+    "passCriteria": [
+      "Niepełny odczyt i błąd nie są publikowane jako pełny snapshot ani pewny brak polis.",
+      "Przyczyna i następne dozwolone działanie są czytelne; raport nie ukrywa niekompletności."
+    ],
+    "evidence": ["Wariant fixture i oczekiwany kod/stan awarii.", "Historia runu oraz dowód braku pozornego zera lub kompletnego wyniku."],
+    "entryPoints": ["npm run test:module:ufg-browser", "npm run test:module:compensa-browser", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U08", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/worker/src/portals/compensa/compensa-ufg.ts", "apps/worker/src/features/execution/live-run.ts", "apps/web/app/result-set-workspace.tsx"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN09",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Poprawialne pole Compensy",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Na fixture doprowadzić Compensę do wymagania poprawialnego pola objętego kontraktem ręcznej korekty.",
+      "Otworzyć interwencję jako starter; sprawdzić również odmowę korekty dla innego assignee bez prawa wynikającego z kontraktu.",
+      "Wprowadzić wyłącznie dozwoloną poprawkę i wznowić, następnie porównać runId, wersję danych i dalszy stan portalu."
+    ],
+    "passCriteria": [
+      "Istnieje wykonalna ścieżka interwencja → dozwolona korekta → wznowienie tego samego runu, bez utraty kontekstu.",
+      "Korekta respektuje starter-only i allowlistę pól; nie wymaga arbitralnej edycji PESEL ani utworzenia nowego runu jako obejścia."
+    ],
+    "evidence": ["Historia interwencji, rewizji danych i wznowienia tego samego runId.", "Odmowa niedozwolonego konta/pola oraz zredagowany dalszy wynik fixture."],
+    "entryPoints": ["npm run test:module:interventions", "npm run test:module:compensa-browser", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U09", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/api/src/features/interventions/manual-data.service.ts", "apps/worker/src/features/execution/live-run.ts", "apps/web/app/workspace.tsx"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN10",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Niepewny zapis i restart w tej granicy",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Na izolowanym fixture przećwiczyć przerwanie przed akcją zapisu, po trwałej intencji oraz po skutecznym zapisie przed otrzymaniem potwierdzenia.",
+      "Wznowić proces po kontrolowanym restarcie i sprawdzić uzgodnienie stanu tej samej sprawy.",
+      "Dla nadal niepewnego stanu przejść procedurę ręcznego rozstrzygnięcia bez ślepego ponownego startu."
+    ],
+    "passCriteria": [
+      "Nie powstaje drugi zapis; retry następuje wyłącznie po autorytatywnym ustaleniu bezpiecznego stanu.",
+      "Panel i procedura rozróżniają niepewny skutek od pewnego niepowodzenia i prowadzą do uzgodnienia istniejącej sprawy lub eskalacji."
+    ],
+    "evidence": ["Historia intencji/checkpointów i dokładny punkt wstrzykniętej awarii.", "Licznik skutków fixture oraz rozstrzygnięcie po restarcie, bez danych portalu klienta."],
+    "entryPoints": ["npm run test:module:compensa-browser", "npm run test:module:worker-lifecycle", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U10", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/worker/src/portals/compensa/compensa-offer-saver.ts", "apps/worker/src/features/execution/live-run.ts", "apps/api/src/features/review/portal-review-contract.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN11",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "SMS poprawny, błędny, wygasły, resend i nieobecność startera",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Na lokalnym fixture przygotować challenge z kodem poprawnym, odrzuconym i wygasłym oraz wariant osiągnięcia limitu prób.",
+      "Obsłużyć submit/resend jako starter i sprawdzić terminy, limity, pamięć pola oraz brak ponownego logowania zamiast jawnego resend.",
+      "Próbować submit, resend i ręcznej korekty jako inny assignee; sam przydział interwencji nie ma przyznawać prawa zastrzeżonego dla startera.",
+      "Przećwiczyć nieobecność startera według uzgodnionej procedury oczekiwania lub eskalacji, bez wymuszania nowej funkcji przekazania uprawnień."
+    ],
+    "passCriteria": [
+      "SMS respektuje terminy i limity; kod jest czyszczony i nie trafia do logów/dowodów, a resend nie staje się nowym logowaniem.",
+      "Egzekwowana jest zasada starter-only dla SMS i korekty; inny assignee bez właściwego prawa otrzymuje odmowę.",
+      "Dla nieobecnego startera istnieje zrozumiała procedura operacyjna, która nie obchodzi uprawnień i nie obiecuje niezaimplementowanego przekazania."
+    ],
+    "evidence": ["Historia challenge z czasami, liczbą prób i stanami, bez treści kodu.", "Macierz starter/inny assignee i odpowiedzi odmowy.", "Protokół przejścia procedury nieobecności startera."],
+    "entryPoints": ["npm run test:w3-sms-ui-smoke -w @goldis/web", "npm run test:module:sms", "npm run test:module:everest-browser", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U11", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/api/src/features/interventions/auth-challenge.service.ts", "apps/api/src/features/interventions/manual-data.service.ts", "apps/web/app/workspace.tsx", "apps/worker/src/portals/pzu/pzu-session.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN12",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Pauza/anulowanie runu, submission oraz „Całego importu”",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Przygotować fixture z aktywnym runem, grupami oczekującymi i kilkoma porcjami wykonania całego importu.",
+      "Osobno wykonać dostępne pauza/wznów/anuluj na poziomie runu, submission i całego importu; zanotować stan żądany i potwierdzony.",
+      "Porównać kolejne przyjęcia, wykonane kroki i zadania, które kontynuują; poprosić pracownika o wyjaśnienie zasięgu każdej akcji."
+    ],
+    "passCriteria": [
+      "Każdy poziom sterowania działa według jawnego kontraktu; stan żądania i osiągnięta bezpieczna granica nie są mylone.",
+      "Pracownik rozumie, które przyjęte runy lub porcje kontynuują, a UI nie przedstawia działania zewnętrznego jako cofniętego."
+    ],
+    "evidence": ["Tabela expected/actual dla trzech poziomów sterowania z rewizjami i checkpointami.", "Historia przyjęć i skutków fixture oraz notatka z objaśnienia pracownika."],
+    "entryPoints": ["npm run test:run-submission-ui-smoke -w @goldis/web", "npm run test:module:run-control", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U12", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/web/app/run-submission-launcher.tsx", "apps/api/src/features/submissions/prepared-set-executions.controller.ts", "apps/api/src/features/runs/run-control.service.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN13",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Mieszana partia: dodatni wynik, zero, pominięcie, błąd",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Przygotować mieszany zestaw z oczekiwanym wynikiem dodatnim, poprawnym zerem, pominięciem oraz błędem wymagającym uwagi.",
+      "Doprowadzić partię do jej rozliczonego stanu końcowego i otworzyć dashboard, postęp, wyniki oraz XLSX.",
+      "Poprosić pracownika i menedżera o wskazanie liczby faktycznie sprawdzonych firm i pozycji wymagających dalszej pracy."
+    ],
+    "passCriteria": [
+      "Agregaty i raport zachowują rzeczywisty podział rezultatów i zgodne jednostki wierszy, grup oraz runów.",
+      "Stan końcowy partii nie jest prezentowany jako sukces wszystkich firm; użytkownicy poprawnie rozpoznają ograniczenia wyniku."
+    ],
+    "evidence": ["Oczekiwany wektor wyników i porównanie agregatów UI/API/XLSX.", "Zredagowany protokół odpowiedzi pracownika i menedżera."],
+    "entryPoints": ["npm run test:oc-workspace-ui-smoke -w @goldis/web", "npm run test:module:results", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U13", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/api/src/features/submissions/run-submission-read.repository.ts", "apps/web/app/result-set-workspace.tsx", "apps/web/app/lib/run-outcome.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN14",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Jednoczesny przydział dwóm osobom i zapis kontaktu",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Na co najmniej dwóch kontach otworzyć ten sam syntetyczny lead w aktualnej rewizji i wysłać konkurujące przydziały.",
+      "Jako właściwie przydzielony pracownik zapisać decyzję kontaktu; z drugiego kontekstu spróbować zapisu na starej rewizji.",
+      "Sprawdzić Moje firmy, pulę, raport menedżera oraz przejścia poprzednia/następna i powrót do filtrowanej listy."
+    ],
+    "passCriteria": [
+      "Nie ma podwójnego aktywnego przydziału; konflikt wersji nie nadpisuje cudzej decyzji kontaktowej.",
+      "Właściwy przydział i kontakt są spójne w panelu i trwałym stanie, a powrót zachowuje kontekst listy."
+    ],
+    "evidence": ["Ślad dwóch konkurujących prób z odpowiedzią konfliktu i końcowym przydziałem.", "Historia kontaktu oraz zredagowane widoki puli, Moich firm i raportu."],
+    "entryPoints": ["npm run test:lead-ui-smoke -w @goldis/web", "npm run test:manager-ui-smoke -w @goldis/web", "npm run test:module:reports", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U14", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/web/app/leads/LeadWorkspace.tsx", "apps/web/app/leads/LeadAllocationPanel.tsx", "apps/api/src/features/leads/business-leads.service.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN15",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Zwolnienie przydziału i usunięcie importu innej osoby",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Przygotować przydzielony lead z utrwalonym wynikiem i importem źródłowym należącym do innego syntetycznego użytkownika.",
+      "Zwolnić przydział w dozwolonym kontekście i sprawdzić powrót do puli; ponownie przygotować przydzielony przypadek do sprawdzenia retencji wyniku.",
+      "Wykonać autoryzowane usunięcie importu zgodnie z podglądem zakresu, następnie otworzyć zachowany wynik jako uprawniony odbiorca."
+    ],
+    "passCriteria": [
+      "Zwolniony lead wraca do właściwej puli i znika z aktywnego przydziału zgodnie z kontraktem.",
+      "Usuwanie źródła respektuje podgląd i autoryzację, a wynik przeznaczony do zachowania pozostaje czytelny wraz z informacją o usuniętym źródle."
+    ],
+    "evidence": ["Podgląd usuwania i końcowy status zadania z bezpiecznymi identyfikatorami.", "Porównanie przydziału oraz czytelności zachowanego snapshotu przed/po usunięciu."],
+    "entryPoints": ["npm run test:lead-ui-smoke -w @goldis/web", "npm run test:deletion-history-ui-smoke -w @goldis/web", "npm run test:module:deletion", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U15", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/web/app/leads/LeadWorkspace.tsx", "apps/web/app/history/HistoryList.tsx", "apps/api/src/features/leads/lead-import-deletion.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN16",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P1",
+    "title": "Drugi import tej samej firmy i ponowienie tej samej próby",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Przygotować zakończony syntetyczny import i wynik firmy z zapisanym kontaktem, a następnie nowy zaakceptowany import tej samej firmy.",
+      "Porównać źródła, runy, snapshoty i historię kontaktu; osobno ponowić tę samą próbę zgodnie z kontraktem idempotencji.",
+      "Otworzyć oba konteksty przez historię i linki bezpośrednie oraz poprosić pracownika o wskazanie aktualnie oglądanego wyniku."
+    ],
+    "passCriteria": [
+      "Nowy zaakceptowany import zachowuje odrębność źródła/operacji zgodnie z uzgodnionym kontraktem, a ponowienie tej samej próby nie tworzy przypadkowej kopii.",
+      "UI nie miesza dat i snapshotów, a użytkownicy nie przypisują poprzedniej decyzji kontaktowej do niewłaściwej operacji."
+    ],
+    "evidence": ["Mapa powiązań dwóch importów, runów i snapshotów oraz tej samej ponowionej próby.", "Zredagowane widoki historii i protokół rozpoznania kontekstu przez pracownika."],
+    "entryPoints": ["npm run test:history-ui-smoke -w @goldis/web", "npm run test:lead-ui-smoke -w @goldis/web", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U16", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/web/app/history/HistoryList.tsx", "apps/web/app/leads/LeadWorkspace.tsx", "apps/api/src/features/results/lead-result-snapshots.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN17",
+    "category": "functional",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Wygaśnięcie sesji, wymuszona zmiana hasła, 503 i cofnięty grant",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Otworzyć zgłoszenie, firmę, wynik i import przez link bezpośredni; dla każdego kontrolowanie wygasić sesję.",
+      "Zalogować ponownie, także z wymuszoną zmianą hasła, i sprawdzić bezpieczny powrót do tego samego kontekstu.",
+      "Osobno wymusić 503/utracone połączenie i przywrócić usługę; następnie cofnąć grant przy otwartym widoku i spróbować dalszych działań."
+    ],
+    "passCriteria": [
+      "401 prowadzi do właściwego logowania i bezpiecznego powrotu; domyślny ekran roli nie zastępuje prawidłowego returnTo zgłoszenia.",
+      "503 nie udaje wylogowania; retry przywraca aktualny stan i odświeżanie bez wysyłania nowej operacji.",
+      "Cofnięty grant jest respektowany przez backend i dalszy UI, bez użycia poprzednio zapisanej możliwości jako uprawnienia."
+    ],
+    "evidence": ["Tabela tras i oczekiwanych powrotów z kodami 401/403/503.", "Sekwencja odzyskania widoku oraz odmowa po cofnięciu grantu, bez cookies/tokenów."],
+    "entryPoints": ["npm run test:module:security-browser", "npm run test:history-ui-smoke -w @goldis/web", "npm run test:run-submission-ui-smoke -w @goldis/web", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U17", "A6", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "apps/web/app/lib/return-to.ts", "apps/web/app/workspace.tsx", "apps/web/app/submissions/[id]/submission-detail.tsx"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "FUN18",
+    "category": "functional",
+    "gate": "G5",
+    "phases": ["A"],
+    "applicability": "oc",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Backup/restore i dzień pracy po odzyskaniu",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "W izolowanej instalacji przygotować kopię syntetycznych danych z pending runem, wynikiem, niepewnym skutkiem oraz tokenem resetu; po kopii wykonać kontrolne usunięcie i zachować nowszy journal.",
+      "Przeprowadzić odebraną procedurę cold restore w nowej instalacji, z właściwą paczką release, kluczami i najnowszym journalem.",
+      "Sprawdzić brak powrotu skasowanych danych i starych reset linków, a następnie rozliczyć pending/niepewne runy przed dopuszczeniem pracy.",
+      "Przejść dzień pracy na syntetycznych danych: login, lista firm, odczyt zachowanego wyniku, dozwolona nowa operacja i nowe MFA według instrukcji; portale rzeczywiste tylko w odrębnie uzgodnionym zakresie."
+    ],
+    "passCriteria": [
+      "Odtworzenie nie udostępnia skasowanych danych ani dawnych linków resetu i nie powtarza automatycznie niepewnych działań zewnętrznych.",
+      "Panel i klucze wyników działają po odzyskaniu, a pending runy i nowe MFA są obsługiwane zgodnie z protokołem.",
+      "Zmierzono rzeczywiste RPO/RTO i wykazano możliwość wykonywania normalnych zadań po restore."
+    ],
+    "evidence": ["Protokół backup/verify/restore i replay journala z hashami oraz zmierzonym RPO/RTO.", "Kontrolna lista rekordów, plików i reset linków przed/po.", "Zredagowany przebieg pracy po odtworzeniu z decyzjami o niepewnych runach."],
+    "entryPoints": ["npm run test:module:backup-restore", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["U18", "docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "docs/PLAN_VPS_I_UTRZYMANIA_KLIENTA_2026-11-05.md", "deploy/backup/restore.sh", "deploy/backup/backup.sh", "apps/api/src/features/deletions/deletion-journal.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "COM01",
+    "category": "commission",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "commission",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Import prowizyjny: jakość, zakres, formuły i źródła",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Przygotować syntetyczne CRM/ASF/Warta i słownik XLSX/XLSM z oczekiwanym zakresem, pustą stawką, jawnym zerem, formułą z/brak cached value oraz uszkodzonym lub niewłaściwym plikiem.",
+      "Wgrać pliki właściwymi ścieżkami i sprawdzić informację o jakości, liczbie/zakresie danych, odrzuceniu oraz pochodzeniu wierszy przed świadomym startem analizy.",
+      "Przeprowadzić analizę zaakceptowanych danych i porównać interpretację wartości/formuł z ustalonym kontraktem; nie uruchamiać makr ani zewnętrznych odwołań."
+    ],
+    "passCriteria": [
+      "Pracownik zna zakres i ograniczenia importu przed analizą; nieznana liczba lub jakość nie jest przedstawiana jako sprawdzona.",
+      "Brak stawki nie staje się zerem, a niewyliczona formuła nie staje się potwierdzoną kwotą lub procentem.",
+      "Niedozwolone pliki są bezpiecznie odrzucone, a wynik zachowuje dowód źródłowego pliku, arkusza i wiersza."
+    ],
+    "evidence": ["Hashe kontrolnych workbooków i tabela oczekiwanej interpretacji komórek/formuł.", "Zredagowane preview jakości, komunikaty odrzucenia i pochodzenie przykładowych findings."],
+    "entryPoints": ["NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["docs/porownywarka-prowizji/03-IMPORT-PLIKOW.md", "docs/porownywarka-prowizji/IMPLEMENTATION_STATUS.md", "services/commission-engine/tests/unit/test_dictionary_import.py", "services/commission-engine/src/goldis_commissions/importers/workbook.py", "apps/web/app/tools/commission-comparison/workspace.tsx"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "COM02",
+    "category": "commission",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "commission",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Słownik prowizji: prawa, rewizje, publikacja i aktywacja",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Na świeżych kontach sprawdzić podgląd oraz próbę edycji/publikacji słownika bez osobnego grantu; nadać grant przez administratora z wymaganym potwierdzeniem.",
+      "Zaimportować wersję roboczą, zmienić odrębne stawki i statusy osób prowizyjnych, a następnie wysłać konkurującą zmianę na starej rewizji.",
+      "Opublikować sprawdzoną wersję i aktywować dozwoloną wersję historyczną; cofnąć grant i ponowić działanie z otwartego ekranu."
+    ],
+    "passCriteria": [
+      "Prawo do narzędzia nie przyznaje samoczynnie edycji/publikacji słownika; nadanie i cofnięcie grantu jest egzekwowane.",
+      "Rewizje chronią przed nadpisaniem, stawki osób i wariantów pozostają odrębne, a BRAK i jawne 0% zachowują znaczenie.",
+      "Publikacja/aktywacja ma audyt i jednoznacznie określa wersję dla nowych analiz bez zmiany dawnych wyników."
+    ],
+    "evidence": ["Macierz praw przed/po nadaniu i cofnięciu grantu oraz odmowy dla starej sesji.", "Historia wersji, rewizji i audytu z oczekiwanymi stawkami syntetycznymi."],
+    "entryPoints": ["npm run test:admin-ui-smoke -w @goldis/web", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["docs/porownywarka-prowizji/04-SLOWNIK-I-WERSJONOWANIE.md", "apps/web/app/admin/page.tsx", "apps/web/app/tools/commission-comparison/workspace.tsx", "apps/api/src/features/commissions/commissions.service.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "COM03",
+    "category": "commission",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "commission",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Parytet reguł prowizji i interpretacja wyniku biznesowego",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Zatwierdzić syntetyczny zestaw referencyjny obejmujący numery z zerami wiodącymi, aliasy TU, OFWCA, warianty PZU, brak w obu kierunkach, niepewne dopasowanie i tolerancję procentu.",
+      "Przeprowadzić go przez rzeczywisty przepływ UI/API/worker/Python i porównać z zaakceptowanym wzorcem reguł, w tym referencją v7 tam, gdzie jest obowiązująca.",
+      "Porównać jednostki liczników, findings, unresolved i reverse audit oraz poprosić użytkownika o objaśnienie ograniczenia braku rozliczenia w dostarczonych plikach."
+    ],
+    "passCriteria": [
+      "Wynik jest zgodny z zatwierdzoną referencją; niepewny numer nie staje się pewnym dopasowaniem/brakiem.",
+      "Jednostki polis i wierszy są jednoznaczne, a brak w plikach nie jest komunikowany jako dowód niewypłacenia prowizji.",
+      "Nieoceniana stawka pozostaje nieoceniona, zamiast pozornego potwierdzenia lub błędu procentu."
+    ],
+    "evidence": ["Wersja/hash referencji i tabela expected/actual dla wszystkich klas przypadków.", "Snapshot wyniku oraz porównanie UI i XLSX; protokół interpretacji przez użytkownika."],
+    "entryPoints": ["NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["docs/porownywarka-prowizji/05-REGULY-POROWNANIA.md", "docs/porownywarka-prowizji/01-KONTRAKTY-I-SILNIK-PYTHON.md", "services/commission-engine/tests/unit/test_engine_rules.py", "services/commission-engine/src/goldis_commissions/engine.py", "packages/core/src/commissions/engine-contract.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "COM04",
+    "category": "commission",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "commission",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Wersje plików, słownika i wyników prowizyjnych",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Uruchomić analizę na znanych plikach i aktywnej wersji słownika, zapisać identyfikatory i hashe wejścia.",
+      "Zmienić aktywny słownik oraz dostarczyć kolejną wersję pliku, następnie uruchomić odrębną analizę.",
+      "Otworzyć dawny i nowy wynik z historii, pobrać eksporty oraz sprawdzić próbę usunięcia pliku użytego przez zachowany wynik."
+    ],
+    "passCriteria": [
+      "Każdy wynik zachowuje niezmienny zestaw wejść i przypiętą wersję słownika; późniejsza aktywacja nie zmienia historii.",
+      "Panel i eksporty jednoznacznie identyfikują kontekst analizy i nie mylą wersji.",
+      "Usuwanie użytych źródeł respektuje kontrakt retencji i nie pozostawia pozornie kompletnego, nieodtwarzalnego wyniku."
+    ],
+    "evidence": ["Mapa run → pliki/hash → dictionary version oraz hashe obu snapshotów przed/po zmianie.", "Porównanie historycznych eksportów i wynik próby usunięcia użytego źródła."],
+    "entryPoints": ["NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["docs/porownywarka-prowizji/04-SLOWNIK-I-WERSJONOWANIE.md", "docs/porownywarka-prowizji/07-PANEL-HISTORIA-I-RAPORTY.md", "apps/api/src/features/commissions/commissions.model.ts", "apps/api/src/features/commissions/commissions.service.ts", "apps/web/app/tools/commission-comparison/workspace.tsx"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "COM05",
+    "category": "commission",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "commission",
+    "owner": "QA i właściciel produktu",
+    "priority": "P1",
+    "title": "Sesja, routing i odzyskiwanie widoku prowizji",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Wejść do prowizji z katalogu i przez link bezpośredni bez sesji; wykonać login i wariant wymuszonej zmiany hasła.",
+      "Kontrolowanie wygasić sesję podczas analizy, a osobno wymusić 503 odczytu plików, słownika lub historii.",
+      "Przywrócić usługę, zalogować ponownie gdy to wymagane i otworzyć właściwą analizę z jej kontekstem."
+    ],
+    "passCriteria": [
+      "Wejście do logowania wskazuje istniejącą trasę i pozwala na bezpieczny powrót do commission-comparison bez skierowania do OC.",
+      "Błąd 503 nie ustawia pozornego wylogowania; po odzyskaniu widok i polling pokazują aktualny stan.",
+      "Powrót i reload nie uruchamiają nowej analizy ani nie mieszają wyników."
+    ],
+    "evidence": ["Macierz tras przed/po loginie i wymuszonej zmianie hasła.", "Sekwencja 401/503/odzyskanie z bezpiecznymi IDs analizy i brakiem nowego runu."],
+    "entryPoints": ["NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["A6", "docs/porownywarka-prowizji/07-PANEL-HISTORIA-I-RAPORTY.md", "apps/web/app/tools/commission-comparison/workspace.tsx", "apps/web/app/lib/return-to.ts", "apps/web/app/workspace.tsx", "apps/web/app/tools/tool-catalog.tsx"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "COM06",
+    "category": "commission",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "commission",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Idempotencja i awarie analizy prowizyjnej",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Kontrolowanie utracić odpowiedź po przyjęciu analizy; ponowić dozwoloną tę samą próbę z UI i sprawdzić trwały stan.",
+      "Na izolowanym stacku zrestartować commission-workera lub Redis w kontrolowanych granicach dispatchu i obliczeń; sprawdzić ponowną dostawę.",
+      "Wysłać anulowanie i zasymulować spóźniony wynik starego attemptu, następnie porównać stan i snapshot.",
+      "Przejść komunikaty operatora i historię po każdej awarii bez ręcznego oznaczania completed."
+    ],
+    "passCriteria": [
+      "Niepewna odpowiedź i retry tej samej próby nie tworzą niezamierzonej drugiej analizy; używany jest właściwy klucz i zakres.",
+      "Ponowna dostawa respektuje attempt/fence, a anulowany lub spóźniony wykonawca nie nadpisuje zaakceptowanego stanu.",
+      "Stan awarii i bezpieczna ścieżka odzyskania są widoczne, a wynik zachowuje spójność z przypiętymi wejściami."
+    ],
+    "evidence": ["Timeline wstrzykniętych awarii i bezpieczne IDs run/dispatch/attempt, bez sekretu engine.", "Liczniki utworzonych analiz, historia statusów i hashe snapshotów po retry/cancel/late result."],
+    "entryPoints": ["NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["docs/porownywarka-prowizji/06-ZADANIA-I-KOMUNIKACJA.md", "apps/web/app/tools/commission-comparison/workspace.tsx", "apps/api/src/commission-worker.ts", "apps/api/src/features/commissions/commissions.service.ts", "apps/api/src/features/commissions/commission-engine-client.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "COM07",
+    "category": "commission",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "commission",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Limity, kompletność raportu prowizji i eksport",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Przygotować syntetyczny wynik z ponad 500 findings i ponad 200 pozycjami reverse audit oraz wejścia przy i ponad zadeklarowanymi limitami plików/obliczeń.",
+      "Otworzyć wynik, filtry/paginację lub uzgodniony sposób dostępu do pełnej listy; porównać widoczne pozycje i liczniki.",
+      "Pobrać XLSX i porównać pełny zakres oraz jednostki z referencją; przećwiczyć czytelne odrzucenie ponad limit i brak pozornie kompletnego wyniku."
+    ],
+    "passCriteria": [
+      "Żaden limit widoku nie jest przemilczany jako pełny raport; użytkownik ma odebrany sposób uzyskania całego wyniku.",
+      "UI/API/XLSX zgadzają się co do liczników, jednostek, pozycji wymagających kontroli i zakresu danych.",
+      "Przekroczenie limitu daje jawny, kontrolowany błąd lub uzgodnione dzielenie pracy, bez cichego obcięcia obliczeń."
+    ],
+    "evidence": ["Zestaw referencyjny liczby findings/reverse audit i udokumentowane granice limitów.", "Hash XLSX oraz zestawienie kompletności UI/API/eksportu i odpowiedzi dla wejść ponad limit."],
+    "entryPoints": ["NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["docs/porownywarka-prowizji/03-IMPORT-PLIKOW.md", "docs/porownywarka-prowizji/07-PANEL-HISTORIA-I-RAPORTY.md", "apps/web/app/tools/commission-comparison/workspace.tsx", "apps/api/src/commission-worker.ts", "services/commission-engine/src/goldis_commissions/exporters/xlsx.py"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "COM08",
+    "category": "commission",
+    "gate": "G3",
+    "phases": ["A", "UAT"],
+    "applicability": "commission",
+    "owner": "QA i właściciel produktu",
+    "priority": "P0",
+    "title": "Granty prowizji i izolacja od OC oraz obcego tenanta",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Przygotować konta OC-only, prowizje-only, oba narzędzia i bez dostępu oraz odrębny syntetyczny tenant; rozpisać expected discover/execute/view/download i grant słownika.",
+      "Sprawdzić katalog i bezpośrednie ścieżki plików, słownika, runów, wyników i eksportów, również z identyfikatorami drugiego narzędzia i tenanta.",
+      "Cofnąć grant podczas otwartej strony oraz przed wykonaniem/publikacją zadania i ponowić odczyt lub akcję.",
+      "Porównać efektywne prawa backendu, komunikaty panelu i brak efektów ubocznych odmów."
+    ],
+    "passCriteria": [
+      "Wspólny odczyt OC nie daje dostępu do prowizji; brakujące lub obce identyfikatory nie kierują do domyślnego narzędzia.",
+      "Granty execute/view/download i edycji słownika są niezależne oraz ponownie egzekwowane przy właściwych granicach wykonania.",
+      "Nie ma odczytu lub modyfikacji danych obcego tenanta ani skutku ubocznego po odmowie; UI odpowiada efektywnym uprawnieniom."
+    ],
+    "evidence": ["Macierz expected/actual dla kont i tenantów z kodami odmów oraz kontrolą braku zapisów.", "Ślad cofnięcia grantu przy otwartym widoku i oczekującym zadaniu, bez payloadów prywatnych danych."],
+    "entryPoints": ["npm run test:module:security", "npm run test:module:tenant-scope", "NOWY HARNESS/UAT — do przygotowania"],
+    "references": ["docs/porownywarka-prowizji/02-MODUL-DANE-I-UPRAWNIENIA.md", "apps/api/src/features/commissions/commissions.controller.ts", "apps/api/src/features/commissions/commissions.service.ts", "apps/api/src/features/authorization/tool-access.ts", "apps/web/app/tools/commission-comparison/workspace.tsx"],
+    "status": "NOT_RUN",
+    "executions": []
+  }
+]

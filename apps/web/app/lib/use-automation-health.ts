@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export type AutomationHealth = {
   automationReady: boolean;
@@ -15,12 +15,19 @@ export type AutomationHealthState = {
   status: "checking" | "available" | "unknown" | "disabled";
   data: AutomationHealth | null;
   message?: string;
+  refresh: () => void;
 };
+type AutomationHealthSnapshot = Omit<AutomationHealthState, "refresh">;
 
 const unknownMessage = "Nie można sprawdzić gotowości automatyzacji.";
 
 export function useAutomationHealth(enabled: boolean): AutomationHealthState {
-  const [state, setState] = useState<AutomationHealthState>({ status: "checking", data: null });
+  const [state, setState] = useState<AutomationHealthSnapshot>({ status: "checking", data: null });
+  const [refreshVersion, setRefreshVersion] = useState(0);
+  const refresh = useCallback(() => {
+    setState((current) => ({ ...current, status: "checking" }));
+    setRefreshVersion((version) => version + 1);
+  }, []);
 
   useEffect(() => {
     if (!enabled) {
@@ -94,9 +101,9 @@ export function useAutomationHealth(enabled: boolean): AutomationHealthState {
       window.removeEventListener("online", resume);
       window.removeEventListener("offline", goOffline);
     };
-  }, [enabled]);
+  }, [enabled, refreshVersion]);
 
-  if (!enabled) return { status: "disabled", data: null };
-  if (state.status === "disabled") return { status: "checking", data: null };
-  return state;
+  if (!enabled) return { status: "disabled", data: null, refresh };
+  if (state.status === "disabled") return { status: "checking", data: null, refresh };
+  return { ...state, refresh };
 }

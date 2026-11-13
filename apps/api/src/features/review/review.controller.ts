@@ -21,6 +21,30 @@ import { ReviewService } from "./review.service";
 export class ReviewController {
   constructor(@Inject(ReviewService) private readonly review: ReviewService) {}
 
+  @Get("corrections/import-options")
+  @RequirePermission("correction:review", "collection")
+  correctionImportOptions(@Req() request: Request, @Query() query: Parameters<ReviewService["listImportOptions"]>[1]) {
+    const actor = readSessionPrincipal(request);
+    if (!actor) throw new ForbiddenException("Brak aktywnej sesji");
+    return this.review.listImportOptions(actor, query, "corrections");
+  }
+
+  @Get("my-corrections/import-options")
+  @RequirePermission("correction:propose", "collection")
+  myCorrectionImportOptions(@Req() request: Request, @Query() query: Parameters<ReviewService["listImportOptions"]>[1]) {
+    const actor = readSessionPrincipal(request);
+    if (!actor) throw new ForbiddenException("Brak aktywnej sesji");
+    return this.review.listImportOptions(actor, query, "corrections", true);
+  }
+
+  @Get("conflicts/import-options")
+  @RequirePermission("conflict:review", "collection")
+  conflictImportOptions(@Req() request: Request, @Query() query: Parameters<ReviewService["listImportOptions"]>[1]) {
+    const actor = readSessionPrincipal(request);
+    if (!actor) throw new ForbiddenException("Brak aktywnej sesji");
+    return this.review.listImportOptions(actor, query, "conflicts");
+  }
+
   @Get("corrections")
   @RequirePermission("correction:review", "collection")
   corrections(@Req() request: Request, @Query() query: Parameters<ReviewService["listCorrections"]>[1]) {

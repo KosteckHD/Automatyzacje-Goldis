@@ -8,7 +8,7 @@ const path = require("node:path");
 const test = require("node:test");
 const { createManifest, verifyManifest, verifyJournal } = require("./manifest.cjs");
 
-const imageKeys = ["GOLDIS_POSTGRES_IMAGE", "GOLDIS_REDIS_IMAGE", "GOLDIS_API_IMAGE", "GOLDIS_WORKER_IMAGE", "GOLDIS_WEB_IMAGE"];
+const imageKeys = ["GOLDIS_POSTGRES_IMAGE", "GOLDIS_REDIS_IMAGE", "GOLDIS_API_IMAGE", "GOLDIS_COMMISSION_ENGINE_IMAGE", "GOLDIS_WORKER_IMAGE", "GOLDIS_WEB_IMAGE"];
 
 function fixture() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "goldis-backup-manifest-"));

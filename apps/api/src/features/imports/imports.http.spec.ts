@@ -49,7 +49,7 @@ test("PATCH /api/imports/:id/rows/:rowNumber wymaga CSRF i przekazuje autora z s
     const service = {
       async create(...args: unknown[]) {
         receivedCreate = args;
-        return { id: "synthetic-import", totalRows: 0, invalidRows: 0, readyRows: 0 };
+        return { id: "synthetic-import", fileName: "pracownicy.xlsx", totalRows: 0, invalidRows: 0, readyRows: 0 };
       },
       async proposeRegonCorrection(...args: unknown[]) {
         received = args;
@@ -92,7 +92,8 @@ test("PATCH /api/imports/:id/rows/:rowNumber wymaga CSRF i przekazuje autora z s
         return { items: [], nextCursor: null };
       },
     };
-    const { HistoryController, HistoryService } = await import("../reports");
+    const { HistoryController } = await import("../reports/history.controller");
+    const { HistoryService } = await import("../reports/history.service");
     @Module({
       controllers: [ImportController, HistoryController],
       providers: [
@@ -197,7 +198,13 @@ test("PATCH /api/imports/:id/rows/:rowNumber wymaga CSRF i przekazuje autora z s
       body: upload,
     });
     assert.equal(created.status, 201);
-    assert.deepEqual(await created.json(), { id: "synthetic-import", totalRows: 0, invalidRows: 0, readyRows: 0 });
+    assert.deepEqual(await created.json(), {
+      id: "synthetic-import",
+      fileName: "pracownicy.xlsx",
+      totalRows: 0,
+      invalidRows: 0,
+      readyRows: 0,
+    });
     assert.equal(receivedCreate?.[1], tenantId);
     assert.equal(receivedCreate?.[2], userIds.operator);
 

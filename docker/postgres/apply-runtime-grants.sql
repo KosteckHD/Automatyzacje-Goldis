@@ -1,11 +1,11 @@
 -- Versioned allowlist. Run as goldis_migrator after every database migration.
 -- A new table receives no runtime rights until it is reviewed here.
 
-REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment;
-REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment;
-REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment;
-REVOKE CREATE ON SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment;
-GRANT USAGE ON SCHEMA public TO goldis_api, goldis_worker, goldis_enrichment;
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
+REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
+REVOKE CREATE ON SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
+GRANT USAGE ON SCHEMA public TO goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
 
 -- API is the application authorization boundary. It owns user/team, import,
 -- run orchestration, result, deletion and audit operations. Append-only logs
@@ -23,12 +23,17 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
   enrichment_jobs, enrichment_job_items,
   deletion_previews, deletion_jobs, deletion_job_files, deletion_journal_state,
   deletion_step_up_grants, privileged_action_confirmations, account_recovery_tokens, auth_mail_outbox, run_control_requests, lead_allocations, lead_result_snapshots,
-  lead_run_links, business_leads, user_notifications, resource_tombstones
+  lead_run_links, business_leads, user_notifications, resource_tombstones,
+  commission_agents, commission_files, commission_dictionary_versions, commission_dictionary_grants,
+  commission_runs, commission_run_files, commission_run_snapshots, commission_dispatches,
+  commission_resolutions, commission_exports
 TO goldis_api;
 
 -- These tables are append-only from the runtime application; deletion is handled
 -- by explicit journaled routines and does not grant general log mutation.
 GRANT SELECT, INSERT ON TABLE audit_events, run_events TO goldis_api;
+GRANT SELECT, INSERT ON TABLE audit_events TO goldis_commission;
+GRANT EXECUTE ON FUNCTION audit_metadata_has_sensitive_key(jsonb) TO goldis_commission;
 GRANT INSERT ON TABLE audit_events TO goldis_enrichment;
 GRANT EXECUTE ON FUNCTION audit_metadata_has_sensitive_key(jsonb) TO goldis_enrichment;
 
@@ -74,6 +79,13 @@ GRANT SELECT, INSERT, UPDATE ON TABLE registry_lookup_cache, registry_result_cac
 GRANT DELETE ON TABLE registry_result_cache TO goldis_enrichment;
 GRANT SELECT, INSERT, UPDATE ON TABLE canonical_entities TO goldis_enrichment;
 GRANT SELECT, INSERT ON TABLE source_entity_links, entity_grouping_conflicts TO goldis_enrichment;
+
+-- Commission dispatcher: only the immutable inputs and dictionary snapshot for
+-- admitted runs, plus run/outbox/snapshot state needed to finish its own queue.
+GRANT SELECT ON TABLE commission_agents, commission_files, commission_dictionary_versions,
+  commission_runs, commission_run_files, commission_dispatches TO goldis_commission;
+GRANT UPDATE ON TABLE commission_runs, commission_dispatches TO goldis_commission;
+GRANT SELECT, INSERT, UPDATE ON TABLE commission_run_snapshots TO goldis_commission;
 
 -- Audit INSERT evaluates this pure JSON validator in a CHECK constraint.
 -- Trigger functions and other application functions remain non-executable.

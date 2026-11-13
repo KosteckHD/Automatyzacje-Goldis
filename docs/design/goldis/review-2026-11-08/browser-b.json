@@ -1,0 +1,6851 @@
+{
+  "generatedAt": "2026-11-08T21:05:51.225Z",
+  "source": "Actual Next render; synthetic API only; separate B browser/context",
+  "pages": [
+    {
+      "name": "b01-dashboard-desktop",
+      "role": "manager",
+      "state": "normal",
+      "metrics": {
+        "url": "http://127.0.0.1:4178/dashboard",
+        "title": "Goldis · Narzędzia",
+        "viewport": {
+          "width": 1440,
+          "height": 1040,
+          "scrollWidth": 1440
+        },
+        "headings": [
+          {
+            "tag": "H1",
+            "text": "Przegląd"
+          },
+          {
+            "tag": "H2",
+            "text": "Do zrobienia"
+          },
+          {
+            "tag": "H2",
+            "text": "Twoje operacje"
+          },
+          {
+            "tag": "H2",
+            "text": "Twoje narzędzia i wyniki"
+          },
+          {
+            "tag": "H2",
+            "text": "Stan puli zespołu"
+          }
+        ],
+        "signals": [
+          {
+            "role": "status",
+            "live": "polite",
+            "text": "Import i przygotowanie danych są dostępne. Worker portali jest obecnie offline."
+          }
+        ],
+        "controls": [
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przejdź do głównej treści",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 8,
+              "y": -64.4000015258789,
+              "w": 197.96875,
+              "h": 45.25
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(17, 17, 22)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "GOLDISplatforma operacyjna",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 18,
+              "w": 267,
+              "h": 75
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przegląd",
+            "ariaLabel": "Przegląd",
+            "labels": [],
+            "role": null,
+            "current": "page",
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 134.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje firmy",
+            "ariaLabel": "Moje firmy",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 182.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Pula firm",
+            "ariaLabel": "Pula firm",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 230.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Automatyzacje",
+            "ariaLabel": "Automatyzacje",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 278.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przebiegi",
+            "ariaLabel": "Przebiegi",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 326.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Historia importów",
+            "ariaLabel": "Historia importów",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 374.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Powiadomienia2",
+            "ariaLabel": "Powiadomienia",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 422.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Pracownicy",
+            "ariaLabel": "Pracownicy",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 508.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Dostępy",
+            "ariaLabel": "Dostępy",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 556.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Raporty",
+            "ariaLabel": "Raporty",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 604.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Weryfikacja danych",
+            "ariaLabel": "Weryfikacja danych",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 652.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Dziennik aktywności",
+            "ariaLabel": "Dziennik aktywności",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 700.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje konto",
+            "ariaLabel": "Moje konto",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 748.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Zwiń menu",
+            "ariaLabel": "Zwiń nawigację",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 16,
+              "y": 936.15625,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.32px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Powiadomienia · 2",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 1235.953125,
+              "y": 22.828125,
+              "w": 101.046875,
+              "h": 19.34375
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.48px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Dokończ sprawdzanie ↗",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 1094,
+              "y": 105.671875,
+              "w": 290,
+              "h": 46
+            },
+            "color": "rgb(23, 19, 11)",
+            "background": "rgb(217, 182, 95)",
+            "font": "12.48px",
+            "outline": "rgb(23, 19, 11) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Wszystkie zadania →",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 738.4375,
+              "y": 421.1875,
+              "w": 116.21875,
+              "h": 18.828125
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.16px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "!Flota — pilna kontrola.xlsxWeryfikacja polis OC · aktualizacja 11 paź 2026, 10:22Otwórz operację →",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 357,
+              "y": 467.109375,
+              "w": 518.65625,
+              "h": 80
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przebiegi →",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 788.71875,
+              "y": 602.1875,
+              "w": 65.9375,
+              "h": 18.828125
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.16px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Baza transportowa — październik.xlsxWeryfikacja polis OC · ID 66666666Zakończona42 gotowych · 1 z bł",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 357,
+              "y": 648.109375,
+              "w": 518.65625,
+              "h": 127.03125
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Flota — pilna kontrola.xlsxWeryfikacja polis OC · ID ccccccccWymaga działania10 gotowych · 0 z błęde",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 357,
+              "y": 775.140625,
+              "w": 518.65625,
+              "h": 126.03125
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Pula firmPrzeglądaj firmy z zakończonych sprawdzeń OC→",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 915.65625,
+              "y": 539.75,
+              "w": 446.34375,
+              "h": 65
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Historia importówWróć do załadowanych plików i przygotowania→",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 915.65625,
+              "y": 604.75,
+              "w": 446.34375,
+              "h": 65
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje firmyKontaktuj firmy i zapisuj decyzje→",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 915.65625,
+              "y": 669.75,
+              "w": 446.34375,
+              "h": 65
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "PrzebiegiŚledź postęp i problemy uruchomionych przebiegów→",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 915.65625,
+              "y": 734.75,
+              "w": 446.34375,
+              "h": 65
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Powiadomienia2 nieprzeczytanych informacji→",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 915.65625,
+              "y": 799.75,
+              "w": 446.34375,
+              "h": 64
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Otwórz pulę i przydziel →",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 1182.703125,
+              "y": 938.671875,
+              "w": 179.296875,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.48px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          }
+        ],
+        "focus": {
+          "tag": "BODY",
+          "id": "",
+          "text": "Przejdź do głównej treściGOLDISplatforma operacyjnaPRACAPrzeglądMoje firmyPula firmAutomatyzacjePrze",
+          "outline": "rgb(242, 238, 229) none 3px"
+        }
+      }
+    },
+    {
+      "name": "b02-notifications-desktop",
+      "role": "operator",
+      "state": "normal",
+      "metrics": {
+        "url": "http://127.0.0.1:4178/notifications",
+        "title": "Goldis · Narzędzia",
+        "viewport": {
+          "width": 1440,
+          "height": 1040,
+          "scrollWidth": 1440
+        },
+        "headings": [],
+        "signals": [
+          {
+            "role": "status",
+            "live": null,
+            "text": "Sprawdzam sesję…"
+          }
+        ],
+        "controls": [
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przejdź do głównej treści",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 8,
+              "y": -64.4000015258789,
+              "w": 197.96875,
+              "h": 45.25
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(17, 17, 22)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          }
+        ],
+        "focus": {
+          "tag": "BODY",
+          "id": "",
+          "text": "Przejdź do głównej treściSprawdzam sesję…(globalThis[\"TURBOPACK\"] || (globalThis[\"TURBOPACK\"] = []))",
+          "outline": "rgb(242, 238, 229) none 3px"
+        }
+      }
+    },
+    {
+      "name": "b03-my-results-desktop",
+      "role": "operator",
+      "state": "normal",
+      "metrics": {
+        "url": "http://127.0.0.1:4178/my-results",
+        "title": "Goldis · Narzędzia",
+        "viewport": {
+          "width": 1440,
+          "height": 1040,
+          "scrollWidth": 1440
+        },
+        "headings": [
+          {
+            "tag": "H1",
+            "text": "Moje firmy"
+          },
+          {
+            "tag": "H2",
+            "text": "Firmy przydzielone do mnie"
+          }
+        ],
+        "signals": [
+          {
+            "role": "status",
+            "live": "polite",
+            "text": "Odczytano: 8 lis 2026, 22:00"
+          },
+          {
+            "role": null,
+            "live": "polite",
+            "text": "Pokazano 4 z 4 firm pasujących do filtrów."
+          }
+        ],
+        "controls": [
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przejdź do głównej treści",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 8,
+              "y": -64.4000015258789,
+              "w": 197.96875,
+              "h": 45.25
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(17, 17, 22)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "GOLDISplatforma operacyjna",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 18,
+              "w": 267,
+              "h": 75
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przegląd",
+            "ariaLabel": "Przegląd",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 134.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje firmy",
+            "ariaLabel": "Moje firmy",
+            "labels": [],
+            "role": null,
+            "current": "page",
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 182.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Pula firm",
+            "ariaLabel": "Pula firm",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 230.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Automatyzacje",
+            "ariaLabel": "Automatyzacje",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 278.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przebiegi",
+            "ariaLabel": "Przebiegi",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 326.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Historia importów",
+            "ariaLabel": "Historia importów",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 374.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Powiadomienia2",
+            "ariaLabel": "Powiadomienia",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 422.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje korekty",
+            "ariaLabel": "Moje korekty",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 470.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje konto",
+            "ariaLabel": "Moje konto",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 556.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Zwiń menu",
+            "ariaLabel": "Zwiń nawigację",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 16,
+              "y": 936.15625,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.32px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje konto",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 1274.78125,
+              "y": 22.828125,
+              "w": 62.21875,
+              "h": 19.34375
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.48px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Eksportuj moje firmy",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 1174.75,
+              "y": 393.59375,
+              "w": 149.25,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.48px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "↻",
+            "ariaLabel": "Odśwież listę firm",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 1333,
+              "y": 400.96875,
+              "w": 28,
+              "h": 29.25
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(107, 107, 107)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": null,
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              "Szukaj firmy"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 379,
+              "y": 496.3125,
+              "w": 420,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "12.64px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "SELECT",
+            "type": null,
+            "text": "Wszystkie statusyNie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+            "ariaLabel": null,
+            "labels": [
+              "Status kontaktuWszystkie statusyNie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 809,
+              "y": 496.3125,
+              "w": 473.265625,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "12.64px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "submit",
+            "text": "Szukaj",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 1292.265625,
+              "y": 496.3125,
+              "w": 68.734375,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.48px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Transport i Logistyka Alfa sp. z o.o.",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 379,
+              "y": 629.15625,
+              "w": 179.453125,
+              "h": 37.0625
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.96px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "+48 22 555 01 20",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 636.234375,
+              "y": 640.625,
+              "w": 93.125,
+              "h": 16
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "kontakt@transportowa.pl",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 619.40625,
+              "y": 659.21875,
+              "w": 137.09375,
+              "h": 16
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "SELECT",
+            "type": null,
+            "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+            "ariaLabel": "Status kontaktu: Transport i Logistyka Alfa sp. z o.o.",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 913.71875,
+              "y": 636.21875,
+              "w": 184,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "11.04px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "→",
+            "ariaLabel": "Otwórz szczegóły: Transport i Logistyka Alfa sp. z o.o.",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 1325.96875,
+              "y": 636.21875,
+              "w": 44,
+              "h": 44
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "16.8px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Mazovia Cargo S.A.",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 379,
+              "y": 723.046875,
+              "w": 113.03125,
+              "h": 17
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.96px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "+48 22 555 01 20",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 636.234375,
+              "y": 724.484375,
+              "w": 93.125,
+              "h": 16
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "kontakt@transportowa.pl",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 619.40625,
+              "y": 743.078125,
+              "w": 137.09375,
+              "h": 16
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "SELECT",
+            "type": null,
+            "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+            "ariaLabel": "Status kontaktu: Mazovia Cargo S.A.",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 913.71875,
+              "y": 720.078125,
+              "w": 184,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "11.04px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "→",
+            "ariaLabel": "Otwórz szczegóły: Mazovia Cargo S.A.",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 1325.96875,
+              "y": 720.078125,
+              "w": 44,
+              "h": 44
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "16.8px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Polskie Drogi Transport sp. z o.o.",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 379,
+              "y": 803.640625,
+              "w": 190.859375,
+              "h": 17
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.96px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "+48 22 555 01 20",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 636.234375,
+              "y": 805.078125,
+              "w": 93.125,
+              "h": 16
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "kontakt@transportowa.pl",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 619.40625,
+              "y": 823.671875,
+              "w": 137.09375,
+              "h": 16
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "SELECT",
+            "type": null,
+            "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+            "ariaLabel": "Status kontaktu: Polskie Drogi Transport sp. z o.o.",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 913.71875,
+              "y": 800.671875,
+              "w": 184,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "11.04px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "→",
+            "ariaLabel": "Otwórz szczegóły: Polskie Drogi Transport sp. z o.o.",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 1325.96875,
+              "y": 800.671875,
+              "w": 44,
+              "h": 44
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "16.8px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Wschód Freight Group",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 379,
+              "y": 884.234375,
+              "w": 131.421875,
+              "h": 17
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.96px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "+48 22 555 01 20",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 636.234375,
+              "y": 885.671875,
+              "w": 93.125,
+              "h": 16
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "kontakt@transportowa.pl",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 619.40625,
+              "y": 904.265625,
+              "w": 137.09375,
+              "h": 16
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "SELECT",
+            "type": null,
+            "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+            "ariaLabel": "Status kontaktu: Wschód Freight Group",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 913.71875,
+              "y": 881.265625,
+              "w": 184,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "11.04px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "→",
+            "ariaLabel": "Otwórz szczegóły: Wschód Freight Group",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 1325.96875,
+              "y": 881.265625,
+              "w": 44,
+              "h": 44
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "16.8px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          }
+        ],
+        "focus": {
+          "tag": "BODY",
+          "id": "",
+          "text": "Przejdź do głównej treściGOLDISplatforma operacyjnaPRACAPrzeglądMoje firmyPula firmAutomatyzacjePrze",
+          "outline": "rgb(242, 238, 229) none 3px"
+        }
+      }
+    },
+    {
+      "name": "b05-commission-desktop",
+      "role": "manager",
+      "state": "normal",
+      "metrics": {
+        "url": "http://127.0.0.1:4178/tools/commission-comparison",
+        "title": "Goldis · Narzędzia",
+        "viewport": {
+          "width": 1440,
+          "height": 1040,
+          "scrollWidth": 1440
+        },
+        "headings": [
+          {
+            "tag": "H1",
+            "text": "Porównywarka prowizji"
+          },
+          {
+            "tag": "H2",
+            "text": "Pliki źródłowe"
+          },
+          {
+            "tag": "H2",
+            "text": "Zakres dat i analiza"
+          }
+        ],
+        "signals": [],
+        "controls": [
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przejdź do głównej treści",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 8,
+              "y": -64.4000015258789,
+              "w": 197.96875,
+              "h": 45.25
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(17, 17, 22)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "GOLDISplatforma operacyjna",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 18,
+              "w": 267,
+              "h": 75
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przegląd",
+            "ariaLabel": "Przegląd",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 134.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje firmy",
+            "ariaLabel": "Moje firmy",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 182.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Pula firm",
+            "ariaLabel": "Pula firm",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 230.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Automatyzacje",
+            "ariaLabel": "Automatyzacje",
+            "labels": [],
+            "role": null,
+            "current": "page",
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 278.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przebiegi",
+            "ariaLabel": "Przebiegi",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 326.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Historia importów",
+            "ariaLabel": "Historia importów",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 374.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Powiadomienia2",
+            "ariaLabel": "Powiadomienia",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 422.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Pracownicy",
+            "ariaLabel": "Pracownicy",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 508.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Dostępy",
+            "ariaLabel": "Dostępy",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 556.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Raporty",
+            "ariaLabel": "Raporty",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 604.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Weryfikacja danych",
+            "ariaLabel": "Weryfikacja danych",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 652.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Dziennik aktywności",
+            "ariaLabel": "Dziennik aktywności",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 700.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje konto",
+            "ariaLabel": "Moje konto",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 748.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Zwiń menu",
+            "ariaLabel": "Zwiń nawigację",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 16,
+              "y": 936.15625,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.32px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje konto ↗",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 1313.3125,
+              "y": 23.078125,
+              "w": 72.6875,
+              "h": 18.828125
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.16px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Nowa analiza",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 356,
+              "y": 233.546875,
+              "w": 83.859375,
+              "h": 46
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.8px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Słownik prowizji",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 459.859375,
+              "y": 233.546875,
+              "w": 99.34375,
+              "h": 46
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.8px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Historia analiz",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 579.203125,
+              "y": 233.546875,
+              "w": 88.78125,
+              "h": 46
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.8px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "file",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              "Lista polis CRMArkusz Excel .xlsxWybierz plik"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 380,
+              "y": 393.609375,
+              "w": 1,
+              "h": 1
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "file",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              "Raport ASFArkusz Excel .xlsxWybierz plik"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 711.328125,
+              "y": 393.609375,
+              "w": 1,
+              "h": 1
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "file",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              "Raport WartyArkusz Excel .xlsxWybierz plik"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 1042.65625,
+              "y": 393.609375,
+              "w": 1,
+              "h": 1
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "checkbox",
+            "text": "",
+            "ariaLabel": "Uwzględnij CRM-listopad-demo.xlsx",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 395,
+              "y": 579.46875,
+              "w": 13,
+              "h": 13
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "11.68px",
+            "outline": "rgb(255, 255, 255) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "checkbox",
+            "text": "",
+            "ariaLabel": "Uwzględnij ASF-listopad-demo.xlsx",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 395,
+              "y": 622.828125,
+              "w": 13,
+              "h": 13
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "11.68px",
+            "outline": "rgb(255, 255, 255) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "checkbox",
+            "text": "",
+            "ariaLabel": "Uwzględnij WARTA-listopad-demo.xlsx",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 395,
+              "y": 666.1875,
+              "w": 13,
+              "h": 13
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "11.68px",
+            "outline": "rgb(255, 255, 255) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "date",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              "Od dnia"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 379,
+              "y": 887.515625,
+              "w": 190,
+              "h": 42
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "12.48px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "date",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              "Do dnia"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 581,
+              "y": 887.515625,
+              "w": 190,
+              "h": 42
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "12.48px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Otwórz słownik",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 783,
+              "y": 895.515625,
+              "w": 119.375,
+              "h": 34
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.48px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Uruchom porównanie",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": true,
+            "box": {
+              "x": 1207.71875,
+              "y": 885.515625,
+              "w": 153.28125,
+              "h": 44
+            },
+            "color": "rgb(23, 19, 11)",
+            "background": "rgb(217, 182, 95)",
+            "font": "12.48px",
+            "outline": "rgb(23, 19, 11) none 3px"
+          }
+        ],
+        "focus": {
+          "tag": "BODY",
+          "id": "",
+          "text": "Przejdź do głównej treściGOLDISplatforma operacyjnaPRACAPrzeglądMoje firmyPula firmAutomatyzacjePrze",
+          "outline": "rgb(242, 238, 229) none 3px"
+        }
+      }
+    },
+    {
+      "name": "b07-oc-selection-desktop",
+      "role": "operator",
+      "state": "normal",
+      "metrics": {
+        "url": "http://127.0.0.1:4178/tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=selection",
+        "title": "Goldis · Narzędzia",
+        "viewport": {
+          "width": 1440,
+          "height": 1040,
+          "scrollWidth": 1440
+        },
+        "headings": [
+          {
+            "tag": "H1",
+            "text": "Sprawdzanie OC"
+          },
+          {
+            "tag": "H2",
+            "text": "Kroki automatyzacji"
+          },
+          {
+            "tag": "H2",
+            "text": "Wybór wierszy"
+          },
+          {
+            "tag": "H2",
+            "text": "Wybierz wiersze do sprawdzenia"
+          },
+          {
+            "tag": "H3",
+            "text": "Wszystkie gotowe firmy"
+          },
+          {
+            "tag": "H3",
+            "text": "Wybrane firmy"
+          },
+          {
+            "tag": "H2",
+            "text": "Uzupełnianie i korekty danych"
+          },
+          {
+            "tag": "H3",
+            "text": "Wzbogacanie NIP → REGON"
+          },
+          {
+            "tag": "H2",
+            "text": "Przygotowanie i deduplikacja"
+          }
+        ],
+        "signals": [
+          {
+            "role": null,
+            "live": "polite",
+            "text": "0 / 500 wybranych"
+          },
+          {
+            "role": "status",
+            "live": "polite",
+            "text": "worker nie odpowiadaDostawca: GUS BIROstatnia weryfikacja: 16 wierszy. Wznawianie lookup wymaga aktywnego workera.Status jest odświeżany co 15 sekund."
+          },
+          {
+            "role": "status",
+            "live": null,
+            "text": "Ta rewizja jest zamknięta. Możesz przejść do podglądu uruchomienia; wiersze do kontroli, duplikaty i rekordy bez REGON-u zostaną pominięte."
+          }
+        ],
+        "controls": [
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przejdź do głównej treści",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 8,
+              "y": -64.4000015258789,
+              "w": 197.96875,
+              "h": 45.25
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(17, 17, 22)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "GOLDISplatforma operacyjna",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 18,
+              "w": 267,
+              "h": 75
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przegląd",
+            "ariaLabel": "Przegląd",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 134.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje firmy",
+            "ariaLabel": "Moje firmy",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 182.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Pula firm",
+            "ariaLabel": "Pula firm",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 230.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Automatyzacje",
+            "ariaLabel": "Automatyzacje",
+            "labels": [],
+            "role": null,
+            "current": "page",
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 278.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przebiegi",
+            "ariaLabel": "Przebiegi",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 326.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Historia importów",
+            "ariaLabel": "Historia importów",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 374.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Powiadomienia2",
+            "ariaLabel": "Powiadomienia",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 422.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje korekty",
+            "ariaLabel": "Moje korekty",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 470.796875,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje konto",
+            "ariaLabel": "Moje konto",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 16,
+              "y": 556.59375,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.76px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Zwiń menu",
+            "ariaLabel": "Zwiń nawigację",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 16,
+              "y": 936.15625,
+              "w": 267,
+              "h": 44
+            },
+            "color": "rgb(196, 192, 183)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.32px",
+            "outline": "rgb(196, 192, 183) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje konto ↗",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 1313.3125,
+              "y": 23.078125,
+              "w": 72.6875,
+              "h": 18.828125
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.16px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Historia importów ↗",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 1287.1875,
+              "y": 183.265625,
+              "w": 110.8125,
+              "h": 19.078125
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.32px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Zmień plik",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 1326.40625,
+              "y": 241.796875,
+              "w": 56.59375,
+              "h": 19.078125
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.32px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "01Plik ExcelPlik zaimportowany",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 354,
+              "y": 345.140625,
+              "w": 241,
+              "h": 54.4375
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "02Kontrola danychKontrola dostępna",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 354,
+              "y": 403.578125,
+              "w": 241,
+              "h": 54.4375
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "03Uzupełnianie REGONDane do sprawdzenia",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 354,
+              "y": 462.015625,
+              "w": 241,
+              "h": 54.4375
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "04DeduplikacjaZestaw przygotowany",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 354,
+              "y": 520.453125,
+              "w": 241,
+              "h": 54.4375
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "05Wybór wierszyWybierz firmy",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": "step",
+            "selected": null,
+            "box": {
+              "x": 354,
+              "y": 578.890625,
+              "w": 241,
+              "h": 54.4375
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "06Podsumowanie i startOczekuje na podsumowanie",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 354,
+              "y": 637.328125,
+              "w": 241,
+              "h": 54.4375
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "07Przebieg zadańBrak uruchomienia",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 354,
+              "y": 695.765625,
+              "w": 241,
+              "h": 54.4375
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "08Wyniki i eksportBrak wyników",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 354,
+              "y": 754.203125,
+              "w": 241,
+              "h": 54.4375
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Wyczyść zapisany wybór",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 646,
+              "y": 477.3125,
+              "w": 158.34375,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(26, 26, 32)",
+            "font": "12px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Sprawdź wszystkie gotowe firmy",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 646,
+              "y": 598.359375,
+              "w": 204.046875,
+              "h": 44
+            },
+            "color": "rgb(22, 20, 13)",
+            "background": "rgb(217, 182, 95)",
+            "font": "12px",
+            "outline": "rgb(22, 20, 13) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Wybierz firmy",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 646,
+              "y": 658.359375,
+              "w": 98.546875,
+              "h": 44
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgb(26, 26, 32)",
+            "font": "12px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Zakres lub numery wierszy",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 751.546875,
+              "y": 658.359375,
+              "w": 167.78125,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(26, 26, 32)",
+            "font": "12px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              "Szukaj po nazwie, NIP, REGON lub numerze wiersza"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 664,
+              "y": 819,
+              "w": 693,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "12.16px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "checkbox",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              " Zaznacz firmy na tej stronie (3)"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 1165.953125,
+              "y": 889,
+              "w": 18,
+              "h": 18
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(255, 255, 255) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "checkbox",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 676,
+              "y": 949,
+              "w": 18,
+              "h": 18
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(255, 255, 255) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "checkbox",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 676,
+              "y": 1034.125,
+              "w": 18,
+              "h": 18
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(255, 255, 255) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "checkbox",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 676,
+              "y": 1119.25,
+              "w": 18,
+              "h": 18
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(255, 255, 255) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Poprzednia",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": true,
+            "box": {
+              "x": 664,
+              "y": 1202.375,
+              "w": 83.953125,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(26, 26, 32)",
+            "font": "12px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Następna",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 1282.15625,
+              "y": 1202.375,
+              "w": 74.84375,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(26, 26, 32)",
+            "font": "12px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "submit",
+            "text": "Sprawdź podsumowanie (0)",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": true,
+            "box": {
+              "x": 666,
+              "y": 1392.875,
+              "w": 178.125,
+              "h": 44
+            },
+            "color": "rgb(22, 20, 13)",
+            "background": "rgb(217, 182, 95)",
+            "font": "12px",
+            "outline": "rgb(22, 20, 13) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "← Wstecz: deduplikacja",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 358,
+              "y": 1507.875,
+              "w": 126.578125,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Otwórz etap: podsumowanie i start →",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 1180.421875,
+              "y": 1507.875,
+              "w": 201.578125,
+              "h": 44
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          }
+        ],
+        "focus": {
+          "tag": "H2",
+          "id": "oc-active-step-heading",
+          "text": "Wybór wierszy",
+          "outline": "rgb(242, 238, 229) none 3px"
+        }
+      }
+    },
+    {
+      "name": "b08-my-results-mobile",
+      "role": "operator",
+      "state": "normal",
+      "metrics": {
+        "url": "http://127.0.0.1:4178/my-results",
+        "title": "Goldis · Narzędzia",
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "scrollWidth": 390
+        },
+        "headings": [
+          {
+            "tag": "H1",
+            "text": "Moje firmy"
+          },
+          {
+            "tag": "H2",
+            "text": "Firmy przydzielone do mnie"
+          }
+        ],
+        "signals": [
+          {
+            "role": "status",
+            "live": "polite",
+            "text": "Odczytano: 8 lis 2026, 22:00"
+          },
+          {
+            "role": null,
+            "live": "polite",
+            "text": "Pokazano 4 z 4 firm pasujących do filtrów."
+          }
+        ],
+        "controls": [
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przejdź do głównej treści",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 8,
+              "y": -64.4000015258789,
+              "w": 197.96875,
+              "h": 45.25
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(17, 17, 22)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Goldis platforma operacyjna",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 14,
+              "y": 6.5,
+              "w": 151.234375,
+              "h": 45
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.28px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "",
+            "ariaLabel": "Otwórz menu nawigacji",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 332,
+              "y": 7,
+              "w": 44,
+              "h": 44
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgb(17, 17, 22)",
+            "font": "17.6px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje konto",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 275.359375,
+              "y": 76.703125,
+              "w": 56.640625,
+              "h": 17.59375
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "11.36px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Eksportuj moje firmy",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 276.390625,
+              "y": 576.234375,
+              "w": 66.609375,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "10.72px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "↻",
+            "ariaLabel": "Odśwież listę firm",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 299,
+              "y": 629.234375,
+              "w": 44,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(107, 107, 107)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": null,
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              "Szukaj firmy"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 47,
+              "y": 730.3125,
+              "w": 296,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "12.64px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "SELECT",
+            "type": null,
+            "text": "Wszystkie statusyNie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+            "ariaLabel": null,
+            "labels": [
+              "Status kontaktuWszystkie statusyNie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 47,
+              "y": 807.15625,
+              "w": 143,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "12.64px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "submit",
+            "text": "Szukaj",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 47,
+              "y": 861.15625,
+              "w": 296,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.48px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Transport i Logistyka Alfa sp. z o.o.",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 59,
+              "y": 968.109375,
+              "w": 219,
+              "h": 44.65625
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "14.4px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "→",
+            "ariaLabel": "Otwórz szczegóły: Transport i Logistyka Alfa sp. z o.o.",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 287,
+              "y": 978.984375,
+              "w": 44,
+              "h": 44
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "16.8px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "+48 22 555 01 20",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 137,
+              "y": 1062.875,
+              "w": 194,
+              "h": 18.59375
+            },
+            "color": "rgb(228, 220, 200)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(228, 220, 200) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "kontakt@transportowa.pl",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 137,
+              "y": 1089.46875,
+              "w": 194,
+              "h": 18.59375
+            },
+            "color": "rgb(228, 220, 200)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(228, 220, 200) none 3px"
+          },
+          {
+            "tag": "SELECT",
+            "type": null,
+            "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+            "ariaLabel": "Status kontaktu: Transport i Logistyka Alfa sp. z o.o.",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 59,
+              "y": 1152.90625,
+              "w": 272,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "12.16px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Mazovia Cargo S.A.",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 59,
+              "y": 1311.25,
+              "w": 219,
+              "h": 22.328125
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "14.4px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "→",
+            "ariaLabel": "Otwórz szczegóły: Mazovia Cargo S.A.",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 287,
+              "y": 1310.96875,
+              "w": 44,
+              "h": 44
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "16.8px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "+48 22 555 01 20",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 137,
+              "y": 1383.96875,
+              "w": 194,
+              "h": 18.59375
+            },
+            "color": "rgb(228, 220, 200)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(228, 220, 200) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "kontakt@transportowa.pl",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 137,
+              "y": 1410.5625,
+              "w": 194,
+              "h": 18.59375
+            },
+            "color": "rgb(228, 220, 200)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(228, 220, 200) none 3px"
+          },
+          {
+            "tag": "SELECT",
+            "type": null,
+            "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+            "ariaLabel": "Status kontaktu: Mazovia Cargo S.A.",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 59,
+              "y": 1474,
+              "w": 272,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "12.16px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Polskie Drogi Transport sp. z o.o.",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 59,
+              "y": 1632.34375,
+              "w": 219,
+              "h": 22.328125
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "14.4px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "→",
+            "ariaLabel": "Otwórz szczegóły: Polskie Drogi Transport sp. z o.o.",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 287,
+              "y": 1632.0625,
+              "w": 44,
+              "h": 44
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "16.8px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "+48 22 555 01 20",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 137,
+              "y": 1705.0625,
+              "w": 194,
+              "h": 18.59375
+            },
+            "color": "rgb(228, 220, 200)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(228, 220, 200) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "kontakt@transportowa.pl",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 137,
+              "y": 1731.65625,
+              "w": 194,
+              "h": 18.59375
+            },
+            "color": "rgb(228, 220, 200)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(228, 220, 200) none 3px"
+          },
+          {
+            "tag": "SELECT",
+            "type": null,
+            "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+            "ariaLabel": "Status kontaktu: Polskie Drogi Transport sp. z o.o.",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 59,
+              "y": 1795.09375,
+              "w": 272,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "12.16px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Wschód Freight Group",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 59,
+              "y": 1953.4375,
+              "w": 219,
+              "h": 22.328125
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "14.4px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "→",
+            "ariaLabel": "Otwórz szczegóły: Wschód Freight Group",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 287,
+              "y": 1953.15625,
+              "w": 44,
+              "h": 44
+            },
+            "color": "rgb(217, 182, 95)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "16.8px",
+            "outline": "rgb(217, 182, 95) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "+48 22 555 01 20",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 137,
+              "y": 2026.15625,
+              "w": 194,
+              "h": 18.59375
+            },
+            "color": "rgb(228, 220, 200)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(228, 220, 200) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "kontakt@transportowa.pl",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 137,
+              "y": 2052.75,
+              "w": 194,
+              "h": 18.59375
+            },
+            "color": "rgb(228, 220, 200)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12px",
+            "outline": "rgb(228, 220, 200) none 3px"
+          },
+          {
+            "tag": "SELECT",
+            "type": null,
+            "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+            "ariaLabel": "Status kontaktu: Wschód Freight Group",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 59,
+              "y": 2116.1875,
+              "w": 272,
+              "h": 44
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "12.16px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          }
+        ],
+        "focus": {
+          "tag": "BODY",
+          "id": "",
+          "text": "Przejdź do głównej treściGOLDISplatforma operacyjnaPRACAPrzeglądMoje firmyPula firmAutomatyzacjePrze",
+          "outline": "rgb(242, 238, 229) none 3px"
+        }
+      }
+    },
+    {
+      "name": "b10-commission-mobile",
+      "role": "manager",
+      "state": "normal",
+      "metrics": {
+        "url": "http://127.0.0.1:4178/tools/commission-comparison",
+        "title": "Goldis · Narzędzia",
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "scrollWidth": 390
+        },
+        "headings": [
+          {
+            "tag": "H1",
+            "text": "Porównywarka prowizji"
+          },
+          {
+            "tag": "H2",
+            "text": "Pliki źródłowe"
+          },
+          {
+            "tag": "H2",
+            "text": "Zakres dat i analiza"
+          }
+        ],
+        "signals": [],
+        "controls": [
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Przejdź do głównej treści",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 8,
+              "y": -64.4000015258789,
+              "w": 197.96875,
+              "h": 45.25
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(17, 17, 22)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Goldis platforma operacyjna",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 14,
+              "y": 6.5,
+              "w": 151.234375,
+              "h": 45
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "13.28px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "",
+            "ariaLabel": "Otwórz menu nawigacji",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 332,
+              "y": 7,
+              "w": 44,
+              "h": 44
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgb(17, 17, 22)",
+            "font": "17.6px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          },
+          {
+            "tag": "A",
+            "type": null,
+            "text": "Moje konto ↗",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "box": {
+              "x": 302.3125,
+              "y": 76.078125,
+              "w": 72.6875,
+              "h": 18.828125
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.16px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Nowa analiza",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 14,
+              "y": 320.671875,
+              "w": 83.859375,
+              "h": 46
+            },
+            "color": "rgb(242, 216, 137)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.8px",
+            "outline": "rgb(242, 216, 137) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Słownik prowizji",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 117.859375,
+              "y": 320.671875,
+              "w": 99.34375,
+              "h": 46
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.8px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Historia analiz",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 237.203125,
+              "y": 320.671875,
+              "w": 88.78125,
+              "h": 46
+            },
+            "color": "rgb(170, 166, 156)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.8px",
+            "outline": "rgb(170, 166, 156) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "file",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              "Lista polis CRMArkusz Excel .xlsxWybierz plik"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 32,
+              "y": 530.296875,
+              "w": 1,
+              "h": 1
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "file",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              "Raport ASFArkusz Excel .xlsxWybierz plik"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 32,
+              "y": 660.296875,
+              "w": 1,
+              "h": 1
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "file",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              "Raport WartyArkusz Excel .xlsxWybierz plik"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 32,
+              "y": 790.296875,
+              "w": 1,
+              "h": 1
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "15px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "checkbox",
+            "text": "",
+            "ariaLabel": "Uwzględnij CRM-listopad-demo.xlsx",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 47,
+              "y": 976.15625,
+              "w": 13,
+              "h": 13
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "11.68px",
+            "outline": "rgb(255, 255, 255) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "checkbox",
+            "text": "",
+            "ariaLabel": "Uwzględnij ASF-listopad-demo.xlsx",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 47,
+              "y": 1019.515625,
+              "w": 13,
+              "h": 13
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "11.68px",
+            "outline": "rgb(255, 255, 255) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "checkbox",
+            "text": "",
+            "ariaLabel": "Uwzględnij WARTA-listopad-demo.xlsx",
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 47,
+              "y": 1062.875,
+              "w": 13,
+              "h": 13
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "11.68px",
+            "outline": "rgb(255, 255, 255) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "date",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              "Od dnia"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 31,
+              "y": 1292.21875,
+              "w": 158,
+              "h": 42
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "12.48px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "INPUT",
+            "type": "date",
+            "text": "",
+            "ariaLabel": null,
+            "labels": [
+              "Do dnia"
+            ],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 201,
+              "y": 1292.21875,
+              "w": 158,
+              "h": 42
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgb(13, 13, 18)",
+            "font": "12.48px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Otwórz słownik",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": false,
+            "box": {
+              "x": 31,
+              "y": 1394.40625,
+              "w": 119.375,
+              "h": 34
+            },
+            "color": "rgb(242, 238, 229)",
+            "background": "rgba(0, 0, 0, 0)",
+            "font": "12.48px",
+            "outline": "rgb(242, 238, 229) none 3px"
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "text": "Uruchom porównanie",
+            "ariaLabel": null,
+            "labels": [],
+            "role": null,
+            "current": null,
+            "selected": null,
+            "disabled": true,
+            "box": {
+              "x": 31,
+              "y": 1440.40625,
+              "w": 158,
+              "h": 44
+            },
+            "color": "rgb(23, 19, 11)",
+            "background": "rgb(217, 182, 95)",
+            "font": "12.48px",
+            "outline": "rgb(23, 19, 11) none 3px"
+          }
+        ],
+        "focus": {
+          "tag": "BODY",
+          "id": "",
+          "text": "Przejdź do głównej treściGOLDISplatforma operacyjnaPRACAPrzeglądMoje firmyPula firmAutomatyzacjePrze",
+          "outline": "rgb(242, 238, 229) none 3px"
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "fixtureSupplements": [
+    "Current /api/leads summary and tenantId supplied in browser context; existing October fixture lacks the current contract."
+  ],
+  "cleanup": {
+    "browserClosed": true
+  },
+  "skipLinkAfterEnterAndTab": {
+    "url": "http://127.0.0.1:4178/my-results#main-content",
+    "title": "Goldis · Narzędzia",
+    "viewport": {
+      "width": 1440,
+      "height": 1040,
+      "scrollWidth": 1440
+    },
+    "headings": [
+      {
+        "tag": "H1",
+        "text": "Moje firmy"
+      },
+      {
+        "tag": "H2",
+        "text": "Firmy przydzielone do mnie"
+      }
+    ],
+    "signals": [
+      {
+        "role": "status",
+        "live": "polite",
+        "text": "Odczytano: 8 lis 2026, 22:00"
+      },
+      {
+        "role": null,
+        "live": "polite",
+        "text": "Pokazano 4 z 4 firm pasujących do filtrów."
+      }
+    ],
+    "controls": [
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Przejdź do głównej treści",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 8,
+          "y": -64.4000015258789,
+          "w": 197.96875,
+          "h": 45.25
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(17, 17, 22)",
+        "font": "15px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "GOLDISplatforma operacyjna",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 18,
+          "w": 267,
+          "h": 75
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "15px",
+        "outline": "rgb(242, 216, 137) solid 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Przegląd",
+        "ariaLabel": "Przegląd",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 134.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Moje firmy",
+        "ariaLabel": "Moje firmy",
+        "labels": [],
+        "role": null,
+        "current": "page",
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 182.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(242, 216, 137)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(242, 216, 137) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Pula firm",
+        "ariaLabel": "Pula firm",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 230.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Automatyzacje",
+        "ariaLabel": "Automatyzacje",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 278.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Przebiegi",
+        "ariaLabel": "Przebiegi",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 326.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Historia importów",
+        "ariaLabel": "Historia importów",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 374.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Powiadomienia2",
+        "ariaLabel": "Powiadomienia",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 422.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Moje korekty",
+        "ariaLabel": "Moje korekty",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 470.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Moje konto",
+        "ariaLabel": "Moje konto",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 556.59375,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Zwiń menu",
+        "ariaLabel": "Zwiń nawigację",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 16,
+          "y": 936.15625,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.32px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Moje konto",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 1274.78125,
+          "y": 22.828125,
+          "w": 62.21875,
+          "h": 19.34375
+        },
+        "color": "rgb(170, 166, 156)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.48px",
+        "outline": "rgb(170, 166, 156) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Eksportuj moje firmy",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 1174.75,
+          "y": 393.59375,
+          "w": 149.25,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.48px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "↻",
+        "ariaLabel": "Odśwież listę firm",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 1333,
+          "y": 400.96875,
+          "w": 28,
+          "h": 29.25
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(107, 107, 107)",
+        "font": "15px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "INPUT",
+        "type": null,
+        "text": "",
+        "ariaLabel": null,
+        "labels": [
+          "Szukaj firmy"
+        ],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 379,
+          "y": 496.3125,
+          "w": 420,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.64px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Wszystkie statusyNie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": null,
+        "labels": [
+          "Status kontaktuWszystkie statusyNie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany"
+        ],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 809,
+          "y": 496.3125,
+          "w": 473.265625,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.64px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "submit",
+        "text": "Szukaj",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 1292.265625,
+          "y": 496.3125,
+          "w": 68.734375,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.48px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Transport i Logistyka Alfa sp. z o.o.",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 379,
+          "y": 629.15625,
+          "w": 179.453125,
+          "h": 37.0625
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.96px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "+48 22 555 01 20",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 636.234375,
+          "y": 640.625,
+          "w": 93.125,
+          "h": 16
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "kontakt@transportowa.pl",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 619.40625,
+          "y": 659.21875,
+          "w": 137.09375,
+          "h": 16
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": "Status kontaktu: Transport i Logistyka Alfa sp. z o.o.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 913.71875,
+          "y": 636.21875,
+          "w": 184,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "11.04px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "→",
+        "ariaLabel": "Otwórz szczegóły: Transport i Logistyka Alfa sp. z o.o.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 1325.96875,
+          "y": 636.21875,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "16.8px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Mazovia Cargo S.A.",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 379,
+          "y": 723.046875,
+          "w": 113.03125,
+          "h": 17
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.96px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "+48 22 555 01 20",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 636.234375,
+          "y": 724.484375,
+          "w": 93.125,
+          "h": 16
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "kontakt@transportowa.pl",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 619.40625,
+          "y": 743.078125,
+          "w": 137.09375,
+          "h": 16
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": "Status kontaktu: Mazovia Cargo S.A.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 913.71875,
+          "y": 720.078125,
+          "w": 184,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "11.04px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "→",
+        "ariaLabel": "Otwórz szczegóły: Mazovia Cargo S.A.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 1325.96875,
+          "y": 720.078125,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "16.8px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Polskie Drogi Transport sp. z o.o.",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 379,
+          "y": 803.640625,
+          "w": 190.859375,
+          "h": 17
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.96px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "+48 22 555 01 20",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 636.234375,
+          "y": 805.078125,
+          "w": 93.125,
+          "h": 16
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "kontakt@transportowa.pl",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 619.40625,
+          "y": 823.671875,
+          "w": 137.09375,
+          "h": 16
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": "Status kontaktu: Polskie Drogi Transport sp. z o.o.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 913.71875,
+          "y": 800.671875,
+          "w": 184,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "11.04px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "→",
+        "ariaLabel": "Otwórz szczegóły: Polskie Drogi Transport sp. z o.o.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 1325.96875,
+          "y": 800.671875,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "16.8px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Wschód Freight Group",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 379,
+          "y": 884.234375,
+          "w": 131.421875,
+          "h": 17
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.96px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "+48 22 555 01 20",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 636.234375,
+          "y": 885.671875,
+          "w": 93.125,
+          "h": 16
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "kontakt@transportowa.pl",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 619.40625,
+          "y": 904.265625,
+          "w": 137.09375,
+          "h": 16
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": "Status kontaktu: Wschód Freight Group",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 913.71875,
+          "y": 881.265625,
+          "w": 184,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "11.04px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "→",
+        "ariaLabel": "Otwórz szczegóły: Wschód Freight Group",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 1325.96875,
+          "y": 881.265625,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "16.8px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      }
+    ],
+    "focus": {
+      "tag": "A",
+      "id": "",
+      "text": "GOLDISplatforma operacyjna",
+      "outline": "rgb(242, 216, 137) solid 3px"
+    }
+  },
+  "dictionary": {
+    "url": "http://127.0.0.1:4178/tools/commission-comparison",
+    "title": "Goldis · Narzędzia",
+    "viewport": {
+      "width": 1440,
+      "height": 1040,
+      "scrollWidth": 1440
+    },
+    "headings": [
+      {
+        "tag": "H1",
+        "text": "Porównywarka prowizji"
+      },
+      {
+        "tag": "H2",
+        "text": "Słownik prowizji"
+      }
+    ],
+    "signals": [],
+    "controls": [
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Przejdź do głównej treści",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 8,
+          "y": -64.4000015258789,
+          "w": 197.96875,
+          "h": 45.25
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(17, 17, 22)",
+        "font": "15px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "GOLDISplatforma operacyjna",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 18,
+          "w": 267,
+          "h": 75
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "15px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Przegląd",
+        "ariaLabel": "Przegląd",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 134.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Moje firmy",
+        "ariaLabel": "Moje firmy",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 182.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Pula firm",
+        "ariaLabel": "Pula firm",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 230.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Automatyzacje",
+        "ariaLabel": "Automatyzacje",
+        "labels": [],
+        "role": null,
+        "current": "page",
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 278.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(242, 216, 137)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(242, 216, 137) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Przebiegi",
+        "ariaLabel": "Przebiegi",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 326.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Historia importów",
+        "ariaLabel": "Historia importów",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 374.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Powiadomienia2",
+        "ariaLabel": "Powiadomienia",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 422.796875,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Pracownicy",
+        "ariaLabel": "Pracownicy",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 508.59375,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Dostępy",
+        "ariaLabel": "Dostępy",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 556.59375,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Raporty",
+        "ariaLabel": "Raporty",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 604.59375,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Weryfikacja danych",
+        "ariaLabel": "Weryfikacja danych",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 652.59375,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Dziennik aktywności",
+        "ariaLabel": "Dziennik aktywności",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 700.59375,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Moje konto",
+        "ariaLabel": "Moje konto",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 16,
+          "y": 748.59375,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Zwiń menu",
+        "ariaLabel": "Zwiń nawigację",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 16,
+          "y": 936.15625,
+          "w": 267,
+          "h": 44
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.32px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Moje konto ↗",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 1313.3125,
+          "y": 23.078125,
+          "w": 72.6875,
+          "h": 18.828125
+        },
+        "color": "rgb(170, 166, 156)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.16px",
+        "outline": "rgb(170, 166, 156) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Nowa analiza",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 356,
+          "y": 233.546875,
+          "w": 83.859375,
+          "h": 46
+        },
+        "color": "rgb(170, 166, 156)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.8px",
+        "outline": "rgb(170, 166, 156) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Słownik prowizji",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 459.859375,
+          "y": 233.546875,
+          "w": 99.34375,
+          "h": 46
+        },
+        "color": "rgb(242, 216, 137)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.8px",
+        "outline": "rgb(242, 216, 137) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Historia analiz",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 579.203125,
+          "y": 233.546875,
+          "w": 88.78125,
+          "h": 46
+        },
+        "color": "rgb(170, 166, 156)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.8px",
+        "outline": "rgb(170, 166, 156) none 3px"
+      },
+      {
+        "tag": "INPUT",
+        "type": "file",
+        "text": "",
+        "ariaLabel": null,
+        "labels": [
+          "Wczytaj Excel"
+        ],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 1309.171875,
+          "y": 343.046875,
+          "w": 1,
+          "h": 1
+        },
+        "color": "rgb(23, 19, 11)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "11.84px",
+        "outline": "rgb(23, 19, 11) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Wybierzv1 · Opublikowana · aktywna",
+        "ariaLabel": null,
+        "labels": [
+          "WersjaWybierzv1 · Opublikowana · aktywna"
+        ],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 379,
+          "y": 434.6875,
+          "w": 240,
+          "h": 42
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.48px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Wszystkie towarzystwaPZUWarta",
+        "ariaLabel": null,
+        "labels": [
+          "TowarzystwoWszystkie towarzystwaPZUWarta"
+        ],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 630,
+          "y": 434.6875,
+          "w": 360,
+          "h": 42
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.48px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "INPUT",
+        "type": "search",
+        "text": "",
+        "ariaLabel": null,
+        "labels": [
+          "Szukaj"
+        ],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 1001,
+          "y": 434.6875,
+          "w": 360,
+          "h": 42
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.48px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      }
+    ],
+    "focus": {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "Słownik prowizji",
+      "outline": "rgb(242, 216, 137) none 3px"
+    }
+  },
+  "mobileDrawerOpen": {
+    "url": "http://127.0.0.1:4178/my-results",
+    "title": "Goldis · Narzędzia",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390
+    },
+    "headings": [
+      {
+        "tag": "H1",
+        "text": "Moje firmy"
+      },
+      {
+        "tag": "H2",
+        "text": "Firmy przydzielone do mnie"
+      }
+    ],
+    "signals": [
+      {
+        "role": "status",
+        "live": "polite",
+        "text": "Odczytano: 8 lis 2026, 22:00"
+      },
+      {
+        "role": null,
+        "live": "polite",
+        "text": "Pokazano 4 z 4 firm pasujących do filtrów."
+      }
+    ],
+    "controls": [
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Przejdź do głównej treści",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 8,
+          "y": -64.4000015258789,
+          "w": 197.96875,
+          "h": 45.25
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(17, 17, 22)",
+        "font": "15px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Goldis platforma operacyjna",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 14,
+          "y": 6.5,
+          "w": 151.234375,
+          "h": 45
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.28px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "",
+        "ariaLabel": "Otwórz menu nawigacji",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 332,
+          "y": 7,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(242, 216, 137)",
+        "background": "rgb(17, 17, 22)",
+        "font": "17.6px",
+        "outline": "rgb(242, 216, 137) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "",
+        "ariaLabel": "Zamknij menu",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 284,
+          "y": 19,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(17, 17, 22)",
+        "font": "24px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Przegląd",
+        "ariaLabel": "Przegląd",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 15,
+          "y": 132.796875,
+          "w": 317,
+          "h": 46
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Moje firmy",
+        "ariaLabel": "Moje firmy",
+        "labels": [],
+        "role": null,
+        "current": "page",
+        "selected": null,
+        "box": {
+          "x": 15,
+          "y": 182.796875,
+          "w": 317,
+          "h": 46
+        },
+        "color": "rgb(242, 216, 137)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(242, 216, 137) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Pula firm",
+        "ariaLabel": "Pula firm",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 15,
+          "y": 232.796875,
+          "w": 317,
+          "h": 46
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Automatyzacje",
+        "ariaLabel": "Automatyzacje",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 15,
+          "y": 282.796875,
+          "w": 317,
+          "h": 46
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Przebiegi",
+        "ariaLabel": "Przebiegi",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 15,
+          "y": 332.796875,
+          "w": 317,
+          "h": 46
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Historia importów",
+        "ariaLabel": "Historia importów",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 15,
+          "y": 382.796875,
+          "w": 317,
+          "h": 46
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Powiadomienia2",
+        "ariaLabel": "Powiadomienia",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 15,
+          "y": 432.796875,
+          "w": 317,
+          "h": 46
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Moje korekty",
+        "ariaLabel": "Moje korekty",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 15,
+          "y": 482.796875,
+          "w": 317,
+          "h": 46
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Moje konto",
+        "ariaLabel": "Moje konto",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 15,
+          "y": 587.59375,
+          "w": 317,
+          "h": 46
+        },
+        "color": "rgb(196, 192, 183)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.76px",
+        "outline": "rgb(196, 192, 183) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Moje konto",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 275.359375,
+          "y": 76.703125,
+          "w": 56.640625,
+          "h": 17.59375
+        },
+        "color": "rgb(170, 166, 156)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "11.36px",
+        "outline": "rgb(170, 166, 156) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Eksportuj moje firmy",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 276.390625,
+          "y": 576.234375,
+          "w": 66.609375,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "10.72px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "↻",
+        "ariaLabel": "Odśwież listę firm",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 299,
+          "y": 629.234375,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(107, 107, 107)",
+        "font": "15px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "INPUT",
+        "type": null,
+        "text": "",
+        "ariaLabel": null,
+        "labels": [
+          "Szukaj firmy"
+        ],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 47,
+          "y": 730.3125,
+          "w": 296,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.64px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Wszystkie statusyNie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": null,
+        "labels": [
+          "Status kontaktuWszystkie statusyNie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany"
+        ],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 47,
+          "y": 807.15625,
+          "w": 143,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.64px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "submit",
+        "text": "Szukaj",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 47,
+          "y": 861.15625,
+          "w": 296,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.48px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Transport i Logistyka Alfa sp. z o.o.",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 59,
+          "y": 968.109375,
+          "w": 219,
+          "h": 44.65625
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "14.4px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "→",
+        "ariaLabel": "Otwórz szczegóły: Transport i Logistyka Alfa sp. z o.o.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 287,
+          "y": 978.984375,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "16.8px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "+48 22 555 01 20",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 1062.875,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "kontakt@transportowa.pl",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 1089.46875,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": "Status kontaktu: Transport i Logistyka Alfa sp. z o.o.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 59,
+          "y": 1152.90625,
+          "w": 272,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.16px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Mazovia Cargo S.A.",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 59,
+          "y": 1311.25,
+          "w": 219,
+          "h": 22.328125
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "14.4px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "→",
+        "ariaLabel": "Otwórz szczegóły: Mazovia Cargo S.A.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 287,
+          "y": 1310.96875,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "16.8px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "+48 22 555 01 20",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 1383.96875,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "kontakt@transportowa.pl",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 1410.5625,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": "Status kontaktu: Mazovia Cargo S.A.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 59,
+          "y": 1474,
+          "w": 272,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.16px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Polskie Drogi Transport sp. z o.o.",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 59,
+          "y": 1632.34375,
+          "w": 219,
+          "h": 22.328125
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "14.4px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "→",
+        "ariaLabel": "Otwórz szczegóły: Polskie Drogi Transport sp. z o.o.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 287,
+          "y": 1632.0625,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "16.8px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "+48 22 555 01 20",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 1705.0625,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "kontakt@transportowa.pl",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 1731.65625,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": "Status kontaktu: Polskie Drogi Transport sp. z o.o.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 59,
+          "y": 1795.09375,
+          "w": 272,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.16px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Wschód Freight Group",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 59,
+          "y": 1953.4375,
+          "w": 219,
+          "h": 22.328125
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "14.4px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "→",
+        "ariaLabel": "Otwórz szczegóły: Wschód Freight Group",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 287,
+          "y": 1953.15625,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "16.8px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "+48 22 555 01 20",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 2026.15625,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "kontakt@transportowa.pl",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 2052.75,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": "Status kontaktu: Wschód Freight Group",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 59,
+          "y": 2116.1875,
+          "w": 272,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.16px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      }
+    ],
+    "focus": {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "",
+      "outline": "rgb(242, 238, 229) none 3px"
+    }
+  },
+  "mobileDrawerAfterEscape": {
+    "url": "http://127.0.0.1:4178/my-results",
+    "title": "Goldis · Narzędzia",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390
+    },
+    "headings": [
+      {
+        "tag": "H1",
+        "text": "Moje firmy"
+      },
+      {
+        "tag": "H2",
+        "text": "Firmy przydzielone do mnie"
+      }
+    ],
+    "signals": [
+      {
+        "role": "status",
+        "live": "polite",
+        "text": "Odczytano: 8 lis 2026, 22:00"
+      },
+      {
+        "role": null,
+        "live": "polite",
+        "text": "Pokazano 4 z 4 firm pasujących do filtrów."
+      }
+    ],
+    "controls": [
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Przejdź do głównej treści",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 8,
+          "y": -64.4000015258789,
+          "w": 197.96875,
+          "h": 45.25
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(17, 17, 22)",
+        "font": "15px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Goldis platforma operacyjna",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 14,
+          "y": 6.5,
+          "w": 151.234375,
+          "h": 45
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "13.28px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "",
+        "ariaLabel": "Otwórz menu nawigacji",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 332,
+          "y": 7,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(242, 216, 137)",
+        "background": "rgb(17, 17, 22)",
+        "font": "17.6px",
+        "outline": "rgb(217, 182, 95) solid 2px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Moje konto",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 275.359375,
+          "y": 76.703125,
+          "w": 56.640625,
+          "h": 17.59375
+        },
+        "color": "rgb(170, 166, 156)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "11.36px",
+        "outline": "rgb(170, 166, 156) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Eksportuj moje firmy",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 276.390625,
+          "y": 576.234375,
+          "w": 66.609375,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "10.72px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "↻",
+        "ariaLabel": "Odśwież listę firm",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 299,
+          "y": 629.234375,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(107, 107, 107)",
+        "font": "15px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "INPUT",
+        "type": null,
+        "text": "",
+        "ariaLabel": null,
+        "labels": [
+          "Szukaj firmy"
+        ],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 47,
+          "y": 730.3125,
+          "w": 296,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.64px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Wszystkie statusyNie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": null,
+        "labels": [
+          "Status kontaktuWszystkie statusyNie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany"
+        ],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 47,
+          "y": 807.15625,
+          "w": 143,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.64px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "BUTTON",
+        "type": "submit",
+        "text": "Szukaj",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 47,
+          "y": 861.15625,
+          "w": 296,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12.48px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Transport i Logistyka Alfa sp. z o.o.",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 59,
+          "y": 968.109375,
+          "w": 219,
+          "h": 44.65625
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "14.4px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "→",
+        "ariaLabel": "Otwórz szczegóły: Transport i Logistyka Alfa sp. z o.o.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 287,
+          "y": 978.984375,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "16.8px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "+48 22 555 01 20",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 1062.875,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "kontakt@transportowa.pl",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 1089.46875,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": "Status kontaktu: Transport i Logistyka Alfa sp. z o.o.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 59,
+          "y": 1152.90625,
+          "w": 272,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.16px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Mazovia Cargo S.A.",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 59,
+          "y": 1311.25,
+          "w": 219,
+          "h": 22.328125
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "14.4px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "→",
+        "ariaLabel": "Otwórz szczegóły: Mazovia Cargo S.A.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 287,
+          "y": 1310.96875,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "16.8px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "+48 22 555 01 20",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 1383.96875,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "kontakt@transportowa.pl",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 1410.5625,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": "Status kontaktu: Mazovia Cargo S.A.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 59,
+          "y": 1474,
+          "w": 272,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.16px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Polskie Drogi Transport sp. z o.o.",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 59,
+          "y": 1632.34375,
+          "w": 219,
+          "h": 22.328125
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "14.4px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "→",
+        "ariaLabel": "Otwórz szczegóły: Polskie Drogi Transport sp. z o.o.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 287,
+          "y": 1632.0625,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "16.8px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "+48 22 555 01 20",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 1705.0625,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "kontakt@transportowa.pl",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 1731.65625,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": "Status kontaktu: Polskie Drogi Transport sp. z o.o.",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 59,
+          "y": 1795.09375,
+          "w": 272,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.16px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "Wschód Freight Group",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 59,
+          "y": 1953.4375,
+          "w": 219,
+          "h": 22.328125
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "14.4px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "→",
+        "ariaLabel": "Otwórz szczegóły: Wschód Freight Group",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 287,
+          "y": 1953.15625,
+          "w": 44,
+          "h": 44
+        },
+        "color": "rgb(217, 182, 95)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "16.8px",
+        "outline": "rgb(217, 182, 95) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "+48 22 555 01 20",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 2026.15625,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "A",
+        "type": null,
+        "text": "kontakt@transportowa.pl",
+        "ariaLabel": null,
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "box": {
+          "x": 137,
+          "y": 2052.75,
+          "w": 194,
+          "h": 18.59375
+        },
+        "color": "rgb(228, 220, 200)",
+        "background": "rgba(0, 0, 0, 0)",
+        "font": "12px",
+        "outline": "rgb(228, 220, 200) none 3px"
+      },
+      {
+        "tag": "SELECT",
+        "type": null,
+        "text": "Nie kontaktowanoKlient zgadza się na ofertęKlient nie jest zainteresowany",
+        "ariaLabel": "Status kontaktu: Wschód Freight Group",
+        "labels": [],
+        "role": null,
+        "current": null,
+        "selected": null,
+        "disabled": false,
+        "box": {
+          "x": 59,
+          "y": 2116.1875,
+          "w": 272,
+          "h": 44
+        },
+        "color": "rgb(242, 238, 229)",
+        "background": "rgb(13, 13, 18)",
+        "font": "12.16px",
+        "outline": "rgb(242, 238, 229) none 3px"
+      }
+    ],
+    "focus": {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "",
+      "outline": "rgb(217, 182, 95) solid 2px"
+    }
+  }
+}

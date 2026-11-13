@@ -61,12 +61,13 @@ export class ImportPreparationController {
     @Param("preparationId") preparationId: string,
     @Query("page") rawPage: string | undefined,
     @Query("state") state: string | undefined,
+    @Query("q") search: string | undefined,
     @Req() request: Request,
   ) {
     const page = rawPage ? Number(rawPage) : 1;
     if (!Number.isSafeInteger(page) || page < 1 || page > 100_000)
       throw new BadRequestException("Nieprawidłowa strona przygotowania");
-    return this.preparations.rows(batchId, preparationId, page, state, this.actor(request));
+    return this.preparations.rows(batchId, preparationId, page, state, search ?? "", this.actor(request));
   }
 
   @Get("imports/:batchId/preparations/:preparationId/export")

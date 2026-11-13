@@ -38,6 +38,8 @@ export type AuditedAction =
   | "enrichment.job.completed"
   | "run.submission.created"
   | "run.submission.cancelled"
+  | "run.submission.paused"
+  | "run.submission.resumed"
   | "run.submission.group_admitted"
   | "run.prepared_set.created"
   | "run.prepared_set.completed"
@@ -49,6 +51,7 @@ export type AuditedAction =
   | "lead.status.updated"
   | "lead.assignment.released"
   | "artifact.downloaded"
+  | "result_set.exported"
   | "user.created"
   | "user.updated"
   | "privileged_action.confirmed"
@@ -65,7 +68,23 @@ export type AuditedAction =
   | "intervention.unassigned"
   | "intervention.priority_changed"
   | "intervention.resolved"
-  | "settings.updated";
+  | "settings.updated"
+  | "commission.file.uploaded"
+  | "commission.file.deleted"
+  | "commission.dictionary.imported"
+  | "commission.dictionary.edited"
+  | "commission.dictionary.published"
+  | "commission.dictionary.activated"
+  | "commission.dictionary.grant.updated"
+  | "commission.run.created"
+  | "commission.run.started"
+  | "commission.run.completed"
+  | "commission.run.failed"
+  | "commission.run.cancel_requested"
+  | "commission.run.cancelled"
+  | "commission.resolution.created"
+  | "commission.export.created"
+  | "commission.export.downloaded";
 
 export type AuditOutcome = "succeeded" | "denied" | "failed";
 export type AuditEventInput = Readonly<{
@@ -89,7 +108,12 @@ export type AuditEventInput = Readonly<{
     | "tool"
     | "intervention"
     | "settings"
-    | "business_lead";
+    | "business_lead"
+    | "result_set"
+    | "commission_file"
+    | "commission_dictionary"
+    | "commission_run"
+    | "commission_export";
   resourceId: string | null;
   outcome: AuditOutcome;
   metadata?: Readonly<Record<string, string | number | boolean | null>>;

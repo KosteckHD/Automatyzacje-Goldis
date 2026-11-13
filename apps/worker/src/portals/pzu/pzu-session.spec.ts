@@ -77,9 +77,9 @@ test("manual login or a closed MFA tab cannot be recorded as an accepted platfor
 test("observed PZU selectors submit through the SMS frame and remember the device", {
   skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
 }, async () => {
-  const observed = JSON.parse(await readFile(resolve(__dirname, "../../../config/pzu-sms.observed.json"), "utf8"));
-  const example = JSON.parse(await readFile(resolve(__dirname, "../../../config/portal-selectors.example.json"), "utf8"));
-  const documented = JSON.parse(await readFile(resolve(__dirname, "../../../docs/portal-selectors.example.json"), "utf8"));
+  const observed = JSON.parse(await readFile(resolve(__dirname, "../../../../../config/pzu-sms.observed.json"), "utf8"));
+  const example = JSON.parse(await readFile(resolve(__dirname, "../../../../../config/portal-selectors.example.json"), "utf8"));
+  const documented = JSON.parse(await readFile(resolve(__dirname, "../../../../../docs/portal-selectors.example.json"), "utf8"));
   for (const [key, selector] of Object.entries(observed.session)) {
     assert.equal(example.pzu.session[key], selector, "example must use the captured SMS selectors");
     assert.equal(documented.pzu.session[key], selector, "documented example must use the captured SMS selectors");
@@ -152,7 +152,7 @@ test("PZU does not submit an expired code, including expiry immediately before t
 test("observed PZU resend waits for a delayed link and never falls back to login", {
   skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
 }, async () => {
-  const observed = JSON.parse(await readFile(resolve(__dirname, "../../../config/pzu-sms.observed.json"), "utf8"));
+  const observed = JSON.parse(await readFile(resolve(__dirname, "../../../../../config/pzu-sms.observed.json"), "utf8"));
   const directory = await mkdtemp(join(tmpdir(), "goldis-pzu-delayed-resend-"));
   const browser = new BrowserSession({ profileDirectory: directory });
   let mode: "delayed" | "absent" | "duplicate" | "revoked" = "delayed";
@@ -162,7 +162,7 @@ test("observed PZU resend waits for a delayed link and never falls back to login
       const target = new URL(route.request().url());
       if (target.hostname !== "goldis.test") return route.abort();
       const link = `<a id="resend" onclick="parent.resends=(parent.resends||0)+1">Resend</a>`;
-      const body = `<form><input id="code" name="code" type="text"><div class="buttons">${mode === "duplicate" ? link + link : ""}</div></form>`;
+      const body = `<form><input id="code" name="code" type="text"><div class="buttons"><button class="btn btn-primary" type="button">Submit</button>${mode === "duplicate" ? link + link : ""}</div></form>`;
       return route.fulfill({ status: 200, contentType: "text/html", body: target.pathname === "/sms"
         ? body + (mode === "delayed" ? `<script>setTimeout(()=>document.querySelector('.buttons').insertAdjacentHTML('beforeend', ${JSON.stringify(link)}),20000)</script>` : "")
         : `<iframe id="secfense_iframe" src="/sms"></iframe>` });

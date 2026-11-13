@@ -1,0 +1,76 @@
+apps/api/src/features\admin\admin-mutations.repository.ts:33:    await this.database.query("SELECT pg_advisory_xact_lock(hashtextextended(:tenantId, 0))", {
+apps/api/src/features\admin\admin-operations.repository.ts:95:    return this.database.query(
+apps/api/src/features\admin\admin-operations.repository.ts:124:    return this.database.query(
+apps/api/src/features\admin\admin-operations.repository.ts:164:    const rows = await this.database.query(
+apps/api/src/features\teams\team.repository.ts:20:    await this.database.query("SELECT pg_advisory_xact_lock(hashtextextended(:tenantId, 0))", {
+apps/api/src/features\privileged-actions\privileged-actions.repository.ts:123:    await this.database.query(
+apps/api/src/features\privileged-actions\privileged-actions.repository.ts:131:    await this.database.query(
+apps/api/src/features\account-recovery\account-recovery.repository.ts:30:    await this.database.query("SELECT pg_advisory_xact_lock(hashtextextended(:tenantId, 0))", {
+apps/api/src/features\account-recovery\account-recovery.repository.ts:147:    return this.database.query(
+apps/api/src/features\account-recovery\account-recovery.repository.ts:163:    return this.database.query(
+apps/api/src/features\account-recovery\account-recovery.repository.ts:215:    return this.database.query(
+apps/api/src/features\notifications\notifications.repository.ts:26:    const eventKey = `${resultSet.resultSetId}:${eventType}`;
+apps/api/src/features\enrichment\registry-enrichment.repository.ts:68:    return this.database.query(
+apps/api/src/features\interventions\interventions.repository.ts:106:       WHERE b.tenant_id = :tenantId ${ownerFilter} ${toolFilter}
+apps/api/src/features\interventions\interventions.repository.ts:154:       WHERE b.tenant_id = :tenantId ${ownerFilter} ${toolFilter}`,
+apps/api/src/features\admin\admin-users.repository.ts:129:    await this.database.query(
+apps/api/src/features\interventions\auth-challenge.repository.ts:40:      { reasonCode, revision: sequelize.literal("revision + 1"), updatedAt: now },
+apps/api/src/features\enrichment\enrichment-jobs.repository.ts:296:    return this.database.query(
+apps/api/src/features\enrichment\enrichment-jobs.repository.ts:303:    return this.database.query(
+apps/api/src/features\enrichment\enrichment-jobs.repository.ts:310:    return this.database.query(
+apps/api/src/features\enrichment\enrichment-jobs.repository.ts:347:    return this.database.query(
+apps/api/src/features\preparations\preparations.repository.ts:288:        version: sequelize.literal("version + 1"),
+apps/api/src/features\imports\imports.repository.ts:213:    await this.database.query(
+apps/api/src/features\results\oc-snapshot.repository.ts:171:          comparable(`${identity.firstName} ${identity.lastName}`) !== comparable(source.decisionMakerName))
+apps/api/src/features\deletions\deletions.repository.ts:63:      sourceVersion: `${instant(row.createdAt)}:${row.sha256}:${row.state}:${number(row.policyCount)}:${row.deletionPending ? "deleting" : "active"}`,
+apps/api/src/features\deletions\deletions.repository.ts:130:      sourceVersion: `${instant(row.updatedAt)}:${row.status}:${counts.sourceRows}:${counts.submissions}:${counts.artifacts}:${counts.files}:${number(row.pendingArtifacts)}:${row.artifactStateDigest}:${counts.sharedRunReferences}:${counts.activeOutbox}:${counts.stagedFiles}:${counts.deletingArtifacts}`,
+apps/api/src/features\deletions\deletions.repository.ts:296:      sourceVersion: `${instant(row.createdAt)}:${row.sha256}:${number(row.totalRows)}:${row.rowRevisionDigest}:${counts.runs}:${counts.submissions}:${counts.artifacts}:${counts.activeRuns}:${counts.activeSubmissions}:${counts.activePreparations}:${counts.activeWorkflows}:${counts.activeEnrichmentJobs}:${counts.activePreparedExecutions}:${counts.activeOutbox}:${counts.pendingArtifacts}:${counts.stagedFiles}:${counts.sharedRunReferences}:${counts.deletingRuns}:${counts.deletingArtifacts}:${counts.resultSets}:${counts.businessLeads}:${counts.retainedAssignedLeads}:${counts.removedLeads}:${counts.missingLeadSnapshots}:${counts.leadAllocations}:${counts.notifications}:${row.importDeletionPending ? "deleting" : "active"}:${row.runStateDigest}:${row.submissionStateDigest}:${row.artifactStateDigest}:${row.resultSetStateDigest}:${row.leadStateDigest}:${row.notificationStateDigest}`,
+apps/api/src/features\deletions\deletions.repository.ts:387:    sourceVersion: `${row.rowRevisionDigest}:${counts.imports}:${counts.sourceRows}:${counts.runs}:${counts.submissions}:${counts.artifacts}:${counts.activeRuns}:${counts.activeSubmissions}:${counts.activePreparations}:${counts.activeWorkflows}:${counts.activeEnrichmentJobs}:${counts.activePreparedExecutions}:${counts.activeOutbox}:${counts.pendingArtifacts}:${counts.stagedFiles}:${row.runStateDigest}:${row.submissionStateDigest}:${row.artifactStateDigest}:${counts.sharedRunReferences}`,
+apps/api/src/features\deletions\deletions.repository.ts:427:    await sequelize.query(
+apps/api/src/features\deletions\deletions.repository.ts:441:    await sequelize.query(
+apps/api/src/features\submissions\run-submission-cancellation.repository.ts:36:        version: sequelize.literal("version + 1"),
+apps/api/src/features\deletions\deletion-step-up.repository.ts:163:        const marked = await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:63:         ${transaction ? "FOR UPDATE" : ""}`,
+apps/api/src/features\deletions\deletion-jobs.repository.ts:97:        WHERE j.tenant_id = :tenantId ${actorFilter}
+apps/api/src/features\deletions\deletion-jobs.repository.ts:106:      const lockKey = `${actor.tenantId}:${actor.userId}:${idempotencyKey}`;
+apps/api/src/features\deletions\deletion-jobs.repository.ts:107:      await sequelize.query("SELECT pg_advisory_xact_lock(hashtextextended(:lockKey, 0))", {
+apps/api/src/features\deletions\deletion-jobs.repository.ts:316:      const updatedPreview = await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:328:      await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:355:        await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:370:        await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:377:        await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:384:          await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:389:        await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:418:            const state = await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:470:      await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:498:    const marked = await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:527:      await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:534:        remaining = await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:544:        await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:553:        remaining = await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:565:        remaining = await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:577:      await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:581:      await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:611:      await sequelize.query(
+apps/api/src/features\deletions\deletion-jobs.repository.ts:627:        await sequelize.query(
+apps/api/src/features\runs\run-cancellation.repository.ts:53:              revision: sequelize.literal("revision + 1"),
+apps/api/src/features\runs\run-control.repository.ts:84:    await sequelize.query(
+apps/api/src/features\review\review.repository.ts:394:        WHERE ${conditions.join(" AND ")}
+apps/api/src/features\review\review.repository.ts:415:        WHERE ${conditions.join(" AND ")}
+apps/api/src/features\reports\history.repository.ts:47:  if (filters.toolId) conditions.push(`${alias}.tool_id = :toolId`);
+apps/api/src/features\reports\history.repository.ts:48:  if (filters.batchId) conditions.push(`${alias === "r" ? "r.batch_id" : "b.id"} = :batchId`);
+apps/api/src/features\reports\history.repository.ts:49:  if (filters.status) conditions.push(`${alias}.status = :status`);
+apps/api/src/features\reports\history.repository.ts:50:  if (filters.from) conditions.push(`${alias}.created_at >= :from`);
+apps/api/src/features\reports\history.repository.ts:51:  if (filters.to) conditions.push(`${alias}.created_at <= :to`);
+apps/api/src/features\reports\history.repository.ts:99:          WHERE ${conditions.join(" AND ")}
+apps/api/src/features\reports\history.repository.ts:103:        WHERE ${dataStateCondition}
+apps/api/src/features\reports\history.repository.ts:141:          r.created_at, ${projection}
+apps/api/src/features\reports\history.repository.ts:145:       ${countsJoin}
+apps/api/src/features\reports\history.repository.ts:146:       WHERE ${conditions.join(" AND ")}
+apps/api/src/features\reports\admin-reports.repository.ts:55:    throw new BadRequestException(`Zakres musi być rosnący i nie może przekraczać ${maxDays} dni`);
+apps/api/src/features\reports\admin-reports.repository.ts:173:       AND ${reviewerToolGrantScope}`
+apps/api/src/features\reports\admin-reports.repository.ts:235:       ${reviewerPolicy}
+apps/api/src/features\reports\admin-reports.repository.ts:398:    const daily = await this.database.query(
+apps/api/src/features\reports\admin-reports.repository.ts:471:    const rows = await this.database.query(
+apps/api/src/features\reports\admin-reports.repository.ts:490:    const rows = await this.database.query(
+apps/api/src/features\reports\admin-reports.repository.ts:512:    const rows = await this.database.query(

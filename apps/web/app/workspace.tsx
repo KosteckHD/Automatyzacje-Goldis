@@ -4,12 +4,29 @@ import { useCallback, useEffect, useRef, useState, type FormEvent, type Keyboard
 import EnrichmentReviewPanel from "./enrichment-review";
 import ImportPreparationPanel from "./import-preparation-panel";
 import RunSubmissionLauncher from "./run-submission-launcher";
+import ResultSetWorkspace from "./result-set-workspace";
 import { useAutomationHealth } from "./lib/use-automation-health";
 import { GoldisLogo } from "../components/brand/GoldisLogo";
 import SpotlightCard from "../components/react-bits/SpotlightCard";
 import { RunStepper } from "../components/tools/RunStepper";
+import { automationReasonLabels, runOutcomeLabel } from "./lib/run-outcome";
+import { automationStepUrl, OcAutomationWorkspace, readAutomationStep, type AutomationStep } from "./tools/oc-policy-verification/automation-workspace";
+import { deriveAutomationFlow, type AutomationPreviewState } from "./tools/oc-policy-verification/automation-flow";
+import { automationDraftStorageKey, clearAutomationDraft, type AutomationDraftIdentity } from "./tools/oc-policy-verification/automation-draft";
+import { sanitizeAppReturnTo } from "./lib/return-to";
+import { polishCount, uiLabels } from "./lib/ui-labels";
+import { automationStatusMessage } from "./lib/automation-status-copy";
+import AutomationHealthPanel from "../components/tools/AutomationHealthPanel";
 
-type ImportResult = { id: string; totalRows: number; invalidRows: number; readyRows: number; sha256: string };
+function requiredPasswordChangeHref() {
+  const origin = window.location.origin;
+  const requested = sanitizeAppReturnTo(new URLSearchParams(window.location.search).get("returnTo"), origin);
+  const current = sanitizeAppReturnTo(`${window.location.pathname}${window.location.search}`, origin);
+  const target = requested ?? (current !== "/" ? current : null);
+  return `/account?required=1${target ? `&returnTo=${encodeURIComponent(target)}` : ""}`;
+}
+
+type ImportResult = { id: string; fileName?: string; totalRows: number; invalidRows: number; readyRows: number; sha256: string };
 type ImportRow = { rowNumber: number; companyName: string; decisionMakerName: string | null; regon: string; issues: string[] };
 type Run = { id: string; batchId?: string; rowNumber: number; status: string; currentStep: string; referenceDate: string; errorCode: string | null; controlState?: "running" | "pause_requested" | "paused"; controlRevision?: string; controlAckRevision?: string; controlCheckpointStatus?: string | null; manualDataVersion?: number; createdAt: string; incident?: { kind: string; portal: string | null; reasonCode: string | null; fieldCode?: string | null; createdAt: string; retryAllowed?: boolean; canResumeAuth?: boolean; canResumeReview?: boolean } | null; policyCounts?: { totalOcCount: number; currentOcCount: number } | null; artifactAvailable?: boolean; events?: { status: string; step: string; errorCode: string | null; createdAt: string }[] };
 type AuthChallenge = { challengeId: string; runId: string; portal: "pzu" | "compensa"; status: "active" | "claimed" | "submitted"; expiresAt: string; serverNow?: string; attemptCount: number; attemptLimit: number; reasonCode?: string };
@@ -33,6 +50,7 @@ const runLabels: Record<string, string> = {
 };
 const roleLabels = { admin: "Administrator", manager: "Menedżer", operator: "Operator", reviewer: "Recenzent", auditor: "Audytor" } as const;
 const interventionLabels: Record<string, string> = {
+  ...automationReasonLabels,
   sms: "Kod SMS", identity_review: "Weryfikacja tożsamości", portal_error: "Błąd portalu",
   SMS_TIMEOUT: "Kod wygasł", SMS_DELIVERY_UNCERTAIN: "Niepewne przekazanie kodu", PORTAL_FAILURE: "Błąd automatyzacji",
   SMS_REQUIRED: "Potwierdź logowanie kodem SMS", SMS_CODE_REJECTED: "Portal odrzucił kod SMS",
@@ -185,8 +203,59 @@ function SmsDialog({ challenge, runId, csrfToken, onAccepted, onRefresh, onUnaut
   </div>;
 }
 
-export default function Workspace() {
+function OcExcelUploadPanel({ file, working, onChooseFile, onRemoveFile, onSubmit }: {
+  file: File | null;
+  working: boolean;
+  onChooseFile: (file: File | null) => void;
+  onRemoveFile: () => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+}) {
+  const [dragOver, setDragOver] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const formattedSize = file
+    ? file.size < 1024 * 1024
+      ? `${Math.max(1, Math.round(file.size / 1024))} KB`
+      : `${(file.size / (1024 * 1024)).toLocaleString("pl-PL", { maximumFractionDigits: 1 })} MB`
+    : "";
+
+  function takeFile(candidate: File | null) {
+    onChooseFile(candidate);
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  return <SpotlightCard className="card upload-card" spotlightColor="rgba(217, 182, 95, 0.12)">
+    <div className="section-head"><div><p className="eyebrow">KROK 01 / DANE WEJŚCIOWE</p><h2>Dodaj bazę transportową</h2></div><span className="file-mark">.xlsx</span></div>
+    <p>Arkusz „Realizacja” powinien zawierać nazwę firmy i NIP lub REGON. Oryginalny plik pozostaje bez zmian. Import sprawdza strukturę i nie uruchamia portali.</p>
+    <form className="oc-upload-form" onSubmit={onSubmit}>
+      <div className={`oc-upload-dropzone${dragOver ? " is-dragging" : ""}`} onDragEnter={(event) => { event.preventDefault(); setDragOver(true); }} onDragOver={(event) => { event.preventDefault(); setDragOver(true); }} onDragLeave={(event) => { event.preventDefault(); if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragOver(false); }} onDrop={(event) => { event.preventDefault(); setDragOver(false); takeFile(event.dataTransfer.files?.[0] ?? null); }}>
+        <svg className="oc-upload-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 21V4m0 0L9.5 10.5M16 4l6.5 6.5M5 20v7h22v-7" /></svg>
+        <strong>Przeciągnij plik tutaj</strong>
+        <span>lub wybierz z dysku</span>
+        <label className="oc-upload-browse"><span>Wybierz plik</span><input ref={inputRef} type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" aria-label="Wybierz plik Excel" onChange={(event) => takeFile(event.target.files?.[0] ?? null)} /></label>
+      </div>
+      {file && <div className="oc-upload-file" aria-live="polite">
+        <span className="oc-upload-file-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h5M9 13h6M9 17h4" /></svg></span>
+        <span className="oc-upload-file-copy"><strong>{file.name}</strong><small>{formattedSize} · .xlsx</small></span>
+        <span className="oc-upload-file-ready"><span aria-hidden="true">✓</span> Plik wybrany</span>
+        <button className="oc-upload-remove" type="button" onClick={onRemoveFile} disabled={working}>Usuń</button>
+      </div>}
+      <section className="oc-upload-requirements" aria-labelledby="oc-upload-requirements-title">
+        <h3 id="oc-upload-requirements-title">Wymagania pliku</h3>
+        <dl><div><dt>Format</dt><dd>.xlsx</dd></div><div><dt>Arkusz</dt><dd>Realizacja</dd></div><div><dt>Kolumna</dt><dd>Nazwa firmy oraz NIP lub REGON</dd></div></dl>
+        <p>Oryginalny plik pozostaje bez zmian.</p>
+      </section>
+      <button className="oc-upload-submit" type="submit" disabled={!file || working}>{working ? "Sprawdzanie pliku…" : "Sprawdź i zaimportuj"}</button>
+    </form>
+  </SpotlightCard>;
+}
+
+export default function Workspace({ mode = "catalog", initialImportId = null }: {
+  mode?: "catalog" | "oc-automation";
+  initialImportId?: string | null;
+}) {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const [sessionCheckError, setSessionCheckError] = useState("");
+  const [sessionRetry, setSessionRetry] = useState(0);
   const [userRole, setUserRole] = useState<"admin" | "manager" | "operator" | "reviewer" | "auditor" | null>(null);
   const [toolAccess, setToolAccess] = useState<ToolAccess[]>([]);
   const [catalogItems, setCatalogItems] = useState<CatalogTool[]>([]);
@@ -199,13 +268,28 @@ export default function Workspace() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [automationStep, setAutomationStep] = useState<AutomationStep>("upload");
+  const [automationSubmissionId, setAutomationSubmissionId] = useState<string | null>(null);
+  const [automationExecutionId, setAutomationExecutionId] = useState<string | null>(null);
+  const [automationImportId, setAutomationImportId] = useState<string | null>(initialImportId);
+  const [automationResultSetId, setAutomationResultSetId] = useState<string | null>(null);
+  const [automationOperationStatus, setAutomationOperationStatus] = useState<string | null>(null);
+  const [automationResultStatus, setAutomationResultStatus] = useState<string | null>(null);
+  const [automationDraftIdentity, setAutomationDraftIdentity] = useState<AutomationDraftIdentity | null>(null);
+  const onAutomationOperationStatus = useCallback((status: string) => setAutomationOperationStatus(status), []);
+  const onAutomationResultStatus = useCallback((status: string) => setAutomationResultStatus(status), []);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<ImportResult | null>(null);
-  const [preparationReadyBatchId, setPreparationReadyBatchId] = useState<string | null>(null);
+  const [preparationState, setPreparationState] = useState<{ batchId: string; preparationId: string; revision: number; sourceFingerprint: string; ready: boolean; status: "working" | "ready" | "attention" } | null>(null);
+  const [automationPreview, setAutomationPreview] = useState<AutomationPreviewState>(null);
   const [rows, setRows] = useState<ImportRow[]>([]);
   const [rowPage, setRowPage] = useState(1);
   const [rowState, setRowState] = useState<"all" | "ready" | "review">("all");
+  const [rowSearch, setRowSearch] = useState("");
+  const [debouncedRowSearch, setDebouncedRowSearch] = useState("");
+  const [rowTotal, setRowTotal] = useState(0);
+  const [rowCounts, setRowCounts] = useState<{ matching: number; ready: number; review: number; all: number } | null>(null);
   const [runNumber, setRunNumber] = useState("");
   const [runs, setRuns] = useState<Run[]>([]);
   const [selectedRun, setSelectedRun] = useState<Run | null>(null);
@@ -234,7 +318,11 @@ export default function Workspace() {
   const canDiscoverTool = activeToolAccess?.canDiscover === true;
   const canOperate = activeToolAccess?.canExecute === true;
   const canViewResults = activeToolAccess?.canViewResults === true;
-  const automationHealth = useAutomationHealth(Boolean(authenticated && canDiscoverTool)).data;
+  const automationHealthState = useAutomationHealth(Boolean(authenticated && canDiscoverTool));
+  const automationHealth = automationHealthState.data;
+  const legacyStartBlockedReason = automationHealthState.status === "checking" || automationHealthState.status === "unknown" || !automationHealth
+    ? automationStatusMessage(automationHealthState.status, automationHealth, automationHealthState.message)
+    : automationHealth.automationReady ? null : automationStatusMessage(automationHealthState.status, automationHealth);
   const canManageRuns = userRole === "admin" || userRole === "manager";
   const handleSessionExpired = useCallback(() => {
     setAuthenticated(false);
@@ -245,10 +333,11 @@ export default function Workspace() {
     setActiveChallenge(null);
     setSmsModalRunId(null);
   }, []);
-  const handlePreparationReadyChange = useCallback((ready: boolean) => {
-    setPreparationReadyBatchId(ready ? result?.id ?? null : null);
-  }, [result?.id]);
-  const preparationReady = Boolean(result && preparationReadyBatchId === result.id);
+  const handlePreparationReadyChange = useCallback((state: { batchId: string; preparationId: string; revision: number; sourceFingerprint: string; ready: boolean; status: "working" | "ready" | "attention" } | null) => {
+    setPreparationState(state);
+  }, []);
+  const preparationReady = Boolean(result && preparationState?.batchId === result.id && preparationState.ready);
+  useEffect(() => { setAutomationPreview(null); }, [preparationState?.batchId, preparationState?.preparationId, preparationState?.revision, preparationState?.sourceFingerprint, preparationState?.ready]);
   const canDownloadResults = activeToolAccess?.canDownloadResults === true;
   const canSeeInterventions = Boolean(activeToolAccess && (canOperate || canViewResults));
 
@@ -276,6 +365,41 @@ export default function Workspace() {
   }, []);
 
   useEffect(() => {
+    setAutomationImportId(initialImportId);
+  }, [initialImportId]);
+
+  useEffect(() => {
+    const syncStep = () => {
+      const params = new URLSearchParams(window.location.search);
+      setAutomationStep(readAutomationStep(window.location.search));
+      setAutomationSubmissionId(params.get("submission"));
+      setAutomationExecutionId(params.get("execution"));
+      setAutomationImportId(params.get("import"));
+      setAutomationResultSetId(params.get("resultSetId"));
+    };
+    syncStep();
+    window.addEventListener("popstate", syncStep);
+    return () => window.removeEventListener("popstate", syncStep);
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedRowSearch(rowSearch.trim()), 250);
+    return () => window.clearTimeout(timer);
+  }, [rowSearch]);
+
+  const navigateAutomationStep = useCallback((step: AutomationStep, replace = false) => {
+    const url = automationStepUrl(step);
+    if (replace) window.history.replaceState(null, "", url);
+    else window.history.pushState(null, "", url);
+    setAutomationStep(step);
+  }, []);
+
+  const handleAutomationPreviewChange = useCallback((preview: AutomationPreviewState) => {
+    setAutomationPreview(preview);
+    if (preview) navigateAutomationStep("launch");
+  }, [navigateAutomationStep]);
+
+  useEffect(() => {
     if (!authenticated || !isCatalogLanding) return;
     const controller = new AbortController();
     fetch("/api/tools", { credentials: "same-origin", signal: controller.signal }).then(async (response) => {
@@ -293,16 +417,8 @@ export default function Workspace() {
     const defaultPath = userRole === "auditor" ? "/audit" : userRole === "reviewer" ? "/review" : "/dashboard";
     const target = new URLSearchParams(window.location.search).get("returnTo");
     if (!target) { window.location.replace(defaultPath); return; }
-    if (!target.startsWith("/") || target.startsWith("//") || target.includes("\\")) { window.location.replace(defaultPath); return; }
-    let parsed: URL;
-    try { parsed = new URL(target, window.location.origin); } catch { window.location.replace(defaultPath); return; }
-    const validReturn = parsed.origin === window.location.origin && (
-      ["/imports", "/runs", "/results", "/audit", "/tools", "/tools/oc-policy-verification", "/dashboard", "/notifications", "/my-results", "/team", "/access", "/reports", "/review", "/account"].includes(parsed.pathname)
-      || parsed.pathname.startsWith("/imports/") || parsed.pathname.startsWith("/runs/")
-      || parsed.pathname.startsWith("/my-results/") || parsed.pathname.startsWith("/leads/") || parsed.pathname.startsWith("/results/")
-    );
-    if (!validReturn) { window.location.replace(defaultPath); return; }
-    window.location.replace(`${parsed.pathname}${parsed.search}${parsed.hash}`);
+    const safeTarget = sanitizeAppReturnTo(target, window.location.origin);
+    window.location.replace(safeTarget || defaultPath);
   }, [authenticated, isCatalogLanding, userRole]);
 
   useEffect(() => {
@@ -350,23 +466,26 @@ export default function Workspace() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/auth/me", { credentials: "same-origin" }).then(async (response) => {
+    setSessionCheckError("");
+    fetch("/api/auth/me", { credentials: "same-origin", cache: "no-store" }).then(async (response) => {
       if (!active) return;
-      if (!response.ok) {
+      if (response.status === 401) {
         setAuthenticated(false);
         return;
       }
-      const session = await response.json() as { csrfToken?: string; role?: "admin" | "manager" | "operator" | "reviewer" | "auditor"; mustChangePassword?: boolean; tools?: ToolAccess[] };
+      if (!response.ok) { setSessionCheckError("Nie udało się sprawdzić sesji. Spróbuj ponownie."); return; }
+      const session = await response.json() as { csrfToken?: string; role?: "admin" | "manager" | "operator" | "reviewer" | "auditor"; mustChangePassword?: boolean; tools?: ToolAccess[]; tenantId?: string; userId?: string };
       if (active) {
-        if (session.mustChangePassword) { window.location.assign("/account?required=1"); return; }
+        if (session.mustChangePassword) { window.location.assign(requiredPasswordChangeHref()); return; }
         setCsrfToken(typeof session.csrfToken === "string" ? session.csrfToken : "");
         setUserRole(session.role ?? null);
         setToolAccess(Array.isArray(session.tools) ? session.tools : []);
+        setAutomationDraftIdentity(session.tenantId && session.userId ? { tenantId: session.tenantId, userId: session.userId } : null);
         setAuthenticated(true);
       }
-    }).catch(() => { if (active) setAuthenticated(false); });
+    }).catch(() => { if (active) setSessionCheckError("Nie udało się połączyć, aby sprawdzić sesję. Spróbuj ponownie."); });
     return () => { active = false; };
-  }, []);
+  }, [sessionRetry]);
 
   useEffect(() => {
     if (!authenticated || !userRole || !canSeeInterventions) return;
@@ -430,8 +549,9 @@ export default function Workspace() {
 
   useEffect(() => {
     if (!authenticated || !canViewResults) return;
-    const id = new URLSearchParams(window.location.search).get("import");
-    if (!id || !/^[0-9a-f-]{36}$/i.test(id)) return;
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("import");
+    if (!id || params.has("run") || !/^[0-9a-f-]{36}$/i.test(id)) return;
     let active = true;
     Promise.all([
       fetch(`/api/imports/${id}`, { credentials: "same-origin" }),
@@ -462,6 +582,14 @@ export default function Workspace() {
         const runPayload = await runResponse.json().catch(() => ({})) as Run & { message?: string };
         if (!runResponse.ok) throw new Error(runPayload.message || (runResponse.status === 404 ? "Zadanie nie istnieje lub nie jest dostępne dla tego konta." : "Nie udało się odczytać zadania."));
         if (!active) return;
+        const requestedBatchId = new URLSearchParams(window.location.search).get("import");
+        if (requestedBatchId && requestedBatchId !== runPayload.batchId) {
+          setSelectedRun(null);
+          setResult(null);
+          setRows([]);
+          setRunError("Zadanie i import w adresie nie są ze sobą powiązane. Otwórz zadanie z jego historii.");
+          return;
+        }
         setSelectedRun(runPayload);
         setRuns((current) => [runPayload, ...current.filter((item) => item.id !== runPayload.id)]);
         setRunError("");
@@ -485,11 +613,23 @@ export default function Workspace() {
   useEffect(() => {
     if (!authenticated || !canViewResults || !result?.id) return;
     let active = true;
-    fetch(`/api/imports/${result.id}/rows?page=${rowPage}&state=${rowState}`, { credentials: "same-origin" })
-      .then(async (response) => { if (active && response.ok) setRows(await response.json()); })
-      .catch(() => { if (active) setRows([]); });
-    return () => { active = false; };
-  }, [authenticated, canViewResults, result?.id, rowPage, rowState]);
+    const controller = new AbortController();
+    const request = mode === "oc-automation"
+      ? fetch(`/api/imports/${result.id}/rows/search?page=${rowPage}&state=${rowState}&q=${encodeURIComponent(debouncedRowSearch)}`, { credentials: "same-origin", signal: controller.signal })
+      : fetch(`/api/imports/${result.id}/rows?page=${rowPage}&state=${rowState}`, { credentials: "same-origin", signal: controller.signal });
+    request.then(async (response) => {
+      if (!response.ok) return;
+      if (mode === "oc-automation") {
+        const page = await response.json() as { rows: ImportRow[]; total: number; counts: { matching: number; ready: number; review: number; all: number } };
+        if (active) { setRows(page.rows ?? []); setRowTotal(page.total ?? 0); setRowCounts(page.counts ?? null); }
+      } else if (active) {
+        setRows(await response.json());
+        setRowTotal(result.totalRows);
+        setRowCounts(null);
+      }
+    }).catch(() => { if (active && !controller.signal.aborted) setRows([]); });
+    return () => { active = false; controller.abort(); };
+  }, [authenticated, canViewResults, result?.id, rowPage, rowState, mode, debouncedRowSearch]);
 
   useEffect(() => {
     if (!authenticated || !canViewResults || !result?.id) return;
@@ -678,7 +818,16 @@ export default function Workspace() {
         const params = new URLSearchParams(window.location.search);
         params.set("run", id);
         if (run.batchId) params.set("import", run.batchId);
+        params.delete("submission");
+        params.delete("execution");
+        params.delete("resultSetId");
+        params.set("step", "progress");
         window.history.pushState({}, "", `${window.location.pathname}?${params}`);
+        setAutomationStep("progress");
+        setAutomationSubmissionId(null);
+        setAutomationExecutionId(null);
+        setAutomationImportId(run.batchId ?? null);
+        setAutomationResultSetId(null);
         setResourceLocationVersion((current) => current + 1);
         return run;
       }
@@ -913,20 +1062,37 @@ export default function Workspace() {
       const response = await fetch("/api/auth/login", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password }) });
       const session = await response.json().catch(() => ({})) as { csrfToken?: string; role?: "admin" | "manager" | "operator" | "reviewer" | "auditor"; mustChangePassword?: boolean };
       if (!response.ok) throw new Error("Sprawdź login i hasło.");
-      if (session.mustChangePassword) { window.location.assign("/account?required=1"); return; }
+      if (session.mustChangePassword) { window.location.assign(requiredPasswordChangeHref()); return; }
       const meResponse = await fetch("/api/auth/me", { credentials: "same-origin" });
-      const me = await meResponse.json().catch(() => ({})) as { csrfToken?: string; role?: "admin" | "manager" | "operator" | "reviewer" | "auditor"; tools?: ToolAccess[] };
+      const me = await meResponse.json().catch(() => ({})) as { csrfToken?: string; role?: "admin" | "manager" | "operator" | "reviewer" | "auditor"; tools?: ToolAccess[]; tenantId?: string; userId?: string };
       if (!meResponse.ok) throw new Error("Nie udało się odczytać uprawnień konta.");
       setPassword("");
       setCsrfToken(typeof me.csrfToken === "string" ? me.csrfToken : typeof session.csrfToken === "string" ? session.csrfToken : "");
       setUserRole(me.role ?? session.role ?? null);
       setToolAccess(Array.isArray(me.tools) ? me.tools : []);
+      setAutomationDraftIdentity(me.tenantId && me.userId ? { tenantId: me.tenantId, userId: me.userId } : null);
+      setSessionCheckError("");
       setAuthenticated(true);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Nie udało się zalogować.");
     } finally {
       setWorking(false);
     }
+  }
+
+  function chooseImportFile(candidate: File | null) {
+    if (candidate && !candidate.name.toLowerCase().endsWith(".xlsx")) {
+      setFile(null);
+      setError("Wybierz plik Excel w formacie .xlsx.");
+      return;
+    }
+    setFile(candidate);
+    setError("");
+  }
+
+  function removeImportFile() {
+    setFile(null);
+    setError("");
   }
 
   async function upload(event: FormEvent<HTMLFormElement>) {
@@ -944,9 +1110,22 @@ export default function Workspace() {
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.message || "Nie udało się odczytać pliku.");
       setResult(payload as ImportResult);
+      setAutomationImportId(payload.id);
       setRowPage(1);
       setRowState("all");
-      window.history.replaceState(null, "", `/tools/oc-policy-verification?import=${payload.id}`);
+      const params = new URLSearchParams(window.location.search);
+      params.set("import", payload.id);
+      params.delete("submission");
+      params.delete("execution");
+      params.delete("run");
+      params.delete("resultSetId");
+      params.set("step", "validation");
+      window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
+      setAutomationStep("validation");
+      setAutomationSubmissionId(null);
+      setAutomationExecutionId(null);
+      setAutomationImportId(payload.id);
+      setAutomationResultSetId(null);
       if (canViewResults) {
         const preview = await fetch(`/api/imports/${payload.id}/rows`, { credentials: "same-origin" });
         if (preview.ok) setRows(await preview.json());
@@ -958,11 +1137,14 @@ export default function Workspace() {
     }
   }
 
-  async function logout() {
+  async function logout(clearDraft = false) {
+    const draftKey = automationDraftIdentity && automationImportId ? automationDraftStorageKey(automationDraftIdentity, automationImportId) : null;
+    if (clearDraft && draftKey && typeof window !== "undefined") clearAutomationDraft(window.sessionStorage, draftKey);
     await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin", headers: csrfToken ? { "X-CSRF-Token": csrfToken } : {} }).catch(() => undefined);
     setAuthenticated(false);
     setMobileNavOpen(false);
     setUserRole(null);
+    setAutomationDraftIdentity(null);
     setToolAccess([]);
     setCsrfToken("");
     setResult(null);
@@ -975,10 +1157,11 @@ export default function Workspace() {
     window.history.replaceState(null, "", "/");
   }
 
+  if (sessionCheckError) return <main className="lead-auth-required"><h1>Nie udało się sprawdzić sesji</h1><p>{sessionCheckError}</p><button className="lead-primary" type="button" onClick={() => setSessionRetry((value) => value + 1)}>Spróbuj ponownie</button></main>;
   if (authenticated === null) return <main className="loading" role="status" aria-live="polite"><span className="loader" aria-hidden="true" /> Ładowanie panelu…</main>;
   if (!authenticated) return <main className="login-shell"><section className="login-intro"><GoldisLogo variant="login" priority /><p className="eyebrow">GOLDIS UBEZPIECZENIA</p><h1>Narzędzia dla pracy z danymi.</h1><p>Jedno miejsce do uruchamiania i kontroli automatyzacji.</p><div className="login-rail"><span>01 · Import</span><span>02 · Weryfikacja</span><span>03 · Wynik</span></div></section><section className="login-card"><p className="eyebrow">DOSTĘP DO PANELU</p><h2>Zaloguj się</h2><form onSubmit={login}><label>Użytkownik<input autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} required /></label><label>Hasło<input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>{error && <p className="error" role="alert">{error}</p>}<button type="submit" disabled={working}>{working ? "Logowanie…" : "Przejdź do panelu"}</button><p className="login-help">Nie pamiętasz hasła? <a href="/odzyskaj-haslo">Wyślij link do resetu</a>. Jeśli odzyskiwanie nie jest włączone, skontaktuj się z administratorem.</p></form></section></main>;
   if (authenticated && isCatalogLanding) return <main className="platform-home">
-    <header><a className="platform-home-brand" href="/"><GoldisLogo variant="header" /><span>Goldis · Platforma automatyzacji</span></a><nav><a href="/dashboard">Przegląd</a><a href="/notifications">Powiadomienia</a><a href="/account">Moje konto</a>{userRole && ["admin", "manager", "reviewer", "auditor"].includes(userRole) && <a href="/audit">Audyt</a>}{userRole === "admin" && <a href="/admin">Administracja</a>}<span className="topbar-user">{userRole ? roleLabels[userRole] : "Użytkownik"}</span><button type="button" onClick={() => void logout()}>Wyloguj</button></nav></header>
+    <header><a className="platform-home-brand" href="/"><GoldisLogo variant="header" /><span>Goldis · Platforma automatyzacji</span></a><nav><a href="/dashboard">Przegląd</a><a href="/notifications">Powiadomienia</a><a href="/account">Moje konto</a>{userRole && ["admin", "manager", "reviewer", "auditor"].includes(userRole) && <a href="/audit">Audyt</a>}{userRole === "admin" && <a href="/admin">Administracja</a>}<span className="topbar-user">{userRole ? roleLabels[userRole] : "Użytkownik"}</span><button type="button" onClick={() => void logout(true)}>Wyloguj</button></nav></header>
     <div className="platform-home-content"><p className="eyebrow">GOLDIS / KATALOG</p><h1>Wybierz obszar pracy</h1><p>Narzędzia i historie dostępne dla Twojego konta. Zakres dalszych działań zależy od przydzielonych uprawnień.</p>
       {catalogError && <p className="history-error" role="alert">{catalogError}</p>}
       <div className="platform-tool-grid">{catalogItems.map((tool) => {
@@ -991,11 +1174,11 @@ export default function Workspace() {
         </article>;
       })}</div>
       {!catalogItems.length && !catalogError && <p className="history-empty">Brak narzędzi z dostępem. Skontaktuj się z administratorem organizacji.</p>}
-      {catalogItems.some((tool) => tool.access.canViewResults) && <nav className="platform-history-links" aria-label="Historie"><a href="/imports">Historia importów</a><a href="/runs">Historia zadań</a><a href="/results/oc-policy-verification">Pula wyników OC</a><a href="/my-results">Moje wyniki</a><a href="/results/history">Historia zadań firmowych</a></nav>}
-      {userRole && ["admin", "manager", "reviewer", "auditor"].includes(userRole) && <nav className="platform-history-links" aria-label="Bezpieczeństwo"><a href="/audit">Dziennik audytu</a></nav>}
+      {catalogItems.some((tool) => tool.access.canViewResults) && <nav className="platform-history-links" aria-label="Historie"><a href="/imports">{uiLabels.importHistory}</a><a href="/runs">{uiLabels.runs}</a><a href="/results/oc-policy-verification">{uiLabels.companyPool}</a><a href="/my-results">{uiLabels.myCompanies}</a><a href="/results/history">Historia zadań firmowych</a></nav>}
+      {userRole && ["admin", "manager", "reviewer", "auditor"].includes(userRole) && <nav className="platform-history-links" aria-label="Bezpieczeństwo"><a href="/audit">{uiLabels.activityLog}</a></nav>}
     </div>
   </main>;
-  if (!canDiscoverTool && !canOperate && !canViewResults) return <main className="no-tool-access"><section className="no-tool-card"><GoldisLogo variant="header" /><p className="eyebrow">DOSTĘP DO PLATFORMY</p><h1>Brak dostępu do narzędzia</h1><p>Administrator nie przyznał temu kontu dostępu do narzędzia ani wcześniejszych wyników. Skontaktuj się z administratorem organizacji.</p><div><a href="/account">Moje konto</a><button type="button" onClick={() => void logout()}>Wyloguj</button></div></section></main>;
+  if (!canDiscoverTool && !canOperate && !canViewResults) return <main className="no-tool-access"><section className="no-tool-card"><GoldisLogo variant="header" /><p className="eyebrow">DOSTĘP DO PLATFORMY</p><h1>Brak dostępu do narzędzia</h1><p>Administrator nie przyznał temu kontu dostępu do narzędzia ani wcześniejszych wyników. Skontaktuj się z administratorem organizacji.</p><div><a href="/account">Moje konto</a><button type="button" onClick={() => void logout(true)}>Wyloguj</button></div></section></main>;
 
   const finalRunStep = selectedRun && (selectedRun.status === "completed" || selectedRun.status === "no_matching_policies");
   const currentStep: 1 | 2 | 3 = !result ? 1 : finalRunStep ? 3 : 2;
@@ -1017,6 +1200,112 @@ export default function Workspace() {
       />
     : null;
 
+  if (mode === "oc-automation") {
+    const currentPreparation = result && preparationState?.batchId === result.id ? preparationState : null;
+    const healthState = automationHealthState.status === "unknown" || automationHealthState.status === "disabled"
+      ? "unknown" as const : !automationHealth ? "unknown" as const : automationHealth.automationReady ? "ready" as const : "waiting" as const;
+    const automationFlow = deriveAutomationFlow({
+      hasImport: Boolean(result),
+      preparation: currentPreparation?.status ?? "missing",
+      preview: automationPreview && automationPreview.preparationId === currentPreparation?.preparationId
+        && automationPreview.revision === currentPreparation?.revision ? automationPreview : null,
+      canExecute: canOperate,
+      health: healthState,
+      operationStatus: automationOperationStatus,
+      resultStatus: automationResultStatus,
+      hasResultSet: Boolean(automationResultSetId || automationExecutionId || automationResultStatus),
+    });
+    const startBlockedReason = automationHealthState.status === "checking" || automationHealthState.status === "unknown" || !automationHealth
+      ? automationStatusMessage(automationHealthState.status, automationHealth, automationHealthState.message)
+      : automationHealth.automationReady ? null : automationStatusMessage(automationHealthState.status, automationHealth);
+    const runBusyStatuses = ["queued", "validating", "awaiting_portal_adapter", "pzu_login", "everest_search", "waiting_for_sms", "compensa_login", "compensa_form", "ufg_verification"];
+    const batchInterventions = result ? interventions.filter((item) => item.batchId === result.id) : [];
+    const onAutomationStarted = (id: string, kind: "submission" | "execution") => {
+      const params = new URLSearchParams(window.location.search);
+      params.delete("run");
+      params.delete("submission");
+      params.delete("execution");
+      params.delete("resultSetId");
+      params.set(kind, id);
+      params.set("step", "progress");
+      window.history.pushState({}, "", `${window.location.pathname}?${params.toString()}`);
+      setAutomationSubmissionId(kind === "submission" ? id : null);
+      setAutomationExecutionId(kind === "execution" ? id : null);
+      setAutomationImportId(result?.id ?? null);
+      setAutomationResultSetId(null);
+      setAutomationPreview(null);
+      setAutomationOperationStatus("queued");
+      setAutomationResultStatus(null);
+      setAutomationStep("progress");
+    };
+    const runDetail = selectedRun && canViewResults ? <section className="oc-run-detail" aria-labelledby="oc-run-detail-heading">
+      <div><p className="eyebrow">ZADANIE {selectedRun.id.slice(0, 8)}</p><h3 id="oc-run-detail-heading">Wiersz {selectedRun.rowNumber} · {runOutcomeLabel(selectedRun.status, selectedRun.errorCode, runLabels[selectedRun.status] ?? selectedRun.status)}</h3><p>Data odniesienia: {selectedRun.referenceDate}{selectedRun.errorCode ? ` · ${interventionLabels[selectedRun.errorCode] ?? selectedRun.errorCode}` : ""}</p></div>
+      {selectedRun.controlState === "pause_requested" && <p className="submission-notice" role="status">Wstrzymywanie po bieżącej akcji portalu. Akcja już wysłana może się jeszcze zakończyć.</p>}
+      {selectedRun.controlState === "paused" && <p className="submission-notice" role="status">Zadanie wstrzymano przy bezpiecznym punkcie. Wznowienie kontynuuje ten sam przebieg.</p>}
+      {selectedRun.incident && <div className="sms-challenge" role="status"><strong>Zadanie wymaga uwagi</strong><p>Portal: {selectedRun.incident.portal === "pzu" ? "PZU Everest" : "Compensa"} · Powód: {interventionLabels[selectedRun.incident.reasonCode ?? ""] ?? selectedRun.incident.reasonCode}{selectedRun.incident.fieldCode ? ` · Pole: ${manualFieldLabels[selectedRun.incident.fieldCode] ?? selectedRun.incident.fieldCode}` : ""}</p>
+        {selectedRun.incident.canResumeAuth && canOperate && <button type="button" disabled={authResuming || authRetryPendingRunId === selectedRun.id} onClick={() => void resumeAuth()}>{authResuming || authRetryPendingRunId === selectedRun.id ? "Oczekiwanie na ponowienie…" : "Wyślij jeden dodatkowy kod SMS"}</button>}
+        {(userRole === "admin" || userRole === "manager") && selectedRun.incident.fieldCode && manualFieldLabels[selectedRun.incident.fieldCode] && <form className="manual-data-form" onSubmit={saveManualData}><label>{manualFieldLabels[selectedRun.incident.fieldCode]}<input value={manualValue} onChange={(event) => setManualValue(event.target.value)} maxLength={selectedRun.incident.fieldCode === "ADDRESS" ? 200 : selectedRun.incident.fieldCode === "CITY" ? 100 : selectedRun.incident.fieldCode === "EXPECTED_PERSON" ? 150 : 80} required /></label><label>Powód poprawki<textarea value={manualReason} onChange={(event) => setManualReason(event.target.value)} minLength={10} maxLength={300} required /></label><button type="submit" disabled={manualSaving || !manualValue.trim() || manualReason.trim().length < 10}>{manualSaving ? "Zapisywanie…" : "Zapisz wersjonowaną poprawkę"}</button></form>}
+        {(userRole === "admin" || userRole === "manager") && selectedRun.incident.canResumeReview && <button type="button" onClick={() => void resumeReview()}>Wznów to samo zadanie</button>}
+      </div>}
+      {selectedRun.policyCounts && <div className="run-policy-counts"><div><strong>{selectedRun.policyCounts.totalOcCount.toLocaleString("pl-PL")}</strong><span>polis w snapshotcie UFG</span></div><div><strong>{selectedRun.policyCounts.currentOcCount.toLocaleString("pl-PL")}</strong><span>aktualnych na {selectedRun.referenceDate}</span></div></div>}
+      {selectedRun.status === "no_matching_policies" && <p className="table-note">Brak polis OC z okresem obejmującym dzień sprawdzenia; to poprawny wynik, nie błąd.</p>}
+      {selectedRun.artifactAvailable && canDownloadResults && <a className="download-link" href={`/api/runs/${selectedRun.id}/artifact`}>Pobierz wynik tego zadania</a>}
+      {canManageRuns && runBusyStatuses.includes(selectedRun.status) && <div className="run-control-actions">{selectedRun.controlState === "paused" ? <button type="button" disabled={runControlBusy || !csrfToken} onClick={() => void controlRun("resume")}>Wznów zadanie</button> : <button type="button" disabled={runControlBusy || !csrfToken || selectedRun.controlState === "pause_requested"} onClick={() => void controlRun("pause")}>{selectedRun.controlState === "pause_requested" || runControlBusy ? "Wstrzymywanie…" : "Wstrzymaj po bieżącej akcji"}</button>}</div>}
+      {canOperate && ["queued", "awaiting_portal_adapter", "waiting_for_sms"].includes(selectedRun.status) && <button className="cancel-run" type="button" onClick={() => void cancelRun()}>Anuluj zadanie</button>}
+      {selectedRun.events && <ol>{selectedRun.events.map((item, index) => <li key={`${item.createdAt}-${index}`}>{runOutcomeLabel(item.status, item.errorCode, runLabels[item.status] ?? item.status)} · {new Date(item.createdAt).toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" })}</li>)}</ol>}
+    </section> : null;
+    const importedFileName = result ? result.fileName ?? `Import ${result.id.slice(0, 8)}` : file?.name;
+
+    return <>
+      <OcAutomationWorkspace step={automationStep} onNavigate={navigateAutomationStep} fileName={importedFileName}
+        contextLabel={automationResultSetId ? `Zestaw wyników ${automationResultSetId.slice(0, 8)}` : undefined}
+        rowCount={result?.totalRows} statuses={automationFlow.labels} stepStates={automationFlow.states}>
+        {result && canOperate && (preparationReady || automationSubmissionId || automationExecutionId) && <div className="oc-launcher-host" hidden={!(["selection", "launch", "progress"].includes(automationStep))}>
+          <RunSubmissionLauncher batchId={result.id} csrfToken={csrfToken} phase={automationStep === "selection" || automationStep === "launch" || automationStep === "progress" ? automationStep : "selection"}
+            draftIdentity={automationDraftIdentity}
+            preparationId={currentPreparation?.preparationId} preparationRevision={currentPreparation?.revision} preparationFingerprint={currentPreparation?.sourceFingerprint}
+            startBlockedReason={automationStep === "launch" ? startBlockedReason : null} onRefreshReadiness={automationHealthState.refresh}
+            onUnauthorized={handleSessionExpired}
+            submissionId={automationSubmissionId} executionId={automationExecutionId}
+            onPreviewReady={handleAutomationPreviewChange}
+            onStarted={onAutomationStarted}
+            onOperationStatus={onAutomationOperationStatus}
+            onOpenRun={(id) => { void showRun(id); }} />
+        </div>}
+        {result && canViewResults && <div className="oc-enrichment-host" hidden={automationStep !== "regon"}><EnrichmentReviewPanel key={`enrichment-${result.id}`} batchId={result.id} csrfToken={csrfToken} canStart={canOperate} onUnauthorized={handleSessionExpired} /></div>}
+        {result && canViewResults && <div className="oc-preparation-host" hidden={automationStep !== "deduplication"}><ImportPreparationPanel key={`preparation-${result.id}`} batchId={result.id} csrfToken={csrfToken} canStart={canOperate} canDownload={canDownloadResults} onUnauthorized={handleSessionExpired} onRunReadyChange={handlePreparationReadyChange} /></div>}
+        {(error || runError) && <p className="error" role="alert">{error || runError}</p>}
+
+        {automationStep === "upload" && <>
+          {canOperate ? <OcExcelUploadPanel file={file} working={working} onChooseFile={chooseImportFile} onRemoveFile={removeImportFile} onSubmit={upload} /> : <p className="submission-notice">To konto ma dostęp tylko do podglądu wyników. Wybierz import z historii.</p>}
+          <AutomationHealthPanel variant="oc-health" health={automationHealth} status={automationHealthState.status}
+            message={automationHealthState.message} onRefresh={automationHealthState.refresh} />
+        </>}
+
+        {automationStep === "validation" && (result && canViewResults ? <section className="result-section oc-validation"><div className="section-head"><div><p className="eyebrow">KROK 02 / WALIDACJA</p><h3>Kontrola wierszy importu</h3></div><span className="result-id">{result.id.slice(0, 8)}</span></div><div className="metrics"><div><strong>{result.totalRows.toLocaleString("pl-PL")}</strong><span>wierszy w pliku</span></div><div><strong>{result.readyRows.toLocaleString("pl-PL")}</strong><span>gotowych wstępnie</span></div><div><strong>{result.invalidRows.toLocaleString("pl-PL")}</strong><span>do sprawdzenia</span></div></div><div className="row-tools"><label>Filtr <select value={rowState} onChange={(event) => { setRowState(event.target.value as "all" | "ready" | "review"); setRowPage(1); }}><option value="all">Wszystkie</option><option value="ready">Gotowe</option><option value="review">Do sprawdzenia</option></select></label>{mode === "oc-automation" && <label className="row-search">Szukaj w danych<input type="search" value={rowSearch} onChange={(event) => { setRowSearch(event.target.value); setRowPage(1); }} placeholder="Nazwa, NIP, REGON, miejscowość" maxLength={120} /></label>}</div><div className="row-pagination"><span>Strona {rowPage} z {Math.max(1, Math.ceil((mode === "oc-automation" ? rowTotal : result.totalRows) / 50))}{rowCounts ? ` · ${rowCounts.matching} pasujących` : ""}</span><button type="button" disabled={rowPage === 1} onClick={() => setRowPage((page) => page - 1)}>Poprzednia</button><button type="button" disabled={mode === "oc-automation" ? rowPage * 50 >= rowTotal : rows.length < 50} onClick={() => setRowPage((page) => page + 1)}>Następna</button></div><div className="table-wrap" tabIndex={0} role="region" aria-label="Wiersze importu; przewiń poziomo, aby zobaczyć wszystkie kolumny"><table><thead><tr><th>Wiersz</th><th>Nazwa</th><th>Osoba decyzyjna</th><th>REGON</th><th>Stan</th></tr></thead><tbody>{rows.map((row) => { const duplicate = row.issues.includes("DUPLICATE_SOURCE_ROW"); const missingRegon = row.issues.includes("REGON_EMPTY"); return <tr key={row.rowNumber}><td>{row.rowNumber}</td><td>{row.companyName}</td><td>{row.decisionMakerName ?? "—"}</td><td className="mono">{row.regon || "—"}</td><td>{duplicate ? <span className="pill warn">Duplikat — pominięty</span> : missingRegon ? <span className="pill warn">Wymaga ustalenia REGON-u</span> : row.issues.length ? <span className="pill warn">Do sprawdzenia</span> : <span className="pill good">Gotowy</span>}</td></tr>; })}</tbody></table></div><p className="table-note">Duplikaty pozostają w źródłowym imporcie; są rozliczane w kroku przygotowania.</p></section> : <p className="submission-notice">Najpierw zaimportuj plik Excel albo otwórz istniejący import z historii.</p>)}
+
+        {automationStep === "regon" && !result && <p className="submission-notice">Po imporcie będzie tu lookup REGON, wyniki dostawców oraz dostępne propozycje korekty.</p>}
+        {automationStep === "deduplication" && !result && <p className="submission-notice">Po imporcie będzie tu przygotowanie zestawu, rozliczenie duplikatów i historia rewizji.</p>}
+
+        {automationStep === "selection" && canOperate && !preparationReady && !automationSubmissionId && !automationExecutionId && <p className="submission-notice">Najpierw zakończ przygotowanie i deduplikację całego importu w kroku 4. Po każdej zmianie źródła wykonaj nową rewizję.</p>}
+        {automationStep === "launch" && canOperate && !preparationReady && !automationSubmissionId && !automationExecutionId && <p className="submission-notice">Start będzie dostępny po przygotowaniu aktualnej rewizji oraz pobraniu podglądu z kroku 5.</p>}
+        {automationStep === "selection" && !canOperate && <p className="submission-notice">To konto może przeglądać import, ale nie może wybierać ani uruchamiać wierszy.</p>}
+        {automationStep === "launch" && !canOperate && <p className="submission-notice">Uruchomienie wymaga uprawnienia do wykonywania automatyzacji.</p>}
+
+        {automationStep === "progress" && <>
+          {canSeeInterventions && <section className="oc-interventions" aria-labelledby="oc-interventions-title"><div className="section-head"><div><p className="eyebrow">OBSŁUGA W TRAKCIE PRACY</p><h3 id="oc-interventions-title">Sprawy wymagające uwagi</h3></div><span>{batchInterventions.length} otwartych</span></div>{interventionError && <p className="error" role="alert">{interventionError}</p>}{!batchInterventions.length ? <p className="intervention-empty">Brak otwartych zgłoszeń dla tego importu.</p> : <ul className="intervention-list">{batchInterventions.map((item) => <li key={item.interventionId} className={item.isUnread ? "intervention-item unread" : "intervention-item"}><div className="intervention-copy"><strong>{interventionLabels[item.reasonCode ?? ""] ?? interventionLabels[item.kind] ?? "Wymaga sprawdzenia"}</strong><span>Wiersz {item.rowNumber} · {item.portal === "pzu" ? "PZU Everest" : item.portal === "compensa" ? "Compensa" : "platforma"}</span><small>{item.isUnread ? "Nowa zmiana" : "Przeczytane"} · {new Date(item.updatedAt).toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" })}</small></div><button type="button" onClick={() => void openIntervention(item)}>{item.canSubmitSms ? "Wpisz kod" : "Otwórz zgłoszenie"}</button></li>)}</ul>}</section>}
+          {canViewResults && <section className="result-section oc-run-list"><div className="section-head"><div><p className="eyebrow">ZADANIA IMPORTU</p><h3>Postęp pojedynczych wierszy</h3></div><span>{runs.length} zadań</span></div>{!runs.length ? <p className="intervention-empty">Zadania pojawią się po ich uruchomieniu.</p> : <div className="oc-run-grid">{runs.map((run) => <button key={run.id} type="button" aria-current={selectedRun?.id === run.id ? "true" : undefined} onClick={() => void showRun(run.id)}><strong>Wiersz {run.rowNumber}</strong><span>{runOutcomeLabel(run.status, run.errorCode, runLabels[run.status] ?? run.status)}</span><small>{run.referenceDate}</small></button>)}</div>}</section>}
+          {runDetail}
+          {smsDialog}
+        </>}
+
+        {automationStep === "results" && canViewResults && <ResultSetWorkspace resultSetId={automationResultSetId} expectedBatchId={automationImportId} submissionId={automationSubmissionId} executionId={automationExecutionId} canDownload={canDownloadResults} onUnauthorized={handleSessionExpired} onStatus={onAutomationResultStatus} onOpenRun={(id) => { void showRun(id); }} />}
+        {automationStep === "results" && !canViewResults && <p className="submission-notice">To konto nie ma uprawnienia do odczytu zapisanych wyników.</p>}
+      </OcAutomationWorkspace>
+      {!(["progress"].includes(automationStep)) && smsDialog}
+    </>;
+  }
+
   return <div className="shell">
     <aside className="sidebar">
       <div className="sidebar-head">
@@ -1025,31 +1314,29 @@ export default function Workspace() {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
         </button>
       </div>
-      <nav className="desktop-workspace-nav" aria-label="Główna nawigacja"><a className={activeNav === "workspace-start" ? "nav-active" : ""} href="#workspace-start" aria-current={activeNav === "workspace-start" ? "page" : undefined}>Przegląd</a><a className={activeNav === "workspace-import" ? "nav-active" : ""} href="#workspace-import" aria-current={activeNav === "workspace-import" ? "page" : undefined}>Importy</a><a className={activeNav === "workspace-runs" ? "nav-active" : ""} href={result ? "#workspace-runs" : "#workspace-import"} aria-current={activeNav === "workspace-runs" ? "page" : undefined}>Zadania</a><a className={activeNav === "workspace-result" ? "nav-active" : ""} href={result ? "#workspace-result" : "#workspace-import"} aria-current={activeNav === "workspace-result" ? "page" : undefined}>Wyniki</a></nav>
-      <div className="sidebar-foot"><span>Środowisko robocze</span><button type="button" onClick={() => void logout()}>Wyloguj</button></div>
+      <nav className="desktop-workspace-nav" aria-label="Główna nawigacja"><a className={activeNav === "workspace-start" ? "nav-active" : ""} href="#workspace-start" aria-current={activeNav === "workspace-start" ? "page" : undefined}>{uiLabels.overview}</a><a className={activeNav === "workspace-import" ? "nav-active" : ""} href="#workspace-import" aria-current={activeNav === "workspace-import" ? "page" : undefined}>Plik i przygotowanie</a><a className={activeNav === "workspace-runs" ? "nav-active" : ""} href={result ? "#workspace-runs" : "#workspace-import"} aria-current={activeNav === "workspace-runs" ? "page" : undefined}>{uiLabels.runs}</a><a className={activeNav === "workspace-result" ? "nav-active" : ""} href={result ? "#workspace-result" : "#workspace-import"} aria-current={activeNav === "workspace-result" ? "page" : undefined}>{uiLabels.companyPool}</a></nav>
+      <div className="sidebar-foot"><span>Środowisko robocze</span><button type="button" onClick={() => void logout(true)}>Wyloguj</button></div>
       <div className="mobile-nav-layer" hidden={!mobileNavOpen} onMouseDown={(event) => { if (event.target === event.currentTarget) closeMobileNav(); }}>
         <div ref={mobileDrawerRef} className="mobile-nav-drawer" role="dialog" aria-modal="true" aria-labelledby="mobile-nav-title" onKeyDown={trapMobileNavFocus}>
           <div className="mobile-nav-head"><h2 id="mobile-nav-title">Nawigacja</h2><button type="button" className="mobile-nav-close" onClick={() => closeMobileNav()} aria-label="Zamknij menu nawigacji"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button></div>
           <nav aria-label="Główna nawigacja">
             <a className={activeNav === "workspace-start" ? "nav-active" : ""} href="#workspace-start" aria-current={activeNav === "workspace-start" ? "page" : undefined} onClick={() => { closeMobileNav(false); window.requestAnimationFrame(() => document.getElementById("workspace-start")?.focus({ preventScroll: true })); }}>Przegląd</a>
-            <a className={activeNav === "workspace-import" ? "nav-active" : ""} href="#workspace-import" aria-current={activeNav === "workspace-import" ? "page" : undefined} onClick={() => { closeMobileNav(false); window.requestAnimationFrame(() => document.getElementById("workspace-import")?.focus({ preventScroll: true })); }}>Importy</a>
-            <a className={activeNav === "workspace-runs" ? "nav-active" : ""} href={result ? "#workspace-runs" : "#workspace-import"} aria-current={activeNav === "workspace-runs" ? "page" : undefined} onClick={() => { closeMobileNav(false); const target = result ? "workspace-runs" : "workspace-import"; window.requestAnimationFrame(() => document.getElementById(target)?.focus({ preventScroll: true })); }}>Zadania</a>
-            <a className={activeNav === "workspace-result" ? "nav-active" : ""} href={result ? "#workspace-result" : "#workspace-import"} aria-current={activeNav === "workspace-result" ? "page" : undefined} onClick={() => { closeMobileNav(false); const target = result ? "workspace-result" : "workspace-import"; window.requestAnimationFrame(() => document.getElementById(target)?.focus({ preventScroll: true })); }}>Wyniki</a>
-            <a href="/dashboard">Przegląd</a><a href="/notifications">Powiadomienia</a><a href="/">Katalog platformy</a><a href="/imports">Historia importów</a><a href="/runs">Historia zadań</a><a href="/results/oc-policy-verification">Pula wyników OC</a><a href="/my-results">Moje wyniki</a><a href="/results/history">Historia zadań firmowych</a>
+          <a className={activeNav === "workspace-import" ? "nav-active" : ""} href="#workspace-import" aria-current={activeNav === "workspace-import" ? "page" : undefined} onClick={() => { closeMobileNav(false); window.requestAnimationFrame(() => document.getElementById("workspace-import")?.focus({ preventScroll: true })); }}>Plik i przygotowanie</a>
+            <a className={activeNav === "workspace-runs" ? "nav-active" : ""} href={result ? "#workspace-runs" : "#workspace-import"} aria-current={activeNav === "workspace-runs" ? "page" : undefined} onClick={() => { closeMobileNav(false); const target = result ? "workspace-runs" : "workspace-import"; window.requestAnimationFrame(() => document.getElementById(target)?.focus({ preventScroll: true })); }}>{uiLabels.runs}</a>
+            <a className={activeNav === "workspace-result" ? "nav-active" : ""} href={result ? "#workspace-result" : "#workspace-import"} aria-current={activeNav === "workspace-result" ? "page" : undefined} onClick={() => { closeMobileNav(false); const target = result ? "workspace-result" : "workspace-import"; window.requestAnimationFrame(() => document.getElementById(target)?.focus({ preventScroll: true })); }}>{uiLabels.companyPool}</a>
+            <a href="/dashboard">{uiLabels.overview}</a><a href="/notifications">{uiLabels.notifications}</a><a href="/tools">{uiLabels.automations}</a><a href="/imports">{uiLabels.importHistory}</a><a href="/runs">{uiLabels.runs}</a><a href="/results/oc-policy-verification">{uiLabels.companyPool}</a><a href="/my-results">{uiLabels.myCompanies}</a><a href="/results/history">Historia zadań firmowych</a>
           </nav>
-          <div className="mobile-nav-foot"><a href="/account">Moje konto</a>{userRole && ["admin", "manager", "reviewer", "auditor"].includes(userRole) && <a href="/audit">Audyt</a>}{userRole === "admin" && <a href="/admin">Administracja</a>}<span>{userRole ? roleLabels[userRole] : "Użytkownik"}</span><button type="button" onClick={() => void logout()}>Wyloguj</button></div>
+          <div className="mobile-nav-foot"><a href="/account">Moje konto</a>{userRole && ["admin", "manager", "reviewer", "auditor"].includes(userRole) && <a href="/audit">Audyt</a>}{userRole === "admin" && <a href="/admin">Administracja</a>}<span>{userRole ? roleLabels[userRole] : "Użytkownik"}</span><button type="button" onClick={() => void logout(true)}>Wyloguj</button></div>
         </div>
       </div>
     </aside>
     <main className="main">
-      <header className="topbar"><span>GOLDIS / NARZĘDZIA</span><nav className="workspace-links"><a href="/dashboard">Przegląd</a><a href="/notifications">Powiadomienia</a><a href="/">Katalog</a><a href="/imports">Importy</a><a href="/runs">Zadania</a><a href="/results/oc-policy-verification">Wyniki</a><a href="/my-results">Moje wyniki</a><a href="/results/history">Historia wyników</a>{userRole && ["admin", "manager", "reviewer", "auditor"].includes(userRole) && <a href="/audit">Audyt</a>}<a href="/account">Moje konto</a>{userRole === "admin" && <a href="/admin">Administracja</a>}<span className="topbar-user">{userRole ? roleLabels[userRole] : "Użytkownik"}</span></nav></header>
+      <header className="topbar"><span>GOLDIS / NARZĘDZIA</span><nav className="workspace-links"><a href="/dashboard">{uiLabels.overview}</a><a href="/notifications">{uiLabels.notifications}</a><a href="/tools">{uiLabels.automations}</a><a href="/imports">{uiLabels.importHistory}</a><a href="/runs">{uiLabels.runs}</a><a href="/results/oc-policy-verification">{uiLabels.companyPool}</a><a href="/my-results">{uiLabels.myCompanies}</a><a href="/results/history">Historia zadań firmowych</a>{userRole && ["admin", "manager", "reviewer", "auditor"].includes(userRole) && <a href="/audit">Audyt</a>}<a href="/account">{uiLabels.account}</a>{userRole === "admin" && <a href="/admin">Administracja</a>}<span className="topbar-user">{userRole ? roleLabels[userRole] : "Użytkownik"}</span></nav></header>
       <div className="content">
         <section className="intro" id="workspace-start" tabIndex={-1}><p className="eyebrow">NARZĘDZIE 01 / POLISY OC</p><h1>Weryfikacja danych transportowych</h1><p>Przygotuj bazę firm do sprawdzenia w Everest i Compensie. Po imporcie zobaczysz wiersze wymagające poprawy.</p></section>
         {runError && <p className="error" role="alert">{runError}</p>}
-        <section className="automation-health" aria-live="polite" aria-label="Gotowość usług">
-          <span className={`status-dot ${automationHealth?.automationReady ? "" : "health-warn"}`} aria-hidden="true" />
-          <div><strong>{automationHealth?.message ?? "Sprawdzanie gotowości usług…"}</strong><span>{automationHealth ? `Usługi: ${automationHealth.servicesReady ? "gotowe" : "niedostępne"} · Worker: ${automationHealth.worker} · Tryb portali: ${automationHealth.portalMode === "off" ? "wyłączone" : automationHealth.portalMode === "live" ? "live" : "nieznany"}` : ""}</span></div>
-        </section>
+        <AutomationHealthPanel variant="automation-health" health={automationHealth} status={automationHealthState.status}
+          message={automationHealthState.message} onRefresh={automationHealthState.refresh} />
         <RunStepper currentStep={currentStep} />
 
         {canSeeInterventions && <section className="result-section intervention-center" aria-labelledby="intervention-title" aria-live="polite">
@@ -1074,18 +1361,24 @@ export default function Workspace() {
           <div className="card status-card"><p className="eyebrow">STAN NARZĘDZIA</p><h2>{canOperate ? "Import i przygotowanie dostępne" : "Tryb podglądu"}</h2><p>Uruchomienie sprawdzania portali wymaga aktywnego workera Playwright i potwierdzonych selektorów ekranów.</p><div className="status-line"><span className="status-dot" /> Import i walidacja dostępne</div><div className="status-line muted"><span className="status-dot" /> Automatyzacja portali wymaga workera</div></div>
         </section>
 
-        {result && canViewResults && <section id="workspace-result" tabIndex={-1} className="result-section"><div className="section-head"><div><p className="eyebrow">WYNIK IMPORTU</p><h2>Przegląd bazy</h2></div><span className="result-id">{result.id.slice(0, 8)}</span></div><div className="metrics"><div><strong>{result.totalRows.toLocaleString("pl-PL")}</strong><span>wierszy</span></div><div><strong>{result.readyRows.toLocaleString("pl-PL")}</strong><span>gotowych wstępnie</span></div><div><strong>{result.invalidRows.toLocaleString("pl-PL")}</strong><span>do sprawdzenia lub pominięcia</span></div></div><div className="row-tools"><label>Filtr <select value={rowState} onChange={(event) => { setRowState(event.target.value as "all" | "ready" | "review"); setRowPage(1); }}><option value="all">Wszystkie</option><option value="ready">Gotowe</option><option value="review">Do sprawdzenia</option></select></label><span>Strona {rowPage}</span><button type="button" disabled={rowPage === 1} onClick={() => setRowPage((page) => page - 1)}>Poprzednia</button><button type="button" disabled={rows.length < 50} onClick={() => setRowPage((page) => page + 1)}>Następna</button></div><div className="table-wrap" tabIndex={0} role="region" aria-label="Tabela wyników; przewiń w poziomie, aby zobaczyć wszystkie kolumny"><table><thead><tr><th>Wiersz</th><th>Nazwa</th><th>Osoba decyzyjna</th><th>REGON</th><th>Stan</th></tr></thead><tbody>{rows.map((row) => { const duplicate = row.issues.includes("DUPLICATE_SOURCE_ROW"); const missingRegon = row.issues.includes("REGON_EMPTY"); return <tr key={row.rowNumber}><td>{row.rowNumber}</td><td>{row.companyName}</td><td>{row.decisionMakerName ?? "—"}</td><td className="mono">{row.regon}</td><td>{duplicate ? <span className="pill warn" title="Ten wiersz nie trafi do zestawu roboczego">Duplikat — pominięty</span> : missingRegon ? <span className="pill warn">Wymaga ustalenia REGON-u</span> : row.issues.length ? <span className="pill warn">Do sprawdzenia</span> : <span className="pill good">Gotowy</span>}</td></tr>; })}</tbody></table></div><p className="table-note">Podgląd 50 wierszy na stronę. Duplikat pozostaje w źródłowym imporcie, ale jest pomijany w zestawie roboczym. Import nie uruchamia zapytań do portali.</p></section>}
+        {result && canViewResults && <section id="workspace-result" tabIndex={-1} className="result-section"><div className="section-head"><div><p className="eyebrow">WYNIK IMPORTU</p><h2>Przegląd bazy</h2></div><span className="result-id">{result.id.slice(0, 8)}</span></div><div className="metrics"><div><strong>{result.totalRows.toLocaleString("pl-PL")}</strong><span>wierszy</span></div><div><strong>{result.readyRows.toLocaleString("pl-PL")}</strong><span>gotowych wstępnie</span></div><div><strong>{result.invalidRows.toLocaleString("pl-PL")}</strong><span>do sprawdzenia lub pominięcia</span></div></div><div className="row-tools"><label>Filtr <select value={rowState} onChange={(event) => { setRowState(event.target.value as "all" | "ready" | "review"); setRowPage(1); }}><option value="all">Wszystkie</option><option value="ready">Gotowe</option><option value="review">Do sprawdzenia</option></select></label></div><div className="row-pagination"><span>Strona {rowPage}</span><button type="button" disabled={rowPage === 1} onClick={() => setRowPage((page) => page - 1)}>Poprzednia</button><button type="button" disabled={rows.length < 50} onClick={() => setRowPage((page) => page + 1)}>Następna</button></div><div className="table-wrap" tabIndex={0} role="region" aria-label="Tabela wyników; przewiń w poziomie, aby zobaczyć wszystkie kolumny"><table><thead><tr><th>Wiersz</th><th>Nazwa</th><th>Osoba decyzyjna</th><th>REGON</th><th>Stan</th></tr></thead><tbody>{rows.map((row) => { const duplicate = row.issues.includes("DUPLICATE_SOURCE_ROW"); const missingRegon = row.issues.includes("REGON_EMPTY"); return <tr key={row.rowNumber}><td>{row.rowNumber}</td><td>{row.companyName}</td><td>{row.decisionMakerName ?? "—"}</td><td className="mono">{row.regon}</td><td>{duplicate ? <span className="pill warn" title="Ten wiersz nie trafi do zestawu roboczego">Duplikat — pominięty</span> : missingRegon ? <span className="pill warn">Wymaga ustalenia REGON-u</span> : row.issues.length ? <span className="pill warn">Do sprawdzenia</span> : <span className="pill good">Gotowy</span>}</td></tr>; })}</tbody></table></div><p className="table-note">Podgląd 50 wierszy na stronę. Duplikat pozostaje w źródłowym imporcie, ale jest pomijany w zestawie roboczym. Import nie uruchamia zapytań do portali.</p></section>}
         {result && canViewResults && <ImportPreparationPanel key={`preparation-${result.id}`} batchId={result.id} csrfToken={csrfToken}
           canStart={canOperate} canDownload={canDownloadResults} onUnauthorized={handleSessionExpired} onRunReadyChange={handlePreparationReadyChange} />}
         {result && canViewResults && <EnrichmentReviewPanel key={`enrichment-${result.id}`} batchId={result.id} csrfToken={csrfToken} canStart={canOperate} onUnauthorized={handleSessionExpired} />}
 
         {result && (canOperate || canViewResults) && <section id="workspace-runs" tabIndex={-1} className="result-section run-section"><div className="section-head"><div><p className="eyebrow">KROK 02 / ZADANIA</p><h2>Kontrola pojedynczego wiersza</h2></div></div><p>Ten etap zapisuje zadanie, sprawdza dane wejściowe i pokazuje historię. Status „Oczekuje na adapter portali” oznacza, że worker portali nie jest aktywny.</p>
           {canOperate && preparationReady && <form className="run-form" onSubmit={startRun}><label>Numer wiersza w Excelu<input type="number" min="2" step="1" placeholder="np. 18001" value={runNumber} onChange={(event) => setRunNumber(event.target.value)} required /></label><button type="submit" disabled={working || !runNumber}>Sprawdź gotowość wiersza</button></form>}
-          {canOperate && preparationReady && <RunSubmissionLauncher batchId={result.id} csrfToken={csrfToken} />}
+          {canOperate && preparationReady && <RunSubmissionLauncher batchId={result.id} csrfToken={csrfToken}
+            draftIdentity={automationDraftIdentity}
+            preparationId={preparationState?.batchId === result.id ? preparationState.preparationId : undefined}
+            preparationRevision={preparationState?.batchId === result.id ? preparationState.revision : undefined}
+            preparationFingerprint={preparationState?.batchId === result.id ? preparationState.sourceFingerprint : undefined}
+            startBlockedReason={legacyStartBlockedReason} onRefreshReadiness={automationHealthState.refresh}
+            onUnauthorized={handleSessionExpired} />}
           {canOperate && !preparationReady && <p className="preparation-message">Najpierw zakończ przygotowanie i deduplikację całego importu. Po każdej zmianie danych źródłowych wykonaj nową rewizję.</p>}
           {runError && <p className="error" role="alert">{runError}</p>}
-          {canViewResults && runs.length > 0 && <div className="run-list"><h3>Ostatnie zadania</h3>{runs.map((run) => <button key={run.id} type="button" onClick={() => void showRun(run.id)}><span>Wiersz {run.rowNumber}</span><strong>{runLabels[run.status] ?? run.status}</strong><small>{run.referenceDate}</small></button>)}</div>}
-          {selectedRun && canViewResults && <div className="run-detail" id="run-detail"><h3>Wiersz {selectedRun.rowNumber}: {runLabels[selectedRun.status] ?? selectedRun.status}</h3><p>Data odniesienia: {selectedRun.referenceDate}{selectedRun.errorCode ? " · " + selectedRun.errorCode : ""}</p>
+          {canViewResults && runs.length > 0 && <div className="run-list"><h3>Ostatnie zadania</h3>{runs.map((run) => <button key={run.id} type="button" onClick={() => void showRun(run.id)}><span>Wiersz {run.rowNumber}</span><strong>{runOutcomeLabel(run.status, run.errorCode, runLabels[run.status] ?? run.status)}</strong><small>{run.referenceDate}</small></button>)}</div>}
+          {selectedRun && canViewResults && <div className="run-detail" id="run-detail"><h3>Wiersz {selectedRun.rowNumber}: {runOutcomeLabel(selectedRun.status, selectedRun.errorCode, runLabels[selectedRun.status] ?? selectedRun.status)}</h3><p>Data odniesienia: {selectedRun.referenceDate}{selectedRun.errorCode ? " · " + (interventionLabels[selectedRun.errorCode] ?? selectedRun.errorCode) : ""}</p>
             {selectedRun.controlState === "pause_requested" && <p className="submission-notice" role="status">Wstrzymywanie po bieżącej akcji portalu. Akcja już wysłana może się jeszcze zakończyć.</p>}
             {selectedRun.controlState === "paused" && <p className="submission-notice" role="status">Zadanie wstrzymano przy bezpiecznym punkcie{selectedRun.controlCheckpointStatus ? ` (${runLabels[selectedRun.controlCheckpointStatus] ?? selectedRun.controlCheckpointStatus})` : ""}. Wznowienie kontynuuje ten sam przebieg.</p>}
             {selectedRun.incident && <div className="sms-challenge" role="status">
@@ -1114,7 +1407,7 @@ export default function Workspace() {
                   : <button type="button" disabled={runControlBusy || !csrfToken || selectedRun.controlState === "pause_requested"} onClick={() => void controlRun("pause")}>{selectedRun.controlState === "pause_requested" || runControlBusy ? "Wstrzymywanie…" : "Wstrzymaj po bieżącej akcji"}</button>}
               </div>}
             {canOperate && (selectedRun.status === "queued" || selectedRun.status === "awaiting_portal_adapter" || selectedRun.status === "waiting_for_sms") && <button className="cancel-run" type="button" onClick={() => void cancelRun()}>Anuluj zadanie</button>}
-            {selectedRun.events && <ol>{selectedRun.events.map((item, index) => <li key={item.createdAt + "-" + index}>{runLabels[item.status] ?? item.status} · {new Date(item.createdAt).toLocaleString("pl-PL")}</li>)}</ol>}
+            {selectedRun.events && <ol>{selectedRun.events.map((item, index) => <li key={item.createdAt + "-" + index}>{runOutcomeLabel(item.status, item.errorCode, runLabels[item.status] ?? item.status)} · {new Date(item.createdAt).toLocaleString("pl-PL")}</li>)}</ol>}
           </div>}
         </section>}
       </div>

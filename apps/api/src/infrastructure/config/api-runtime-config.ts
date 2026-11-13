@@ -11,6 +11,7 @@ export type ApiRuntimeConfig = Readonly<{
   loginRateLimitKeyPrefix: string | undefined;
   workerInternalUrl: string | undefined;
   importParserUrl: string | undefined;
+  commissionEngineUrl: string | undefined;
   apiExportDirectory: string | undefined;
   deletionJournalDirectory: string | undefined;
   artifactEncryptionRequired: boolean;
@@ -73,6 +74,7 @@ function parseApiRuntimeConfig(environment: StartupEnvironment): ApiRuntimeConfi
   }
   const workerInternalUrl = serviceUrl(environment.WORKER_INTERNAL_URL, "WORKER_INTERNAL_URL", ["/"]);
   const importParserUrl = serviceUrl(environment.IMPORT_PARSER_URL, "IMPORT_PARSER_URL", ["/", "/internal/parse-xlsx"]);
+  const commissionEngineUrl = serviceUrl(environment.COMMISSION_ENGINE_URL, "COMMISSION_ENGINE_URL", ["/"]);
   return Object.freeze({
     port: apiPort(environment.API_PORT),
     trustProxyIps: environment.TRUST_PROXY_IPS,
@@ -82,6 +84,7 @@ function parseApiRuntimeConfig(environment: StartupEnvironment): ApiRuntimeConfi
     loginRateLimitKeyPrefix,
     workerInternalUrl,
     importParserUrl,
+    commissionEngineUrl,
     apiExportDirectory: environment.API_EXPORT_DIR,
     deletionJournalDirectory: environment.GOLDIS_DELETION_JOURNAL_DIR,
     artifactEncryptionRequired: environment.ARTIFACT_REQUIRE_ENCRYPTION === "1",

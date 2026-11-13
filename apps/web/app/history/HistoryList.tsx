@@ -2,10 +2,13 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { GoldisLogo } from "../../components/brand/GoldisLogo";
+import { loginHref } from "../lib/return-to";
+import { uiLabels } from "../lib/ui-labels";
+import { polishCount } from "../lib/ui-labels";
 
 type HistoryKind = "imports" | "runs" | "results";
 type HistoryItem = {
-  id: string; batchId?: string; toolId: string; fileName?: string; totalRows?: number; reviewCount?: number;
+  id: string; batchId?: string; toolId: string; fileName?: string; sourceFileName?: string; totalRows?: number; reviewCount?: number;
   ownerLabel?: string | null; rowNumber?: number; status?: string; referenceDate?: string; errorCode?: string | null;
   createdAt: string; policyCounts?: { totalOcCount: number; currentOcCount: number } | null;
   artifactAvailable?: boolean; artifactId?: string | null; deletionTargetType?: "run" | "artifact" | "import"; deletionTargetId?: string;
@@ -31,30 +34,30 @@ type DeletionFlow =
   | { type: "error"; item: HistoryItem; message: string; preview?: DeletionPreview; retryRequest?: DeletionJobRequest };
 
 const deletionCountLabels: Record<string, string> = {
-  sourceRows: "wiersze w wyniku", runs: "przebiegi", submissions: "zgłoszenia", artifacts: "pliki wynikowe",
-  files: "pliki do usunięcia", activeRuns: "aktywne przebiegi", pendingArtifacts: "oczekujące pliki",
+  sourceRows: "wiersze w wyniku", runs: "zadania firmowe", submissions: "zgłoszenia", artifacts: "pliki wynikowe",
+  files: "pliki do usunięcia", activeRuns: "aktywne zadania firmowe", pendingArtifacts: "oczekujące pliki",
   sharedRunReferences: "współdzielone odwołania", activeOutbox: "oczekujące dostarczenia", stagedFiles: "pliki tymczasowe",
-  deletingArtifacts: "pliki w trakcie usuwania", deletingRuns: "przebiegi w trakcie usuwania",
+  deletingArtifacts: "pliki w trakcie usuwania", deletingRuns: "zadania w trakcie usuwania",
   activePreparations: "aktywne przygotowania", activeWorkflows: "aktywne procesy przygotowania",
   activeEnrichmentJobs: "aktywne wzbogacenia REGON", activePreparedExecutions: "aktywne wykonania zestawu",
   activeSubmissions: "aktywne zgłoszenia", imports: "importy",
-  resultSets: "wyniki automatyzacji", businessLeads: "leadów firmowych",
-  retainedAssignedLeads: "leadów zachowanych dla innych pracowników", removedLeads: "leadów usuwanych z importem",
+  resultSets: "wyniki automatyzacji", businessLeads: "firmy",
+  retainedAssignedLeads: "firmy zachowane dla innych pracowników", removedLeads: "firmy usuwane z importem",
   missingLeadSnapshots: "niekompletnych zapisów zachowywanych leadów",
   leadAllocations: "przydziałów leadów", notifications: "powiadomień",
 };
 const deletionBlockerLabels: Record<string, string> = {
   RUN_ACTIVE: "Zadanie nadal działa.", RUN_REFERENCED_BY_SUBMISSION: "Zadanie jest używane przez zgłoszenie.",
-  RUN_SHARED_WITH_OTHER_IMPORT: "Zadanie współdzieli dane z innym importem.", RUN_HAS_PENDING_DELIVERY: "Trwa przekazywanie zadania do workera.",
+  RUN_SHARED_WITH_OTHER_IMPORT: "Zadanie współdzieli dane z innym importem.", RUN_HAS_PENDING_DELIVERY: "Trwa przekazywanie zadania do kolejki.",
   RUN_HAS_STAGED_RESULT: "Istnieje tymczasowy wynik workera.", RUN_HAS_PENDING_EXPORT: "Plik wynikowy nie jest jeszcze gotowy.",
   RUN_HAS_PENDING_ARTIFACT_DELETION: "Usuwanie pliku Excel dla tego wyniku już trwa.", ARTIFACT_DELETION_PENDING: "Usuwanie tego pliku już trwa.",
-  IMPORT_HAS_ACTIVE_RUNS: "Import ma aktywne przebiegi.", IMPORT_REFERENCED_BY_SUBMISSION: "Import jest powiązany ze zgłoszeniem.",
+  IMPORT_HAS_ACTIVE_RUNS: "Import ma aktywne zadania firmowe.", IMPORT_REFERENCED_BY_SUBMISSION: "Import jest powiązany ze zgłoszeniem.",
   IMPORT_HAS_ACTIVE_PREPARATION: "Trwa przygotowanie importu.", IMPORT_HAS_ACTIVE_PREPARATION_WORKFLOW: "Trwa proces przygotowania importu.",
   IMPORT_HAS_ACTIVE_ENRICHMENT: "Trwa pobieranie lub zapis danych REGON.", IMPORT_HAS_ACTIVE_SET_EXECUTION: "Trwa wykonywanie zestawu.",
-  IMPORT_HAS_ACTIVE_SUBMISSION: "Trwa wysyłanie zgłoszenia.", IMPORT_HAS_PENDING_DELIVERY: "Trwa przekazanie przebiegu do workera.",
+  IMPORT_HAS_ACTIVE_SUBMISSION: "Trwa wysyłanie zgłoszenia.", IMPORT_HAS_PENDING_DELIVERY: "Trwa przekazywanie zadania do kolejki roboczej.",
   IMPORT_HAS_PENDING_EXPORT: "Jeden z plików wynikowych nie jest gotowy.", IMPORT_HAS_STAGED_RESULT: "Istnieje niezatwierdzony plik tymczasowy.",
-  IMPORT_HAS_SHARED_RUN_REFERENCES: "Wiersze importu są używane w innym przebiegu.", IMPORT_DELETION_PENDING: "Usuwanie tego importu już trwa.",
-  IMPORT_HAS_PENDING_RUN_DELETION: "Usuwanie przebiegu z tego importu już trwa.",
+  IMPORT_HAS_SHARED_RUN_REFERENCES: "Wiersze importu są używane w innym zadaniu.", IMPORT_DELETION_PENDING: "Usuwanie tego importu już trwa.",
+  IMPORT_HAS_PENDING_RUN_DELETION: "Usuwanie zadania firmowego z tego importu już trwa.",
   IMPORT_HAS_PENDING_ARTIFACT_DELETION: "Usuwanie pliku wynikowego z tego importu już trwa.",
   IMPORT_LEAD_SNAPSHOT_INCOMPLETE: "Nie wszystkie przypisane wyniki mają kompletny zapis do zachowania. Import pozostaje dostępny.",
 };
@@ -377,7 +380,7 @@ export default function HistoryList({ kind }: { kind: HistoryKind }) {
     setDeletionPassword("");
   }
 
-  const title = kind === "imports" ? "Historia importów" : kind === "runs" ? "Historia zadań" : "Wyniki weryfikacji";
+  const title = kind === "imports" ? uiLabels.importHistory : kind === "runs" ? uiLabels.runs : "Historia wyników OC";
   const description = kind === "imports" ? "Wróć do wcześniejszego importu i zobacz, ile wierszy wymaga przeglądu."
     : kind === "runs" ? "Śledź wykonanie zadań dla dozwolonych importów."
       : "Zobacz wyniki zakończone, także zadania bez aktualnych polis OC.";
@@ -394,11 +397,11 @@ export default function HistoryList({ kind }: { kind: HistoryKind }) {
       && ["queued", "processing", "verifying", "failed_retryable", "manual_required"].includes(job.status));
 
   return <main className="history-page">
-    <header className="history-topbar"><a className="history-brand" href="/" aria-label="Goldis — katalog"><GoldisLogo variant="header" /><span>Goldis · Platforma automatyzacji</span></a><nav aria-label="Historia"><a href="/">Katalog</a>{sessionState === "ready" && session?.role !== "auditor" && <><a href="/imports">Importy</a><a href="/runs">Zadania</a><a href="/results">Wyniki</a></>}{sessionState === "ready" && session?.role && ["admin", "manager", "reviewer", "auditor"].includes(session.role) && <a href="/audit">Audyt</a>}<a href="/account">Moje konto</a></nav></header>
+    <header className="history-topbar"><a className="history-brand" href="/" aria-label="Goldis — katalog"><GoldisLogo variant="header" /><span>Goldis · Platforma automatyzacji</span></a><nav aria-label="Historia"><a href="/">Automatyzacje</a>{sessionState === "ready" && session?.role !== "auditor" && <><a href="/imports">{uiLabels.importHistory}</a><a href="/runs">{uiLabels.runs}</a><a href="/results/oc-policy-verification">{uiLabels.companyPool}</a></>}{sessionState === "ready" && session?.role && ["admin", "manager", "reviewer", "auditor"].includes(session.role) && <a href="/audit">{uiLabels.activityLog}</a>}<a href="/account">{uiLabels.account}</a></nav></header>
     <section className="history-content">
       <p className="eyebrow">PLATFORMA / OC</p><h1>{title}</h1><p className="history-lede">{description}</p>
       {sessionState === "loading" && <p className="history-notice" role="status">Sprawdzanie sesji…</p>}
-      {sessionState === "signed-out" && <p className="history-notice" role="status">Sesja wygasła. <a href={`/?returnTo=${encodeURIComponent(returnTo)}`}>Zaloguj się, aby wrócić do tej historii</a>.</p>}
+      {sessionState === "signed-out" && <p className="history-notice" role="status">Sesja wygasła. <a href={loginHref(returnTo, window.location.origin)}>Zaloguj się, aby wrócić do tej historii</a>.</p>}
       {sessionState === "error" && <p className="history-error" role="alert">Nie udało się sprawdzić sesji. Odśwież stronę.</p>}
       {sessionState === "ready" && <>
         <form className="history-filters" onSubmit={applyFilters}>
@@ -430,11 +433,12 @@ export default function HistoryList({ kind }: { kind: HistoryKind }) {
           const workspace = `/tools/oc-policy-verification?${new URLSearchParams({ ...(item.batchId ? { import: item.batchId } : { import: item.id }), ...(kind !== "imports" ? { run: item.id } : {}) })}`;
           return <article className="history-row" key={item.id}>
             <div className="history-row-main">
-              <span className="history-row-kicker">{kind === "imports" ? item.toolId : `Wiersz ${item.rowNumber}`}</span>
-              <h2>{kind === "imports" ? item.fileName : runLabels[item.status ?? ""] ?? item.status}</h2>
-              <p>{kind === "imports" ? `${item.totalRows ?? 0} wierszy · ${item.reviewCount ?? 0} do przeglądu${item.ownerLabel ? ` · ${item.ownerLabel}` : ""}`
-                : kind === "results" ? item.status === "no_matching_policies" ? "Brak polis OC aktualnych na dzień sprawdzenia" : `${item.policyCounts?.currentOcCount ?? 0} aktualnych polis OC · ${item.policyCounts?.totalOcCount ?? 0} w danych źródłowych`
-                  : `Import ${item.batchId} · data sprawdzenia ${item.referenceDate ?? "—"}${item.errorCode ? ` · ${item.errorCode}` : ""}`}</p>
+              <span className="history-row-kicker">{kind === "imports" ? (item.toolId === "oc-policy-verification" ? uiLabels.ocVerification : item.toolId) : `${item.toolId === "oc-policy-verification" ? uiLabels.ocVerification : item.toolId} · wiersz ${item.rowNumber ?? "—"}`}</span>
+              <h2>{kind === "imports" ? item.fileName || "Import bez nazwy pliku" : item.sourceFileName ? `${item.sourceFileName} · wiersz ${item.rowNumber ?? "—"}` : `Wynik · wiersz ${item.rowNumber ?? "—"}`}</h2>
+              <p>{kind === "imports" ? `${polishCount(item.totalRows ?? 0, "wiersz", "wiersze", "wierszy")} · ${polishCount(item.reviewCount ?? 0, "pozycja do przeglądu", "pozycje do przeglądu", "pozycji do przeglądu")}${item.ownerLabel ? ` · ${item.ownerLabel}` : ""}`
+                : kind === "results" ? `${runLabels[item.status ?? ""] ?? item.status} · ${item.status === "no_matching_policies" ? "Brak polis OC aktualnych na dzień sprawdzenia" : `${item.policyCounts?.currentOcCount ?? 0} aktualnych polis OC · ${item.policyCounts?.totalOcCount ?? 0} w danych źródłowych`}`
+                  : `${runLabels[item.status ?? ""] ?? item.status} · data sprawdzenia ${item.referenceDate ?? "—"}${item.errorCode ? ` · ${item.errorCode}` : ""}`}</p>
+              {item.batchId && <details className="history-technical-details"><summary>Szczegóły techniczne</summary><span>Identyfikator importu: <code>{item.batchId}</code></span></details>}
               <time dateTime={item.createdAt}>{displayDate(item.createdAt)}</time>
             </div>
             <div className="history-row-actions">
@@ -471,8 +475,8 @@ export default function HistoryList({ kind }: { kind: HistoryKind }) {
           <p className="deletion-explainer">{deletionFlow.item.deletionTargetType === "artifact"
             ? "Usunięty zostanie tylko opublikowany plik Excel. Wynik zadania i import źródłowy pozostaną w historii; pobranie tego pliku przestanie być dostępne."
             : deletionFlow.item.deletionTargetType === "import"
-              ? "Usunięte zostaną import, jego wiersze, przebiegi i pliki. Leady przydzielone innym pracownikom zachowają status kontaktu i wynik; nieprzydzielone leady oraz leady przydzielone właścicielowi importu zostaną usunięte."
-              : "Usunięte zostaną dane tego przebiegu i jego pliki wynikowe. Import źródłowy Excel pozostanie w systemie; zlecenie nie usuwa sprawy z portalu ubezpieczyciela."}</p>
+              ? "Usunięte zostaną import, jego wiersze, zadania firmowe i pliki. Firmy przydzielone innym pracownikom zachowają status kontaktu i wynik; nieprzydzielone firmy oraz firmy przypisane do właściciela importu zostaną usunięte."
+              : "Usunięte zostaną dane tego zadania i jego pliki wynikowe. Import źródłowy Excel pozostanie w systemie; sprawa w portalu ubezpieczyciela nie zostanie usunięta."}</p>
           <dl className="deletion-counts">{Object.entries(displayedDeletionPreview.summary.counts)
             .filter(([, count]) => Number(count) > 0)
             .map(([key, count]) => <div key={key}><dt>{deletionCountLabels[key] ?? key}</dt><dd>{count}</dd></div>)}</dl>
@@ -497,10 +501,10 @@ export default function HistoryList({ kind }: { kind: HistoryKind }) {
           {deletionFlow.job.status === "manual_required" && <p className="deletion-poll-error">Dane wyniku są ukryte i pozostają oznaczone do usunięcia, dopóki administrator nie wyjaśni błędu.</p>}
         </div>}
         {deletionFlow.type === "done" && <div className="deletion-success" role="status"><strong>{deletionFlow.item.deletionTargetType === "artifact" ? "Plik usunięty" : deletionFlow.item.deletionTargetType === "import" ? "Import usunięty" : "Wynik usunięty"}</strong><p>{deletionFlow.item.deletionTargetType === "artifact"
-          ? "Plik Excel usunięto. Dane przebiegu i import źródłowy pozostały."
+          ? "Plik Excel usunięto. Dane zadania i import źródłowy pozostały."
           : deletionFlow.item.deletionTargetType === "import"
-            ? "Import, jego wiersze, powiązane przebiegi i pliki wynikowe usunięto z lokalnej platformy."
-            : "Pliki i dane przebiegu usunięto. Import źródłowy pozostał w historii importów."}</p><button type="button" className="deletion-secondary" onClick={dismissDeletion}>Zamknij</button></div>}
+            ? "Import, jego wiersze, powiązane zadania firmowe i pliki wynikowe usunięto z lokalnej platformy."
+            : "Pliki i dane zadania usunięto. Import źródłowy pozostał w historii importów."}</p><button type="button" className="deletion-secondary" onClick={dismissDeletion}>Zamknij</button></div>}
         {deletionFlow.type === "error" && <div className="deletion-blockers" role="alert"><strong>Nie udało się zakończyć tego kroku.</strong><p>{deletionFlow.message}</p>
           {deletionFlow.retryRequest && deletionFlow.preview && <button type="button" className="history-delete" onClick={() => void submitDeletionJob(deletionFlow.item, deletionFlow.preview!, deletionFlow.retryRequest!)}>Ponów to samo zlecenie</button>}
           {!deletionFlow.retryRequest && <button type="button" className="deletion-secondary" onClick={() => void beginDeletion(deletionFlow.item, deletionFlow.item.deletionTargetType ?? "run")}>Odśwież podgląd</button>}

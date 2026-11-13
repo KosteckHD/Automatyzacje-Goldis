@@ -5,7 +5,7 @@ const { test } = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const ROOT = path.resolve(__dirname, "..");
-const { FULL_FLOW_ENV_KEYS, MODULES, assertTestFilesExist, assertUniqueTestFiles, commandFor, isolatedEnvironment } = require("./test-module.cjs");
+const { FULL_FLOW_ENV_KEYS, MODULES, assertTestFilesExist, assertUniqueTestFiles, commandFor, isolatedEnvironment, sourceForBuiltTest } = require("./test-module.cjs");
 
 test("runner exposes only named module suites and no broad test glob", () => {
   assert.deepEqual(Object.keys(MODULES).sort(), [
@@ -18,6 +18,9 @@ test("runner exposes only named module suites and no broad test glob", () => {
   for (const name of Object.keys(MODULES)) {
     const plan = commandFor(name);
     assert.equal(new Set(plan.testFiles ?? []).size, (plan.testFiles ?? []).length, `${name} has a duplicate test path`);
+    for (const file of plan.testFiles ?? []) {
+      assertTestFilesExist([sourceForBuiltTest(file)]);
+    }
   }
   assert.throws(() => assertUniqueTestFiles([path.join(ROOT, "apps/api/dist/a.test.js"), path.join(ROOT, "apps/api/dist", "..", "dist/a.test.js")]), /TEST_MODULE_DUPLICATE_TEST_FILE/);
   assert.throws(() => assertTestFilesExist([path.join(ROOT, "apps/api/dist/moved-away.test.js")]), /TEST_MODULE_FILE_MISSING_/);
@@ -86,6 +89,7 @@ test("browser fixture opt-in is explicit, portal live stays disabled, and worker
   assert.equal(browserEnv.PLAYWRIGHT_INTEGRATION, "1");
   assert.equal(browserEnv.WORKER_LIVE_PORTALS, "0");
   assert.equal(commandFor("compensa-browser").testCwd, require("node:path").resolve(__dirname, "../apps/worker"));
+  assert.equal(commandFor("everest-browser").args.some((file) => /[\\/]pzu-session\.spec\.js$/.test(file)), true);
   assert.equal(commandFor("ufg-browser").args.some((file) => /[\\/]oc\.spec\.js$/.test(file)), true);
 });
 
@@ -106,10 +110,11 @@ test("module child environment cannot inherit production databases, exports, pro
 test("module suite paths are explicit and submission does not select a portal worker", () => {
   const submission = commandFor("submission");
   assert.equal(submission.args.includes("--test"), true);
-  assert.equal(submission.args.length, 4);
+  assert.equal(submission.args.length, 5);
   assert.equal(submission.args.some((arg) => /run-submission\.dto\.spec\.js$/.test(arg)), true);
   assert.equal(submission.args.some((arg) => /submissions\.module\.spec\.js$/.test(arg)), true);
   assert.equal(submission.args.some((arg) => /run-submissions\.http\.spec\.js$/.test(arg)), true);
+  assert.equal(submission.args.some((arg) => /run-submission-result-set\.spec\.js$/.test(arg)), true);
   assert.equal(submission.args.some((arg) => /automation-flow|run-submission-platform-smoke|apps\/worker/.test(arg)), false);
 });
 
@@ -195,6 +200,13 @@ test("report module runs only its two-tenant synthetic PostgreSQL aggregation sm
   assert.equal(plan.args.at(-1), "reports");
   assert.equal(plan.env.WORKER_LIVE_PORTALS, "0");
   for (const key of FULL_FLOW_ENV_KEYS) assert.equal(plan.env[key], undefined);
+});
+
+test("database modules can opt into an owned native PostgreSQL cluster on Windows", () => {
+  const plan = commandFor("reports", { nativePostgres: true });
+  assert.equal(plan.args.at(-1), "-NativePostgres");
+  assert.throws(() => commandFor("auth", { nativePostgres: true }), /TEST_MODULE_NATIVE_POSTGRES_DATABASE_REQUIRED/);
+  assert.match(fs.readFileSync(path.join(ROOT, "scripts/Test-GoldisDatabase.ps1"), "utf8"), /goldis-db-smoke-native-\$testId/);
 });
 
 test("backup restore module is pinned to the owned disposable Postgres wrapper", () => {

@@ -1,5 +1,9 @@
 {
-  "source": "user-provided-dom-2026-10-10-and-live-client-choice-2026-10-15",
+  "source": "user-provided-dom-2026-10-10-and-live-client-choice-2026-10-15-and-exceptions-2026-10-17",
+  "payerDataDialog": "ux-dialog:has(ux-dialog-header :text-is(\"Ubezpieczający\")):has(label:text-is(\"Imię\")):has(label:text-is(\"Nazwisko\")):has(label:text-is(\"PESEL\")):has(label:text-is(\"Kod pocztowy\")):visible",
+  "payerIdentifierInput": "div.row:has(> label:text-is(\"PESEL\")) input",
+  "payerCancel": "button:has-text(\"Anuluj\")",
+  "incompleteCustomer": "text=\"Dane Klienta są niekompletne.\"",
   "customerMatches": "ux-dialog .tm-grid-customer-matches-dialog",
   "customerMatchSelect": "button:has-text(\"Wybierz Klienta\")",
   "saveButton": "insured-section button:has(span.i-save):has-text(\"Zapisz\"):visible",

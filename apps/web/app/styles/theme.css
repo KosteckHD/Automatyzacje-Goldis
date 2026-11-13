@@ -120,8 +120,9 @@ button:disabled { opacity: .58; cursor: not-allowed; }
 .admin-button:hover:not(:disabled), .download-link:hover {
   border-color: var(--color-gold-hover); background: var(--color-gold-hover); color: #130f08;
 }
-.download-link { text-decoration: none; }
-.download-link:focus-visible { outline-color: var(--color-gold-hover); }
+.download-link { color: #17120a; text-decoration: none; }
+.download-link:hover { color: #130f08; }
+.download-link:focus-visible { outline: 3px solid var(--color-gold-hover); outline-offset: 3px; }
 .status-line, .status-line.muted { color: var(--color-text-muted); }
 .metrics, .run-policy-counts { border-color: var(--color-border); background: var(--color-surface-raised); }
 .metrics div+div, .run-policy-counts div+div { border-left-color: var(--color-border); }

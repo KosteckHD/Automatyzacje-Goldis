@@ -42,11 +42,11 @@ module.exports = async function verifyWorkerResults() {
     const now = new Date(); const batchId = randomUUID(); const sourceRowId = randomUUID(); const runId = randomUUID();
     await models.ImportBatch.create({ id: batchId, fileName: "synthetic.xlsx", sha256: "a".repeat(64), totalRows: 1, invalidRows: 0,
       createdAt: now, toolId: "oc-policy-verification", tenantId: tenant.tenantId, ownerUserId: admin.userId });
-    await models.SourceRow.create({ id: sourceRowId, batchId, rowNumber: 1, companyName: "Synthetic Company", decisionMakerName: null,
+    await models.SourceRow.create({ id: sourceRowId, batchId, rowNumber: 2, companyName: "Synthetic Company", decisionMakerName: null,
       nipRaw: "", address: "Test 1", postalCode: "00-000", city: "Test City", regonRaw: "012345678", regon: "012345678", effectiveRegon: "012345678", issues: [] });
-    await models.AutomationRun.create({ id: runId, batchId, sourceRowId, rowNumber: 1, toolId: "oc-policy-verification", status,
+    await models.AutomationRun.create({ id: runId, batchId, sourceRowId, rowNumber: 2, toolId: "oc-policy-verification", status,
       currentStep: status, referenceDate: "2026-09-30",
-      inputSnapshot: { schemaVersion: 1, sourceRowId, rowNumber: 1, rowVersion: 1,
+      inputSnapshot: { schemaVersion: 1, sourceRowId, rowNumber: 2, rowVersion: 1,
         companyName: "Synthetic Company", decisionMakerName: null, nipRaw: "", address: "Test 1",
         postalCode: "00-000", city: "Test City", countyCode: null, regonRaw: "012345678",
         regon: "012345678", effectiveRegon: "012345678", issues: [] },
@@ -83,6 +83,42 @@ module.exports = async function verifyWorkerResults() {
     assert.ok(artifact.bytes.byteLength > 0);
     const ExcelJS = require("exceljs"); const workbook = new ExcelJS.Workbook(); await workbook.xlsx.load(artifact.bytes);
     assert.ok(workbook.worksheets.some((sheet) => sheet.getSheetValues().flat(2).includes("90010100016")));
+    const company = await seeded();
+    const companyPayload = payload(company);
+    companyPayload.identity = { ...companyPayload.identity, firstName: "", lastName: "", pesel: "", matchMethod: "regon_company" };
+    assert.equal((await post(company, companyPayload)).status, 200);
+    const storedCompany = await models.RunIdentity.findByPk(company.runId);
+    assert.equal(storedCompany.peselCiphertext, null); assert.equal(storedCompany.peselKeyVersion, null);
+    await assert.rejects(models.RunIdentity.update({ peselCiphertext: null, peselKeyVersion: null }, { where: { runId: normal.runId } }));
+    await assert.rejects(models.RunIdentity.update({ peselCiphertext: "not-a-person-ciphertext", peselKeyVersion: 1 }, { where: { runId: company.runId } }));
+    const companyArtifact = await getVerifiedArtifactDownload(company.runId);
+    const companyWorkbook = new ExcelJS.Workbook(); await companyWorkbook.xlsx.load(companyArtifact.bytes);
+    const companySheet = companyWorkbook.getWorksheet("Wynik OC");
+    assert.equal(companySheet.getCell("B2").value, "012345678");
+    assert.equal(companySheet.getCell("G2").value ?? "", "");
+    assert.equal((await post(company, companyPayload)).status, 200);
+    assert.equal(await models.ExportArtifact.count({ where: { runId: company.runId } }), 1);
+    const pending = await seeded();
+    await assert.rejects(persistOcSnapshot(pending.runId, { ...identity(pending.sourceRowId), firstName: "", lastName: "", matchMethod: "regon_unique_pesel" }, snapshot(), { execution: pending.execution }), /SNAPSHOT_INPUT_INVALID/);
+    assert.equal(await models.RunIdentity.count({ where: { runId: pending.runId } }), 0);
+    const checkpoint = await seeded("everest_search");
+    const { Pool } = require("pg");
+    const { PgRunRepository } = require("../../worker/dist/infrastructure/database/pg-run-repository.js");
+    const checkpointPool = new Pool({ connectionString: process.env.DATABASE_URL });
+    try {
+      const repository = new PgRunRepository(checkpointPool, () => ({ runId: checkpoint.runId, ...checkpoint.execution, dispatchId: randomUUID(), intentType: "create", leaseExpiresAt: new Date(Date.now() + 60000).toISOString() }));
+      const pendingIdentity = { ...identity(checkpoint.sourceRowId), firstName: "", lastName: "", matchMethod: "regon_unique_pesel" };
+      await repository.saveIdentity(checkpoint.runId, pendingIdentity);
+      assert.equal((await repository.load(checkpoint.runId)).identity.matchMethod, "regon_unique_pesel");
+      const before = await models.RunIdentity.findByPk(checkpoint.runId);
+      await models.AutomationRun.update({ status: "compensa_login", currentStep: "compensa_login" }, { where: { id: checkpoint.runId } });
+      await repository.saveIdentity(checkpoint.runId, identity(checkpoint.sourceRowId));
+      const after = await models.RunIdentity.findByPk(checkpoint.runId);
+      assert.equal(after.firstName, "Test"); assert.equal(after.lastName, "Person");
+      assert.equal(after.peselCiphertext, before.peselCiphertext, "confirming names cannot change the bound PESEL");
+      await assert.rejects(repository.saveIdentity(checkpoint.runId, { ...identity(checkpoint.sourceRowId), pesel: "90010100023" }));
+      assert.equal((await models.RunIdentity.findByPk(checkpoint.runId)).peselCiphertext, before.peselCiphertext);
+    } finally { await checkpointPool.end(); }
     for (const scenario of ["expired", "replaced", "cancelled"]) {
       const run = await seeded(scenario === "cancelled" ? "cancelled" : "reading_oc");
       await models.AutomationRun.update(scenario === "expired" ? { leaseExpiresAt: new Date(Date.now() - 1) }
@@ -101,7 +137,7 @@ module.exports = async function verifyWorkerResults() {
     assert.equal(hookCalled, true);
     assert.equal(await models.RunIdentity.count({ where: { runId: interrupted.runId } }), 0);
     assert.equal(await models.OcPolicyRecord.count({ where: { runId: interrupted.runId } }), 0);
-    console.log("WORKER_RESULT_DB_HTTP_SMOKE_PASS guard=true stale=blocked expired=blocked cancelled=blocked midWrite=rollback xlsx=verified replay=one_artifact");
+    console.log("WORKER_RESULT_DB_HTTP_SMOKE_PASS guard=true stale=blocked expired=blocked cancelled=blocked midWrite=rollback xlsx=verified company=verified pendingName=blocked replay=one_artifact");
   } finally {
     if (app) await app.close();
     for (const [key, value] of Object.entries(previous)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; }

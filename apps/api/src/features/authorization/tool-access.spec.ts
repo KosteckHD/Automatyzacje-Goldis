@@ -15,7 +15,7 @@ test("aktywny pracownik ma wspólny odczyt wyników OC bez prawa uruchomienia", 
     canDiscover: true,
     canExecute: false,
     canViewResults: true,
-    canDownloadResults: true,
+    canDownloadResults: false,
   });
 });
 
@@ -29,7 +29,7 @@ test("uprawnienie uruchomienia jest niezależne od wspólnego odczytu wyników O
   assert.equal(executeOnly.canDiscover, true);
   assert.equal(executeOnly.canExecute, true);
   assert.equal(executeOnly.canViewResults, true);
-  assert.equal(executeOnly.canDownloadResults, true);
+  assert.equal(executeOnly.canDownloadResults, false);
 
   const downloadOnly = toolAccessFromRecords(operator, tool, {
     canDiscover: false,
@@ -52,6 +52,7 @@ test("wspólny odczyt OC pozostaje dostępny mimo braku indywidualnego grantu", 
   });
   assert.equal(showToolInSession(hidden), true);
   assert.equal(hidden.canExecute, false);
+  assert.equal(hidden.canDownloadResults, false);
 });
 
 test("wspólna widoczność OC nie rozszerza dostępu do drugiej automatyzacji", () => {
@@ -72,13 +73,22 @@ test("maintenance blokuje nowe uruchomienia, a wyłączone OC zachowuje wspólny
     canDiscover: true,
     canExecute: false,
     canViewResults: true,
-    canDownloadResults: true,
+    canDownloadResults: false,
   });
   const disabled = toolAccessFromRecords(operator, { ...tool, status: "disabled" }, grant);
   assert.equal(disabled.canDiscover, false);
   assert.equal(disabled.canExecute, false);
   assert.equal(disabled.canViewResults, true);
-  assert.equal(disabled.canDownloadResults, true);
+  assert.equal(disabled.canDownloadResults, false);
+  const disabledWithDownloadGrant = toolAccessFromRecords(
+    operator,
+    { ...tool, status: "disabled" },
+    {
+      ...grant,
+      canDownloadResults: true,
+    },
+  );
+  assert.equal(disabledWithDownloadGrant.canDownloadResults, true);
 });
 
 test("admin can inspect every catalogued tool but maintenance still blocks new runs", () => {
@@ -90,6 +100,20 @@ test("admin can inspect every catalogued tool but maintenance still blocks new r
     canViewResults: true,
     canDownloadResults: true,
   });
+});
+
+test("auditor tool capabilities stay disabled even when a legacy grant enables every flag", () => {
+  const auditor: ToolPrincipal = { ...operator, role: "auditor" };
+  const staleGrant = { canDiscover: true, canExecute: true, canViewResults: true, canDownloadResults: true };
+  const access = toolAccessFromRecords(auditor, tool, staleGrant);
+  assert.deepEqual(access, {
+    toolId: tool.toolId,
+    canDiscover: false,
+    canExecute: false,
+    canViewResults: false,
+    canDownloadResults: false,
+  });
+  assert.equal(showToolInSession(access), false);
 });
 
 test("submission reads use view_results independently from execute", () => {

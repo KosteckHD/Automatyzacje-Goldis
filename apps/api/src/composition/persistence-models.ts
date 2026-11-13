@@ -8,6 +8,11 @@ import { CanonicalEntityModel, EntityGroupingConflictModel, SourceEntityLinkMode
 import { AutomationRunModel, RunIdentityModel, RunSourceRowModel } from "../features/runs/runs.model";
 import { ExportArtifactModel, OcPolicyRecordModel, OcSnapshotModel } from "../features/results/results.model";
 import { AuthChallengeModel, ManualInterventionModel } from "../features/interventions/interventions.model";
+import {
+  CommissionAgentModel, CommissionDictionaryGrantModel, CommissionDictionaryVersionModel, CommissionDispatchModel,
+  CommissionExportModel, CommissionFileModel, CommissionResolutionModel, CommissionRunFileModel,
+  CommissionRunModel, CommissionRunSnapshotModel,
+} from "../features/commissions/commissions.model";
 
 registerAssociation(() => ImportBatchModel.hasMany(SourceRowModel, { foreignKey: "batchId" }));
 

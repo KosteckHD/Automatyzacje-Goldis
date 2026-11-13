@@ -1,0 +1,106 @@
+{
+  "recordedAt": "2026-11-06T17:17:59.213875+00:00",
+  "scope": "Documentation expansion only; no application implementation or new security test execution",
+  "cardCount": 8,
+  "testCaseCount": 69,
+  "testCases": {
+    "CYB-001": [
+      "C001-01",
+      "C001-02",
+      "C001-03",
+      "C001-04",
+      "C001-05",
+      "C001-06",
+      "C001-07",
+      "C001-08"
+    ],
+    "CYB-002": [
+      "C002-01",
+      "C002-02",
+      "C002-03",
+      "C002-04",
+      "C002-05",
+      "C002-06",
+      "C002-07",
+      "C002-08"
+    ],
+    "CYB-003": [
+      "C003-01",
+      "C003-02",
+      "C003-03",
+      "C003-04",
+      "C003-05",
+      "C003-06",
+      "C003-07"
+    ],
+    "CYB-004": [
+      "C004-01",
+      "C004-02",
+      "C004-03",
+      "C004-04",
+      "C004-05",
+      "C004-06",
+      "C004-07",
+      "C004-08",
+      "C004-09",
+      "C004-10"
+    ],
+    "CYB-005": [
+      "C005-01",
+      "C005-02",
+      "C005-03",
+      "C005-04",
+      "C005-05",
+      "C005-06",
+      "C005-07",
+      "C005-08",
+      "C005-09",
+      "C005-10"
+    ],
+    "CYB-006": [
+      "C006-01",
+      "C006-02",
+      "C006-03",
+      "C006-04",
+      "C006-05",
+      "C006-06",
+      "C006-07",
+      "C006-08",
+      "C006-09",
+      "C006-10"
+    ],
+    "CYB-007": [
+      "C007-01",
+      "C007-02",
+      "C007-03",
+      "C007-04",
+      "C007-05",
+      "C007-06",
+      "C007-07",
+      "C007-08",
+      "C007-09",
+      "C007-10"
+    ],
+    "DEP-001": [
+      "D001-01",
+      "D001-02",
+      "D001-03",
+      "D001-04",
+      "D001-05",
+      "D001-06"
+    ]
+  },
+  "localLinksValid": true,
+  "sha256": {
+    "docs/security/naprawy-2026-11-06/CYB-001.md": "6c4399edcdd6122cdb7c96608fd10e206aa7dc1f1d8243519fcc2120e9b215d1",
+    "docs/security/naprawy-2026-11-06/CYB-002.md": "c95e39b0fcc2ff49987ce5a936f0264a71a2993abed7a2dc6ce7ec6ccfd26d63",
+    "docs/security/naprawy-2026-11-06/CYB-003.md": "ad458ee6eeb1899514f465114461dcadeb529a68057b87ed1f1e027af1fe7e88",
+    "docs/security/naprawy-2026-11-06/CYB-004.md": "db0dd812bc9327571a3d43ca1b0b1468a91bd064a9e5562bb1c92f36ae60fd66",
+    "docs/security/naprawy-2026-11-06/CYB-005.md": "18470ad160763428e2c8540c00bd22eee427518d9855148da7e3fd341b40aeb9",
+    "docs/security/naprawy-2026-11-06/CYB-006.md": "a503514616945e6a27c4ab6327837ab4bc9c836871ca3b31646a9863f4a6e457",
+    "docs/security/naprawy-2026-11-06/CYB-007.md": "e2a5b4c0c0fd6190c6c0ff3866be5d37ebefd42c58dd940bf8d633c7ad3c39b1",
+    "docs/security/naprawy-2026-11-06/DEP-001.md": "83937ed61dbfb3939210b13df8fbf9fe3efba9ea4d8c8e7366f82c4c41aaeacf",
+    "docs/security/naprawy-2026-11-06/README.md": "98eecfe132dd79c2f1dfeaf6b11e6f84d197996cd3f83f667ab7405ef907d034",
+    "docs/security/PLAN_NAPRAW_BEZPIECZENSTWA_2026-11-06.md": "f963e040bcc0758ba8fe670dd0f021231e82fbfadc67d649e33457bc63fab3ff"
+  }
+}

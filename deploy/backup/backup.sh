@@ -39,7 +39,7 @@ check_owned_container() {
 }
 resume_original_services() {
   local service api_state attempt
-  for service in import-parser; do
+  for service in import-parser commission-engine; do
     if [[ "${initially_running[$service]:-false}" == true ]]; then
       docker compose "${compose_args[@]}" start "$service" >/dev/null 2>&1 || restart_failed=1
     fi
@@ -56,11 +56,11 @@ resume_original_services() {
       restart_failed=1
       return
     fi
-  elif [[ "${initially_running[web]:-false}" == true || "${initially_running[worker]:-false}" == true || "${initially_running[enrichment-worker]:-false}" == true ]]; then
+  elif [[ "${initially_running[web]:-false}" == true || "${initially_running[worker]:-false}" == true || "${initially_running[enrichment-worker]:-false}" == true || "${initially_running[commission-worker]:-false}" == true ]]; then
     restart_failed=1
     return
   fi
-  for service in web enrichment-worker worker; do
+  for service in web enrichment-worker worker commission-worker; do
     if [[ "${initially_running[$service]:-false}" == true ]]; then
       docker compose "${compose_args[@]}" start "$service" >/dev/null 2>&1 || {
         printf 'BACKUP_SERVICE_RESTART_FAILED service=%s\n' "$service" >&2
@@ -128,7 +128,7 @@ flock -n 9 || die "BACKUP_ALREADY_RUNNING"
 compose_args=(--project-name "$project" --env-file "$env_file" -f "$repo_root/compose.yaml" -f "$repo_root/compose.production.yaml")
 GOLDIS_SECRETS_DIR="$secrets_dir" docker compose "${compose_args[@]}" config --quiet >/dev/null 2>&1 || die "BACKUP_PRODUCTION_COMPOSE_INVALID"
 
-for service in postgres api worker enrichment-worker web import-parser; do
+for service in postgres api worker enrichment-worker web import-parser commission-engine commission-worker; do
   id="$(docker compose "${compose_args[@]}" ps -aq "$service" 2>/dev/null | head -n 1)"
   check_owned_container "$id" "$service"
   container_ids[$service]="$id"
@@ -138,7 +138,7 @@ done
 [[ "${initially_running[postgres]}" == true ]] || die "BACKUP_POSTGRES_NOT_RUNNING"
 [[ "${initially_running[api]}" == true && "${initially_running[worker]}" == true ]] || die "BACKUP_WRITERS_NOT_RUNNING"
 
-docker compose "${compose_args[@]}" stop --timeout 45 web worker enrichment-worker import-parser api >/dev/null 2>&1 || die "BACKUP_MAINTENANCE_STOP_FAILED"
+docker compose "${compose_args[@]}" stop --timeout 45 web worker enrichment-worker commission-worker import-parser commission-engine api >/dev/null 2>&1 || die "BACKUP_MAINTENANCE_STOP_FAILED"
 
 work_dir="$(mktemp -d "$target_dir/.goldis-backup-work-$run_id.XXXXXX")"
 chmod 0700 "$work_dir"
@@ -147,9 +147,9 @@ mkdir -m 0700 "$payload"
 mkdir -m 0700 "$payload/config" "$payload/secrets" "$payload/exports" "$payload/staging" "$payload/deletion-journal"
 cp -- "$env_file" "$payload/config/env.production"
 cp -a -- "$secrets_dir/." "$payload/secrets/"
-for name in database_password migrator_db_password api_db_password worker_db_password enrichment_db_password \
-  redis_api_password redis_worker_password database_url_migrator database_url_api database_url_worker database_url_enrichment \
-  redis_url_api redis_url_worker session_secret login_rate_limit_secret privileged_action_binding_key admin_user admin_password \
+for name in database_password migrator_db_password api_db_password worker_db_password enrichment_db_password commission_db_password \
+  redis_api_password redis_worker_password redis_commission_password database_url_migrator database_url_api database_url_worker database_url_enrichment database_url_commission \
+  redis_url_api redis_url_worker redis_url_commission commission_engine_secret session_secret login_rate_limit_secret privileged_action_binding_key admin_user admin_password \
   pesel_keyring artifact_keyring worker_auth_secret import_parser_secret registry_cache_key pzu_login pzu_password \
   compensa_login compensa_password worker_staging_key resend_api_key auth_mail_keyring; do
   [[ -f "$payload/secrets/$name" && ! -L "$payload/secrets/$name" ]] || die "BACKUP_REQUIRED_SECRET_MISSING"

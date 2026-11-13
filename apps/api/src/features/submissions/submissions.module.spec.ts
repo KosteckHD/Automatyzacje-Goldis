@@ -14,6 +14,7 @@ import { PreparedSetExecutionRepository } from "./prepared-set-execution.reposit
 import { PreparedSetExecutionControlRepository } from "./prepared-set-execution-control.repository";
 import { PreparedSetExecutionController } from "./prepared-set-executions.controller";
 import { PreparedSetExecutionService } from "./prepared-set-executions.service";
+import { ResultSetController } from "./result-set.controller";
 import { RunSubmissionAccessRepository } from "./run-submission-access.repository";
 import { RunSubmissionAdmissionRepository } from "./run-submission-admission.repository";
 import { RunSubmissionAdmissionService } from "./run-submission-admission.service";
@@ -40,6 +41,7 @@ test("SubmissionsModule owns submission and prepared-set HTTP routes and dispatc
   assert.deepEqual(Reflect.getMetadata("controllers", SubmissionsModule), [
     RunSubmissionController,
     PreparedSetExecutionController,
+    ResultSetController,
   ]);
   assert.deepEqual(Reflect.getMetadata("providers", SubmissionsModule), [
     RunSubmissionService,

@@ -1,0 +1,355 @@
+{
+  "createdAt": "2026-11-08T21:30:14.826Z",
+  "screens": [
+    {
+      "file": "c01-login.png",
+      "title": "Logowanie — komputer",
+      "priority": null,
+      "observation": "Marka i formularz mają wyraźnie oddzielone obszary. Etykiety pól są widoczne, a pojedynczy złoty przycisk jasno wskazuje następny krok.",
+      "recommendation": "Zachować prosty formularz i widoczną ścieżkę odzyskania hasła. W tej próbce brak istotnego problemu wizualnego.",
+      "confidence": "visual",
+      "id": "ekran-1",
+      "device": "Komputer"
+    },
+    {
+      "file": "a01-dashboard-desktop.png",
+      "title": "Przegląd — komputer",
+      "priority": null,
+      "observation": "Widok wyraźnie oddziela pilną czynność, liczby oraz ostatnie operacje. Główna akcja i sekcja „Do zrobienia” są łatwe do znalezienia. W tej próbce nie ma istotnej wady układu.",
+      "recommendation": "Zachować hierarchię: jedna główna akcja, pilne sprawy przed historią. Nie zmieniać układu na podstawie niespójnych wartości demonstracyjnych.",
+      "confidence": "visual",
+      "id": "ekran-2",
+      "device": "Komputer"
+    },
+    {
+      "file": "c02-tools.png",
+      "title": "Katalog automatyzacji",
+      "priority": null,
+      "observation": "Dwie automatyzacje mają odrębne, krótkie opisy i duże przyciski otwarcia. Stan dostępności oraz zakres możliwości da się odczytać przed wejściem do narzędzia.",
+      "recommendation": "Zachować porównywalny układ kart i opisy mówiące, co użytkownik zrobi w module.",
+      "confidence": "visual",
+      "id": "ekran-3",
+      "device": "Komputer"
+    },
+    {
+      "file": "a02-oc-upload-desktop.png",
+      "title": "Sprawdzanie OC — dodanie pliku",
+      "priority": null,
+      "observation": "Miejsce dodania pliku jest duże i jednoznaczne, a wymagania dotyczące formatu, arkusza i kolumn są dostępne przed importem.",
+      "recommendation": "Zachować widoczne wymagania i zapewnienie, że import nie uruchamia portali. Brak istotnej poprawki wizualnej w tej próbce.",
+      "confidence": "visual",
+      "id": "ekran-4",
+      "device": "Komputer"
+    },
+    {
+      "file": "c06-import-detail.png",
+      "title": "Szczegóły importu — kontrola danych",
+      "priority": "P2",
+      "observation": "Filtry i paginacja mają nierówny rytm: niskie pole wyszukiwania ginie między kontrolkami, a „Następna” spada do osobnej linii.",
+      "recommendation": "Ujednolicić wysokość pól i umieścić paginację w jednym wierszu pod tabelą; zostawić nad tabelą tylko filtry.",
+      "confidence": "visual",
+      "id": "ekran-5",
+      "device": "Komputer"
+    },
+    {
+      "file": "a04-oc-selection-desktop.png",
+      "title": "Sprawdzanie OC — wybór firm",
+      "priority": "P1",
+      "observation": "Indywidualne pola wyboru firm są małe, a źródło i niezależny AX tego samego ekranu potwierdzają, że nie mają nazw dostępnych. Czytnik nie otrzymuje powiązania checkboxa z firmą.",
+      "recommendation": "Objąć wiersz elementem label lub połączyć input z nazwą firmy i numerem wiersza przez aria-labelledby. Powiększyć klikalny obszar wiersza.",
+      "confidence": "source",
+      "id": "ekran-6",
+      "device": "Komputer"
+    },
+    {
+      "file": "c08-run-detail.png",
+      "title": "Szczegóły przebiegu",
+      "priority": "P2",
+      "observation": "Wynik i historia zadania są dostępne, ale jasna etykieta przycisku pobrania słabo odcina się od złotego tła.",
+      "recommendation": "Użyć ciemnej etykiety na złotym przycisku, tak jak w pozostałych głównych akcjach platformy.",
+      "confidence": "visual",
+      "id": "ekran-7",
+      "device": "Komputer"
+    },
+    {
+      "file": "c05-imports.png",
+      "title": "Historia importów",
+      "priority": "P3",
+      "observation": "Nazwa pliku i przycisk otwarcia są czytelne. Nad nazwą pliku użytkownik otrzymuje jednak techniczny kod „oc-policy-verification”, który wymaga tłumaczenia na nazwę narzędzia.",
+      "recommendation": "Wyświetlać „Sprawdzanie OC” jako nazwę narzędzia, a kod techniczny schować w szczegółach.",
+      "confidence": "visual",
+      "id": "ekran-8",
+      "device": "Komputer"
+    },
+    {
+      "file": "c07-runs.png",
+      "title": "Historia przebiegów",
+      "priority": "P2",
+      "observation": "Wpis jest identyfikowany głównie numerem wiersza i długim UUID importu. Przy wielu przebiegach klient musi pamiętać, do jakiego pliku lub firmy odnosi się zadanie.",
+      "recommendation": "W tytule wpisu pokazać nazwę firmy lub pliku oraz numer wiersza; identyfikator techniczny przenieść do szczegółów.",
+      "confidence": "visual",
+      "id": "ekran-9",
+      "device": "Komputer"
+    },
+    {
+      "file": "c09-result-history.png",
+      "title": "Historia wyników OC",
+      "priority": "P2",
+      "observation": "Wynik można otworzyć lub pobrać, ale pozycja jest nazwana jedynie „Wiersz 14”. Nie widać nazwy firmy ani pliku, co utrudnia odnalezienie właściwego wyniku.",
+      "recommendation": "Nazwać wynik firmą i plikiem źródłowym, zostawiając numer wiersza jako informację pomocniczą.",
+      "confidence": "visual",
+      "id": "ekran-10",
+      "device": "Komputer"
+    },
+    {
+      "file": "c10-submission.png",
+      "title": "Stan zgłoszenia",
+      "priority": "P2",
+      "observation": "Dziewięć równorzędnych kafli miesza wielkość zgłoszenia, grupy i stany pracy. Użytkownik musi sam ustalić, które liczby mówią o następnym wymaganym działaniu.",
+      "recommendation": "Wyróżnić trzy podsumowania: zakończone, w toku, wymagające działania. Liczbę wierszy i grup umieścić w osobnej, spokojniejszej sekcji szczegółów.",
+      "confidence": "visual",
+      "id": "ekran-11",
+      "device": "Komputer"
+    },
+    {
+      "file": "c03-my-results.png",
+      "title": "Moje firmy — aktualna lista",
+      "priority": "P2",
+      "observation": "Telefon i e-mail są klikalne, lecz tekst etykiet zlewa się z wartościami w komórce kontaktu. Spowalnia to wybór właściwego kanału kontaktu.",
+      "recommendation": "Rozdzielić telefon i e-mail na dwa wiersze z odstępem między etykietą a wartością.",
+      "confidence": "visual",
+      "id": "ekran-12",
+      "device": "Komputer"
+    },
+    {
+      "file": "c04-pool.png",
+      "title": "Pula firm — komputer",
+      "priority": "P2",
+      "observation": "W tabeli puli dane telefonu i e-maila zlewają się z etykietami. Duża liczba kolumn jeszcze wzmacnia koszt wzrokowego rozdzielania tych danych.",
+      "recommendation": "Ułożyć kanały kontaktu w oddzielnych wierszach z czytelną etykietą i klikalną wartością.",
+      "confidence": "visual",
+      "id": "ekran-13",
+      "device": "Komputer"
+    },
+    {
+      "file": "c23-lead-detail.png",
+      "title": "Szczegóły firmy",
+      "priority": "P2",
+      "observation": "Dane kontaktowe są blisko decyzji po rozmowie, lecz nazwy pól sklejają się z wartościami. Pod nazwą firmy podobnie zlewają się nawigacja kolejki i jej opis.",
+      "recommendation": "Rozdzielić etykiety i wartości kontaktu wierszami z odstępami. Nawigację poprzednia/następna oraz stan kolejki ułożyć jako trzy odrębne elementy.",
+      "confidence": "visual",
+      "id": "ekran-14",
+      "device": "Komputer"
+    },
+    {
+      "file": "a07-commission-desktop.png",
+      "title": "Porównywarka prowizji — komputer",
+      "priority": "P2",
+      "observation": "Po wczytaniu plików start pozostaje nieaktywny, a ekran pokazuje tylko „0 wybranych plików”. Nie podpowiada przy przycisku, że trzeba zaznaczyć CRM i co najmniej jeden raport.",
+      "recommendation": "Obok nieaktywnego startu wyświetlić konkretny warunek: „Zaznacz plik CRM oraz raport ASF lub Warty”.",
+      "confidence": "visual",
+      "id": "ekran-15",
+      "device": "Komputer"
+    },
+    {
+      "file": "a08-commission-dictionary-desktop.png",
+      "title": "Słownik prowizji — komputer",
+      "priority": null,
+      "observation": "Aktywna wersja, filtry i oddzielne kolumny stawek są czytelne. Stan opublikowania jest widoczny w kontrolce wersji i podsumowaniu.",
+      "recommendation": "Zachować widoczną wersję słownika przy tabeli. Dla tej próbki nie ma istotnej wady wizualnej.",
+      "confidence": "visual",
+      "id": "ekran-16",
+      "device": "Komputer"
+    },
+    {
+      "file": "c24-commission-history.png",
+      "title": "Historia analiz prowizji",
+      "priority": null,
+      "observation": "Okres, data utworzenia, opisowy status i liczby rozbieżności są widoczne w jednym wierszu. Osobny przycisk „Otwórz wynik” jasno wyznacza dalszą akcję.",
+      "recommendation": "Zachować opisowe statusy i bezpośredni dostęp do wyniku. W tej próbce nie ma istotnego problemu wizualnego.",
+      "confidence": "visual",
+      "id": "ekran-17",
+      "device": "Komputer"
+    },
+    {
+      "file": "c25-commission-result.png",
+      "title": "Wynik analizy prowizji",
+      "priority": "P2",
+      "observation": "Po otwarciu wyniku z historii użytkownik nadal widzi na górze formularz nowej analizy, a właściwy wynik leży pod wszystkimi kontrolkami wczytywania i startu. Kontekst oglądania wyniku jest mało wyraźny.",
+      "recommendation": "Otwierać historyczny wynik w osobnym widoku albo przynajmniej przenosić focus i przewijanie do nagłówka „Wynik analizy”, zwijając formularz nowego uruchomienia.",
+      "confidence": "visual",
+      "id": "ekran-18",
+      "device": "Komputer"
+    },
+    {
+      "file": "c11-notifications.png",
+      "title": "Powiadomienia",
+      "priority": "P1",
+      "observation": "Ekran pozostaje przy „Sprawdzam sesję…” i nie daje dostępu do powiadomień. Niezależne sprawdzenie źródła potwierdza brak przełączenia authenticated na true po sukcesie sesji.",
+      "recommendation": "Domknąć stan powodzenia sprawdzania sesji i wyświetlić listę; przy błędzie dać odzyskiwalny komunikat oraz ponowienie.",
+      "confidence": "source",
+      "id": "ekran-19",
+      "device": "Komputer"
+    },
+    {
+      "file": "c12-account.png",
+      "title": "Konto i bezpieczeństwo",
+      "priority": null,
+      "observation": "Odzyskiwanie, zmiana hasła i sesje są rozdzielone w osobnych panelach. Wymagana długość hasła i skutek wylogowania innych sesji są podane przed zapisem.",
+      "recommendation": "Zachować wyjaśnienie skutków zmiany przy formularzu. Daty i liczby aktywnych sesji są demonstracyjne, więc nie oceniam ich jako błędu produktu.",
+      "confidence": "visual",
+      "id": "ekran-20",
+      "device": "Komputer"
+    },
+    {
+      "file": "c13-team.png",
+      "title": "Pracownicy",
+      "priority": "P2",
+      "observation": "Na komputerze najważniejsza akcja „Zarządzaj” leży w uciętej prawej kolumnie tabeli. Menedżer musi przesuwać tabelę, aby znaleźć zarządzanie kontem.",
+      "recommendation": "Przypiąć kolumnę akcji do prawej krawędzi lub przenieść „Zarządzaj” przy nazwę pracownika; ograniczyć szerokość kolumn pomocniczych.",
+      "confidence": "visual",
+      "id": "ekran-21",
+      "device": "Komputer"
+    },
+    {
+      "file": "c14-access.png",
+      "title": "Dostępy do narzędzi",
+      "priority": null,
+      "observation": "Widok rozróżnia wspólny odczyt wyników od prawa uruchamiania i uprzedza, że zmiany zapisują się od razu. Opis stanu obok przełącznika ułatwia interpretację.",
+      "recommendation": "Zachować rozdzielenie zakresów dostępu i tekstowe określenie stanu przy przełączniku. Nie traktować demonstracyjnych wartości uprawnień jako problemu UI.",
+      "confidence": "visual",
+      "id": "ekran-22",
+      "device": "Komputer"
+    },
+    {
+      "file": "c15-reports.png",
+      "title": "Raporty",
+      "priority": null,
+      "observation": "Raport oddziela obsługę klientów od automatyzacji. Wyjaśnienie przy zakresie dat mówi, że statusy opisują stan bieżący, co zapobiega myleniu raportu z historią telefonów.",
+      "recommendation": "Zachować wyjaśnienie podstawy raportu przy filtrze oraz podpisy pod liczbami. W tej próbce nie ma istotnej przeszkody wizualnej.",
+      "confidence": "visual",
+      "id": "ekran-23",
+      "device": "Komputer"
+    },
+    {
+      "file": "c16-review.png",
+      "title": "Korekty REGON",
+      "priority": "P2",
+      "observation": "Filtrowanie importu wymaga skopiowania technicznego identyfikatora z adresu innej strony, a narzędzie wpisuje się jako kod. To zmusza recenzenta do przełączania ekranów i zapamiętywania identyfikatorów.",
+      "recommendation": "Zastąpić pole identyfikatora wyszukiwarką importów po nazwie pliku i dacie, a kod narzędzia listą znanych nazw.",
+      "confidence": "visual",
+      "id": "ekran-24",
+      "device": "Komputer"
+    },
+    {
+      "file": "c17-audit.png",
+      "title": "Dziennik audytu",
+      "priority": "P2",
+      "observation": "Główne nazwy zdarzeń są kodami typu „lead.allocated”, a zasób opisuje UUID. Audytor musi znać techniczne słownictwo, aby szybko odczytać co się wydarzyło.",
+      "recommendation": "Wyświetlić polski opis zdarzenia i rozpoznawalną nazwę zasobu, pozostawiając kody i UUID w rozwijanych szczegółach.",
+      "confidence": "visual",
+      "id": "ekran-25",
+      "device": "Komputer"
+    },
+    {
+      "file": "c18-admin.png",
+      "title": "Administracja — komputer",
+      "priority": "P2",
+      "observation": "Panel zbiera uprawnienia, konta, sesje, operacje, kolejkę interwencji, ustawienia, audyt i raporty w jednym bardzo długim widoku. Akcje o różnych skutkach konkurują o uwagę administratora.",
+      "recommendation": "Użyć istniejącej nawigacji sekcji do wyświetlania tylko wybranego obszaru, zamiast pokazywać wszystkie formularze naraz.",
+      "confidence": "visual",
+      "id": "ekran-26",
+      "device": "Komputer"
+    },
+    {
+      "file": "c19-login-mobile.png",
+      "title": "Logowanie — telefon",
+      "priority": null,
+      "observation": "Formularz mieści się w szerokości telefonu, pola i przycisk są duże, a link odzyskania hasła pozostaje bezpośrednio pod akcją logowania.",
+      "recommendation": "Zachować duże kontrolki i krótką drogę do odzyskania dostępu. Brak istotnego problemu układu w tej próbce.",
+      "confidence": "visual",
+      "id": "ekran-27",
+      "device": "Telefon"
+    },
+    {
+      "file": "a09-dashboard-mobile.png",
+      "title": "Przegląd — telefon",
+      "priority": null,
+      "observation": "Najważniejsze działanie pozostaje nad statystykami, a pilne sprawy i operacje przechodzą w czytelną pojedynczą kolumnę. Menu ma duży przycisk.",
+      "recommendation": "Zachować kolejność główna akcja → pilne sprawy → historia. Brak istotnego problemu układu w badanym widoku.",
+      "confidence": "visual",
+      "id": "ekran-28",
+      "device": "Telefon"
+    },
+    {
+      "file": "a10-oc-mobile.png",
+      "title": "Wybór firm OC — telefon",
+      "priority": "P2",
+      "observation": "Przed pierwszą firmą trzeba przewinąć ponad ekran nagłówków i objaśnień: selektor kroku, nagłówek kroku, drugi tytuł wyboru i osobny nagłówek listy powtarzają podobny komunikat.",
+      "recommendation": "Na telefonie zostawić jeden nagłówek kroku, skrócić wstęp i przenieść wybór zakresu oraz wyszukiwanie bezpośrednio nad listę firm.",
+      "confidence": "visual",
+      "id": "ekran-29",
+      "device": "Telefon"
+    },
+    {
+      "file": "c20-my-results-mobile.png",
+      "title": "Moje firmy — telefon, aktualna próbka",
+      "priority": "P2",
+      "observation": "Karta firmy jest czytelna, ale eksport został wciśnięty obok wielowierszowego tytułu i sam łamie etykietę na trzy linie.",
+      "recommendation": "Przenieść eksport i odświeżenie do pełnego wiersza pod nagłówkiem listy, z jednowierszowymi etykietami i dużym obszarem dotyku.",
+      "confidence": "visual",
+      "id": "ekran-30",
+      "device": "Telefon"
+    },
+    {
+      "file": "c21-pool-mobile.png",
+      "title": "Pula firm — telefon",
+      "priority": "P2",
+      "observation": "Formularz przydziału dobrze przechodzi do jednej kolumny, lecz tytuł tabeli i akcje eksportu ponownie konkurują w ciasnym nagłówku. Etykieta eksportu rozpada się na kilka krótkich linii.",
+      "recommendation": "Przenieść akcje listy do osobnego wiersza na pełną szerokość pod tytułem; zachować jednokolumnowy formularz przydziału.",
+      "confidence": "visual",
+      "id": "ekran-31",
+      "device": "Telefon"
+    },
+    {
+      "file": "a11-commission-mobile.png",
+      "title": "Porównywarka prowizji — telefon",
+      "priority": "P2",
+      "observation": "Tabela wymaga przesuwania w poziomie, żeby odczytać nazwy plików, a zaznaczanie odbywa się przez bardzo małe checkboxy. Trudno pewnie wybrać właściwy plik jedną ręką.",
+      "recommendation": "Zastąpić mobilną tabelę kartami lub wierszami z pełną nazwą i klikalnym obszarem zaznaczenia o wysokości co najmniej 44 px.",
+      "confidence": "visual",
+      "id": "ekran-32",
+      "device": "Telefon"
+    },
+    {
+      "file": "a12-commission-empty-mobile.png",
+      "title": "Porównywarka — brak plików na telefonie",
+      "priority": "P2",
+      "observation": "Instrukcja pustej listy jest umieszczona w szerokiej tabeli i na telefonie zostaje ucięta. Użytkownik widzi początek „Dodaj plik CRM oraz…” bez pełnej wskazówki.",
+      "recommendation": "Wyświetlić pusty stan poza przewijaną tabelą, na pełną szerokość panelu, z kompletnym opisem wymaganego zestawu plików.",
+      "confidence": "visual",
+      "id": "ekran-33",
+      "device": "Telefon"
+    },
+    {
+      "file": "a13-commission-error-mobile.png",
+      "title": "Porównywarka — błąd wczytywania",
+      "priority": "P2",
+      "observation": "Alert prosi „Spróbuj ponownie”, ale nie ma obok takiej akcji. Jednocześnie panel pokazuje brak plików i słownika jak stan potwierdzony, choć pobranie danych nie powiodło się.",
+      "recommendation": "Dodać przy alercie przycisk ponownego wczytania i odróżnić dane nieodczytane od rzeczywiście pustych list. Ocena dotyczy prezentacji błędu, nie wymuszonej awarii syntetycznego API.",
+      "confidence": "source",
+      "id": "ekran-34",
+      "device": "Telefon"
+    },
+    {
+      "file": "c22-admin-mobile.png",
+      "title": "Administracja — telefon",
+      "priority": "P2",
+      "observation": "Na telefonie wszystkie sekcje administracji tworzą stronę o wysokości około 7600 px. Lokalna czynność, np. sprawdzenie sesji, wymaga orientowania się w bardzo szerokim zakresie funkcji i formularzy.",
+      "recommendation": "Pokazywać jedną wybraną sekcję administracji naraz, z czytelnym przełącznikiem sekcji nad jej zawartością.",
+      "confidence": "visual",
+      "id": "ekran-35",
+      "device": "Telefon"
+    }
+  ]
+}

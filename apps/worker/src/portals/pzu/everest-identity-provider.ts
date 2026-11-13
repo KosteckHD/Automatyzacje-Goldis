@@ -22,12 +22,11 @@ export type EverestIdentityProviderOptions = Readonly<{
   adapterVersion: string;
   resultTimeoutMs?: number;
   beforeAction?: () => Promise<void>;
-  resolvePersonName?: (context: WorkerRunContext, pesel: string) => Promise<string | null>;
 }>;
 
 function comparable(value: string): string {
-  return value.normalize("NFKC").toLocaleLowerCase("pl-PL")
-    .replace(/[^a-ząćęłńóśźż0-9]+/g, " ").trim().replace(/\s+/g, " ");
+  return value.normalize("NFKD").replace(/\p{M}/gu, "").toLocaleLowerCase("pl-PL").replace(/ł/g, "l")
+    .replace(/[^a-z0-9]+/g, " ").trim().replace(/\s+/g, " ");
 }
 
 function peselValue(value: string): string | null {
@@ -80,7 +79,7 @@ export class EverestIdentityProvider implements IdentityProvider {
     if (sessionState !== "authenticated") throw new Error(`EVEREST_SESSION_${sessionState.toUpperCase()}`);
 
     const regon = context.source.effectiveRegon;
-    const expectedName = context.source.decisionMakerName?.trim() || null;
+    const expectedName = (context.source.expectedPersonName ?? context.source.decisionMakerName)?.trim() || null;
     if (!regon) return { kind: "identity_review", reason: "name_mismatch", candidateCount: 0 };
     const page = await this.browser.page("pzu");
     const selectors = this.options.selectors;
@@ -150,7 +149,7 @@ export class EverestIdentityProvider implements IdentityProvider {
 
     if (await page.locator(selectors.noResults).first().isVisible().catch(() => false)) return { kind: "not_found" };
     const rows = await page.locator(selectors.resultRows).all();
-    const candidates: Array<{ kind: "person" | "business" | "other"; name: string; pesel: string | null; invalidPesel: boolean }> = [];
+    const candidates: Array<{ kind: "person" | "business" | "company" | "other"; name: string; identifier: string; pesel: string | null; invalidPesel: boolean }> = [];
     for (const row of rows) {
       if (!await row.isVisible().catch(() => false)) continue;
       const readField = async (selector: string): Promise<string> => {
@@ -161,51 +160,63 @@ export class EverestIdentityProvider implements IdentityProvider {
         readField(selectors.fields.accountType), readField(selectors.fields.personName), readField(selectors.fields.pesel),
       ]);
       const kind = comparable(rawKind) === comparable("Osoba fizyczna") ? "person"
-        : comparable(rawKind) === comparable("Osoba fizyczna prowadząca działalność gospodarczą") ? "business" : "other";
+        : comparable(rawKind) === comparable("Osoba fizyczna prowadząca działalność gospodarczą") ? "business"
+          : comparable(rawKind) === "firma" ? "company" : "other";
       const pesel = peselValue(rawPesel);
-      candidates.push({ kind, name, pesel, invalidPesel: Boolean(rawPesel.trim()) && pesel === null });
+      candidates.push({ kind, name, identifier: rawPesel.replace(/\s/g, ""), pesel, invalidPesel: Boolean(rawPesel.trim()) && pesel === null });
     }
     if (candidates.length === 0) return { kind: "not_found" };
-    let persons = candidates.filter((candidate) => candidate.kind === "person");
-    if (persons.length === 0 && candidates.every((candidate) => candidate.kind === "other")) {
+    const sourceWords = [...new Set(comparable(context.source.companyName).split(" ").filter(word => word.length >= 4))];
+    const matchesCompany = (name: string) => {
+      const words = new Set(comparable(name).split(" "));
+      return sourceWords.length > 0 && sourceWords.every(word => words.has(word));
+    };
+    const matchesContact = (name: string) => {
+      if (!expectedName) return false;
+      const expected = comparable(expectedName).split(" ");
+      const words = new Set(comparable(name).split(" "));
+      return expected.length >= 2 && expected.every(word => words.has(word));
+    };
+    let persons = candidates.filter(candidate => candidate.kind === "person");
+    if (persons.length === 0) {
+      const companies = candidates.filter(candidate => candidate.kind === "company" && candidate.identifier === regon && matchesCompany(candidate.name));
+      if (companies.length) return { kind: "matched", identity: {
+        schemaVersion: 1, sourceRowId: context.source.id, regon, companyName: context.source.companyName,
+        firstName: "", lastName: "", pesel: "", matchMethod: "regon_company", adapterVersion: this.options.adapterVersion,
+      } };
+      persons = candidates.filter(candidate => candidate.kind === "business" || (candidate.kind === "company" && candidate.pesel));
+    }
+    if (persons.length === 0 && candidates.every(candidate => candidate.kind === "other" || candidate.kind === "company")) {
       return { kind: "identity_review", reason: "unsupported_entity_type", candidateCount: candidates.length };
     }
-    if (persons.length > 1) {
-      const expected = expectedName ? comparable(expectedName) : null;
-      persons = persons.filter((candidate) => {
-        const name = comparable(candidate.name);
-        return expected ? name === expected || name.startsWith(`${expected} `)
-          : personNameBeforeCompany(candidate.name, context.source.companyName) !== null;
-      });
-      if (persons.length === 0) return { kind: "identity_review", reason: "name_mismatch", candidateCount: candidates.length };
-      if (persons.length > 1) return { kind: "ambiguous", candidateCount: persons.length };
-    }
     if (persons.length === 0) return { kind: "identity_review", reason: "missing_expected_person", candidateCount: candidates.length };
-    const person = persons[0];
-    const displayName = comparable(person.name);
-    const sourceCompanyWords = comparable(context.source.companyName).split(" ").filter((word) => word.length >= 4);
-    const displayWords = new Set(displayName.split(" "));
-    if (sourceCompanyWords.length === 0 || !sourceCompanyWords.every((word) => displayWords.has(word))) {
+    if (!persons.some(person => person.pesel)) return { kind: "identity_review", reason: persons.some(person => person.invalidPesel) ? "invalid_pesel" : "missing_pesel", candidateCount: candidates.length };
+    const linkedBusiness = candidates.filter(candidate => candidate.kind === "business" && candidate.pesel);
+    persons = persons.filter(person => person.pesel && (matchesCompany(person.name)
+      || (matchesContact(person.name) && linkedBusiness.some(business => business.pesel === person.pesel))));
+    if (persons.length === 0) {
       return { kind: "identity_review", reason: "name_mismatch", candidateCount: candidates.length };
     }
-    if (!person.pesel) return { kind: "identity_review", reason: person.invalidPesel ? "invalid_pesel" : "missing_pesel", candidateCount: candidates.length };
-    const business = candidates.filter((candidate) => candidate.kind === "business");
-    if (business.some((candidate) => candidate.pesel && candidate.pesel !== person.pesel)) {
+    // Several accounts with the same PESEL identify one person, not several candidates.
+    let identifiers = [...new Set(persons.map(person => person.pesel!))];
+    if (identifiers.length > 1 && expectedName) {
+      const contactIds = [...new Set(persons.filter(person => matchesContact(person.name)).map(person => person.pesel!))];
+      if (contactIds.length === 1) identifiers = contactIds;
+    }
+    if (identifiers.length > 1) return { kind: "ambiguous", candidateCount: identifiers.length };
+    const person = persons.find(person => person.pesel === identifiers[0])!;
+    if (context.source.expectedPersonName && !matchesContact(person.name)) return { kind: "identity_review", reason: "name_mismatch", candidateCount: candidates.length };
+    if (linkedBusiness.some(business => business.pesel !== person.pesel && (matchesCompany(business.name) || matchesContact(business.name)))) {
       return { kind: "identity_review", reason: "name_mismatch", candidateCount: candidates.length };
     }
-    const resolvedName = expectedName ?? personNameBeforeCompany(person.name, context.source.companyName)
-      ?? await this.options.resolvePersonName?.(context, person.pesel);
-    if (!resolvedName) return { kind: "identity_review", reason: "name_mismatch", candidateCount: candidates.length };
-    const normalizedExpectedName = comparable(resolvedName);
-    const nameMatches = expectedName
-      ? displayName === normalizedExpectedName || displayName.startsWith(`${normalizedExpectedName} `)
-      : normalizedExpectedName.split(" ").every(word => displayWords.has(word));
-    if (!nameMatches) return { kind: "identity_review", reason: "name_mismatch", candidateCount: candidates.length };
-    const name = splitPersonName(resolvedName);
-    if (!name) return { kind: "identity_review", reason: "name_mismatch", candidateCount: candidates.length };
+    const contactMatched = matchesContact(person.name);
+    const usesContactName = contactMatched && (comparable(person.name) === comparable(expectedName!) || comparable(person.name).startsWith(comparable(expectedName!) + " "));
+    const resolvedName = usesContactName ? expectedName : personNameBeforeCompany(person.name, context.source.companyName);
+    const name = resolvedName ? splitPersonName(resolvedName) : null;
     const identity: IdentityMatchV1 = {
       schemaVersion: 1, sourceRowId: context.source.id, regon, companyName: context.source.companyName,
-      ...name, pesel: person.pesel, matchMethod: expectedName ? "regon_company_name_decision_maker" : "unique_business_identity",
+      firstName: name?.firstName ?? "", lastName: name?.lastName ?? "", pesel: person.pesel!,
+      matchMethod: !name ? "regon_unique_pesel" : usesContactName ? "regon_company_name_decision_maker" : "unique_business_identity",
       adapterVersion: this.options.adapterVersion,
     };
     return { kind: "matched", identity };

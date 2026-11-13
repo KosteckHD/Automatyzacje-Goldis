@@ -1,0 +1,108 @@
+- link "Przejdź do głównej treści":
+  - /url: "#main-content"
+- complementary:
+  - link "GOLDIS platforma operacyjna":
+    - /url: /dashboard
+    - strong: GOLDIS
+    - text: platforma operacyjna
+  - paragraph: PRACA
+  - navigation "Główna nawigacja":
+    - link "Przegląd":
+      - /url: /dashboard
+    - link "Moje firmy":
+      - /url: /my-results
+    - link "Pula firm":
+      - /url: /results/oc-policy-verification
+    - link "Automatyzacje":
+      - /url: /tools
+    - link "Przebiegi":
+      - /url: /runs
+    - link "Historia importów":
+      - /url: /imports
+    - link "Powiadomienia":
+      - /url: /notifications
+      - text: Powiadomienia 2
+  - paragraph: ORGANIZACJA
+  - navigation "Zarządzanie":
+    - link "Pracownicy":
+      - /url: /team
+    - link "Dostępy":
+      - /url: /access
+    - link "Raporty":
+      - /url: /reports
+    - link "Weryfikacja danych":
+      - /url: /review
+    - link "Dziennik aktywności":
+      - /url: /audit
+    - link "Moje konto":
+      - /url: /account
+  - button "Zwiń nawigację": Zwiń menu
+  - text: Menedżer
+- banner:
+  - text: GOLDIS / AUTOMATYZACJE ewa.zielinska · Menedżer
+  - link "Moje konto":
+    - /url: /account
+- main:
+  - heading "Porównywarka prowizji" [level=1]
+  - paragraph: Sprawdź kompletność rozliczeń ASF i Warty oraz zgodność procentów z wersją słownika przypiętą do analizy.
+  - text: Słownik v1 aktywny
+  - navigation "Sekcje porównywarki":
+    - button "Nowa analiza"
+    - button "Słownik prowizji"
+    - button "Historia analiz"
+  - heading "Pliki źródłowe" [level=2]
+  - paragraph: Dodaj zestaw danych dla wybranego okresu. Identyczne pliki zostaną wykryte po zawartości.
+  - text: 3 plików
+  - strong: Lista polis CRM
+  - text: Arkusz Excel .xlsx
+  - button "Lista polis CRM Arkusz Excel .xlsx Wybierz plik"
+  - text: Wybierz plik
+  - strong: Raport ASF
+  - text: Arkusz Excel .xlsx
+  - button "Raport ASF Arkusz Excel .xlsx Wybierz plik"
+  - text: Wybierz plik
+  - strong: Raport Warty
+  - text: Arkusz Excel .xlsx
+  - button "Raport Warty Arkusz Excel .xlsx Wybierz plik"
+  - text: Wybierz plik
+  - table:
+    - rowgroup:
+      - row "Do analizy Rodzaj Plik Rozmiar Dodano":
+        - columnheader "Do analizy"
+        - columnheader "Rodzaj"
+        - columnheader "Plik"
+        - columnheader "Rozmiar"
+        - columnheader "Dodano"
+    - rowgroup:
+      - row "Uwzględnij CRM-listopad-demo.xlsx Lista polis CRM CRM-listopad-demo.xlsx 0.02 MB 8.11.2026":
+        - cell "Uwzględnij CRM-listopad-demo.xlsx":
+          - checkbox "Uwzględnij CRM-listopad-demo.xlsx"
+        - cell "Lista polis CRM"
+        - cell "CRM-listopad-demo.xlsx"
+        - cell "0.02 MB"
+        - cell "8.11.2026"
+      - row "Uwzględnij ASF-listopad-demo.xlsx Raport ASF ASF-listopad-demo.xlsx 0.02 MB 8.11.2026":
+        - cell "Uwzględnij ASF-listopad-demo.xlsx":
+          - checkbox "Uwzględnij ASF-listopad-demo.xlsx"
+        - cell "Raport ASF"
+        - cell "ASF-listopad-demo.xlsx"
+        - cell "0.02 MB"
+        - cell "8.11.2026"
+      - row "Uwzględnij WARTA-listopad-demo.xlsx Raport Warty WARTA-listopad-demo.xlsx 0.02 MB 8.11.2026":
+        - cell "Uwzględnij WARTA-listopad-demo.xlsx":
+          - checkbox "Uwzględnij WARTA-listopad-demo.xlsx"
+        - cell "Raport Warty"
+        - cell "WARTA-listopad-demo.xlsx"
+        - cell "0.02 MB"
+        - cell "8.11.2026"
+  - heading "Zakres dat i analiza" [level=2]
+  - paragraph: Zakres dotyczy daty wystawienia polisy w CRM. Dzień początkowy i końcowy wliczają się do analizy.
+  - text: 0 wybranych plików Od dnia
+  - textbox "Od dnia": 2026-11-01
+  - text: Do dnia
+  - textbox "Do dnia": 2026-11-08
+  - text: Aktywny słownik
+  - strong: Wersja 1
+  - button "Otwórz słownik"
+  - button "Uruchom porównanie" [disabled]
+- alert

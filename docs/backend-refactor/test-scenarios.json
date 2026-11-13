@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "generator": "scripts/backend-refactor-scenarios.cjs",
   "evidence": {
-    "testFiles": 187,
-    "scenarioPatterns": 616,
-    "dynamicTitlePatterns": 14,
-    "scenariosWithSkipConditions": 59,
+    "testFiles": 202,
+    "scenarioPatterns": 672,
+    "dynamicTitlePatterns": 19,
+    "scenariosWithSkipConditions": 68,
     "filesWithoutCases": [],
     "duplicateIds": []
   },
@@ -220,12 +220,34 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-05ce4e0f5ec6",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "targetPath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "titlePattern": "a reviewed read-only failure can continue only the last two rows without portal mutations",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-064c94166a0a",
       "owner": "health",
       "stage": "P2",
       "sourcePath": "apps/api/src/features/health/health-readiness.spec.ts",
       "targetPath": "apps/api/src/features/health/health-readiness.spec.ts",
       "titlePattern": "off, stale, future, invalid-config, or unavailable services report specific safe readiness",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-0697eceae82d",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/backend-persistence-inventory.test.cjs",
+      "targetPath": "scripts/backend-persistence-inventory.test.cjs",
+      "titlePattern": "SQL table extraction ignores common SQL keywords used as aliases or modifiers",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -374,6 +396,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-0c459fc89cdb",
+      "owner": "reports",
+      "stage": "P6/P11",
+      "sourcePath": "apps/api/src/features/reports/dashboard.repository.spec.ts",
+      "targetPath": "apps/api/src/features/reports/dashboard.repository.spec.ts",
+      "titlePattern": "dashboard projections bind actor scope and preserve deletion barriers",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-0d4dc405f338",
       "owner": "enrichment",
       "stage": "P8",
@@ -418,6 +451,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-0e20471b75df",
+      "owner": "portals/pzu",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/pzu/everest-identity-provider.spec.ts",
+      "targetPath": "apps/worker/src/portals/pzu/everest-identity-provider.spec.ts",
+      "titlePattern": "a unique PESEL without a contact defers names to the Communication form without looking up another portal",
+      "dynamicTitle": false,
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "testKind": "unit"
+    },
+    {
       "id": "TC-0e601f739f1c",
       "owner": "identity",
       "stage": "P5",
@@ -448,6 +492,17 @@
       "titlePattern": "Compensa Save checkpoint serializuje intent, referencję draftu i wynik bez zduplikowanych zdarzeń",
       "dynamicTitle": false,
       "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-0ea7ec681804",
+      "owner": "portals/pzu",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-sms-detection.spec.ts",
+      "targetPath": "apps/worker/src/portals/pzu/pzu-sms-detection.spec.ts",
+      "titlePattern": "the confirmed SMS route and visible code form are recognized without submitting anything",
+      "dynamicTitle": false,
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
       "testKind": "unit"
     },
     {
@@ -501,6 +556,17 @@
       "sourcePath": "apps/api/src/features/interventions/auth-challenges.spec.ts",
       "targetPath": "apps/api/src/features/interventions/auth-challenges.spec.ts",
       "titlePattern": "niepewna dostawa unieważnia challenge i zatrzymuje run bez retry kodu",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-11ebba75295a",
+      "owner": "review",
+      "stage": "P7",
+      "sourcePath": "apps/api/src/features/review/review.repository.spec.ts",
+      "targetPath": "apps/api/src/features/review/review.repository.spec.ts",
+      "titlePattern": "review correction projection binds tenant, grant scope, filters, author and cursor in persistence",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -627,12 +693,34 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-1466046ff5d3",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "targetPath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "titlePattern": "the new campaign uses exactly rows 18020–18030 and its own report directory",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-151e24f4d128",
       "owner": "test-tooling",
       "stage": "P1",
       "sourcePath": "scripts/backend-refactor-scenarios.test.cjs",
       "targetPath": "scripts/backend-refactor-scenarios.test.cjs",
       "titlePattern": "scenario IDs follow the mapped destination and point to an existing current test",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-159b5ea6c24d",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "targetPath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "titlePattern": "the policy check is restricted to row 18025 and stops on any unexpected write intent",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -825,6 +913,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-1ca7c8c33468",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "targetPath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "titlePattern": "an export with another identity or policy value never passes verification",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-1cf3ee7dc01e",
       "owner": "features/authentication",
       "stage": "P13",
@@ -957,6 +1056,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-225376f98785",
+      "owner": "leads",
+      "stage": "P11",
+      "sourcePath": "apps/api/src/features/leads/lead-query.spec.ts",
+      "targetPath": "apps/api/src/features/leads/lead-query.spec.ts",
+      "titlePattern": "escapes SQL wildcard characters and shares the restrictive ACL predicate",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-22fdef7087ae",
       "owner": "preparations",
       "stage": "P7",
@@ -974,6 +1084,17 @@
       "sourcePath": "scripts/backend-refactor-inventory.test.cjs",
       "targetPath": "scripts/backend-refactor-inventory.test.cjs",
       "titlePattern": "top-level import-effect candidates are reviewed and isolated to direct process startup",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-24880fc2c313",
+      "owner": "privileged-actions",
+      "stage": "P0",
+      "sourcePath": "apps/api/src/features/privileged-actions/privileged-actions.repository.spec.ts",
+      "targetPath": "apps/api/src/features/privileged-actions/privileged-actions.repository.spec.ts",
+      "titlePattern": "PrivilegedActionRepository preserves advisory, user, membership and session lock order",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -1040,6 +1161,17 @@
       "sourcePath": "apps/api/src/features/authorization/authorization-guard.spec.ts",
       "targetPath": "apps/api/src/features/authorization/authorization-guard.spec.ts",
       "titlePattern": "operator czyta i zmienia tylko własny batch; reviewer czyta batch tenanta",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-2808f77e4750",
+      "owner": "packages/core",
+      "stage": "P13",
+      "sourcePath": "packages/core/src/party-identity.spec.ts",
+      "targetPath": "packages/core/src/party-identity.spec.ts",
+      "titlePattern": "a pending person needs a valid PESEL and both names are confirmed together",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -1364,6 +1496,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-33e3bbf85b5b",
+      "owner": "reports",
+      "stage": "P6/P11",
+      "sourcePath": "apps/api/src/features/reports/reports.module.spec.ts",
+      "targetPath": "apps/api/src/features/reports/reports.module.spec.ts",
+      "titlePattern": "ReportsModule owns reporting routes and exports only the cross-feature history service",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-344f141db7fe",
       "owner": "portals/compensa",
       "stage": "P13",
@@ -1392,6 +1535,17 @@
       "sourcePath": "apps/api/src/features/interventions/interventions.service.spec.ts",
       "targetPath": "apps/api/src/features/interventions/interventions.service.spec.ts",
       "titlePattern": "InterventionService maps repository rows to the redacted paginated response contract",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-35930e8f5012",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "targetPath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "titlePattern": "post-fix revision accepts only the three unstarted rows and never replays an offer",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -1482,6 +1636,17 @@
       "titlePattern": "wyjątek adaptera jest mapowany na stały kod bez ujawniania treści wyjątku",
       "dynamicTitle": false,
       "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-3a1a0a37d23b",
+      "owner": "portals/pzu",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/pzu/everest-identity-provider.spec.ts",
+      "targetPath": "apps/worker/src/portals/pzu/everest-identity-provider.spec.ts",
+      "titlePattern": "the observed no-result marker accepts the searched identifier suffix and a following successful search",
+      "dynamicTitle": false,
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
       "testKind": "unit"
     },
     {
@@ -1815,6 +1980,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-45f17998790e",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/backend-persistence-inventory.test.cjs",
+      "targetPath": "scripts/backend-persistence-inventory.test.cjs",
+      "titlePattern": "persistence inventory detects Sequelize model calls and records owner and unresolved contract fields",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-462d3288c7f2",
       "owner": "privileged-actions",
       "stage": "P0",
@@ -1914,6 +2090,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-4870dae565be",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/check-feature-boundaries.test.cjs",
+      "targetPath": "scripts/check-feature-boundaries.test.cjs",
+      "titlePattern": "public feature entries reject controller and model value exports but allow type contracts",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-48923d1928e5",
       "owner": "runs",
       "stage": "P9",
@@ -1953,17 +2140,6 @@
       "sourcePath": "apps/api/src/features/imports/import.service.spec.ts",
       "targetPath": "apps/api/src/features/imports/import.service.spec.ts",
       "titlePattern": "ImportService keeps a correction, source version, and audit event in one transaction",
-      "dynamicTitle": false,
-      "skipCondition": null,
-      "testKind": "unit"
-    },
-    {
-      "id": "TC-4b6ec2c89e92",
-      "owner": "infrastructure/database",
-      "stage": "P3",
-      "sourcePath": "apps/api/src/infrastructure/database/database.factory.spec.ts",
-      "targetPath": "apps/api/src/infrastructure/database/database.factory.spec.ts",
-      "titlePattern": "database import is inert; the factory binds the 48 models once and shares same-config leases",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -2024,6 +2200,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-4e0432ecb25e",
+      "owner": "portals/compensa",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "observed Compensa exception ${*} never accepts customer data, saves, or queries UFG",
+      "dynamicTitle": true,
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "testKind": "unit"
+    },
+    {
       "id": "TC-4e3eab551110",
       "owner": "portals/compensa",
       "stage": "P13",
@@ -2032,6 +2219,17 @@
       "titlePattern": "verified zero OC returns a complete empty snapshot without opening unavailable details",
       "dynamicTitle": false,
       "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-4e9609e7dfa1",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/check-feature-boundaries.test.cjs",
+      "targetPath": "scripts/check-feature-boundaries.test.cjs",
+      "titlePattern": "layer scan rejects database access from a feature service and records a bounded migration exception",
+      "dynamicTitle": false,
+      "skipCondition": null,
       "testKind": "unit"
     },
     {
@@ -2255,6 +2453,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-5813bd839d24",
+      "owner": "portals/compensa",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "a unique Everest PESEL obtains names only from the Communication form: ${*}",
+      "dynamicTitle": true,
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "testKind": "unit"
+    },
+    {
       "id": "TC-586910a9cc48",
       "owner": "reports",
       "stage": "P6/P11",
@@ -2264,6 +2473,17 @@
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "http"
+    },
+    {
+      "id": "TC-591fb873c6c3",
+      "owner": "portals/compensa",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "a company enters Communication with REGON and verifies the prefilled business: ${*}",
+      "dynamicTitle": true,
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "testKind": "unit"
     },
     {
       "id": "TC-594134a0ba2e",
@@ -2338,6 +2558,17 @@
       "sourcePath": "apps/worker/src/application/api-readiness.spec.ts",
       "targetPath": "apps/worker/src/application/api-readiness.spec.ts",
       "titlePattern": "worker readiness fails closed when API readiness is unavailable or reports another state",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-5d0824ad4ae4",
+      "owner": "privileged-actions",
+      "stage": "P0",
+      "sourcePath": "apps/api/src/features/privileged-actions/privileged-actions.repository.spec.ts",
+      "targetPath": "apps/api/src/features/privileged-actions/privileged-actions.repository.spec.ts",
+      "titlePattern": "PrivilegedActionRepository inserts a confirmation and prunes old rows in the caller transaction",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -2431,6 +2662,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-619caed331db",
+      "owner": "submissions",
+      "stage": "P9",
+      "sourcePath": "apps/api/src/features/submissions/run-submission-result-set.spec.ts",
+      "targetPath": "apps/api/src/features/submissions/run-submission-result-set.spec.ts",
+      "titlePattern": "result-set rows and summary queries carry one result-set scope through filtering and deduplicated counts",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-61fc30aafdfd",
       "owner": "preparations",
       "stage": "P7",
@@ -2497,6 +2739,17 @@
       "testKind": "contract"
     },
     {
+      "id": "TC-63ef739c56e9",
+      "owner": "portals/pzu",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-sms-detection.spec.ts",
+      "targetPath": "apps/worker/src/portals/pzu/pzu-sms-detection.spec.ts",
+      "titlePattern": "an empty or ambiguous Secfense frame cannot create an SMS challenge",
+      "dynamicTitle": false,
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "testKind": "unit"
+    },
+    {
       "id": "TC-63fd7a1af8c9",
       "owner": "auth",
       "stage": "P5",
@@ -2541,6 +2794,28 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-655474873366",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "targetPath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "titlePattern": "main local database and inherited test/secret settings cannot enter acceptance",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-656594d6c72d",
+      "owner": "infrastructure/browser",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/infrastructure/browser/browser.spec.ts",
+      "targetPath": "apps/worker/src/infrastructure/browser/browser.spec.ts",
+      "titlePattern": "profil ma jednego właściciela także między workerami używającymi różnych baz",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-660a2c5c525c",
       "owner": "auth",
       "stage": "P5",
@@ -2558,6 +2833,17 @@
       "sourcePath": "apps/api/src/features/auth/session.guard.spec.ts",
       "targetPath": "apps/api/src/features/auth/session.guard.spec.ts",
       "titlePattern": "rola i aktor pochodzą z aktywnego członkostwa, a nie z claims ciasteczka",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-665556375c76",
+      "owner": "submissions",
+      "stage": "P9",
+      "sourcePath": "apps/api/src/features/submissions/run-submission-result-set.spec.ts",
+      "targetPath": "apps/api/src/features/submissions/run-submission-result-set.spec.ts",
+      "titlePattern": "result-set export is scoped to its snapshot, marks partial state, and emits formula-safe current policies",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -2849,6 +3135,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-6e1e77cdb82e",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/check-feature-boundaries.test.cjs",
+      "targetPath": "scripts/check-feature-boundaries.test.cjs",
+      "titlePattern": "application layers reject infrastructure and cross-process source dependencies",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-6e2c1c6d80e1",
       "owner": "infrastructure/staging",
       "stage": "P13",
@@ -2948,6 +3245,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-703b7f510798",
+      "owner": "infrastructure/database",
+      "stage": "P3",
+      "sourcePath": "apps/api/src/infrastructure/database/database.factory.spec.ts",
+      "targetPath": "apps/api/src/infrastructure/database/database.factory.spec.ts",
+      "titlePattern": "database import is inert; the factory binds the 58 models once and shares same-config leases",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-70c4f18173a3",
       "owner": "results",
       "stage": "P11",
@@ -3042,6 +3350,17 @@
       "sourcePath": "apps/api/src/contracts/registry-result.spec.ts",
       "targetPath": "apps/api/src/features/contracts/registry-result.spec.ts",
       "titlePattern": "T-REG-06: niezgodny NIP lub nazwa to konflikt do przeglądu, bez wyboru REGON-u",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-73e8508696b1",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/test-module.test.cjs",
+      "targetPath": "scripts/test-module.test.cjs",
+      "titlePattern": "database modules can opt into an owned native PostgreSQL cluster on Windows",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -3240,6 +3559,17 @@
       "sourcePath": "apps/api/src/features/imports/workbook.spec.ts",
       "targetPath": "apps/api/src/features/imports/workbook.spec.ts",
       "titlePattern": "import rejects duplicate key headers instead of silently selecting the last column",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-7a38bdc0c05e",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "targetPath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "titlePattern": "scope includes exactly the eleven physical rows and rejects missing or extra rows",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -3487,6 +3817,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-82b2d00c3415",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "targetPath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "titlePattern": "a row outcome before portal mutations may continue, uncertain portal actions halt",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-836890ddcde2",
       "owner": "auth",
       "stage": "P5",
@@ -3542,6 +3883,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-870f802fe5d5",
+      "owner": "packages/core",
+      "stage": "P13",
+      "sourcePath": "packages/core/src/party-identity.spec.ts",
+      "targetPath": "packages/core/src/party-identity.spec.ts",
+      "titlePattern": "a company uses REGON, has no invented PESEL, and rejects mixed person facts",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-880a35e3a329",
       "owner": "packages/core",
       "stage": "P13",
@@ -3575,12 +3927,34 @@
       "testKind": "http"
     },
     {
+      "id": "TC-8931a2edf92a",
+      "owner": "portals/compensa",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-client-choice.spec.ts",
+      "targetPath": "apps/worker/src/portals/compensa/compensa-client-choice.spec.ts",
+      "titlePattern": "client-card selection never fills or opens the home Client 360 search",
+      "dynamicTitle": false,
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "testKind": "unit"
+    },
+    {
       "id": "TC-89575c593303",
       "owner": "test-tooling",
       "stage": "P1",
       "sourcePath": "scripts/test-module.test.cjs",
       "targetPath": "scripts/test-module.test.cjs",
       "titlePattern": "registry job module runs only its own disposable PostgreSQL smoke",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-89f433140720",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/prepare-acceptance-portal-config.test.cjs",
+      "targetPath": "scripts/prepare-acceptance-portal-config.test.cjs",
+      "titlePattern": "the payer prompt is scoped to its observed title and required fields",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -3696,6 +4070,39 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-8cb3326c3a6a",
+      "owner": "leads",
+      "stage": "P11",
+      "sourcePath": "apps/api/src/features/leads/lead-query.spec.ts",
+      "targetPath": "apps/api/src/features/leads/lead-query.spec.ts",
+      "titlePattern": "rejects malformed or repeated known query parameters instead of widening the scope",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-8cef5e06c928",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/backend-persistence-inventory.test.cjs",
+      "targetPath": "scripts/backend-persistence-inventory.test.cjs",
+      "titlePattern": "persistence inventory includes direct database imports even before a query is found",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-8d7d28c44289",
+      "owner": "reports",
+      "stage": "P6/P11",
+      "sourcePath": "apps/api/src/features/reports/contact-report.repository.spec.ts",
+      "targetPath": "apps/api/src/features/reports/contact-report.repository.spec.ts",
+      "titlePattern": "contact projection binds tenant and date filters and excludes pending deletions",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-8e4405ff015a",
       "owner": "infrastructure/http",
       "stage": "P2",
@@ -3773,17 +4180,6 @@
       "testKind": "unit"
     },
     {
-      "id": "TC-9041038d4ba9",
-      "owner": "portals/compensa",
-      "stage": "P13",
-      "sourcePath": "apps/worker/src/portals/compensa/compensa-client-choice.spec.ts",
-      "targetPath": "apps/worker/src/portals/compensa/compensa-client-choice.spec.ts",
-      "titlePattern": "missing source contact name is read from a verified business card without starting an offer",
-      "dynamicTitle": false,
-      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
-      "testKind": "unit"
-    },
-    {
       "id": "TC-904fff329336",
       "owner": "portals/compensa",
       "stage": "P13",
@@ -3803,6 +4199,17 @@
       "titlePattern": "effectiveRegon pochodzi z importu lub zatwierdzonej korekty i nie zmienia raw",
       "dynamicTitle": false,
       "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-908d4f921793",
+      "owner": "portals/pzu",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/pzu/everest-identity-provider.spec.ts",
+      "targetPath": "apps/worker/src/portals/pzu/everest-identity-provider.spec.ts",
+      "titlePattern": "Firma uses the exact returned REGON and name ordering does not create a false ambiguity",
+      "dynamicTitle": false,
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
       "testKind": "unit"
     },
     {
@@ -3916,6 +4323,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-92a2261bd17f",
+      "owner": "submissions",
+      "stage": "P9",
+      "sourcePath": "apps/api/src/features/submissions/run-submission-read.repository.spec.ts",
+      "targetPath": "apps/api/src/features/submissions/run-submission-read.repository.spec.ts",
+      "titlePattern": "a skipped payer prompt is settled separately from failures and does not hold the next row",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-92a6f1b7608a",
       "owner": "identity",
       "stage": "P5",
@@ -4002,6 +4420,17 @@
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "http"
+    },
+    {
+      "id": "TC-9412b253d0fe",
+      "owner": "commissions",
+      "stage": "P0",
+      "sourcePath": "apps/api/src/features/commissions/commissions.module.spec.ts",
+      "targetPath": "apps/api/src/features/commissions/commissions.module.spec.ts",
+      "titlePattern": "CommissionsModule exposes authenticated endpoints and owns commission persistence",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
     },
     {
       "id": "TC-94a16f9a02e4",
@@ -4235,6 +4664,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-9bb0d28eaa2a",
+      "owner": "features/execution",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "targetPath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "titlePattern": "live worker settles ${*} at ${*} without an intervention, save, or result",
+      "dynamicTitle": true,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-9bdd3759be68",
       "owner": "health",
       "stage": "P2",
@@ -4389,6 +4829,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-9f93a6866130",
+      "owner": "privileged-actions",
+      "stage": "P0",
+      "sourcePath": "apps/api/src/features/privileged-actions/privileged-actions.dto.spec.ts",
+      "targetPath": "apps/api/src/features/privileged-actions/privileged-actions.dto.spec.ts",
+      "titlePattern": "privileged action input parser returns only the bounded confirmation contract",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-9fdca2bd782b",
       "owner": "enrichment",
       "stage": "P8",
@@ -4505,6 +4956,17 @@
       "sourcePath": "apps/worker/src/features/execution/pipeline.spec.ts",
       "targetPath": "apps/worker/src/features/execution/pipeline.spec.ts",
       "titlePattern": "restart po zatwierdzonym checkpointcie osoby nie odpytuje ponownie Everest",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-a3a7c30b2d2b",
+      "owner": "submissions",
+      "stage": "P9",
+      "sourcePath": "apps/api/src/features/submissions/run-submission-result-set.spec.ts",
+      "targetPath": "apps/api/src/features/submissions/run-submission-result-set.spec.ts",
+      "titlePattern": "result-set export follows shared OC access while enforcing role and owner scope",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -4752,6 +5214,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-addc70764af6",
+      "owner": "features/execution",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "targetPath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "titlePattern": "production form preserves actionable intervention ${*}",
+      "dynamicTitle": true,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-ae5e4702bfd1",
       "owner": "test-tooling",
       "stage": "P1",
@@ -4870,6 +5343,17 @@
       "titlePattern": "preparation deduplikuje identyczną tożsamość wybierając pełniejszego reprezentanta",
       "dynamicTitle": false,
       "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-b325b80a62bb",
+      "owner": "portals/pzu",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-sms-detection.spec.ts",
+      "targetPath": "apps/worker/src/portals/pzu/pzu-sms-detection.spec.ts",
+      "titlePattern": "SMS recognition waits for the code form inside a loading Secfense frame",
+      "dynamicTitle": false,
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
       "testKind": "unit"
     },
     {
@@ -5368,12 +5852,34 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-c6b9a59c5652",
+      "owner": "leads",
+      "stage": "P11",
+      "sourcePath": "apps/api/src/features/leads/lead-query.spec.ts",
+      "targetPath": "apps/api/src/features/leads/lead-query.spec.ts",
+      "titlePattern": "normalizes one shared lead scope and preserves the legacy cursor payload",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-c6e8d6415482",
       "owner": "portals/shared",
       "stage": "P13",
       "sourcePath": "apps/worker/src/portals/shared/portal-action-pacer.spec.ts",
       "targetPath": "apps/worker/src/portals/shared/portal-action-pacer.spec.ts",
       "titlePattern": "a different browser profile has an independent action schedule",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-c6fef4c49a28",
+      "owner": "portals/shared",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/shared/portal-runtime-config.spec.ts",
+      "targetPath": "apps/worker/src/portals/shared/portal-runtime-config.spec.ts",
+      "titlePattern": "payer exception selectors are kept together and incomplete configurations are rejected",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -5522,17 +6028,6 @@
       "testKind": "unit"
     },
     {
-      "id": "TC-cc9b92eefac4",
-      "owner": "portals/pzu",
-      "stage": "P13",
-      "sourcePath": "apps/worker/src/portals/pzu/everest-identity-provider.spec.ts",
-      "targetPath": "apps/worker/src/portals/pzu/everest-identity-provider.spec.ts",
-      "titlePattern": "a company-only source obtains the person's name from a verified business lookup instead of splitting the company name",
-      "dynamicTitle": false,
-      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
-      "testKind": "unit"
-    },
-    {
       "id": "TC-ccb9752c438c",
       "owner": "portals/shared",
       "stage": "P13",
@@ -5588,6 +6083,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-cedcde31cbf4",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "targetPath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "titlePattern": "incomplete Compensa data is a separate outcome only with direct evidence and no save intent",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-cf7a55da97e4",
       "owner": "features/authentication",
       "stage": "P13",
@@ -5605,6 +6111,17 @@
       "sourcePath": "apps/api/src/features/deletions/deletions.service.spec.ts",
       "targetPath": "apps/api/src/features/deletions/deletions.service.spec.ts",
       "titlePattern": "DeletionsService rejects malformed scope before touching persistence",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-cfeebce14fd8",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/prepare-acceptance-portal-config.test.cjs",
+      "targetPath": "scripts/prepare-acceptance-portal-config.test.cjs",
+      "titlePattern": "observed company fields tolerate whitespace in labels without selecting another field",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -5742,6 +6259,28 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-d423105cffb5",
+      "owner": "application",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/application/worker-runtime-config.spec.ts",
+      "targetPath": "apps/worker/src/application/worker-runtime-config.spec.ts",
+      "titlePattern": "worker can start paused for safe preparation, but not as a live-ready worker",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-d44ec91b1f60",
+      "owner": "portals/shared",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/shared/portal-runtime-config.spec.ts",
+      "targetPath": "apps/worker/src/portals/shared/portal-runtime-config.spec.ts",
+      "titlePattern": "runtime config preserves the observed SMS frame path and rejects URLs or missing frame selectors",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-d5ea4f6b49e8",
       "owner": "preparations",
       "stage": "P7",
@@ -5836,6 +6375,17 @@
       "sourcePath": "apps/api/src/infrastructure/config/runtime-startup-config.spec.ts",
       "targetPath": "apps/api/src/infrastructure/config/runtime-startup-config.spec.ts",
       "titlePattern": "API production startup rejects a DB superuser, user Redis ACL, wildcard proxy, and plaintext artifact mode",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-d96d067f4016",
+      "owner": "submissions",
+      "stage": "P9",
+      "sourcePath": "apps/api/src/features/submissions/run-submission-result-set.spec.ts",
+      "targetPath": "apps/api/src/features/submissions/run-submission-result-set.spec.ts",
+      "titlePattern": "result-set export rejects a snapshot that fails its integrity checksum",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -6039,6 +6589,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-e14ff17ef469",
+      "owner": "packages/core",
+      "stage": "P13",
+      "sourcePath": "packages/core/src/commissions/engine-contract.spec.ts",
+      "targetPath": "packages/core/src/engine-contract.spec.ts",
+      "titlePattern": "commission engine request rejects non-allowlisted sources and malformed file hashes",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "contract"
+    },
+    {
       "id": "TC-e17d0325b9f8",
       "owner": "deletions",
       "stage": "P6",
@@ -6160,6 +6721,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-e6361d75efc5",
+      "owner": "application",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/application/worker-runtime-config.spec.ts",
+      "targetPath": "apps/worker/src/application/worker-runtime-config.spec.ts",
+      "titlePattern": "live portal mode requires all four portal credentials without exposing values",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-e6c869cd7fc6",
       "owner": "test-tooling",
       "stage": "P1",
@@ -6237,12 +6809,34 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-e8895abf6f57",
+      "owner": "privileged-actions",
+      "stage": "P0",
+      "sourcePath": "apps/api/src/features/privileged-actions/privileged-actions.repository.spec.ts",
+      "targetPath": "apps/api/src/features/privileged-actions/privileged-actions.repository.spec.ts",
+      "titlePattern": "PrivilegedActionRepository scopes reauthentication context to actor, tenant and session",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
       "id": "TC-e89b9dce3d5c",
       "owner": "contracts",
       "stage": "P14",
       "sourcePath": "apps/api/src/contracts/registry-result.spec.ts",
       "targetPath": "apps/api/src/features/contracts/registry-result.spec.ts",
       "titlePattern": "pojedynczy podmiot MF bez nadanego REGON trafia do odrębnego stanu not_found",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-e8d3a1f53e05",
+      "owner": "teams",
+      "stage": "P6",
+      "sourcePath": "apps/api/src/features/teams/team.service.spec.ts",
+      "targetPath": "apps/api/src/features/teams/team.service.spec.ts",
+      "titlePattern": "team access reports the actual download grant, not just active membership",
       "dynamicTitle": false,
       "skipCondition": null,
       "testKind": "unit"
@@ -6523,17 +7117,6 @@
       "testKind": "unit"
     },
     {
-      "id": "TC-f5dffba5bc6e",
-      "owner": "reports",
-      "stage": "P6/P11",
-      "sourcePath": "apps/api/src/features/reports/reports.module.spec.ts",
-      "targetPath": "apps/api/src/features/reports/reports.module.spec.ts",
-      "titlePattern": "ReportsModule owns operational/reporting routes and exports history for importing",
-      "dynamicTitle": false,
-      "skipCondition": null,
-      "testKind": "unit"
-    },
-    {
       "id": "TC-f5e99c7e658e",
       "owner": "features/authentication",
       "stage": "P13",
@@ -6644,6 +7227,17 @@
       "testKind": "unit"
     },
     {
+      "id": "TC-fa5d5e6220ad",
+      "owner": "portals/pzu",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-sms-detection.spec.ts",
+      "targetPath": "apps/worker/src/portals/pzu/pzu-sms-detection.spec.ts",
+      "titlePattern": "Secfense non-SMS methods with the same code fields are not reported as SMS",
+      "dynamicTitle": false,
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "testKind": "unit"
+    },
+    {
       "id": "TC-fa6f87b291ce",
       "owner": "results",
       "stage": "P11",
@@ -6708,6 +7302,28 @@
       "dynamicTitle": false,
       "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
       "testKind": "unit"
+    },
+    {
+      "id": "TC-fcefaf27cf9d",
+      "owner": "test-tooling",
+      "stage": "P1",
+      "sourcePath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "targetPath": "scripts/live-acceptance-18010-18020.test.cjs",
+      "titlePattern": "reviewed continuation preserves the failed run and refuses uncertain Compensa actions",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "unit"
+    },
+    {
+      "id": "TC-fd0c743c3dbc",
+      "owner": "packages/core",
+      "stage": "P13",
+      "sourcePath": "packages/core/src/commissions/engine-contract.spec.ts",
+      "targetPath": "packages/core/src/engine-contract.spec.ts",
+      "titlePattern": "commission result enforces unambiguous complete policy counters",
+      "dynamicTitle": false,
+      "skipCondition": null,
+      "testKind": "contract"
     },
     {
       "id": "TC-fd70f4150461",

@@ -81,18 +81,18 @@ async function main() {
       } else if (url.pathname === `/api/imports/${batchId}/rows`) {
         body = [{ rowNumber: 18001, companyName: "Syntetyczna firma", decisionMakerName: "Osoba testowa", regon: "012345678", issues: [] }];
       } else if (url.pathname === "/api/runs") {
-        body = [{ id: runId, rowNumber: 18001, status: runStatus, currentStep: runStatus, referenceDate: "2026-09-30", errorCode: null, createdAt: "2026-09-30T10:00:00.000Z" }];
+        body = [{ id: runId, batchId, rowNumber: 18001, status: runStatus, currentStep: runStatus, referenceDate: "2026-09-30", errorCode: null, createdAt: "2026-09-30T10:00:00.000Z" }];
       } else if (url.pathname === `/api/runs/${runId}/cancel` && method === "POST") {
         cancellationRequest = { headers: request.headers() };
         runStatus = "cancelled";
-        body = { id: runId, rowNumber: 18001, status: runStatus, currentStep: runStatus, referenceDate: "2026-09-30", errorCode: null, createdAt: "2026-09-30T10:00:00.000Z" };
+        body = { id: runId, batchId, rowNumber: 18001, status: runStatus, currentStep: runStatus, referenceDate: "2026-09-30", errorCode: null, createdAt: "2026-09-30T10:00:00.000Z" };
       } else if (url.pathname === `/api/runs/${runId}/resume-auth` && method === "POST") {
         resendRequests++; resendHeaders = request.headers();
         runStatus = "waiting_for_sms"; reasonCode = "SMS_REQUIRED"; canResumeAuth = false;
         challengeExpiry = new Date(Date.now() + 300_000).toISOString();
-        body = { id: runId, rowNumber: 18001, status: runStatus, currentStep: runStatus, referenceDate: "2026-09-30", errorCode: null, createdAt: "2026-09-30T10:00:00.000Z" };
+        body = { id: runId, batchId, rowNumber: 18001, status: runStatus, currentStep: runStatus, referenceDate: "2026-09-30", errorCode: null, createdAt: "2026-09-30T10:00:00.000Z" };
       } else if (url.pathname === `/api/runs/${runId}`) {
-        body = { id: runId, rowNumber: 18001, status: runStatus, currentStep: runStatus, referenceDate: "2026-09-30", errorCode: null, createdAt: "2026-09-30T10:00:00.000Z", events: [], incident: { kind: "sms", portal: "pzu", reasonCode, canResumeAuth } };
+        body = { id: runId, batchId, rowNumber: 18001, status: runStatus, currentStep: runStatus, referenceDate: "2026-09-30", errorCode: null, createdAt: "2026-09-30T10:00:00.000Z", events: [], incident: { kind: "sms", portal: "pzu", reasonCode, canResumeAuth } };
         if (!viewResults) { status = 403; body = { message: "No result access" }; }
       } else if (url.pathname === "/api/auth-challenges" && method === "GET") {
         body = runStatus === "waiting_for_sms" ? { challengeId, runId, portal: "pzu", status: "active", expiresAt: challengeExpiry, serverNow: new Date().toISOString(), attemptCount: reasonCode === "SMS_CODE_REJECTED" ? 1 : 0, attemptLimit: 5, reasonCode } : null;

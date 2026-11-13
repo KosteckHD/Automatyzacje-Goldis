@@ -1,0 +1,15 @@
+{
+  "startedAt": "2026-11-06T12:22:12.382Z",
+  "scope": "Sequential local regression, synthetic data, no live portals or customer services. VPS acceptance remains separate.",
+  "results": [
+    {
+      "name": "extra-browser-coverage",
+      "startedAt": "2026-11-06T12:22:12.384Z",
+      "endedAt": "2026-11-06T12:22:20.492Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "extra-browser-coverage.log"
+    }
+  ]
+}

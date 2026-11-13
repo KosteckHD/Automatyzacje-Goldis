@@ -164,8 +164,19 @@ export class ImportPreparationsRepository {
     return ImportPreparation.findOne({ where: { preparationId, batchId, tenantId } });
   }
 
-  findPreparedPage(preparationId: string, status: string | undefined, page: number, pageSize: number) {
-    const where = { preparationId, ...(status ? { status } : {}) };
+  findPreparedPage(preparationId: string, status: string | undefined, page: number, pageSize: number, search = "") {
+    const escaped = search.replace(/[\\%_]/g, "\\$&");
+    const query = search
+      ? {
+          [Op.or]: [
+            { normalizedName: { [Op.iLike]: `%${escaped}%` } },
+            { normalizedNip: { [Op.iLike]: `%${escaped}%` } },
+            { effectiveRegon: { [Op.iLike]: `%${escaped}%` } },
+            ...(/^\d+$/.test(search) ? [{ rowNumber: Number(search) }] : []),
+          ],
+        }
+      : {};
+    const where = { preparationId, ...(status ? { status } : {}), ...query };
     return Promise.all([
       ImportPreparedRow.findAll({
         where,

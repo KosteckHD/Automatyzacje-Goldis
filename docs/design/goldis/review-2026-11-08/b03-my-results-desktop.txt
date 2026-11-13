@@ -1,0 +1,167 @@
+- link "Przejdź do głównej treści":
+  - /url: "#main-content"
+- complementary:
+  - link "GOLDIS platforma operacyjna":
+    - /url: /dashboard
+    - strong: GOLDIS
+    - text: platforma operacyjna
+  - paragraph: PRACA
+  - navigation "Główna nawigacja":
+    - link "Przegląd":
+      - /url: /dashboard
+    - link "Moje firmy":
+      - /url: /my-results
+    - link "Pula firm":
+      - /url: /results/oc-policy-verification
+    - link "Automatyzacje":
+      - /url: /tools
+    - link "Przebiegi":
+      - /url: /runs
+    - link "Historia importów":
+      - /url: /imports
+    - link "Powiadomienia":
+      - /url: /notifications
+      - text: Powiadomienia 2
+    - link "Moje korekty":
+      - /url: /review
+  - paragraph: KONTO
+  - navigation "Zarządzanie":
+    - link "Moje konto":
+      - /url: /account
+  - button "Zwiń nawigację": Zwiń menu
+  - text: Pracownik
+- main:
+  - text: GOLDIS / PRACA Przestrzeń operacyjna
+  - link "Moje konto":
+    - /url: /account
+  - text: P
+  - heading "Moje firmy" [level=1]
+  - paragraph: Firmy przydzielone Tobie. Po rozmowie zapisz decyzję i przejdź dalej.
+  - status: "Odczytano: 8 lis 2026, 22:00"
+  - region "Podsumowanie firm w tym widoku":
+    - article:
+      - text: Firmy w tym widoku
+      - strong: "4"
+      - text: 4 w wybranym zakresie
+    - article:
+      - text: Do kontaktu w tym widoku
+      - strong: "2"
+      - text: Nie kontaktowano
+    - article:
+      - text: Zainteresowane w tym widoku
+      - strong: "1"
+      - text: Zaakceptowano ofertę
+  - heading "Firmy przydzielone do mnie" [level=2]
+  - paragraph: Excel obejmie wszystkie firmy pasujące do aktywnych filtrów.
+  - button "Eksportuj moje firmy"
+  - button "Odśwież listę firm": ↻
+  - text: Szukaj firmy
+  - textbox "Szukaj firmy":
+    - /placeholder: Nazwa, NIP lub REGON
+  - text: Status kontaktu
+  - combobox "Status kontaktu":
+    - option "Wszystkie statusy" [selected]
+    - option "Nie kontaktowano"
+    - option "Klient zgadza się na ofertę"
+    - option "Klient nie jest zainteresowany"
+  - button "Szukaj"
+  - paragraph: Pokazano 4 z 4 firm pasujących do filtrów.
+  - region "Tabela firm":
+    - table:
+      - rowgroup:
+        - row "Firma Kontakt Status kontaktu Wynik OC Szczegóły":
+          - columnheader "Firma"
+          - columnheader "Kontakt"
+          - columnheader "Status kontaktu"
+          - columnheader "Wynik OC"
+          - columnheader "Szczegóły"
+      - rowgroup:
+        - 'row "Transport i Logistyka Alfa sp. z o.o. ul. Przemysłowa 18, Warszawa Telefon+48 22 555 01 20E-mailkontakt@transportowa.pl Nie kontaktowano 2 zadań firmowych 4 pozycji · data odniesienia 2026-10-10 Otwórz szczegóły: Transport i Logistyka Alfa sp. z o.o."':
+          - cell "Transport i Logistyka Alfa sp. z o.o. ul. Przemysłowa 18, Warszawa":
+            - link "Transport i Logistyka Alfa sp. z o.o.":
+              - /url: /my-results/77777777-7777-4777-8777-777777777777?returnTo=%2Fmy-results%3Fscope%3Dmine
+            - text: ul. Przemysłowa 18, Warszawa
+          - cell "Telefon+48 22 555 01 20E-mailkontakt@transportowa.pl":
+            - text: Telefon
+            - link "+48 22 555 01 20":
+              - /url: tel:+48225550120
+            - text: E-mail
+            - link "kontakt@transportowa.pl":
+              - /url: mailto:kontakt@transportowa.pl
+          - cell "Nie kontaktowano":
+            - 'combobox "Status kontaktu: Transport i Logistyka Alfa sp. z o.o."':
+              - option "Nie kontaktowano" [selected]
+              - option "Klient zgadza się na ofertę"
+              - option "Klient nie jest zainteresowany"
+          - cell "2 zadań firmowych 4 pozycji · data odniesienia 2026-10-10"
+          - 'cell "Otwórz szczegóły: Transport i Logistyka Alfa sp. z o.o."':
+            - 'link "Otwórz szczegóły: Transport i Logistyka Alfa sp. z o.o."':
+              - /url: /my-results/77777777-7777-4777-8777-777777777777?returnTo=%2Fmy-results%3Fscope%3Dmine
+              - text: →
+        - 'row "Mazovia Cargo S.A. ul. Przemysłowa 18, Warszawa Telefon+48 22 555 01 20E-mailkontakt@transportowa.pl Klient zgadza się na ofertę 2 zadań firmowych 4 pozycji · data odniesienia 2026-10-10 Otwórz szczegóły: Mazovia Cargo S.A."':
+          - cell "Mazovia Cargo S.A. ul. Przemysłowa 18, Warszawa":
+            - link "Mazovia Cargo S.A.":
+              - /url: /my-results/99999999-9999-4999-8999-999999999998?returnTo=%2Fmy-results%3Fscope%3Dmine
+            - text: ul. Przemysłowa 18, Warszawa
+          - cell "Telefon+48 22 555 01 20E-mailkontakt@transportowa.pl":
+            - text: Telefon
+            - link "+48 22 555 01 20":
+              - /url: tel:+48225550120
+            - text: E-mail
+            - link "kontakt@transportowa.pl":
+              - /url: mailto:kontakt@transportowa.pl
+          - cell "Klient zgadza się na ofertę":
+            - 'combobox "Status kontaktu: Mazovia Cargo S.A."':
+              - option "Nie kontaktowano"
+              - option "Klient zgadza się na ofertę" [selected]
+              - option "Klient nie jest zainteresowany"
+          - cell "2 zadań firmowych 4 pozycji · data odniesienia 2026-10-10"
+          - 'cell "Otwórz szczegóły: Mazovia Cargo S.A."':
+            - 'link "Otwórz szczegóły: Mazovia Cargo S.A."':
+              - /url: /my-results/99999999-9999-4999-8999-999999999998?returnTo=%2Fmy-results%3Fscope%3Dmine
+              - text: →
+        - 'row "Polskie Drogi Transport sp. z o.o. ul. Przemysłowa 18, Warszawa Telefon+48 22 555 01 20E-mailkontakt@transportowa.pl Nie kontaktowano 2 zadań firmowych 4 pozycji · data odniesienia 2026-10-10 Otwórz szczegóły: Polskie Drogi Transport sp. z o.o."':
+          - cell "Polskie Drogi Transport sp. z o.o. ul. Przemysłowa 18, Warszawa":
+            - link "Polskie Drogi Transport sp. z o.o.":
+              - /url: /my-results/99999999-9999-4999-8999-999999999997?returnTo=%2Fmy-results%3Fscope%3Dmine
+            - text: ul. Przemysłowa 18, Warszawa
+          - cell "Telefon+48 22 555 01 20E-mailkontakt@transportowa.pl":
+            - text: Telefon
+            - link "+48 22 555 01 20":
+              - /url: tel:+48225550120
+            - text: E-mail
+            - link "kontakt@transportowa.pl":
+              - /url: mailto:kontakt@transportowa.pl
+          - cell "Nie kontaktowano":
+            - 'combobox "Status kontaktu: Polskie Drogi Transport sp. z o.o."':
+              - option "Nie kontaktowano" [selected]
+              - option "Klient zgadza się na ofertę"
+              - option "Klient nie jest zainteresowany"
+          - cell "2 zadań firmowych 4 pozycji · data odniesienia 2026-10-10"
+          - 'cell "Otwórz szczegóły: Polskie Drogi Transport sp. z o.o."':
+            - 'link "Otwórz szczegóły: Polskie Drogi Transport sp. z o.o."':
+              - /url: /my-results/99999999-9999-4999-8999-999999999997?returnTo=%2Fmy-results%3Fscope%3Dmine
+              - text: →
+        - 'row "Wschód Freight Group ul. Przemysłowa 18, Warszawa Telefon+48 22 555 01 20E-mailkontakt@transportowa.pl Klient nie jest zainteresowany 2 zadań firmowych 4 pozycji · data odniesienia 2026-10-10 Otwórz szczegóły: Wschód Freight Group"':
+          - cell "Wschód Freight Group ul. Przemysłowa 18, Warszawa":
+            - link "Wschód Freight Group":
+              - /url: /my-results/99999999-9999-4999-8999-999999999996?returnTo=%2Fmy-results%3Fscope%3Dmine
+            - text: ul. Przemysłowa 18, Warszawa
+          - cell "Telefon+48 22 555 01 20E-mailkontakt@transportowa.pl":
+            - text: Telefon
+            - link "+48 22 555 01 20":
+              - /url: tel:+48225550120
+            - text: E-mail
+            - link "kontakt@transportowa.pl":
+              - /url: mailto:kontakt@transportowa.pl
+          - cell "Klient nie jest zainteresowany":
+            - 'combobox "Status kontaktu: Wschód Freight Group"':
+              - option "Nie kontaktowano"
+              - option "Klient zgadza się na ofertę"
+              - option "Klient nie jest zainteresowany" [selected]
+          - cell "2 zadań firmowych 4 pozycji · data odniesienia 2026-10-10"
+          - 'cell "Otwórz szczegóły: Wschód Freight Group"':
+            - 'link "Otwórz szczegóły: Wschód Freight Group"':
+              - /url: /my-results/99999999-9999-4999-8999-999999999996?returnTo=%2Fmy-results%3Fscope%3Dmine
+              - text: →
+- alert

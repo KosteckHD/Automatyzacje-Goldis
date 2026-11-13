@@ -12,6 +12,10 @@ passphrase_file="${GOLDIS_BACKUP_PASSPHRASE_FILE:-}"
 restore_project="${GOLDIS_RESTORE_PROJECT:-}"
 restore_base="${GOLDIS_RESTORE_BASE:-/var/lib/goldis/restores}"
 web_port="${GOLDIS_RESTORE_WEB_PORT:-}"
+restore_subnet="${GOLDIS_RESTORE_FRONTEND_SUBNET:-}"
+restore_web_ip="${GOLDIS_RESTORE_FRONTEND_WEB_IP:-}"
+[[ -n "$restore_subnet" && -n "$restore_web_ip" ]] || { printf "%s\n" "RESTORE_DISTINCT_FRONTEND_NETWORK_REQUIRED" >&2; exit 1; }
+export GOLDIS_FRONTEND_SUBNET="$restore_subnet" GOLDIS_FRONTEND_WEB_IP="$restore_web_ip" TRUST_PROXY_IPS="$restore_web_ip"
 restore_root=""
 work_dir=""
 compose_args=()
@@ -102,6 +106,7 @@ done
 chmod 0700 "$restore_root" "$restore_root/secrets"
 find "$restore_root/secrets" -type d -exec chmod 0700 {} +
 find "$restore_root/secrets" -type f -exec chmod 0600 {} +
+bash "$repo_root/deploy/secrets/prepare-linux-permissions.sh" "$restore_root/secrets"
 chmod 0600 "$restore_root/env.production" "$restore_root/source-manifest.json"
 
 compose_args=(--project-name "$restore_project" --env-file "$restore_root/env.production" -f "$repo_root/compose.yaml" -f "$repo_root/compose.production.yaml")
@@ -117,7 +122,7 @@ existing="$(GOLDIS_SECRETS_DIR="$restore_root/secrets" GOLDIS_WEB_HOST_PORT="$we
 for volume in postgres_data redis_data worker_profile worker_staging export_data deletion_journal web_cache; do
   docker volume inspect "${restore_project}_${volume}" >/dev/null 2>&1 && die "RESTORE_PROJECT_VOLUME_ALREADY_EXISTS"
 done
-for network in goldis_frontend goldis_data goldis_parser; do
+for network in goldis_frontend goldis_data goldis_parser goldis_commission_engine; do
   docker network inspect "${restore_project}_${network}" >/dev/null 2>&1 && die "RESTORE_PROJECT_NETWORK_ALREADY_EXISTS"
 done
 
@@ -125,6 +130,7 @@ compose up -d postgres >/dev/null || die "RESTORE_POSTGRES_START_FAILED"
 started=1
 compose run --rm --no-deps db-roles >/dev/null || die "RESTORE_DATABASE_ROLES_FAILED"
 cat "$payload/database.dump" | compose exec -T postgres pg_restore -U goldis -d goldis --no-owner --exit-on-error >/dev/null 2>&1 || die "RESTORE_DATABASE_IMPORT_FAILED"
+compose run --rm --no-deps db-roles >/dev/null || die "RESTORE_DATABASE_OWNERSHIP_FAILED"
 compose run --rm --no-deps migrate >/dev/null || die "RESTORE_MIGRATION_OR_RUNTIME_GRANTS_FAILED"
 
 config_json="$(GOLDIS_SECRETS_DIR="$restore_root/secrets" GOLDIS_WEB_HOST_PORT="$web_port" docker compose "${compose_args[@]}" config --format json)" || die "RESTORE_IMAGE_CONFIG_FAILED"
@@ -134,7 +140,7 @@ worker_image="$(node -e 'const c=JSON.parse(process.argv[1]);process.stdout.writ
 copy_into_volume() {
   local image="$1" volume="$2" source="$3"
   docker volume create "$volume" >/dev/null || die "RESTORE_VOLUME_CREATE_FAILED"
-  docker run --rm --network none --entrypoint /bin/sh \
+  docker run --rm --network none --user 0:0 --entrypoint /bin/sh \
     --mount "type=volume,source=$volume,target=/target" \
     --mount "type=bind,source=$source,target=/source,readonly" \
     "$image" -c 'cp -a /source/. /target/ && chown -R 1000:1000 /target' >/dev/null 2>&1 || die "RESTORE_FILE_VOLUME_IMPORT_FAILED"

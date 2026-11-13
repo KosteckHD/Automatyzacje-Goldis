@@ -3,6 +3,7 @@
 import { Fragment, useCallback, useEffect, useState, type FormEvent } from "react";
 import { usePathname } from "next/navigation";
 import { performPrivilegedMutation } from "../lib/privileged-action";
+import { polishCount } from "../lib/ui-labels";
 import LeadSidebar from "../leads/LeadSidebar";
 import "../leads/leads.css";
 import "../leads/platform-pages.css";
@@ -136,15 +137,15 @@ export default function TeamWorkspace() {
         </section>
 
         <section className="lead-panel team-list-panel">
-          <div className="lead-section-heading"><div><h2>Lista pracowników</h2><p>{items.length} kont · zarządzanie dotyczy wyłącznie kont o roli pracownika.</p></div></div>
+          <div className="lead-section-heading"><div><h2>Lista pracowników</h2><p>{polishCount(items.length, "konto", "konta", "kont")} · zarządzanie dotyczy wyłącznie kont o roli pracownika.</p></div></div>
           <form className="team-search" onSubmit={(event) => { event.preventDefault(); void load(query); }}><label className="admin-field">Szukaj pracownika<input type="search" maxLength={128} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Wpisz login" /></label><button className="lead-secondary" disabled={loading}>Szukaj</button></form>
           <div className="team-table-wrap" role="region" aria-label="Pracownicy; przewiń poziomo, aby zobaczyć pełną tabelę" tabIndex={0}>
             <table className="team-table"><thead><tr><th>Pracownik</th><th>Status konta</th><th>Adres odzyskiwania</th><th>Ostatnie logowanie</th><th>Przydzielone leady</th><th>Uruchamianie OC</th><th /></tr></thead>
               <tbody>{items.map((employee) => <Fragment key={employee.userId}><tr>
                 <td><strong>{employee.username}</strong><small>Utworzono {dateLabel(employee.createdAt)} · {employee.activeSessionCount} aktywnych sesji</small></td>
-                <td><span className={`team-status ${employee.status}`}>{employee.status === "active" ? "Aktywne" : "Wyłączone"}</span></td>
-                <td>{employee.hasVerifiedRecoveryEmail ? "Zweryfikowany" : "Brak"}</td>
-                <td>{dateLabel(employee.lastLoginAt)}</td><td>{employee.leadCount}</td><td>{employee.canExecuteOc ? "Dozwolone" : "Brak dostępu"}</td>
+                <td data-label="Status konta"><span className={`team-status ${employee.status}`}>{employee.status === "active" ? "Aktywne" : "Wyłączone"}</span></td>
+                <td data-label="Adres odzyskiwania">{employee.hasVerifiedRecoveryEmail ? "Zweryfikowany" : "Brak"}</td>
+                <td data-label="Ostatnie logowanie">{dateLabel(employee.lastLoginAt)}</td><td data-label="Przydzielone firmy">{employee.leadCount}</td><td data-label="Uruchamianie OC">{employee.canExecuteOc ? "Dozwolone" : "Brak dostępu"}</td>
                 <td><button type="button" className="lead-secondary team-manage-button" aria-expanded={expandedId === employee.userId} onClick={() => { setExpandedId(expandedId === employee.userId ? null : employee.userId); setPasswordDraft(""); }}>Zarządzaj</button></td>
               </tr>{expandedId === employee.userId && <tr><td className="team-edit-cell" colSpan={7}>
                 <div className="team-edit-panel"><div><strong>{employee.username}</strong><p>Zmiany konta nie przenoszą przypisanych leadów.</p></div>

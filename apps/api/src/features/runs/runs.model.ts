@@ -288,9 +288,9 @@ export class RunIdentityModel extends Model {
 
   declare lastName: string;
 
-  declare peselCiphertext: string;
+  declare peselCiphertext: string | null;
 
-  declare peselKeyVersion: number;
+  declare peselKeyVersion: number | null;
 
   declare matchMethod: string;
 
@@ -314,9 +314,9 @@ registerModel(
 
     lastName: { type: DataTypes.TEXT, allowNull: false, field: "last_name" },
 
-    peselCiphertext: { type: DataTypes.TEXT, allowNull: false, field: "pesel_ciphertext" },
+    peselCiphertext: { type: DataTypes.TEXT, allowNull: true, field: "pesel_ciphertext" },
 
-    peselKeyVersion: { type: DataTypes.INTEGER, allowNull: false, field: "pesel_key_version" },
+    peselKeyVersion: { type: DataTypes.INTEGER, allowNull: true, field: "pesel_key_version" },
 
     matchMethod: { type: DataTypes.STRING(80), allowNull: false, field: "match_method" },
 

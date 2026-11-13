@@ -47,6 +47,46 @@ export class RunSubmissionCancellationRepository {
     );
   }
 
+  pauseUnadmittedGroups(submissionId: string, now: Date, transaction: Transaction) {
+    return RunSubmissionGroup.update(
+      {
+        admissionState: "waiting_paused",
+        reasonCode: "SUBMISSION_PAUSED",
+        nextAttemptAt: null,
+        leaseOwner: null,
+        leaseExpiresAt: null,
+        version: sequelize.literal("version + 1"),
+        updatedAt: now,
+      },
+      {
+        where: {
+          submissionId,
+          runId: null,
+          admissionState: ["pending", "leased", "waiting_capacity", "waiting_window", "waiting_paused"],
+        },
+        transaction,
+      },
+    );
+  }
+
+  resumeUnadmittedGroups(submissionId: string, now: Date, transaction: Transaction) {
+    return RunSubmissionGroup.update(
+      {
+        admissionState: "pending",
+        reasonCode: null,
+        nextAttemptAt: now,
+        leaseOwner: null,
+        leaseExpiresAt: null,
+        version: sequelize.literal("version + 1"),
+        updatedAt: now,
+      },
+      {
+        where: { submissionId, runId: null, admissionState: "waiting_paused", reasonCode: "SUBMISSION_PAUSED" },
+        transaction,
+      },
+    );
+  }
+
   saveSubmission(submission: RunSubmission, transaction: Transaction) {
     return submission.save({ transaction });
   }
@@ -57,6 +97,25 @@ export class RunSubmissionCancellationRepository {
         tenantId: actor.tenantId,
         actorUserId: actor.actorUserId,
         action: "run.submission.cancelled",
+        resourceType: "run_submission",
+        resourceId: submissionId,
+        outcome: "succeeded",
+      },
+      transaction,
+    );
+  }
+
+  recordAdmissionControl(
+    submissionId: string,
+    actor: AuditActorContext,
+    action: "paused" | "resumed",
+    transaction: Transaction,
+  ) {
+    return recordAuditEvent(
+      {
+        tenantId: actor.tenantId,
+        actorUserId: actor.actorUserId,
+        action: action === "paused" ? "run.submission.paused" : "run.submission.resumed",
         resourceType: "run_submission",
         resourceId: submissionId,
         outcome: "succeeded",

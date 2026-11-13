@@ -2,6 +2,8 @@ import { Module } from "@nestjs/common";
 import { AccountRecoveryModule } from "../account-recovery";
 import { AuditModule } from "../audit/public";
 import { AuthModule } from "../auth";
+import { CommissionsModule } from "../commissions/public";
+import { PrivilegedActionsModule } from "../privileged-actions/public";
 import { AdminOnlyGuard } from "./admin.support";
 import { AdminMutationsRepository } from "./admin-mutations.repository";
 import { AdminMutationsService } from "./admin-mutations.service";
@@ -19,7 +21,7 @@ import { AdminUsersRepository } from "./admin-users.repository";
 import { AdminUsersService } from "./admin-users.service";
 
 @Module({
-  imports: [AuthModule, AccountRecoveryModule, AuditModule],
+  imports: [AuthModule, AccountRecoveryModule, AuditModule, PrivilegedActionsModule, CommissionsModule],
   controllers: [AdminOverviewController, AdminUsersController, AdminToolsController, AdminOperationsController],
   providers: [
     AdminOnlyGuard,

@@ -69,11 +69,12 @@ const MODULES = Object.freeze({
     "features/grouping/grouping.module.spec.js",
     "features/review/review.module.spec.js",
     "features/review/review.dto.spec.js",
+    "features/review/review.repository.spec.js",
     "features/preparations/import-preparations.http.spec.js", "features/preparations/preparation-analysis.spec.js",
     "features/preparations/preparation-export.spec.js", "features/preparations/preparation-workflows.service.spec.js",
     "features/review/review.http.spec.js", "features/grouping/entity-grouping.spec.js",
   ] },
-  leads: { workspace: "@goldis/api", files: ["features/leads/leads.module.spec.js", "features/leads/business-leads.http.spec.js"] },
+  leads: { workspace: "@goldis/api", files: ["features/leads/leads.module.spec.js", "features/leads/lead-query.spec.js", "features/leads/business-leads.http.spec.js"] },
   teams: { workspace: "@goldis/api", files: ["features/teams/team.http.spec.js", "features/teams/team.module.spec.js", "features/teams/team.service.spec.js"] },
   tools: { workspace: "@goldis/api", files: ["features/tools/tools.module.spec.js", "features/tools/tools.service.spec.js"] },
   admin: { workspace: "@goldis/api", files: ["features/admin/admin.http.spec.js", "features/admin/admin.module.spec.js", "features/admin/admin-mutations.service.spec.js", "features/privileged-actions/privileged-actions.module.spec.js"] },
@@ -81,7 +82,7 @@ const MODULES = Object.freeze({
   "admin-users-db": { workspace: "@goldis/api", db: true, dbMode: "admin-users-db" },
   submission: { workspace: "@goldis/api", files: [
     "features/submissions/run-submission.dto.spec.js", "features/submissions/submissions.module.spec.js",
-    "features/submissions/run-submissions.http.spec.js",
+    "features/submissions/run-submissions.http.spec.js", "features/submissions/run-submission-result-set.spec.js",
   ] },
   auth: { workspace: "@goldis/api", files: [
     "features/auth/session.guard.spec.js", "features/auth/auth.session.spec.js",
@@ -103,6 +104,8 @@ const MODULES = Object.freeze({
   security: { workspace: "@goldis/api", files: [
     "features/authorization/authorization-guard.spec.js", "features/authorization/authorization-policy.spec.js", "infrastructure/http/http-bootstrap.spec.js", "infrastructure/http/public-output.spec.js", "features/admin/manager-revocation.http.spec.js", "features/auth/session.guard.spec.js",
     "features/privileged-actions/privileged-actions.spec.js",
+      "features/privileged-actions/privileged-actions.dto.spec.js",
+      "features/privileged-actions/privileged-actions.repository.spec.js",
     "features/reports/history.spec.js", "features/auth/login-rate-limiter.spec.js", "features/auth/password-hash.spec.js", "features/auth/password-policy.spec.js",
     "features/authorization/resource-scope.spec.js", "features/runs/run-cancel.http.spec.js", "features/auth/auth.session.spec.js", "features/authorization/tool-access.spec.js",
     "contracts/user-serialization.spec.js", "features/imports/workbook.spec.js",
@@ -138,13 +141,15 @@ const MODULES = Object.freeze({
     "apps/worker/dist/infrastructure/staging/result-staging.spec.js", "apps/worker/dist/features/results/oc.spec.js", "apps/worker/dist/testing/fixtures/oc-fixtures.spec.js",
   ] },
   "audit-reports": { workspace: "@goldis/api", files: [
-    "features/audit/audit.spec.js", "features/audit/audit.module.spec.js", "features/audit/audit.service.spec.js", "features/reports/reports.module.spec.js", "features/audit/audit-search.http.spec.js",
+    "features/audit/audit.spec.js", "features/audit/audit.module.spec.js", "features/audit/audit.service.spec.js", "features/reports/reports.module.spec.js", "features/reports/audit-search.http.spec.js", "features/reports/history.spec.js", "features/reports/contact-report.repository.spec.js", "features/reports/dashboard.repository.spec.js",
   ] },
   everest: { workspace: "@goldis/worker", files: [
     "apps/worker/dist/portals/pzu/everest-identity-provider.spec.js", "apps/worker/dist/portals/shared/portal-action-pacer.spec.js",
   ] },
   "everest-browser": { workspace: "@goldis/worker", browserFixture: true, testCwd: "apps/worker", files: [
-    "apps/worker/dist/portals/pzu/everest-identity-provider.spec.js", "apps/worker/dist/portals/shared/portal-navigation.spec.js",
+    "apps/worker/dist/portals/pzu/everest-identity-provider.spec.js", "apps/worker/dist/portals/pzu/pzu-session.spec.js",
+    "apps/worker/dist/portals/pzu/pzu-sms-detection.spec.js",
+    "apps/worker/dist/portals/shared/portal-navigation.spec.js",
   ] },
   compensa: { workspace: "@goldis/worker", files: [
     "apps/worker/dist/portals/compensa/compensa-session.spec.js", "apps/worker/dist/portals/compensa/compensa-portal.spec.js",
@@ -152,6 +157,7 @@ const MODULES = Object.freeze({
     "apps/worker/dist/portals/compensa/compensa-offer-checkpoint.spec.js",
   ] },
   "compensa-browser": { workspace: "@goldis/worker", browserFixture: true, testCwd: "apps/worker", files: [
+    "apps/worker/dist/portals/compensa/compensa-client-choice.spec.js",
     "apps/worker/dist/portals/compensa/compensa-session.spec.js", "apps/worker/dist/portals/compensa/compensa-portal.spec.js",
     "apps/worker/dist/portals/compensa/compensa-form.spec.js", "apps/worker/dist/portals/compensa/compensa-offer-saver.spec.js",
     "apps/worker/dist/portals/compensa/compensa-offer-checkpoint.spec.js",
@@ -212,9 +218,10 @@ function npmCommand(args) {
   return { command: process.execPath, args: [npmCli, ...args] };
 }
 
-function commandFor(name) {
+function commandFor(name, options = {}) {
   const definition = MODULES[name];
   if (!definition) throw new Error("TEST_MODULE_UNKNOWN");
+  if (options.nativePostgres && !definition.db) throw new Error("TEST_MODULE_NATIVE_POSTGRES_DATABASE_REQUIRED");
   if (definition.browser) {
     const command = npmCommand(["run", "test:module:security-browser"]);
     return {
@@ -233,9 +240,11 @@ function commandFor(name) {
   }
   if (definition.db) {
     if (process.platform !== "win32") throw new Error("MIGRATION_MODULE_REQUIRES_WINDOWS_DOCKER_RUNNER");
+    const args = ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", path.join(ROOT, "scripts/Test-GoldisDatabase.ps1"), "-Module", definition.dbMode ?? name];
+    if (options.nativePostgres) args.push("-NativePostgres");
     return {
       command: "powershell.exe",
-      args: ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", path.join(ROOT, "scripts/Test-GoldisDatabase.ps1"), "-Module", definition.dbMode ?? name],
+      args,
       env: isolatedEnvironment(process.env, name),
     };
   }
@@ -267,11 +276,17 @@ function assertTestFilesExist(files) {
   }
 }
 
+function sourceForBuiltTest(file) {
+  return path.resolve(file)
+    .replace(`${path.sep}dist${path.sep}`, `${path.sep}src${path.sep}`)
+    .replace(/\.js$/, ".ts");
+}
+
 function run(name) {
   const ownedTempDir = fs.mkdtempSync(path.join(os.tmpdir(), `goldis-module-${randomBytes(4).toString("hex")}-`));
   let plan;
   try {
-    plan = commandFor(name);
+    plan = commandFor(name, { nativePostgres: process.env.GOLDIS_TEST_NATIVE_POSTGRES === "1" });
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : "TEST_MODULE_INVALID"}\n`);
     fs.rmSync(ownedTempDir, { recursive: true, force: true });
@@ -309,4 +324,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { FULL_FLOW_ENV_KEYS, MODULES, assertTestFilesExist, assertUniqueTestFiles, commandFor, isolatedEnvironment };
+module.exports = { FULL_FLOW_ENV_KEYS, MODULES, assertTestFilesExist, assertUniqueTestFiles, commandFor, isolatedEnvironment, sourceForBuiltTest };

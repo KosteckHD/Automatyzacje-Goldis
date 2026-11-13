@@ -1,0 +1,134 @@
+- link "Przejdź do głównej treści":
+  - /url: "#main-content"
+- complementary:
+  - link "GOLDIS platforma operacyjna":
+    - /url: /dashboard
+    - strong: GOLDIS
+    - text: platforma operacyjna
+  - paragraph: PRACA
+  - navigation "Główna nawigacja":
+    - link "Przegląd":
+      - /url: /dashboard
+    - link "Moje firmy":
+      - /url: /my-results
+    - link "Pula firm":
+      - /url: /results/oc-policy-verification
+    - link "Automatyzacje":
+      - /url: /tools
+    - link "Przebiegi":
+      - /url: /runs
+    - link "Historia importów":
+      - /url: /imports
+    - link "Powiadomienia":
+      - /url: /notifications
+      - text: Powiadomienia 2
+  - paragraph: ORGANIZACJA
+  - navigation "Zarządzanie":
+    - link "Pracownicy":
+      - /url: /team
+    - link "Dostępy":
+      - /url: /access
+    - link "Raporty":
+      - /url: /reports
+    - link "Weryfikacja danych":
+      - /url: /review
+    - link "Dziennik aktywności":
+      - /url: /audit
+    - link "Moje konto":
+      - /url: /account
+  - button "Zwiń nawigację": Zwiń menu
+  - text: Menedżer
+- main:
+  - text: GOLDIS / PRZEGLĄD Twoje miejsce pracy
+  - link "Powiadomienia · 2":
+    - /url: /notifications
+  - text: M
+  - paragraph: CENTRUM OPERACYJNE · GOLDIS
+  - heading "Przegląd" [level=1]
+  - paragraph: Wróć do rozpoczętych operacji, sprawdź firmy do kontaktu i przejdź prosto do dostępnych wyników.
+  - link "Dokończ sprawdzanie":
+    - /url: /runs/55555555-5555-4555-8555-555555555555
+  - status: Import i przygotowanie danych są dostępne. Worker portali jest obecnie offline.
+  - region "Podsumowanie pracy":
+    - article:
+      - text: Twoje operacje
+      - strong: "8"
+      - text: 1 aktywnych teraz
+    - article:
+      - text: Wymagają działania
+      - strong: "1"
+      - text: Operacje uruchomione przez Ciebie
+    - article:
+      - text: Moje leady
+      - strong: "6"
+      - text: 9 do kontaktu
+    - article:
+      - text: Wolna pula zespołu
+      - strong: "42"
+      - text: Gotowe leady do przydzielenia
+  - paragraph: WYMAGA TWOJEJ UWAGI
+  - heading "Do zrobienia" [level=2]
+  - link "Wszystkie zadania →":
+    - /url: /runs
+  - link "Flota — pilna kontrola.xlsx Weryfikacja polis OC · aktualizacja 11 paź 2026, 10:22 Otwórz operację":
+    - /url: /runs/55555555-5555-4555-8555-555555555555
+    - strong: Flota — pilna kontrola.xlsx
+    - text: Weryfikacja polis OC · aktualizacja 11 paź 2026, 10:22 Otwórz operację
+  - paragraph: OSTATNIE URUCHOMIENIA
+  - heading "Twoje operacje" [level=2]
+  - link "Przebiegi →":
+    - /url: /runs
+  - link "Baza transportowa — październik.xlsx Weryfikacja polis OC · ID 66666666 Zakończona 42 gotowych · 1 z błędem 10 paź 2026, 16:10":
+    - /url: /tools/oc-policy-verification?resultSetId=66666666-6666-4666-8666-666666666666&step=results
+    - strong: Baza transportowa — październik.xlsx
+    - text: Weryfikacja polis OC · ID 66666666 Zakończona 42 gotowych · 1 z błędem
+    - time: 10 paź 2026, 16:10
+  - link "Flota — pilna kontrola.xlsx Weryfikacja polis OC · ID cccccccc Wymaga działania 10 gotowych · 0 z błędem 11 paź 2026, 10:15":
+    - /url: /runs
+    - strong: Flota — pilna kontrola.xlsx
+    - text: Weryfikacja polis OC · ID cccccccc Wymaga działania 10 gotowych · 0 z błędem
+    - time: 11 paź 2026, 10:15
+  - paragraph: SZYBKIE PRZEJŚCIA
+  - heading "Twoje narzędzia i wyniki" [level=2]
+  - paragraph: Sprawdzenie OC tworzy pulę firm. Menedżer przydziela firmy, które pracownicy kontaktują w sekcji Moje firmy.
+  - navigation "Szybkie przejścia":
+    - link "Pula firm Przeglądaj firmy z zakończonych sprawdzeń OC":
+      - /url: /results/oc-policy-verification
+      - strong: Pula firm
+      - text: Przeglądaj firmy z zakończonych sprawdzeń OC
+    - link "Historia importów Wróć do załadowanych plików i przygotowania":
+      - /url: /imports
+      - strong: Historia importów
+      - text: Wróć do załadowanych plików i przygotowania
+    - link "Moje firmy Kontaktuj firmy i zapisuj decyzje":
+      - /url: /my-results
+      - strong: Moje firmy
+      - text: Kontaktuj firmy i zapisuj decyzje
+    - link "Przebiegi Śledź postęp i problemy uruchomionych przebiegów":
+      - /url: /runs
+      - strong: Przebiegi
+      - text: Śledź postęp i problemy uruchomionych przebiegów
+    - link "Powiadomienia 2 nieprzeczytanych informacji":
+      - /url: /notifications
+      - strong: Powiadomienia
+      - text: 2 nieprzeczytanych informacji
+  - paragraph: DYSTRYBUCJA LEADÓW
+  - heading "Stan puli zespołu" [level=2]
+  - link "Otwórz pulę i przydziel →":
+    - /url: /results/oc-policy-verification
+  - article:
+    - text: W puli
+    - strong: "42"
+  - article:
+    - text: Przydzielone
+    - strong: "37"
+  - article:
+    - text: Bez kontaktu
+    - strong: "21"
+  - article:
+    - text: Pozytywne
+    - strong: "10"
+  - article:
+    - text: Brak zainteresowania
+    - strong: "6"
+- alert

@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { connection } from "next/server";
 import { ActivitySignal } from "./activity-signal";
 import PlatformRouteFrame from "./platform-route-frame";
+import MainContentTarget from "./main-content-target";
 import "./styles/tokens.css";
 import "./globals.css";
 import "./admin.css";
@@ -46,5 +47,8 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   await connection();
-  return <html lang="pl"><body className={`${newsreader.variable} ${hankenGrotesk.variable} ${ibmPlexMono.variable}`}><ActivitySignal /><PlatformRouteFrame>{children}</PlatformRouteFrame></body></html>;
+  return <html lang="pl"><body className={`${newsreader.variable} ${hankenGrotesk.variable} ${ibmPlexMono.variable}`}>
+    <a className="skip-link" href="#main-content">Przejdź do głównej treści</a>
+    <div className="skip-target"><ActivitySignal /><PlatformRouteFrame>{children}</PlatformRouteFrame><MainContentTarget /></div>
+  </body></html>;
 }

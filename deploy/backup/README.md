@@ -67,3 +67,7 @@ Po sukcesie projekt pozostaje uruchomiony w kwarantannie na loopback, a workery 
 ## Co wymaga odbioru
 
 `npm run test:backup-crypto` i `npm run test:backup-manifest` sprawdzają szyfrowanie, checksums i journal na syntetycznych plikach. Komendy Linuxa wymagają `bash -n`; pełna walidacja PostgreSQL/Compose i odtworzenie muszą być wykonane na izolowanym Linux/Docker Engine. Do wyboru pozostały: zewnętrzny storage, synchronizacja obu archiwów, klucz/escrow, harmonogram, retencja, cold restore na drugim hoście i zmierzone RPO/RTO.
+
+### Osobna sieć próby odtworzenia
+
+Przed restore ustaw GOLDIS_RESTORE_FRONTEND_SUBNET i GOLDIS_RESTORE_FRONTEND_WEB_IP na wolną podsieć i adres w niej (np. 172.30.20.0/24 oraz 172.30.20.10 po sprawdzeniu routingu i sieci Docker). Skrypt nadpisze także TRUST_PROXY_IPS adresem testowego web. Nie używaj podsieci aktywnej instalacji. Docker ma odrzucić nakładające się pule. Restore wymaga bash; przygotowuje uprawnienia sekretów dla obecnych UID/GID obrazów i ponownie nadaje własność DB po pg_restore, przed migracjami. Są to zmiany wymagające pełnej próby Linux z docelowymi digestami — sama kontrola składni nie potwierdza RTO/RPO.

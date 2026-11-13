@@ -8,9 +8,9 @@ const { spawnSync } = require("node:child_process");
 
 const root = path.resolve(__dirname, "..");
 const secretNames = [
-  "database_password", "migrator_db_password", "api_db_password", "worker_db_password", "enrichment_db_password",
-  "redis_api_password", "redis_worker_password", "database_url_migrator", "database_url_api", "database_url_worker",
-  "database_url_enrichment", "redis_url_api", "redis_url_worker", "session_secret", "login_rate_limit_secret",
+  "database_password", "migrator_db_password", "api_db_password", "worker_db_password", "enrichment_db_password", "commission_db_password",
+  "redis_api_password", "redis_worker_password", "redis_commission_password", "database_url_migrator", "database_url_api", "database_url_worker",
+  "database_url_enrichment", "database_url_commission", "redis_url_api", "redis_url_worker", "redis_url_commission", "commission_engine_secret", "session_secret", "login_rate_limit_secret",
   "privileged_action_binding_key", "admin_user", "admin_password", "pesel_keyring", "artifact_keyring", "worker_auth_secret",
   "import_parser_secret", "registry_cache_key", "pzu_login", "pzu_password", "compensa_login", "compensa_password", "worker_staging_key",
   "resend_api_key", "auth_mail_keyring",
@@ -30,6 +30,7 @@ function main() {
       GOLDIS_REDIS_IMAGE: `redis@sha256:${"b".repeat(64)}`,
       GOLDIS_API_IMAGE: `api@sha256:${"c".repeat(64)}`,
       GOLDIS_WORKER_IMAGE: `worker@sha256:${"d".repeat(64)}`,
+      GOLDIS_COMMISSION_ENGINE_IMAGE: `commission-engine@sha256:${"f".repeat(64)}`,
       GOLDIS_WEB_IMAGE: `web@sha256:${"e".repeat(64)}`,
       GOLDIS_BUILD_VERSION: "0.1.0-fixture",
       GOLDIS_BUILD_COMMIT: "a1b2c3d4".padEnd(40, "e"),

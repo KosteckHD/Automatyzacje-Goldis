@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { GoldisLogo } from "../../components/brand/GoldisLogo";
+import { sanitizeAppReturnTo } from "../lib/return-to";
 
 type Account = { username: string; role: string; csrfToken: string; mustChangePassword: boolean };
 type RecoveryEmail = { enabled: boolean; recoveryEmail: string | null; verifiedAt: string | null; pendingEmail: string | null };
@@ -24,6 +25,8 @@ export default function AccountPage() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
+  const [requiredPasswordChange, setRequiredPasswordChange] = useState(false);
+  const [requiredReturnTo, setRequiredReturnTo] = useState<string | null>(null);
 
   async function load() {
     try {
@@ -37,7 +40,13 @@ export default function AccountPage() {
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Nie udało się odczytać bezpieczeństwa konta."); }
   }
 
-  useEffect(() => { void load(); }, []);
+  useEffect(() => {
+    void load();
+    const params = new URLSearchParams(window.location.search);
+    const required = params.get("required") === "1";
+    setRequiredPasswordChange(required);
+    setRequiredReturnTo(required ? sanitizeAppReturnTo(params.get("returnTo"), window.location.origin) : null);
+  }, []);
 
   async function changePassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(""); setNotice("");
@@ -53,6 +62,7 @@ export default function AccountPage() {
       setAccount({ ...account, csrfToken: result.csrfToken, mustChangePassword: false });
       setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
       setNotice("Hasło zmienione. Pozostałe sesje zostały cofnięte.");
+      if (requiredPasswordChange) { window.location.replace(requiredReturnTo ?? "/"); return; }
       await load();
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Nie udało się zmienić hasła."); }
     finally { setBusy(false); }
@@ -93,7 +103,7 @@ export default function AccountPage() {
     <div className="account-content">
       <p className="eyebrow">KONTO I BEZPIECZEŃSTWO</p><h1>Twoje sesje,<br /><em>Twoje hasło.</em></h1>
       {error && <p className="admin-alert" role="alert">{error}</p>}{notice && <p className="admin-notice" role="status">{notice}</p>}
-      {account?.mustChangePassword && <div className="account-required" role="alert"><strong>Wymagana zmiana hasła</strong><span>To konto ma hasło tymczasowe. Zmień je, aby korzystać z narzędzi.</span></div>}
+      {(requiredPasswordChange || account?.mustChangePassword) && <div className="account-required" role="alert"><strong>Wymagana zmiana hasła</strong><span>To konto ma hasło tymczasowe. Zmień je, aby korzystać z narzędzi.</span></div>}
       {recoveryEmail?.enabled && <section className="account-card"><div className="admin-card-head"><div><h2>Adres odzyskiwania</h2><p>Adres musi należeć do Ciebie. Link potwierdzający jest ważny 24 godziny.</p></div><span className="admin-counter">{recoveryEmail.verifiedAt ? "Zweryfikowany" : "Niezweryfikowany"}</span></div>
         <p className="admin-muted">{recoveryEmail.recoveryEmail ? `Aktywny: ${recoveryEmail.recoveryEmail}` : "Nie przypisano jeszcze adresu."}{recoveryEmail.pendingEmail ? ` · Oczekuje na potwierdzenie: ${recoveryEmail.pendingEmail}` : ""}</p>
         <form className="admin-form" onSubmit={(event) => void requestRecoveryEmail(event)}><label className="admin-field">Nowy adres e-mail<input type="email" autoComplete="email" maxLength={254} value={recoveryEmailDraft} onChange={(event) => setRecoveryEmailDraft(event.target.value)} required /></label><label className="admin-field">Obecne hasło<input type="password" autoComplete="current-password" maxLength={1024} value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} required /></label><button className="admin-button" disabled={busy || !account}>Wyślij link potwierdzający</button></form>

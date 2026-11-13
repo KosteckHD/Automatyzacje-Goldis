@@ -181,7 +181,7 @@ test("review API gates role, tenant, session and CSRF before forwarding decision
       true,
     );
     const { ReviewService: ReviewServiceClass } = await import("./review.service");
-    const bodyValidator = new ReviewServiceClass({} as never, { record: async () => undefined } as never);
+    const bodyValidator = new ReviewServiceClass({} as never, { record: async () => undefined } as never, {} as never);
     await assert.rejects(
       bodyValidator.decideCorrection(
         correctionId,

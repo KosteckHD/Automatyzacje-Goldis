@@ -13,3 +13,17 @@ Adresy DB w plikach URL muszą używać hosta `postgres` i portu `5432`; `redis_
 Na Linuxie katalog ustaw jako `/etc/goldis/secrets`, właściciel `root`, tryb `0700`; pliki tryb `0600`. Nie zapisuj ich w repozytorium, obrazie, kopii danych tej samej klasy co backup ani w logach. Windowsowy `Initialize-GoldisLocal.ps1` i `Start-GoldisLocal.ps1` synchronizują lokalne pliki do ACL-chronionego katalogu użytkownika.
 
 W Compose user `default` Redis jest wyłączony. `goldis_api` ma dostęp do kluczy `goldis:*` limitera i kolejki `oc-verification`; `goldis_worker` widzi tylko tę kolejkę. Hasła i ACL są rozdzielone, a konta nie dostają kategorii administracyjnych ani niebezpiecznych. Kontrola Redis po starcie musi potwierdzić odrzucenie `ACL`, `CONFIG`, `SHUTDOWN`, `FLUSHALL` i `FLUSHDB`, a także poprawne działanie skryptów rate-limit/BullMQ.
+
+## Linux — kontenery bez roota
+
+Po zapisaniu kompletu sekretów uruchom jako root:
+
+```sh
+bash deploy/secrets/prepare-linux-permissions.sh /etc/goldis/secrets
+```
+
+Katalog pozostaje root:root 0700. Pliki czytane przez procesy aplikacji mają root:1000 0640, ponieważ bind mounts Compose zachowują uprawnienia hosta. UID/GID 1000 dotyczy obecnych obrazów Node i Playwright; przy zmianie obrazu potwierdź je ponownie. Silnik Python UID 10001 dostaje dodatkową grupę 1000 i wyłącznie swój zamontowany token. Kontenery nadal otrzymują tylko sekrety wymienione dla danej usługi. Hasła administracyjne DB/Redis zachowuj root:root 0600. Odczyt każdego pliku przez właściwą usługę musi przejść kontrolę przed uruchomieniem na VPS.
+
+Standardowe nazwy to pzu_login, pzu_password, compensa_login, compensa_password. Starsze nazwy *_activation_20261017 można przejściowo wskazać zmiennymi GOLDIS_PZU_LOGIN_SECRET_FILE, GOLDIS_PZU_PASSWORD_SECRET_FILE, GOLDIS_COMPENSA_LOGIN_SECRET_FILE i GOLDIS_COMPENSA_PASSWORD_SECRET_FILE. Przed procedurą backup/restore ujednolić je do standardowych nazw bez zmiany wartości.
+
+Komplet dla prowizji obejmuje też commission_db_password, database_url_commission, redis_commission_password, redis_url_commission i commission_engine_secret.

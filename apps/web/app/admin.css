@@ -14,3 +14,4 @@
 .admin-intervention-controls .admin-filter-inline select { width: 100%; max-width: none; }
 .admin-intervention-controls .admin-filter-inline button { justify-self: end; }
 @media(max-width:680px) { .admin-intervention-controls>.admin-filter-inline { width: 100%; grid-template-columns: minmax(0, 1fr); } .admin-intervention-controls .admin-filter-inline button { width: 100%; } }
+.admin-section[hidden]{display:none!important}

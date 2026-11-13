@@ -19,6 +19,8 @@ export type PortalSessionSelectors = Readonly<{
   loginSubmit: string;
   smsChallenge: string;
   smsFrame?: string;
+  /** Observed frame path distinguishes SMS from other methods sharing the MFA shell. */
+  smsFramePath?: string;
   smsCodeInput?: string;
   smsCodeSubmit?: string;
   smsRememberDevice?: string;
@@ -65,7 +67,9 @@ export class PortalSession {
     const requiredSelectors = [options.selectors.authenticated, options.selectors.loginForm, options.selectors.usernameInput,
       options.selectors.passwordInput, options.selectors.loginSubmit, options.selectors.smsChallenge, options.selectors.accessDenied];
     const optionalSmsSelectorInvalid = Boolean(options.selectors.smsCodeInput) !== Boolean(options.selectors.smsCodeSubmit)
-      || [options.selectors.smsFrame, options.selectors.smsCodeInput, options.selectors.smsCodeSubmit,
+      || (options.selectors.smsFramePath !== undefined
+        && (!options.selectors.smsFrame || !/^\/(?!\/)[A-Za-z0-9/_-]+$/.test(options.selectors.smsFramePath)))
+      || [options.selectors.smsFrame, options.selectors.smsFramePath, options.selectors.smsCodeInput, options.selectors.smsCodeSubmit,
         options.selectors.smsRememberDevice, options.selectors.smsResendCode,
         options.selectors.smsCodeRejected, options.selectors.smsCodeExpired, options.selectors.postLoginLanding]
         .some((selector) => selector !== undefined && !selector.trim());
@@ -299,6 +303,26 @@ export class PortalSession {
     catch { return false; }
   }
 
+  private async readSmsState(page: Page): Promise<PortalSessionState> {
+    const selectors = this.options.selectors;
+    if (!selectors.smsFrame) return "waiting_for_sms";
+    // A visible Secfense shell can still be loading or host a different MFA method.
+    // Keep that screen unknown; never submit a login form behind the overlay.
+    if (!selectors.smsCodeInput || !selectors.smsCodeSubmit
+      || !await this.isVisibleInSmsFrame(page, selectors.smsCodeInput)
+      || !await this.isVisibleInSmsFrame(page, selectors.smsCodeSubmit)) return "unknown";
+    if (selectors.smsFramePath) {
+      try {
+        const matchesPath = await this.smsLocators(page, selectors.smsCodeInput).evaluate(
+          (_input, expectedPath) => window.location.pathname === expectedPath,
+          selectors.smsFramePath, { timeout: 1_000 },
+        );
+        if (!matchesPath) return "unknown";
+      } catch { return "unknown"; }
+    }
+    return "waiting_for_sms";
+  }
+
   private async readState(page: Page, allowLandingRedirect = true): Promise<PortalSessionState> {
     if (page.url().startsWith("chrome-error://")) return "navigation_error";
     const allowedOrigins = this.options.allowedOrigins ?? [new URL(this.options.entryUrl).origin];
@@ -319,7 +343,7 @@ export class PortalSession {
       }
       return this.readState(page, false);
     }
-    if (await this.isVisible(page, this.options.selectors.smsChallenge)) return "waiting_for_sms";
+    if (await this.isVisible(page, this.options.selectors.smsChallenge)) return this.readSmsState(page);
     if (await this.isVisible(page, this.options.selectors.loginForm)) return "login_required";
     if (await this.isVisible(page, this.options.selectors.authenticated)) return "authenticated";
     return "unknown";

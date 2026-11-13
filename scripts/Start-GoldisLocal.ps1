@@ -10,6 +10,12 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $envPath = if ([System.IO.Path]::IsPathRooted($EnvFile)) { $EnvFile } else { Join-Path $repoRoot $EnvFile }
 $nodeCommand = Get-Command node -ErrorAction Stop
 $npmCommand = Get-Command npm -ErrorAction Stop
+$pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+$pythonPrefix = @()
+if (-not $pythonCommand) {
+  $pythonCommand = Get-Command py -ErrorAction SilentlyContinue
+  if ($pythonCommand) { $pythonPrefix = @("-3.12") }
+}
 $oldEnvironment = @{}
 $children = [System.Collections.Generic.List[System.Diagnostics.Process]]::new()
 $cancelRequested = $false
@@ -32,6 +38,46 @@ function Start-LocalService([string[]]$Arguments, [string]$Label, [string]$LogDi
   $stderr = Join-Path $LogDirectory "$Label.err.log"
   if (-not $WorkingDirectory) { $WorkingDirectory = $repoRoot }
   $process = Start-Process -FilePath $nodeCommand.Source -ArgumentList $Arguments -WorkingDirectory $WorkingDirectory -PassThru -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+  $children.Add($process)
+  return $process
+}
+
+function Start-LocalPythonService([string[]]$Arguments, [string]$Label, [string]$LogDirectory) {
+  $stdout = Join-Path $LogDirectory "$Label.out.log"
+  $stderr = Join-Path $LogDirectory "$Label.err.log"
+  $allowed = @("PATH", "SYSTEMROOT", "WINDIR", "TEMP", "TMP", "PYTHONPATH", "COMMISSION_INTERNAL_TOKEN_FILE")
+  $removedEnvironment = @{}
+  foreach ($entry in Get-ChildItem Env:) {
+    if ($entry.Name -notin $allowed) {
+      $removedEnvironment[$entry.Name] = $entry.Value
+      Remove-Item -LiteralPath "Env:$($entry.Name)"
+    }
+  }
+  try {
+    $process = Start-Process -FilePath $pythonCommand.Source -ArgumentList (@($pythonPrefix) + $Arguments) -WorkingDirectory $repoRoot -PassThru -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+  } finally {
+    foreach ($name in $removedEnvironment.Keys) { Set-Item -LiteralPath "Env:$name" -Value $removedEnvironment[$name] }
+  }
+  $children.Add($process)
+  return $process
+}
+
+function Start-LocalCommissionWorker([string]$LogDirectory) {
+  $stdout = Join-Path $LogDirectory "commission-worker.out.log"
+  $stderr = Join-Path $LogDirectory "commission-worker.err.log"
+  $allowed = @("PATH", "SYSTEMROOT", "WINDIR", "TEMP", "TMP", "NODE_ENV", "APP_ENV", "DATABASE_URL", "REDIS_URL", "API_EXPORT_DIR", "ARTIFACT_REQUIRE_ENCRYPTION", "ARTIFACT_ENCRYPTION_ACTIVE_KEY_VERSION", "ARTIFACT_ENCRYPTION_KEYS_BASE64", "COMMISSION_ENGINE_URL", "COMMISSION_ENGINE_TOKEN_FILE", "COMMISSION_ENGINE_VERSION")
+  $removedEnvironment = @{}
+  foreach ($entry in Get-ChildItem Env:) {
+    if ($entry.Name -notin $allowed) {
+      $removedEnvironment[$entry.Name] = $entry.Value
+      Remove-Item -LiteralPath "Env:$($entry.Name)"
+    }
+  }
+  try {
+    $process = Start-Process -FilePath $nodeCommand.Source -ArgumentList @("apps/api/dist/commission-worker.js") -WorkingDirectory $repoRoot -PassThru -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+  } finally {
+    foreach ($name in $removedEnvironment.Keys) { Set-Item -LiteralPath "Env:$name" -Value $removedEnvironment[$name] }
+  }
   $children.Add($process)
   return $process
 }
@@ -62,6 +108,20 @@ function Wait-LocalImportParserReady([System.Diagnostics.Process]$ParserProcess)
     Start-Sleep -Milliseconds 250
   }
   throw "Parser importu nie osiągnął gotowości w 15 sekund; API nie zostało uruchomione."
+}
+
+function Wait-LocalCommissionEngineReady([System.Diagnostics.Process]$EngineProcess) {
+  $deadline = [DateTime]::UtcNow.AddSeconds(30)
+  while ([DateTime]::UtcNow -lt $deadline) {
+    $EngineProcess.Refresh()
+    if ($EngineProcess.HasExited) { throw "Silnik prowizji zakończył pracę; sprawdź prywatny log commission-engine.err.log." }
+    try {
+      $response = Invoke-WebRequest -Uri "http://127.0.0.1:8000/health/ready" -TimeoutSec 2 -UseBasicParsing
+      if ([int]$response.StatusCode -eq 200) { return }
+    } catch { }
+    Start-Sleep -Milliseconds 300
+  }
+  throw "Silnik prowizji nie osiągnął gotowości w 30 sekund; API nie zostało uruchomione."
 }
 
 function Stop-OwnedServices {
@@ -103,6 +163,9 @@ try {
   if (-not $env:IMPORT_PARSER_HOST) { Set-LocalValue "IMPORT_PARSER_HOST" "127.0.0.1" }
   if (-not $env:IMPORT_PARSER_PORT) { Set-LocalValue "IMPORT_PARSER_PORT" "3010" }
   if (-not $env:IMPORT_PARSER_SHARED_SECRET -or $env:IMPORT_PARSER_SHARED_SECRET.Length -lt 32) { throw "Ustaw oddzielny IMPORT_PARSER_SHARED_SECRET o długości co najmniej 32 znaków." }
+  if (-not $env:COMMISSION_ENGINE_URL) { Set-LocalValue "COMMISSION_ENGINE_URL" "http://127.0.0.1:8000" }
+  if (-not $env:COMMISSION_ENGINE_TOKEN_FILE -and $env:GOLDIS_SECRETS_DIR) { Set-LocalValue "COMMISSION_ENGINE_TOKEN_FILE" (Join-Path $env:GOLDIS_SECRETS_DIR "commission_engine_secret") }
+  if (-not $env:COMMISSION_INTERNAL_TOKEN_FILE) { Set-LocalValue "COMMISSION_INTERNAL_TOKEN_FILE" $env:COMMISSION_ENGINE_TOKEN_FILE }
   if (-not $env:COMPOSE_PROJECT_NAME) { Set-LocalValue "COMPOSE_PROJECT_NAME" "goldis-local" }
   if ($env:COMPOSE_PROJECT_NAME -notmatch '^[a-z0-9][a-z0-9_-]{0,62}$') { throw "COMPOSE_PROJECT_NAME musi być nazwą lokalnego projektu Docker Compose." }
   if (-not $env:WORKER_HEADLESS) { Set-LocalValue "WORKER_HEADLESS" "0" }
@@ -118,6 +181,11 @@ try {
   $logDirectory = Join-Path $localData "logs"
   New-Item -ItemType Directory -Force -Path $logDirectory | Out-Null
   & (Join-Path $PSScriptRoot "Write-GoldisComposeSecrets.ps1") -EnvFile $envPath
+  if (-not $pythonCommand) { throw "Brak Pythona 3.12. Zainstaluj zależności z services/commission-engine/requirements.lock i uruchom ponownie." }
+  if (-not $env:COMMISSION_ENGINE_TOKEN_FILE -or -not (Test-Path -LiteralPath $env:COMMISSION_ENGINE_TOKEN_FILE -PathType Leaf)) { throw "Brak pliku sekretu silnika prowizji." }
+  Set-LocalValue "PYTHONPATH" (Join-Path $repoRoot "services/commission-engine/src")
+  Set-LocalValue "COMMISSION_INTERNAL_TOKEN_FILE" $env:COMMISSION_ENGINE_TOKEN_FILE
+  Invoke-LocalCommand $pythonCommand.Source (@($pythonPrefix) + @("-c", "import fastapi, openpyxl, uvicorn")) "commission-python-preflight" $logDirectory
 
   if (-not $SkipDataServices) {
     $dockerCommand = Get-Command docker -ErrorAction Stop
@@ -148,7 +216,7 @@ try {
   Set-LocalValue "DATABASE_URL" $apiDatabaseUrl
   Invoke-LocalCommand $nodeCommand.Source @("scripts/local-preflight.cjs", "--post-migration") "post-migration-preflight" $logDirectory
   Set-LocalValue "DATABASE_URL" $env:MIGRATOR_DATABASE_URL
-  Invoke-LocalCommand $nodeCommand.Source @("apps/api/dist/processes/bootstrap-admin/composition/main.js") "bootstrap-admin" $logDirectory
+  Invoke-LocalCommand $nodeCommand.Source @("apps/api/dist/processes/bootstrap-admin/main.js") "bootstrap-admin" $logDirectory
   Set-LocalValue "DATABASE_URL" $apiDatabaseUrl
   Set-LocalValue "GOLDIS_ADMIN_USER" ""
   Set-LocalValue "GOLDIS_ADMIN_PASSWORD" ""
@@ -156,9 +224,19 @@ try {
   Write-Host "Uruchamiam API, panel i workery. Zatrzymanie tego okna zamknie wyłącznie uruchomione procesy i ich procesy potomne."
   $parserProcess = Start-LocalService @("apps/api/dist/import-parser-main.js") "import-parser" $logDirectory
   Wait-LocalImportParserReady $parserProcess
+  $engineProcess = Start-LocalPythonService @("-m", "uvicorn", "goldis_commissions.transport.app:app", "--host", "127.0.0.1", "--port", "8000", "--workers", "1") "commission-engine" $logDirectory
+  Wait-LocalCommissionEngineReady $engineProcess
   $apiProcess = Start-LocalService @("apps/api/dist/composition/main.js") "api" $logDirectory
   Wait-LocalApiReady $apiProcess
   [void](Start-LocalService @((Join-Path $repoRoot "node_modules/next/dist/bin/next"), "start", "-p", "3000") "web" $logDirectory (Join-Path $repoRoot "apps/web"))
+  if (-not $env:COMMISSION_DATABASE_URL) { throw "Brak COMMISSION_DATABASE_URL dla workera prowizyjnego." }
+  if (-not $env:COMMISSION_REDIS_URL) { throw "Brak COMMISSION_REDIS_URL dla workera prowizyjnego." }
+  $apiRedisUrl = $env:REDIS_URL
+  Set-LocalValue "DATABASE_URL" $env:COMMISSION_DATABASE_URL
+  Set-LocalValue "REDIS_URL" $env:COMMISSION_REDIS_URL
+  [void](Start-LocalCommissionWorker $logDirectory)
+  Set-LocalValue "DATABASE_URL" $apiDatabaseUrl
+  Set-LocalValue "REDIS_URL" $apiRedisUrl
   if (-not $SkipPortalWorker) {
     if (-not $env:WORKER_DATABASE_URL) { throw "Brak WORKER_DATABASE_URL dla odrębnego konta workera." }
     if (-not $env:WORKER_REDIS_URL) { throw "Brak WORKER_REDIS_URL dla odrębnego konta Redis workera." }
@@ -173,7 +251,7 @@ try {
   Set-LocalValue "DATABASE_URL" $env:ENRICHMENT_DATABASE_URL
   [void](Start-LocalService @("apps/api/dist/enrichment-worker.js") "enrichment-worker" $logDirectory)
   Set-LocalValue "DATABASE_URL" $apiDatabaseUrl
-  Write-Host "Panel: http://127.0.0.1:3000  |  API: http://127.0.0.1:3001/api/health/ready"
+  Write-Host "Panel: http://127.0.0.1:3000  |  API: http://127.0.0.1:3001/api/health/ready  |  Silnik prowizji: Python 3.12"
   Write-Host "Portale: $(if ($env:WORKER_LIVE_PORTALS -eq '1') { 'live — wymagają osobno zaakceptowanej konfiguracji' } else { 'wyłączone' })"
   if ($SkipPortalWorker) { Write-Host "Worker portalowy pominięty: profil pozostaje dla nadzorowanej kontroli selektorów." }
   Write-Host "Wzbogacanie NIP → REGON: $env:GOLDIS_ENRICHMENT_PROVIDER (sprawdź /api/health/enrichment)"

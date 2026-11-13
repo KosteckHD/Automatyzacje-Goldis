@@ -6,7 +6,7 @@ const path = require("node:path");
 const { execFileSync } = require("node:child_process");
 
 const root = path.resolve(__dirname, "..");
-const imageKeys = ["GOLDIS_POSTGRES_IMAGE", "GOLDIS_REDIS_IMAGE", "GOLDIS_API_IMAGE", "GOLDIS_WORKER_IMAGE", "GOLDIS_WEB_IMAGE"];
+const imageKeys = ["GOLDIS_POSTGRES_IMAGE", "GOLDIS_REDIS_IMAGE", "GOLDIS_API_IMAGE", "GOLDIS_COMMISSION_ENGINE_IMAGE", "GOLDIS_WORKER_IMAGE", "GOLDIS_WEB_IMAGE"];
 const releaseFiles = [
   "compose.yaml", "compose.production.yaml", "deploy/nginx/goldis.conf.example",
   "deploy/docker/chromium-seccomp.json", "docker/postgres/apply-runtime-grants.sql", "config/portal-selectors.example.json",

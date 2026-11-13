@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "templateOnly": true,
+  "runId": "DO_UZUPELNIENIA",
+  "status": "NOT_RUN",
+  "timezone": "Europe/Warsaw",
+  "source": {
+    "commitSha": null,
+    "workingTreeMustBeCleanForRelease": true,
+    "sourceSnapshotSha256": null,
+    "operatorPackageSha256": null,
+    "npmLockSha256": null,
+    "pythonLockSha256": null,
+    "migrationHead": null,
+    "runtimeGrantsSha256": null
+  },
+  "plannedScope": {
+    "organizationCount": 1,
+    "concurrentEmployees": "2-5",
+    "tools": ["oc-policy-verification", "commission-comparison"],
+    "commissionRuntimePresentInCurrentTree": true,
+    "portalLive": null,
+    "recoveryMail": null,
+    "registryProvider": null,
+    "legacyDataMigration": null,
+    "dailyWorkload": null,
+    "excludedFeaturesAndTechnicalControls": []
+  },
+  "imagesByDigest": {
+    "postgres": null,
+    "redisWithAcl": null,
+    "apiAndCommissionWorker": null,
+    "commissionEngine": null,
+    "portalWorker": null,
+    "web": null
+  },
+  "environments": [],
+  "allowedTestTargets": [],
+  "excludedAttackTargets": ["PZU", "Compensa", "UFG", "MF VAT", "GUS", "external mail provider"],
+  "testData": { "seedVersion": null, "syntheticDatasetHashes": [], "approvedCommissionReferenceId": null },
+  "tooling": { "versions": {}, "vulnerabilityDatabaseDate": null, "securityRequirementsVersion": null },
+  "executionPolicy": {
+    "baselineRequestsPerSecond": 2,
+    "baselineConcurrency": 4,
+    "faultInjectionOnlyInIsolatedEnvironment": true,
+    "livePortalExecutionByAuthorizedOperatorOnly": true,
+    "automaticFullFlowNotAuthorizedByThisTemplate": true
+  },
+  "recoveryTargets": {
+    "rpoHoursMaximum": 24,
+    "rtoHoursMaximum": 8,
+    "measurementStartDefinition": null,
+    "measurementEndDefinition": null,
+    "deletionJournalOffsiteLagPolicy": null,
+    "automaticTtlForBusinessDataOrBackupHistory": false
+  },
+  "owners": { "product": null, "qa": null, "security": null, "operator": null, "operatorBackup": null },
+  "resultsSource": null,
+  "evidenceIndexPath": null,
+  "findingsRegisterPath": null,
+  "retestOfRunId": null,
+  "notes": "Szablon planu. Null oznacza brak decyzji/dowodu, nie PASS. Nie wpisywać sekretów, tokenów, SMS ani danych klientów."
+}

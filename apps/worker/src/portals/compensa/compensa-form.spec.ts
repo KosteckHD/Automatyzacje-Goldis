@@ -58,6 +58,45 @@ function formOptions(authorizeStart: CompensaFormOptions["authorizeStart"]): Com
   };
 }
 
+for (const scenario of ["payer", "wrong_payer", "existing_payer", "incomplete_customer", "payer_with_draft"] as const) {
+  test(`observed Compensa exception ${scenario} never accepts customer data, saves, or queries UFG`, {
+    skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
+  }, async () => {
+    const directory = await mkdtemp(join(tmpdir(), "goldis-compensa-exception-"));
+    const browser = new BrowserSession({ profileDirectory: directory });
+    try {
+      const payer = scenario !== "incomplete_customer";
+      const source = await readFile(resolve(process.cwd(), "src/testing/fixtures/compensa-portal.html"), "utf8");
+      const html = source.replace("</head>", `<script>window.syntheticPayerPrompt=${payer};window.syntheticWrongPayer=${scenario === "wrong_payer"};window.syntheticIncompleteCustomer=${!payer};</script></head>`);
+      const page = await browser.page("compensa");
+      await page.route("https://goldis.test/**", route => route.fulfill({ contentType: "text/html; charset=utf-8", body: html }));
+      let starts = 0;
+      const options = formOptions(async () => { starts++; return true; });
+      const assistant = new CompensaFormAssistant(browser, new CompensaPortalSession(browser, sessionOptions), {
+        ...options, requirePrefilledIdentity: true,
+        selectors: { ...options.selectors, payerDataDialog: "#payer-data-dialog", payerIdentifierInput: "#payer-identifier", payerCancel: "#cancel-payer", incompleteCustomer: "#incomplete-customer" },
+        recordDraftReference: async () => scenario === "payer_with_draft" || await page.locator("#insured-data").isVisible(),
+      });
+      if (scenario === "existing_payer") {
+        await page.goto(sessionOptions.entryUrl);
+        await page.locator("#compensa-communication-tile").click();
+        await page.locator('[name="insuredIdentifier"]').fill(context().identity!.pesel);
+        await page.locator("#start-communication").click();
+      }
+      const result = await assistant.prepareInsuredForm(context(), context().identity, undefined, scenario === "existing_payer");
+      assert.deepEqual(result, scenario === "wrong_payer" ? { kind: "identity_review", reason: "identity_mismatch" }
+        : scenario === "payer_with_draft" ? { kind: "waiting_for_manual_data", fieldCode: "PORTAL_ACTION_REVIEW" }
+          : payer ? { kind: "skipped", reason: "payer_data_required" } : { kind: "blocked", reason: "incomplete_customer_data" });
+      assert.equal(starts, scenario === "existing_payer" ? 0 : 1);
+      const actions = await page.evaluate(() => {
+        const state = window as unknown as Record<string, unknown>;
+        return { accepted: !!state.syntheticPayerAccepted, cancelled: !!state.syntheticPayerCancelled, saves: state.syntheticSaveClickCount ?? 0, ufg: state.syntheticVerifyCount ?? 0 };
+      });
+      assert.deepEqual(actions, { accepted: false, cancelled: scenario === "payer" || scenario === "existing_payer", saves: 0, ufg: 0 });
+    } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
+  });
+}
+
 test("a fresh row navigates home even when the previous row left an authenticated open case", {
   skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
 }, async () => {
@@ -115,7 +154,9 @@ test("missing contact keeps the normal Communication, PESEL, registration, then 
   const browser = new BrowserSession({ profileDirectory: directory });
   try {
     let html = await readFile(resolve(process.cwd(), "src", "testing", "fixtures", "compensa-portal.html"), "utf8");
-    html = html.replace('</main>', `<section id="matches" hidden><div class="client-card"><div>Nazwa: Ala Testowa</div>
+    html = html.replace('</main>', `<input id="client360-search" placeholder="PESEL / REGON" oninput="window.client360Touched=true">
+      <button onclick="window.client360Touched=true">Przejdź do Klient 360</button>
+      <section id="matches" hidden><div class="client-card"><div>Nazwa: Ala Testowa</div>
       <div>Typ Klienta: Osoba fizyczna prowadząca działalność gospodarczą</div><div>REGON: 012345678</div>
       <button onclick="window.flow.push('business');document.querySelector('#insured-data').hidden=false;document.querySelector('#matches').remove()">Wybierz Klienta</button></div></section></main>`)
       .replace('dialog.hidden = false;', "window.flow=['communication'];dialog.hidden = false;")
@@ -123,7 +164,8 @@ test("missing contact keeps the normal Communication, PESEL, registration, then 
       .replace('insuredData.hidden = false;', "document.querySelector('#matches').hidden=false;");
     const page = await browser.page("compensa");
     await page.route("https://goldis.test/**", route => route.fulfill({ contentType: "text/html; charset=utf-8", body: html }));
-    const input = context();
+    const existing = context();
+    const input = { ...existing, source: { ...existing.source, decisionMakerName: null } };
     const identity = { ...input.identity!, matchMethod: "unique_business_identity" as const };
     const settings = formOptions(async () => {
       assert.deepEqual(await page.evaluate(() => (window as unknown as { flow: string[] }).flow), ["communication"]);
@@ -136,6 +178,8 @@ test("missing contact keeps the normal Communication, PESEL, registration, then 
     });
     assert.equal((await assistant.prepareInsuredForm(input, identity)).kind, "ready_to_save");
     assert.deepEqual(await page.evaluate(() => (window as unknown as { flow: string[] }).flow), ["communication", "start", "business"]);
+    assert.equal(await page.locator("#client360-search").inputValue(), "");
+    assert.equal(await page.evaluate(() => Boolean((window as unknown as { client360Touched?: boolean }).client360Touched)), false);
   } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
 });
 
@@ -158,6 +202,58 @@ for (const referenceConfirmed of [true, false]) {
       });
       assert.equal((await assistant.prepareInsuredForm(context(), context().identity)).kind, referenceConfirmed ? "ready_to_save" : "waiting_for_manual_data");
       assert.equal(await page.evaluate(() => (window as unknown as { editorOpens?: number }).editorOpens || 0), referenceConfirmed ? 1 : 0);
+    } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
+  });
+}
+
+for (const correctPesel of [true, false]) {
+  test(`a unique Everest PESEL obtains names only from the Communication form: ${correctPesel}`, {
+    skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
+  }, async () => {
+    const directory = await mkdtemp(join(tmpdir(), "goldis-compensa-pending-name-"));
+    const browser = new BrowserSession({ profileDirectory: directory });
+    try {
+      let html = await readFile(resolve(process.cwd(), "src", "testing", "fixtures", "compensa-portal.html"), "utf8");
+      if (!correctPesel) html = html.replace('name="pesel" value="90010100016"', 'name="pesel" value="90010100023"');
+      const page = await browser.page("compensa");
+      await page.route("https://goldis.test/**", route => route.fulfill({ contentType: "text/html; charset=utf-8", body: html }));
+      const input = context();
+      const identity = { ...input.identity!, firstName: "", lastName: "", matchMethod: "regon_unique_pesel" as const };
+      const assistant = new CompensaFormAssistant(browser, new CompensaPortalSession(browser, sessionOptions), { ...formOptions(async () => true), requirePrefilledIdentity: true });
+      const result = await assistant.prepareInsuredForm({ ...input, status: "compensa_login", source: { ...input.source, decisionMakerName: null } }, identity);
+      assert.equal(result.kind, correctPesel ? "ready_to_save" : "identity_review");
+      assert.equal(await page.locator('input[name="insuredIdentifier"]').inputValue(), identity.pesel);
+      if (result.kind === "ready_to_save") {
+        assert.equal(result.identity?.firstName, "Ala"); assert.equal(result.identity?.lastName, "Testowa");
+        assert.equal(result.identity?.matchMethod, "unique_business_identity"); assert.equal(result.identity?.pesel, identity.pesel);
+      }
+      assert.equal(await page.evaluate(() => Boolean((window as unknown as { syntheticSaved?: boolean }).syntheticSaved)), false);
+    } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
+  });
+}
+
+for (const correctRegon of [true, false]) {
+  test(`a company enters Communication with REGON and verifies the prefilled business: ${correctRegon}`, {
+    skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
+  }, async () => {
+    const directory = await mkdtemp(join(tmpdir(), "goldis-compensa-company-"));
+    const browser = new BrowserSession({ profileDirectory: directory });
+    try {
+      let html = await readFile(resolve(process.cwd(), "src", "testing", "fixtures", "compensa-portal.html"), "utf8");
+      html = html.replace('<label>Imię<input name="firstName" value="Ala" /></label>', '<label>Nazwa<input name="companyName" value="Synthetic Company" /></label>')
+        .replace('<label>Nazwisko<input name="lastName" value="Testowa" /></label>', '')
+        .replace('<label>PESEL<input name="pesel" value="90010100016" /></label>', `<label>REGON<input name="regon" value="${correctRegon ? "012345678" : "987654321"}" /></label>`);
+      const page = await browser.page("compensa");
+      await page.route("https://goldis.test/**", route => route.fulfill({ contentType: "text/html; charset=utf-8", body: html }));
+      const input = context(), settings = formOptions(async () => true);
+      const identity = { ...input.identity!, firstName: "", lastName: "", pesel: "", matchMethod: "regon_company" as const };
+      const assistant = new CompensaFormAssistant(browser, new CompensaPortalSession(browser, sessionOptions), { ...settings, requirePrefilledIdentity: true, selectors: { ...settings.selectors, regonInput: 'input[name="regon"]', companyNameInput: 'input[name="companyName"]' } });
+      const result = await assistant.prepareInsuredForm({ ...input, status: "compensa_login" }, identity);
+      assert.equal(result.kind, correctRegon ? "ready_to_save" : "identity_review");
+      assert.equal(await page.locator('input[name="insuredIdentifier"]').inputValue(), identity.regon);
+      assert.equal(await page.locator('input[name="vehicleRegistration"]').inputValue(), "RST22339");
+      assert.equal(await page.locator('input[name="pesel"]').count(), 0);
+      assert.equal(await page.evaluate(() => Boolean((window as unknown as { syntheticSaved?: boolean }).syntheticSaved)), false);
     } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
   });
 }

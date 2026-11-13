@@ -9,6 +9,7 @@ const { chromium } = require("playwright");
 const toolId = "oc-policy-verification";
 const importId = "11111111-1111-4111-8111-111111111111";
 const runId = "22222222-2222-4222-8222-222222222222";
+const resultSetId = "77777777-7777-4777-8777-777777777777";
 const batchId = importId;
 const csrfToken = "synthetic-history-ui-csrf-token-12345678901234567890";
 const listRequests = [];
@@ -67,8 +68,14 @@ async function main() {
       };
       else if (path === "/api/tools") body = { items: [{ toolId, displayName: "Weryfikacja polis OC", description: "Historia i praca z importami OC.", status: "available", access: { toolId, canDiscover: true, canExecute: true, canViewResults: true, canDownloadResults: true } }] };
       else if (path === "/api/dashboard") body = { role: "admin", tools: [{ toolId, canExecute: true, canViewResults: true, canDownloadResults: true }],
-        metrics: { operations: { total: 0, active: 0, attention: 0, completed: 0 }, myLeads: { total: 0, notContacted: 0, accepted: 0, notInterested: 0 },
-          team: { unassigned: 0, assigned: 0, notContacted: 0, accepted: 0, notInterested: 0 } }, operations: [], actionRequired: [], unreadNotifications: 0 };
+        metrics: { operations: { total: 1, active: 0, attention: 0, completed: 1 }, myLeads: { total: 0, notContacted: 0, accepted: 0, notInterested: 0 },
+          team: { unassigned: 0, assigned: 0, notContacted: 0, accepted: 0, notInterested: 0 } },
+        operations: [{ id: "operation-dashboard", resultSetId, toolId, toolName: "Weryfikacja polis OC", sourceType: "run_submission", sourceId: "submission-dashboard",
+          batchId: importId, fileName: "Baza operacji syntetyczna.xlsx", status: "completed", createdAt: "2026-10-05T12:00:00.000Z",
+          updatedAt: "2026-10-05T12:00:01.000Z", finishedAt: "2026-10-05T12:00:01.000Z", leadCount: 1, readyCount: 1, failedCount: 0 }], actionRequired: [], unreadNotifications: 0 };
+      else if (path === `/api/result-sets/${resultSetId}/summary`) body = { resultSetId, sourceType: "run_submission", sourceId: "submission-dashboard", batchId: importId, referenceDate: "2026-10-05", status: "completed",
+        counts: { rows: 1, uniqueGroups: 1, policyCount: 1, byStatus: { completed: 1 } } };
+      else if (path === `/api/result-sets/${resultSetId}/rows`) body = { items: [{ sourceRowId: importId, rowNumber: 2, companyName: "Firma z dashboardu", status: "completed", reasonCode: null, runId, runStatus: "completed", policyCount: 1 }], nextCursor: null };
       else if (path === "/api/imports" && request.method() === "GET") {
         listRequests.push({ type: "imports", query: url.searchParams.toString() });
         const secondPage = url.searchParams.has("cursor");
@@ -139,9 +146,15 @@ async function main() {
     await page.goto(baseUrl);
     await page.waitForURL("**/dashboard");
     await page.getByRole("heading", { name: "Przegląd" }).waitFor({ state: "visible" });
+    const dashboardOperation = page.locator(`a[href*="resultSetId=${resultSetId}"]`);
+    await dashboardOperation.waitFor({ state: "visible" });
+    assert.match(await dashboardOperation.getAttribute("href"), new RegExp(`/tools/oc-policy-verification\\?resultSetId=${resultSetId}\\&step=results`));
+    await dashboardOperation.click();
+    await page.waitForURL(`**/tools/oc-policy-verification?resultSetId=${resultSetId}&step=results`);
+    await page.getByText("Firma z dashboardu", { exact: true }).waitFor({ state: "visible" });
     await page.goto(`${baseUrl}/tools`);
     await page.getByRole("heading", { name: "Automatyzacje" }).waitFor({ state: "visible" });
-    await page.getByRole("link", { name: "Otwórz narzędzie" }).waitFor({ state: "visible" });
+    await page.getByRole("link", { name: "Otwórz Sprawdzanie OC" }).waitFor({ state: "visible" });
     await page.goto(`${baseUrl}/imports`);
     await page.getByText("Baza syntetyczna.xlsx").waitFor({ state: "visible" });
     await page.getByLabel("Stan danych").selectOption("needs_review");
@@ -163,7 +176,7 @@ async function main() {
     await page.goto(`${baseUrl}/imports/${importId}`);
     await page.waitForURL("**/tools/oc-policy-verification?import=*");
     await page.waitForTimeout(1200);
-    await page.getByRole("heading", { name: "Przegląd bazy" }).waitFor({ state: "visible", timeout: 5000 });
+    await page.getByRole("heading", { name: "Kontrola wierszy importu" }).waitFor({ state: "visible", timeout: 5000 });
 
     await page.goto(`${baseUrl}/results/history`);
     await page.getByText("Brak polis OC aktualnych na dzień sprawdzenia").waitFor({ state: "visible" });
@@ -188,18 +201,18 @@ async function main() {
 
     await page.getByRole("link", { name: "Otwórz wynik" }).click();
     await page.waitForURL(`**/tools/oc-policy-verification?run=${runId}`);
-    await page.getByRole("heading", { name: "Wiersz 18001: Brak aktualnych polis OC" }).waitFor({ state: "visible", timeout: 5000 });
+    await page.getByRole("heading", { name: "Wiersz 18001 · Brak aktualnych polis OC" }).waitFor({ state: "visible", timeout: 5000 });
     assert.ok(listRequests.some((entry) => entry.type === "results"));
     assert.ok(listRequests.some((entry) => entry.type === "results" && entry.query.includes("limit=50")));
     assert.deepEqual(pageErrors, [], "brak błędów JavaScript w katalogu i historiach");
 
     await page.goto(`${baseUrl}/runs`);
-    await page.getByRole("heading", { name: "Historia zadań" }).waitFor({ state: "visible" });
+    await page.getByRole("heading", { name: "Przebiegi" }).waitFor({ state: "visible" });
     await page.setViewportSize({ width: 375, height: 812 });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "historia nie przewija poziomo przy 375 px");
     mkdirSync(screenshotDir, { recursive: true });
     await page.screenshot({ path: resolve(screenshotDir, "history-mobile.png"), fullPage: true, animations: "disabled" });
-    console.log("HISTORY_UI_SMOKE_PASS catalog=true importFilter=true cursorPagination=true browserBack=true directImport=true zeroPolicyResult=true deletionPreviewStepUpJobPoll=true staleBlockerPreventsJob=true directRun=true responsive375=true screenshots=temp");
+    console.log("HISTORY_UI_SMOKE_PASS dashboardResultSetEntry=true catalog=true importFilter=true cursorPagination=true browserBack=true directImport=true zeroPolicyResult=true deletionPreviewStepUpJobPoll=true staleBlockerPreventsJob=true directRun=true responsive375=true screenshots=temp");
   } catch (error) {
     if (activePage) {
       mkdirSync(screenshotDir, { recursive: true });

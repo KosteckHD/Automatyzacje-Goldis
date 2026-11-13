@@ -1,0 +1,722 @@
+[
+  {
+    "file": "features/account-recovery/index.ts",
+    "import": "./account-recovery.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "PasswordRecoveryController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/admin/index.ts",
+    "import": "./admin-operations.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "AdminOperationsController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/admin/index.ts",
+    "import": "./admin-overview.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "AdminOverviewController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/admin/index.ts",
+    "import": "./admin-tools.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "AdminToolsController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/admin/index.ts",
+    "import": "./admin-users.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "AdminUsersController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/audit/index.ts",
+    "import": "./audit.model",
+    "rule": "public-entry-model-export",
+    "symbol": "AuditEventModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/auth/index.ts",
+    "import": "./auth.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "AuthController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/deletions/index.ts",
+    "import": "./deletion-step-up.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "DeletionStepUpController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/deletions/public.ts",
+    "import": "./deletion-jobs",
+    "rule": "public-entry-controller-export",
+    "symbol": "DeletionJobController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/deletions/public.ts",
+    "import": "./deletions.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "DeletionController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/enrichment/index.ts",
+    "import": "./enrichment.model",
+    "rule": "public-entry-model-export",
+    "symbol": "EnrichmentJobItemModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/enrichment/index.ts",
+    "import": "./enrichment.model",
+    "rule": "public-entry-model-export",
+    "symbol": "EnrichmentJobModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/enrichment/index.ts",
+    "import": "./enrichment.model",
+    "rule": "public-entry-model-export",
+    "symbol": "RegistryEnrichmentAuditModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/enrichment/index.ts",
+    "import": "./enrichment.model",
+    "rule": "public-entry-model-export",
+    "symbol": "RegistryLookupCacheModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/enrichment/index.ts",
+    "import": "./enrichment.model",
+    "rule": "public-entry-model-export",
+    "symbol": "RegonCorrectionModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/enrichment/public.ts",
+    "import": "./enrichment-job.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "EnrichmentJobController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/grouping/index.ts",
+    "import": "./grouping.model",
+    "rule": "public-entry-model-export",
+    "symbol": "CanonicalEntityModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/grouping/index.ts",
+    "import": "./grouping.model",
+    "rule": "public-entry-model-export",
+    "symbol": "EntityGroupingConflictModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/grouping/index.ts",
+    "import": "./grouping.model",
+    "rule": "public-entry-model-export",
+    "symbol": "SourceEntityLinkModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/identity/index.ts",
+    "import": "./identity.model",
+    "rule": "public-entry-model-export",
+    "symbol": "TenantMembershipModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/identity/index.ts",
+    "import": "./identity.model",
+    "rule": "public-entry-model-export",
+    "symbol": "TenantModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/identity/index.ts",
+    "import": "./identity.model",
+    "rule": "public-entry-model-export",
+    "symbol": "UserModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/identity/index.ts",
+    "import": "./identity.model",
+    "rule": "public-entry-model-export",
+    "symbol": "UserSessionModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/imports/index.ts",
+    "import": "./imports.model",
+    "rule": "public-entry-model-export",
+    "symbol": "ImportBatchModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/imports/index.ts",
+    "import": "./imports.model",
+    "rule": "public-entry-model-export",
+    "symbol": "ImportPreparationModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/imports/index.ts",
+    "import": "./imports.model",
+    "rule": "public-entry-model-export",
+    "symbol": "ImportPreparationWorkflowJobModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/imports/index.ts",
+    "import": "./imports.model",
+    "rule": "public-entry-model-export",
+    "symbol": "ImportPreparationWorkflowModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/imports/index.ts",
+    "import": "./imports.model",
+    "rule": "public-entry-model-export",
+    "symbol": "ImportPreparedRowModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/imports/index.ts",
+    "import": "./imports.model",
+    "rule": "public-entry-model-export",
+    "symbol": "PreparedSetChunkModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/imports/index.ts",
+    "import": "./imports.model",
+    "rule": "public-entry-model-export",
+    "symbol": "PreparedSetExecutionModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/imports/index.ts",
+    "import": "./imports.model",
+    "rule": "public-entry-model-export",
+    "symbol": "SourceRowModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/interventions/index.ts",
+    "import": "./interventions.model",
+    "rule": "public-entry-model-export",
+    "symbol": "AuthChallengeModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/interventions/index.ts",
+    "import": "./interventions.model",
+    "rule": "public-entry-model-export",
+    "symbol": "InterventionActivityModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/interventions/index.ts",
+    "import": "./interventions.model",
+    "rule": "public-entry-model-export",
+    "symbol": "InterventionUserReadModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/interventions/index.ts",
+    "import": "./interventions.model",
+    "rule": "public-entry-model-export",
+    "symbol": "ManualInterventionModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/leads/index.ts",
+    "import": "./leads.model",
+    "rule": "public-entry-model-export",
+    "symbol": "BusinessLeadModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/leads/index.ts",
+    "import": "./leads.model",
+    "rule": "public-entry-model-export",
+    "symbol": "LeadAllocationModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/leads/index.ts",
+    "import": "./leads.model",
+    "rule": "public-entry-model-export",
+    "symbol": "LeadRunLinkModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/leads/public.ts",
+    "import": "./business-leads.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "BusinessLeadController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/notifications/index.ts",
+    "import": "./notification.model",
+    "rule": "public-entry-model-export",
+    "symbol": "UserNotificationModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/notifications/public.ts",
+    "import": "./notifications.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "NotificationController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/preparations/index.ts",
+    "import": "./preparation-workflows.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "ImportPreparationWorkflowController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/preparations/index.ts",
+    "import": "./preparations.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "ImportPreparationController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/preparations/public.ts",
+    "import": "./preparation-workflows.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "ImportPreparationWorkflowController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/results/index.ts",
+    "import": "./results.model",
+    "rule": "public-entry-model-export",
+    "symbol": "ExportArtifactModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/results/index.ts",
+    "import": "./results.model",
+    "rule": "public-entry-model-export",
+    "symbol": "LeadResultSnapshotModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/results/index.ts",
+    "import": "./results.model",
+    "rule": "public-entry-model-export",
+    "symbol": "OcPolicyRecordModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/results/index.ts",
+    "import": "./results.model",
+    "rule": "public-entry-model-export",
+    "symbol": "OcSnapshotModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/results/index.ts",
+    "import": "./results.model",
+    "rule": "public-entry-model-export",
+    "symbol": "ResultSetModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/results/public.ts",
+    "import": "./worker-result.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "WorkerResultController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/results/public.ts",
+    "import": "./worker-result.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "WorkerResultGuard",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/runs/index.ts",
+    "import": "./runs.model",
+    "rule": "public-entry-model-export",
+    "symbol": "AutomationRunModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/runs/index.ts",
+    "import": "./runs.model",
+    "rule": "public-entry-model-export",
+    "symbol": "RunDispatchOutboxModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/runs/index.ts",
+    "import": "./runs.model",
+    "rule": "public-entry-model-export",
+    "symbol": "RunEventModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/runs/index.ts",
+    "import": "./runs.model",
+    "rule": "public-entry-model-export",
+    "symbol": "RunIdentityModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/runs/index.ts",
+    "import": "./runs.model",
+    "rule": "public-entry-model-export",
+    "symbol": "RunManualDataOverrideModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/runs/index.ts",
+    "import": "./runs.model",
+    "rule": "public-entry-model-export",
+    "symbol": "RunSourceRowModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/runs/public.ts",
+    "import": "./runs.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "RunController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/submissions/index.ts",
+    "import": "./submissions.model",
+    "rule": "public-entry-model-export",
+    "symbol": "RunSubmissionGroupModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/submissions/index.ts",
+    "import": "./submissions.model",
+    "rule": "public-entry-model-export",
+    "symbol": "RunSubmissionItemModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/submissions/index.ts",
+    "import": "./submissions.model",
+    "rule": "public-entry-model-export",
+    "symbol": "RunSubmissionModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/submissions/public.ts",
+    "import": "./prepared-set-executions.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "PreparedSetExecutionController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/submissions/public.ts",
+    "import": "./run-submissions.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "RunSubmissionController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/teams/index.ts",
+    "import": "./team.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "TeamController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/tools/index.ts",
+    "import": "./tool.model",
+    "rule": "public-entry-model-export",
+    "symbol": "ToolGrantModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/tools/index.ts",
+    "import": "./tool.model",
+    "rule": "public-entry-model-export",
+    "symbol": "ToolModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/tools/index.ts",
+    "import": "./tool.model",
+    "rule": "public-entry-model-export",
+    "symbol": "ToolSettingsModel",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/tools/index.ts",
+    "import": "./tool-catalog.controller",
+    "rule": "public-entry-controller-export",
+    "symbol": "ToolCatalogController",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny eksport modelu lub kontrolera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/admin/index.ts",
+    "import": "./admin-operations.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "AdminOperationsRepository",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/admin/index.ts",
+    "import": "./admin-overview.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "AdminOverviewRepository",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/admin/index.ts",
+    "import": "./admin-tools.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "AdminToolsRepository",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/admin/index.ts",
+    "import": "./admin-users.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "AdminUsersRepository",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/audit/index.ts",
+    "import": "./audit.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "AuditRepository",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/audit/index.ts",
+    "import": "./audit.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "assertAuditMetadataSafe",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/audit/index.ts",
+    "import": "./audit.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "recordAuditEvent",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/audit/public.ts",
+    "import": "./audit.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "recordAuditEvent",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/auth/index.ts",
+    "import": "./authentication.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "AuthenticationRepository",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/authorization/index.ts",
+    "import": "./authorization.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "AuthorizationRepository",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/authorization/index.ts",
+    "import": "./authorization.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "resolvePermissionResource",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/deletions/index.ts",
+    "import": "./deletion-step-up.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "DeletionStepUpRepository",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/deletions/public.ts",
+    "import": "./deletion-jobs.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "DeletionJobsRepository",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/deletions/public.ts",
+    "import": "./deletions.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "DeletionsPreviewRepository",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/deletions/public.ts",
+    "import": "./deletions.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "loadPreviewSnapshot",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/notifications/public.ts",
+    "import": "./notifications.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "NotificationsRepository",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/results/public.ts",
+    "import": "./oc-snapshot.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "persistOcSnapshot",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/results/public.ts",
+    "import": "./oc-snapshot.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "SnapshotPersistenceError",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/results/public.ts",
+    "import": "./results.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "ResultsRepository",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/results/public.ts",
+    "import": "./run-evaluation.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "evaluateStoredSnapshot",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/results/public.ts",
+    "import": "./run-evaluation.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "RunEvaluationError",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/tools/index.ts",
+    "import": "./tool-catalog.repository",
+    "rule": "public-entry-private-reexport",
+    "symbol": "ToolCatalogRepository",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejący publiczny re-eksport prywatnego repozytorium/helpera ujęty w bazowym skanie 2026-10-16; usunąć w D5."
+  }
+]

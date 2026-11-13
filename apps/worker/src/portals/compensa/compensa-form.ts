@@ -1,4 +1,4 @@
-import { validateIdentityMatchV1 } from "@goldis/core";
+import { validateIdentityMatchV1, type IdentityMatchV1 } from "@goldis/core";
 import type { BrowserSession } from "../../infrastructure/browser/browser";
 import type { WorkerRunContext } from "../../features/execution/ports";
 import type { CompensaCredentials, CompensaPortalSession } from "./compensa-session";
@@ -16,6 +16,8 @@ export type CompensaFormSelectors = Readonly<{
   firstNameInput: string;
   lastNameInput: string;
   peselInput: string;
+  regonInput?: string;
+  companyNameInput?: string;
   addressInput?: string;
   postalCodeInput: string;
   cityInput?: string;
@@ -25,6 +27,10 @@ export type CompensaFormSelectors = Readonly<{
   customerMatches?: string;
   customerMatchSelect?: string;
   editInsuredData?: string;
+  payerDataDialog?: string;
+  payerIdentifierInput?: string;
+  payerCancel?: string;
+  incompleteCustomer?: string;
 }>;
 
 export type CompensaFormOptions = Readonly<{
@@ -43,9 +49,11 @@ export type CompensaFormOptions = Readonly<{
 }>;
 
 export type CompensaFormPreparation =
-  | Readonly<{ kind: "ready_to_save" }>
+  | Readonly<{ kind: "ready_to_save"; identity?: IdentityMatchV1 }>
   | Readonly<{ kind: "waiting_for_sms"; portal: "compensa" }>
   | Readonly<{ kind: "identity_review"; reason: "identity_mismatch" }>
+  | Readonly<{ kind: "skipped"; reason: "payer_data_required" }>
+  | Readonly<{ kind: "blocked"; reason: "incomplete_customer_data" }>
   | Readonly<{ kind: "waiting_for_manual_data"; fieldCode: "ADDRESS" | "POSTAL_CODE" | "CITY" | "COUNTY" | "PORTAL_ACTION_REVIEW" }>
   | Readonly<{ kind: "portal_error"; errorCode: "PORTAL_FAILURE" | "PORTAL_SESSION_EXPIRED" | "PORTAL_SCHEMA_CHANGED" }>
   | Readonly<{ kind: "cancelled" }>;
@@ -56,7 +64,9 @@ function comparable(value: string): string {
 
 function validateOptions(options: CompensaFormOptions): void {
   const selectors = Object.values(options.selectors);
+  const payerSelectors = [options.selectors.payerDataDialog, options.selectors.payerIdentifierInput, options.selectors.payerCancel];
   if (selectors.some((selector) => !selector?.trim())
+    || (payerSelectors.some(Boolean) && !payerSelectors.every(Boolean))
     || !/^[A-Za-z0-9._-]{1,64}$/.test(options.adapterVersion)
     || !/^[A-Z0-9 -]{4,12}$/i.test(options.configuredRegistrationNumber)
     || typeof options.authorizeStart !== "function" || typeof options.recordDraftReference !== "function"
@@ -106,6 +116,28 @@ export class CompensaFormAssistant {
     let startActionAttempted = false;
     let draftRecordedDuringLookup = false;
     try {
+      const skipPendingPayer = async (): Promise<CompensaFormPreparation | null> => {
+        if (!selectors.payerDataDialog || !await uniquePortalMarkerVisible(page, selectors.payerDataDialog)) return null;
+        startActionAttempted = true;
+        // This is a separate payer-creation prompt after Communication, never Client 360.
+        // Only dismiss the verified current identity; never accept/create customer data.
+        if (draftRecordedDuringLookup || await this.options.recordDraftReference({ runId: context.run.runId })) {
+          return { kind: "waiting_for_manual_data", fieldCode: "PORTAL_ACTION_REVIEW" };
+        }
+        const dialog = await uniquePortalLocator(page, selectors.payerDataDialog);
+        const identifier = dialog.locator(selectors.payerIdentifierInput!);
+        const cancel = dialog.locator(selectors.payerCancel!).filter({ visible: true });
+        if (await identifier.count() !== 1 || await cancel.count() !== 1 || !await cancel.isEnabled()) {
+          return { kind: "waiting_for_manual_data", fieldCode: "PORTAL_ACTION_REVIEW" };
+        }
+        if ((await identifier.inputValue()).trim() !== (identity.matchMethod === "regon_company" ? identity.regon : identity.pesel)) {
+          return { kind: "identity_review", reason: "identity_mismatch" };
+        }
+        await this.options.beforeAction?.();
+        await cancel.click();
+        await dialog.waitFor({ state: "hidden" });
+        return { kind: "skipped", reason: "payer_data_required" };
+      };
       const chooseInsuringParty = async (): Promise<boolean> => {
         const roles = page.locator(selectors.roleSelect);
         if (await roles.count() === 0) return false;
@@ -120,6 +152,8 @@ export class CompensaFormAssistant {
         }
         return true;
       };
+      const existingPayer = await skipPendingPayer();
+      if (existingPayer) return existingPayer;
       if (!await uniquePortalMarkerVisible(page, selectors.insuredDataSection)) {
         if (verifyExisting) return { kind: "waiting_for_manual_data", fieldCode: "PORTAL_ACTION_REVIEW" };
         if (!await uniquePortalMarkerVisible(page, selectors.startDialog)) {
@@ -128,7 +162,7 @@ export class CompensaFormAssistant {
           await page.locator(selectors.startDialog).waitFor({ state: "visible" });
         }
         const roleChosenInDialog = await chooseInsuringParty();
-        await (await uniquePortalLocator(page, selectors.identifierInput)).fill(identity.pesel);
+        await (await uniquePortalLocator(page, selectors.identifierInput)).fill(identity.matchMethod === "regon_company" ? identity.regon : identity.pesel);
         await (await uniquePortalLocator(page, selectors.registrationInput)).fill(this.options.configuredRegistrationNumber);
         if (signal?.aborted) return { kind: "cancelled" };
         const startButton = await uniquePortalLocator(page, selectors.startCommunication);
@@ -153,13 +187,15 @@ export class CompensaFormAssistant {
         let editorOpened = false;
         while (true) {
           if (signal?.aborted) return { kind: "cancelled" };
+          const pendingPayer = await skipPendingPayer();
+          if (pendingPayer) return pendingPayer;
           // This choice belongs AFTER the home Communication dialog has been
           // submitted with PESEL + registration. Do not route through Client 360.
           if (selectors.customerMatches && selectors.customerMatchSelect) {
             if (clientSelected && await page.locator(selectors.customerMatches).filter({ visible: true }).count()) {
               return { kind: "identity_review", reason: "identity_mismatch" };
             }
-            const choice = new CompensaClientChoice(this.browser, this.session, {
+            const choice = new CompensaClientChoice(this.browser, {
               selectors: { cards: selectors.customerMatches, selectButton: selectors.customerMatchSelect }, beforeAction: this.options.beforeAction,
             });
             const selected = await choice.selectIfVisible(context.source.effectiveRegon!, identity.pesel);
@@ -199,7 +235,21 @@ export class CompensaFormAssistant {
       if (!draftRecorded) return { kind: "waiting_for_manual_data", fieldCode: "PORTAL_ACTION_REVIEW" };
       if (signal?.aborted) return { kind: "cancelled" };
       await chooseInsuringParty();
-      const identityFields = [
+      let resolvedIdentity: IdentityMatchV1 | undefined;
+      if (identity.matchMethod === "regon_company") {
+        if (!selectors.regonInput || !selectors.companyNameInput) return { kind: "portal_error", errorCode: "PORTAL_SCHEMA_CHANGED" };
+        const regonInput = await uniquePortalLocator(page, selectors.regonInput);
+        const companyInput = await uniquePortalLocator(page, selectors.companyNameInput);
+        if ((await regonInput.inputValue()).replace(/\s/g, "") !== identity.regon || !(await companyInput.inputValue()).trim()) {
+          return { kind: "identity_review", reason: "identity_mismatch" };
+        }
+      } else if (identity.matchMethod === "regon_unique_pesel") {
+        const values = await Promise.all([selectors.firstNameInput, selectors.lastNameInput, selectors.peselInput].map(async selector =>
+          (await (await uniquePortalLocator(page, selector)).inputValue()).trim()));
+        if (!values[0] || !values[1] || values[2] !== identity.pesel) return { kind: "identity_review", reason: "identity_mismatch" };
+        resolvedIdentity = validateIdentityMatchV1({ ...identity, firstName: values[0], lastName: values[1], matchMethod: "unique_business_identity" });
+      }
+      const identityFields = identity.matchMethod === "regon_company" || identity.matchMethod === "regon_unique_pesel" ? [] : [
         { selector: selectors.firstNameInput, expected: identity.firstName, normalize: comparable },
         { selector: selectors.lastNameInput, expected: identity.lastName, normalize: comparable },
         { selector: selectors.peselInput, expected: identity.pesel, normalize: (value: string) => value.trim() },
@@ -215,6 +265,15 @@ export class CompensaFormAssistant {
         }
       }
 
+      if (selectors.incompleteCustomer && await uniquePortalMarkerVisible(page, selectors.incompleteCustomer)) {
+        const postal = await uniquePortalLocator(page, selectors.postalCodeInput);
+        const county = await uniquePortalLocator(page, selectors.countyInput);
+        if (await postal.isDisabled() && await county.isDisabled()
+          && (!(await postal.inputValue()).trim() || !(await county.inputValue()).trim())) {
+          return { kind: "blocked", reason: "incomplete_customer_data" };
+        }
+      }
+
       const requiredFields = [
         { selector: selectors.addressInput, value: context.source.address, code: "ADDRESS" as const },
         { selector: selectors.postalCodeInput, value: context.source.postalCode, code: "POSTAL_CODE" as const },
@@ -225,6 +284,7 @@ export class CompensaFormAssistant {
         const input = await uniquePortalLocator(page, field.selector);
         const current = (await input.inputValue()).trim();
         if (current) continue;
+        if (!await input.isEnabled()) return { kind: "waiting_for_manual_data", fieldCode: field.code };
         if (!field.value.trim()) return { kind: "waiting_for_manual_data", fieldCode: field.code };
         await input.fill(field.value);
       }
@@ -232,6 +292,7 @@ export class CompensaFormAssistant {
       const county = await uniquePortalLocator(page, selectors.countyInput);
       const countyValue = await county.evaluate((element) => (element as HTMLInputElement).value.trim());
       if (!countyValue) {
+        if (!await county.isEnabled()) return { kind: "waiting_for_manual_data", fieldCode: "COUNTY" };
         const countyCode = context.source.countyCode?.trim();
         if (!countyCode) return { kind: "waiting_for_manual_data", fieldCode: "COUNTY" };
         const isSelect = await county.evaluate((element) => element.tagName.toLowerCase() === "select");
@@ -245,7 +306,7 @@ export class CompensaFormAssistant {
 
       // Maiden name is intentionally optional; validation succeeds when it is blank.
       await waitForUniquePortalAction(page, selectors.saveButton, 15_000, signal);
-      return { kind: "ready_to_save" };
+      return { kind: "ready_to_save", ...(resolvedIdentity ? { identity: resolvedIdentity } : {}) };
     } catch {
       if (startActionAttempted) return { kind: "waiting_for_manual_data", fieldCode: "PORTAL_ACTION_REVIEW" };
       return { kind: "portal_error", errorCode: "PORTAL_SCHEMA_CHANGED" };

@@ -10,7 +10,11 @@ import {
 import type { Transaction } from "sequelize";
 import { AuditService } from "../audit/public";
 import { applyPasswordChange, hashPassword, passwordPolicyFailure, type SessionPrincipal } from "../auth";
-import { runConfirmedPrivilegedAction } from "../privileged-actions/public";
+import {
+  PRIVILEGED_ACTION_PERSISTENCE,
+  type PrivilegedActionPersistence,
+  runConfirmedPrivilegedAction,
+} from "../privileged-actions/public";
 import { TeamRepository } from "./team.repository";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -36,6 +40,7 @@ export class TeamService {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
     @Inject(TeamRepository) private readonly repository: TeamRepository,
+    @Inject(PRIVILEGED_ACTION_PERSISTENCE) private readonly privilegedActionPersistence: PrivilegedActionPersistence,
   ) {}
 
   private async lockManagerChanges(
@@ -152,6 +157,7 @@ export class TeamService {
               mustChangePassword: true,
             };
           },
+          this.privilegedActionPersistence,
         ),
       );
     } catch (error) {
@@ -212,6 +218,7 @@ export class TeamService {
           );
           return { userId, status, revokedSessions };
         },
+        this.privilegedActionPersistence,
       ),
     );
   }
@@ -251,6 +258,7 @@ export class TeamService {
           });
           return { userId, mustChangePassword: true, revokedSessions };
         },
+        this.privilegedActionPersistence,
       ),
     );
   }
@@ -271,7 +279,7 @@ export class TeamService {
       canExecute: Boolean(grant?.canExecute),
       version: grant?.version ?? 0,
       resultsShared: membership.status === "active",
-      canDownloadResults: membership.status === "active",
+      canDownloadResults: membership.status === "active" && Boolean(grant?.canDownloadResults),
     };
   }
 
@@ -339,6 +347,7 @@ export class TeamService {
           );
           return { userId, toolId, canExecute: next.canExecute, version: next.version };
         },
+        this.privilegedActionPersistence,
       ),
     );
   }

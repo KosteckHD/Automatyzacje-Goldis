@@ -23,11 +23,14 @@ module.exports = async function verifyBusinessLeadFlows(seed) {
   try {
   const { BusinessLeadService } = require("../dist/features/leads/business-leads.service");
   const { ContactReportService } = require("../dist/features/reports/contact-report.service");
+  const { ContactReportRepository } = require("../dist/features/reports/contact-report.repository");
   const { DashboardService } = require("../dist/features/reports/dashboard.service");
+  const { DashboardRepository } = require("../dist/features/reports/dashboard.repository");
   const { NotificationService } = require("../dist/features/notifications/notifications.service");
   const { NotificationsRepository } = require("../dist/features/notifications/notifications.repository");
   const { TeamService } = require("../dist/features/teams/index");
   const { TeamRepository } = require("../dist/features/teams/team.repository");
+  const { PrivilegedActionRepository } = require("../dist/features/privileged-actions/privileged-actions.repository");
   const { recordAuditEvent } = require("../dist/features/audit/public");
   const { ConflictException, ForbiddenException, NotFoundException } = require("@nestjs/common");
   const tenantId = seed.goldisTenantId;
@@ -42,7 +45,8 @@ module.exports = async function verifyBusinessLeadFlows(seed) {
     exp: Date.now() + 3_600_000, csrf: "synthetic-leads-csrf-token-0123456789", version: 2 };
   const notifications = new NotificationService(new NotificationsRepository());
   const leadService = new BusinessLeadService(notifications);
-  const team = new TeamService({ record: recordAuditEvent }, new TeamRepository(models.sequelize));
+  const privilegedActions = new PrivilegedActionRepository(models.sequelize);
+  const team = new TeamService({ record: recordAuditEvent }, new TeamRepository(models.sequelize), privilegedActions);
   const employeeActor = { userId: employee.userId, tenantId, actorRef: employee.userId, role: "operator",
     exp: Date.now() + 3_600_000, csrf: "synthetic-employee-csrf-token-0123456789", version: 2 };
 
@@ -56,10 +60,9 @@ module.exports = async function verifyBusinessLeadFlows(seed) {
     async consumeReauthAttempt() { return { allowed: true, retryAfterSeconds: 0 }; },
     async clearReauth() {},
     async recordReauthFailure() {},
-  }, { record: recordAuditEvent });
+  }, { record: recordAuditEvent }, privilegedActions);
   const confirmAction = (action, targetId, payload, idempotencyKey) => confirmationService.create(actor,
-    { ip: "127.0.0.1", socket: { remoteAddress: "127.0.0.1" } },
-    { action, targetId, payload, currentPassword: manager.password, idempotencyKey }, { setHeader() {} });
+    { action, targetId, payload, currentPassword: manager.password, idempotencyKey }, "127.0.0.1");
   const createConfirmation = await confirmAction(createAction, null, createPayload, createIdempotencyKey);
   const created = await team.create(actor, { ...createPayload, confirmationToken: createConfirmation.token,
     idempotencyKey: createIdempotencyKey });
@@ -178,14 +181,15 @@ module.exports = async function verifyBusinessLeadFlows(seed) {
   const start = new Date(now.getTime() - 60_000).toISOString();
   const end = new Date(now.getTime() + 60_000).toISOString();
   smokeStage = "contact_report";
-  const report = await new ContactReportService().overview(actor, start, end, resultSetId);
+  const report = await new ContactReportService(new ContactReportRepository(models.sequelize)).overview(actor, start, end, resultSetId);
   assert.deepEqual(report.summary, { total: 3, unassigned: 1, assigned: 2, notContacted: 2, accepted: 1, notInterested: 0 });
   assert.equal(report.employees[0].username, employee.username);
   assert.equal(report.employees[0].accepted, 1);
 
   smokeStage = "role_dashboards";
-  const managerDashboard = await new DashboardService().get({ tenantId, userId: manager.userId, role: "manager" });
-  const employeeDashboard = await new DashboardService().get({ tenantId, userId: employee.userId, role: "operator" });
+  const dashboardService = new DashboardService(new DashboardRepository(models.sequelize));
+  const managerDashboard = await dashboardService.get({ tenantId, userId: manager.userId, role: "manager" });
+  const employeeDashboard = await dashboardService.get({ tenantId, userId: employee.userId, role: "operator" });
   assert.equal(managerDashboard.metrics.team.unassigned, 1);
   assert.equal(managerDashboard.metrics.team.assigned, 3);
   assert.equal(managerDashboard.unreadNotifications, 1);

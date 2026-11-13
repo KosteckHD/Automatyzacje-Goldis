@@ -64,6 +64,26 @@ export class AdminUsersController {
     return this.usersService.grants(actor, userId);
   }
 
+  @Get("users/:userId/commission-dictionary-grant")
+  async commissionDictionaryGrant(@Param("userId") userId: string, @Req() request: Request) {
+    if (!uuidPattern.test(userId)) throw new BadRequestException("Nieprawidłowy identyfikator użytkownika");
+    return this.usersService.commissionDictionaryGrant(principal(request), userId);
+  }
+
+  @Put("users/:userId/commission-dictionary-grant")
+  async setCommissionDictionaryGrant(@Param("userId") userId: string, @Body() input: unknown, @Req() request: Request) {
+    requireCsrf(request);
+    if (!uuidPattern.test(userId)) throw new BadRequestException("Nieprawidłowy identyfikator użytkownika");
+    const body = strictObject(input, ["granted", "confirmationToken", "idempotencyKey"]);
+    if (typeof body.granted !== "boolean") throw new BadRequestException("Nieprawidłowy grant słownika prowizji");
+    return this.usersService.setCommissionDictionaryGrant(principal(request), {
+      userId,
+      granted: body.granted,
+      confirmationToken: body.confirmationToken,
+      idempotencyKey: body.idempotencyKey,
+    });
+  }
+
   @Put("users/:userId/grants/:toolId")
   async setGrant(
     @Param("userId") userId: string,

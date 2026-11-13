@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "generator": "scripts/backend-refactor-runtime-scenarios.cjs",
   "evidence": {
-    "declarationFamilies": 14,
-    "runtimeVariants": 41,
+    "declarationFamilies": 19,
+    "runtimeVariants": 58,
     "fixtureVariantsNotExecuted": 2,
-    "variantsSkippedByGuard": 17,
+    "variantsSkippedByGuard": 26,
     "missingFamilies": []
   },
   "cases": [
@@ -50,6 +50,17 @@
       "sourcePath": "apps/worker/src/features/execution/live-run.spec.ts",
       "targetPath": "apps/worker/src/features/execution/live-run.spec.ts",
       "title": "resume_auth from pzu_login continues through Compensa and UFG without recovery",
+      "skipCondition": null,
+      "runtimeStatus": "passed-during-inventory"
+    },
+    {
+      "id": "TV-1854545ac49b",
+      "declarationId": "TC-addc70764af6",
+      "owner": "features/execution",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "targetPath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "title": "production form preserves actionable intervention ADDRESS",
       "skipCondition": null,
       "runtimeStatus": "passed-during-inventory"
     },
@@ -120,6 +131,17 @@
       "runtimeStatus": "skipped-by-guard"
     },
     {
+      "id": "TV-2d34e00fd785",
+      "declarationId": "TC-addc70764af6",
+      "owner": "features/execution",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "targetPath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "title": "production form preserves actionable intervention CITY",
+      "skipCondition": null,
+      "runtimeStatus": "passed-during-inventory"
+    },
+    {
       "id": "TV-3150282fdd95",
       "declarationId": "TC-97bd19ff0d9c",
       "owner": "features/execution",
@@ -127,6 +149,28 @@
       "sourcePath": "apps/worker/src/features/execution/live-run.spec.ts",
       "targetPath": "apps/worker/src/features/execution/live-run.spec.ts",
       "title": "live worker terminalizes missing PESEL without creating an intervention or a result",
+      "skipCondition": null,
+      "runtimeStatus": "passed-during-inventory"
+    },
+    {
+      "id": "TV-3162001bb8f8",
+      "declarationId": "TC-4e0432ecb25e",
+      "owner": "portals/compensa",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "title": "observed Compensa exception existing_payer never accepts customer data, saves, or queries UFG",
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "runtimeStatus": "skipped-by-guard"
+    },
+    {
+      "id": "TV-3c0d3867b8a1",
+      "declarationId": "TC-addc70764af6",
+      "owner": "features/execution",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "targetPath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "title": "production form preserves actionable intervention COUNTY",
       "skipCondition": null,
       "runtimeStatus": "passed-during-inventory"
     },
@@ -149,6 +193,28 @@
       "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
       "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
       "title": "Compensa CEP: ambiguous-start, bez ponawiania rozpoczęcia",
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "runtimeStatus": "skipped-by-guard"
+    },
+    {
+      "id": "TV-493b2842662b",
+      "declarationId": "TC-5813bd839d24",
+      "owner": "portals/compensa",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "title": "a unique Everest PESEL obtains names only from the Communication form: false",
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "runtimeStatus": "skipped-by-guard"
+    },
+    {
+      "id": "TV-4c2fa684d541",
+      "declarationId": "TC-4e0432ecb25e",
+      "owner": "portals/compensa",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "title": "observed Compensa exception wrong_payer never accepts customer data, saves, or queries UFG",
       "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
       "runtimeStatus": "skipped-by-guard"
     },
@@ -208,6 +274,17 @@
       "runtimeStatus": "opt-in-not-executed"
     },
     {
+      "id": "TV-6ced44cfbdff",
+      "declarationId": "TC-4e0432ecb25e",
+      "owner": "portals/compensa",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "title": "observed Compensa exception payer_with_draft never accepts customer data, saves, or queries UFG",
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "runtimeStatus": "skipped-by-guard"
+    },
+    {
       "id": "TV-70c544d20240",
       "declarationId": "TC-7bbdbd350bf8",
       "owner": "portals/compensa",
@@ -215,6 +292,17 @@
       "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
       "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
       "title": "Compensa CEP: delayed, bez ponawiania rozpoczęcia",
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "runtimeStatus": "skipped-by-guard"
+    },
+    {
+      "id": "TV-721d2e23885b",
+      "declarationId": "TC-4e0432ecb25e",
+      "owner": "portals/compensa",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "title": "observed Compensa exception payer never accepts customer data, saves, or queries UFG",
       "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
       "runtimeStatus": "skipped-by-guard"
     },
@@ -263,6 +351,17 @@
       "runtimeStatus": "passed-during-inventory"
     },
     {
+      "id": "TV-87e53ec866d0",
+      "declarationId": "TC-591fb873c6c3",
+      "owner": "portals/compensa",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "title": "a company enters Communication with REGON and verifies the prefilled business: false",
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "runtimeStatus": "skipped-by-guard"
+    },
+    {
       "id": "TV-8ac812083caa",
       "declarationId": "TC-bf0360cab0cc",
       "owner": "features/execution",
@@ -272,6 +371,28 @@
       "title": "Compensa missing-save terminates only this row without saving a result or retaining the lease",
       "skipCondition": null,
       "runtimeStatus": "passed-during-inventory"
+    },
+    {
+      "id": "TV-92d842368e07",
+      "declarationId": "TC-9bb0d28eaa2a",
+      "owner": "features/execution",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "targetPath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "title": "live worker settles skipped at fresh start without an intervention, save, or result",
+      "skipCondition": null,
+      "runtimeStatus": "passed-during-inventory"
+    },
+    {
+      "id": "TV-93e072e29107",
+      "declarationId": "TC-591fb873c6c3",
+      "owner": "portals/compensa",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "title": "a company enters Communication with REGON and verifies the prefilled business: true",
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "runtimeStatus": "skipped-by-guard"
     },
     {
       "id": "TV-979bad12d250",
@@ -340,6 +461,28 @@
       "runtimeStatus": "skipped-by-guard"
     },
     {
+      "id": "TV-ba94496e677d",
+      "declarationId": "TC-addc70764af6",
+      "owner": "features/execution",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "targetPath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "title": "production form preserves actionable intervention POSTAL_CODE",
+      "skipCondition": null,
+      "runtimeStatus": "passed-during-inventory"
+    },
+    {
+      "id": "TV-c9a8bc7bd96a",
+      "declarationId": "TC-5813bd839d24",
+      "owner": "portals/compensa",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "title": "a unique Everest PESEL obtains names only from the Communication form: true",
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "runtimeStatus": "skipped-by-guard"
+    },
+    {
       "id": "TV-ca72b0121ac0",
       "declarationId": "TC-12e590b047df",
       "owner": "portals/compensa",
@@ -347,6 +490,17 @@
       "sourcePath": "apps/worker/src/portals/compensa/compensa-session.spec.ts",
       "targetPath": "apps/worker/src/portals/compensa/compensa-session.spec.ts",
       "title": "Compensa dismisses a planned-maintenance notice before continuing, delay=0",
+      "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "runtimeStatus": "skipped-by-guard"
+    },
+    {
+      "id": "TV-cec5e1c3ab31",
+      "declarationId": "TC-4e0432ecb25e",
+      "owner": "portals/compensa",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "targetPath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "title": "observed Compensa exception incomplete_customer never accepts customer data, saves, or queries UFG",
       "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
       "runtimeStatus": "skipped-by-guard"
     },
@@ -428,6 +582,17 @@
       "runtimeStatus": "passed-during-inventory"
     },
     {
+      "id": "TV-f3bb9ffcf002",
+      "declarationId": "TC-9bb0d28eaa2a",
+      "owner": "features/execution",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "targetPath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "title": "live worker settles skipped at compensa_start_intent without an intervention, save, or result",
+      "skipCondition": null,
+      "runtimeStatus": "passed-during-inventory"
+    },
+    {
       "id": "TV-f4150d7dc5a2",
       "declarationId": "TC-9ca88ce632b9",
       "owner": "features/execution",
@@ -435,6 +600,17 @@
       "sourcePath": "apps/worker/src/features/execution/live-run.spec.ts",
       "targetPath": "apps/worker/src/features/execution/live-run.spec.ts",
       "title": "resume_auth cannot enter an unrelated portal stage",
+      "skipCondition": null,
+      "runtimeStatus": "passed-during-inventory"
+    },
+    {
+      "id": "TV-fac0b18ef624",
+      "declarationId": "TC-9bb0d28eaa2a",
+      "owner": "features/execution",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "targetPath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "title": "live worker settles blocked at compensa_start_intent without an intervention, save, or result",
       "skipCondition": null,
       "runtimeStatus": "passed-during-inventory"
     },
@@ -459,6 +635,17 @@
       "title": "a collapsed customer editor opens once only after the current draft is confirmed: false",
       "skipCondition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
       "runtimeStatus": "skipped-by-guard"
+    },
+    {
+      "id": "TV-ffbe5b52c2bd",
+      "declarationId": "TC-9bb0d28eaa2a",
+      "owner": "features/execution",
+      "stage": "P13",
+      "sourcePath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "targetPath": "apps/worker/src/features/execution/live-run.spec.ts",
+      "title": "live worker settles blocked at fresh start without an intervention, save, or result",
+      "skipCondition": null,
+      "runtimeStatus": "passed-during-inventory"
     }
   ]
 }

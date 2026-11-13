@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { loginHref } from "../lib/return-to";
 
 type Role = "admin" | "manager" | "operator" | "reviewer" | "auditor";
-type Session = { role: Role; username: string; csrfToken: string; mustChangePassword?: boolean };
+type Session = { role: Role; username: string; csrfToken: string; mustChangePassword?: boolean; tools?: Array<{ toolId: string; canExecute?: boolean; canViewResults?: boolean; canDiscover?: boolean }> };
 type Correction = {
   id: string; status: "pending" | "approved" | "rejected"; createdAt: string; previousRegon: string | null;
   proposedRegon: string; reason: string; rowNumber: number; rowVersion: number; companyName: string; batchId: string; toolId: string;
@@ -15,6 +16,7 @@ type Conflict = {
   companyName: string; effectiveRegon: string | null; batchId: string; toolId: string; candidates: Candidate[];
 };
 type Page<T> = { items: T[]; nextCursor: string | null; hasMore: boolean; limit: number };
+type ImportOption = { batchId: string; fileName: string; toolId: string; createdAt: string };
 type Tab = "corrections" | "conflicts";
 type QueueFilters = { status: string; batchId: string; toolId: string; cursor: string | null };
 
@@ -91,6 +93,12 @@ export default function ReviewPage() {
   const [reasonCode, setReasonCode] = useState("REGISTRY_MATCH_VERIFIED");
   const [candidateId, setCandidateId] = useState("");
   const [revision, setRevision] = useState(0);
+  const [importOptions, setImportOptions] = useState<ImportOption[]>([]);
+  const [importSearch, setImportSearch] = useState("");
+  const [importOptionsLoading, setImportOptionsLoading] = useState(false);
+  const [importOptionsError, setImportOptionsError] = useState("");
+  const [importOptionsNextCursor, setImportOptionsNextCursor] = useState<string | null>(null);
+  const [importOptionsRevision, setImportOptionsRevision] = useState(0);
 
   useEffect(() => {
     const initial = filtersFromUrl();
@@ -124,6 +132,8 @@ export default function ReviewPage() {
   const allowedToDecide = session?.role === "admin" || session?.role === "manager" || session?.role === "reviewer";
   const endpoint = session?.role === "operator" ? "/api/review/my-corrections"
     : tab === "corrections" ? "/api/review/corrections" : "/api/review/conflicts";
+  const importOptionsEndpoint = session?.role === "operator" ? "/api/review/my-corrections/import-options"
+    : tab === "corrections" ? "/api/review/corrections/import-options" : "/api/review/conflicts/import-options";
   const query = useMemo(() => {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(filters)) if (value && key !== "cursor") params.set(key, value);
@@ -153,6 +163,38 @@ export default function ReviewPage() {
     void load(controller.signal);
     return () => controller.abort();
   }, [load, revision]);
+
+  useEffect(() => {
+    if (sessionState !== "ready" || !session || session.role === "auditor") return;
+    const controller = new AbortController();
+    setImportOptionsLoading(true); setImportOptionsError(""); setImportOptions([]); setImportOptionsNextCursor(null);
+    const timer = window.setTimeout(() => {
+      const params = new URLSearchParams({ limit: "50" });
+      if (importSearch.trim()) params.set("search", importSearch.trim());
+      if (draft.status) params.set("status", draft.status);
+      if (draft.toolId) params.set("toolId", draft.toolId);
+      void fetch(`${importOptionsEndpoint}?${params}`, { credentials: "same-origin", cache: "no-store", signal: controller.signal })
+        .then((response) => jsonResponse<{ items: ImportOption[]; nextCursor: string | null }>(response))
+        .then((value) => { setImportOptions(value.items); setImportOptionsNextCursor(value.nextCursor); })
+        .catch((cause) => { if (!controller.signal.aborted) { setImportOptionsError(cause instanceof Error ? cause.message : "Nie udało się pobrać listy importów."); setImportOptions([]); } })
+        .finally(() => { if (!controller.signal.aborted) setImportOptionsLoading(false); });
+    }, 180);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [draft.status, draft.toolId, importOptionsEndpoint, importOptionsRevision, importSearch, session, sessionState]);
+
+  async function loadMoreImportOptions() {
+    if (!importOptionsNextCursor || importOptionsLoading) return;
+    setImportOptionsLoading(true); setImportOptionsError("");
+    const params = new URLSearchParams({ limit: "50", cursor: importOptionsNextCursor });
+    if (importSearch.trim()) params.set("search", importSearch.trim());
+    if (draft.status) params.set("status", draft.status);
+    if (draft.toolId) params.set("toolId", draft.toolId);
+    try {
+      const value = await jsonResponse<{ items: ImportOption[]; nextCursor: string | null }>(await fetch(`${importOptionsEndpoint}?${params}`, { credentials: "same-origin", cache: "no-store" }));
+      setImportOptions((current) => [...current, ...value.items]); setImportOptionsNextCursor(value.nextCursor);
+    } catch (cause) { setImportOptionsError(cause instanceof Error ? cause.message : "Nie udało się pobrać dalszych importów."); }
+    finally { setImportOptionsLoading(false); }
+  }
 
   function changeTab(next: Tab) {
     const nextFilters = { ...filters, status: "", cursor: null };
@@ -200,7 +242,7 @@ export default function ReviewPage() {
           ? "Sprawdź, które propozycje REGON oczekują na weryfikację i jakie decyzje podjął zespół. Korekta zaczyna obowiązywać dopiero po zatwierdzeniu."
           : "Rozstrzygaj zgłoszenia z kontrolą wersji i aktualnych uprawnień. Każda decyzja jest zapisywana w dzienniku audytu."}</p></div><div className="review-hero-mark" aria-hidden="true"><span>R</span><i /></div></section>
         {sessionState === "loading" && <section className="admin-card" role="status">Sprawdzam sesję i uprawnienia…</section>}
-        {sessionState === "signed-out" && <section className="admin-card"><h2>Sesja wygasła</h2><p>Zaloguj się ponownie, aby otworzyć kolejkę.</p><a className="admin-button" href="/">Przejdź do logowania</a></section>}
+        {sessionState === "signed-out" && <section className="admin-card"><h2>Sesja wygasła</h2><p>Zaloguj się ponownie, aby otworzyć kolejkę.</p><a className="admin-button" href={loginHref(`${window.location.pathname}${window.location.search}`, window.location.origin)}>Zaloguj się i wróć do kolejki</a></section>}
         {sessionState === "error" && <section className="admin-card" role="alert"><h2>Nie można sprawdzić sesji</h2><p>Odśwież stronę. Jeśli problem się powtarza, sprawdź dostępność API.</p><button className="admin-quiet" type="button" onClick={() => window.location.reload()}>Odśwież stronę</button></section>}
         {session && session.mustChangePassword && <p className="admin-alert">Hasło wymaga zmiany. <a href="/account?required=1">Przejdź do ustawień bezpieczeństwa</a></p>}
         {session?.role === "auditor" && <section className="admin-card"><h2>Brak dostępu do danych operacyjnych</h2><p>Audytor ma dostęp do dziennika audytu. Kolejki decyzji są dostępne dla administratorów i reviewerów.</p><a className="admin-button" href="/audit">Otwórz audyt</a></section>}
@@ -215,10 +257,28 @@ export default function ReviewPage() {
               {tab === "corrections" ? <><option value="pending">Oczekujące</option><option value="approved">Zatwierdzone</option><option value="rejected">Odrzucone</option></>
                 : <><option value="open">Otwarte</option><option value="resolved">Rozstrzygnięte</option></>}
             </select></label>
-            <label>Identyfikator importu<input value={draft.batchId} onChange={(event) => setDraft({ ...draft, batchId: event.target.value })} maxLength={36} placeholder="Opcjonalny filtr" /><small className="review-filter-hint">Skopiuj go z adresu strony importu.</small></label>
-            <label>Narzędzie<input value={draft.toolId} onChange={(event) => setDraft({ ...draft, toolId: event.target.value })} maxLength={80} placeholder="np. oc-policy-verification" /></label>
+            <label>Import<select value={draft.batchId} onChange={(event) => {
+              const batchId = event.target.value;
+              const nextDraft = { ...draft, batchId };
+              const nextFilters = { ...filters, batchId, cursor: null };
+              setDraft(nextDraft); setFilters(nextFilters); setPage(null); writeUrl(tab, nextFilters);
+            }}>
+              <option value="">Wszystkie dostępne importy</option>
+              {draft.batchId && !importOptions.some((option) => option.batchId === draft.batchId) && <option value={draft.batchId}>Import z aktywnego linku · {draft.batchId.slice(0, 8)}</option>}
+              {importOptions.map((option) => <option key={option.batchId} value={option.batchId}>{option.fileName} · {displayDate(option.createdAt)}</option>)}
+            </select><small className="review-filter-hint">Wyszukaj nazwę pliku poniżej. Importy są ograniczone do widocznej kolejki.</small></label>
+            <label>Szukaj importu<input type="search" value={importSearch} maxLength={120} onChange={(event) => setImportSearch(event.target.value)} placeholder="Wpisz nazwę pliku" /></label>
+            <label>Narzędzie<select value={draft.toolId} onChange={(event) => setDraft({ ...draft, toolId: event.target.value })}>
+              <option value="">Wszystkie dostępne</option>
+              {session.tools?.filter((tool) => tool.canDiscover || tool.canExecute || tool.canViewResults).map((tool) => <option key={tool.toolId} value={tool.toolId}>{tool.toolId === "oc-policy-verification" ? "Sprawdzanie OC" : tool.toolId}</option>)}
+              {draft.toolId && !session.tools?.some((tool) => tool.toolId === draft.toolId) && <option value={draft.toolId}>{draft.toolId}</option>}
+            </select></label>
             <button className="admin-button" type="submit" disabled={loading}>Zastosuj filtry</button>
           </form>
+          {importOptionsLoading && <p className="review-loading" role="status">Wyszukuję importy…</p>}
+          {importOptionsError && <div className="review-error" role="alert"><p>{importOptionsError}</p><button className="admin-quiet" type="button" onClick={() => setImportOptionsRevision((value) => value + 1)}>Ponów wyszukiwanie</button></div>}
+          {!importOptionsLoading && !importOptionsError && importSearch.trim() && importOptions.length === 0 && <p className="review-loading" role="status">Nie znaleziono importów pasujących do tej nazwy w widocznej kolejce.</p>}
+          {importOptionsNextCursor && <button className="admin-quiet review-import-more" type="button" onClick={() => void loadMoreImportOptions()} disabled={importOptionsLoading}>{importOptionsLoading ? "Pobieranie…" : "Pokaż starsze importy"}</button>}
           {error && <div className="review-error" role="alert"><p>{error}</p>{error.includes("Odśwież kolejkę") && <button className="admin-quiet" type="button" onClick={() => setRevision((value) => value + 1)}>Odśwież kolejkę</button>}</div>}
           {notice && <p className="review-notice" role="status">{notice}</p>}
           {loading && <p className="review-loading" role="status">Pobieram aktualną kolejkę…</p>}

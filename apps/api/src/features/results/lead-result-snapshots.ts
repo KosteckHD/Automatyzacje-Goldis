@@ -16,7 +16,7 @@ import {
 } from "../../infrastructure/database/db";
 import { canonicalJsonStringify } from "./canonical-json";
 import { exportOcWorkbook } from "./export";
-import { decryptPesel } from "./pesel-crypto";
+import { decryptIdentityPesel } from "./pesel-crypto";
 import { validateRunInputSnapshotForExport } from "./run-export-snapshot";
 
 export function leadResultSnapshotChecksum(input: {
@@ -27,8 +27,8 @@ export function leadResultSnapshotChecksum(input: {
   sourceOwnerUserId: string;
   referenceDate: string;
   companyFields: Record<string, unknown>;
-  peselCiphertext: string;
-  peselKeyVersion: number;
+  peselCiphertext: string | null;
+  peselKeyVersion: number | null;
   policies: OcPolicy[];
 }): string {
   return createHash("sha256").update(canonicalJsonStringify(input), "utf8").digest("hex");
@@ -106,6 +106,7 @@ export async function materializeLeadResultSnapshots(
     if (source.schemaVersion === 1 && !legacy) throw new ConflictException("Brak źródłowych danych kontaktowych");
     const companyFields = {
       schemaVersion: 2 as const,
+      ...(identity.matchMethod === "regon_company" ? { subjectKind: "company" as const } : {}),
       companyName: source.companyName,
       effectiveRegon: source.effectiveRegon,
       decisionMakerName: source.decisionMakerName,
@@ -128,10 +129,7 @@ export async function materializeLeadResultSnapshots(
         capturedAt: header.capturedAt.toISOString(),
         parserVersion: header.parserVersion,
       });
-      decryptPesel(
-        { ciphertext: identity.peselCiphertext, keyVersion: identity.peselKeyVersion },
-        { runId, sourceRowId: run.sourceRowId },
-      );
+      decryptIdentityPesel(identity, { runId, sourceRowId: run.sourceRowId });
     } catch {
       throw new ConflictException("Nie można sprawdzić integralności PESEL lub polis");
     }
@@ -206,8 +204,12 @@ export async function buildLeadSnapshotWorkbook(input: {
   }
   let pesel: string;
   try {
-    pesel = decryptPesel(
-      { ciphertext: snapshot.peselCiphertext, keyVersion: snapshot.peselKeyVersion },
+    pesel = decryptIdentityPesel(
+      {
+        peselCiphertext: snapshot.peselCiphertext,
+        peselKeyVersion: snapshot.peselKeyVersion,
+        matchMethod: snapshot.companyFields.subjectKind === "company" ? "regon_company" : "unique_business_identity",
+      },
       { runId: snapshot.originalRunId, sourceRowId: snapshot.originalSourceRowId },
     );
   } catch {

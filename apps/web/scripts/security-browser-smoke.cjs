@@ -131,7 +131,58 @@ async function main() {
     await page.getByRole("status").waitFor();
     assert.equal(verifyRequests, 1, "verification occurs only after an explicit user click");
 
-    process.stdout.write("security-browser-smoke: CSP, nonce, no-store, anti-frame, idle activity, recovery token handling and explicit email verification verified\n");
+    const commissionPage = await browser.newPage();
+    let scenario = "unavailable";
+    const starts = [];
+    await commissionPage.route("**/api/**", async (route) => {
+      const request = route.request();
+      const pathname = new URL(request.url()).pathname;
+      const respond = (body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
+      if (pathname === "/api/auth/me") return scenario === "unauthorized"
+        ? respond({ error: "UNAUTHORIZED" }, 401)
+        : respond({ csrfToken: "synthetic-browser-csrf", tools: [{ toolId: "commission-comparison", canExecute: true, canDownloadResults: true }] });
+      const base = "/api/tools/commission-comparison";
+      if (pathname === `${base}/files`) return scenario === "unavailable" ? respond({ error: "SERVICE_UNAVAILABLE" }, 503) : respond({ items: [
+        { fileId: "crm", sourceType: "CRM", fileName: "fixture-crm.xlsx", sizeBytes: 100, uploadedAt: "2026-11-01T00:00:00Z" },
+        { fileId: "asf", sourceType: "ASF", fileName: "fixture-asf.xlsx", sizeBytes: 100, uploadedAt: "2026-11-01T00:00:00Z" },
+      ] });
+      if (pathname === `${base}/dictionary/versions`) return respond({ canEdit: false, items: [{ dictionaryVersionId: "v1", versionNumber: 1, status: "published", isActive: true }] });
+      if (pathname === `${base}/dictionary/versions/v1`) return respond({ preset: { client_dictionary: { entries: [] } } });
+      if (pathname === `${base}/runs` && request.method() === "POST") {
+        assert.equal(request.headers()["x-csrf-token"], "synthetic-browser-csrf");
+        starts.push(request.postDataJSON());
+        return starts.length === 1 ? respond({ error: "SERVICE_UNAVAILABLE" }, 503) : respond({ runId: "fixture-run" }, 201);
+      }
+      if (pathname === `${base}/runs`) return respond({ items: [] });
+      if (pathname === `${base}/runs/fixture-run`) return respond({ run: { runId: "fixture-run", start: "2026-11-01", end: "2026-11-06", status: "completed", counters: {} }, result: null });
+      return respond({ items: [] });
+    });
+    await commissionPage.goto(`${url}tools/commission-comparison`);
+    await commissionPage.locator('main [role="alert"]').waitFor();
+    assert.equal(await commissionPage.getByRole("link", { name: "Przejdź do logowania" }).count(), 0, "a resource 503 must not turn an authenticated session into a logout");
+    scenario = "unauthorized";
+    await commissionPage.reload();
+    const login = commissionPage.getByRole("link", { name: "Przejdź do logowania" });
+    await login.waitFor();
+    const loginUrl = new URL(await login.getAttribute("href"), url);
+    assert.equal(loginUrl.pathname, "/");
+    assert.equal(loginUrl.searchParams.get("returnTo"), "/tools/commission-comparison");
+    scenario = "ready";
+    await commissionPage.reload();
+    await commissionPage.getByRole("checkbox", { name: "Uwzględnij fixture-crm.xlsx" }).check();
+    await commissionPage.getByRole("checkbox", { name: "Uwzględnij fixture-asf.xlsx" }).check();
+    await commissionPage.getByLabel("Od dnia", { exact: true }).fill("2026-11-01");
+    await commissionPage.getByLabel("Do dnia", { exact: true }).fill("2026-11-06");
+    await commissionPage.getByRole("button", { name: "Uruchom porównanie" }).click();
+    await commissionPage.locator('main [role="alert"]').waitFor();
+    await commissionPage.getByRole("button", { name: "Uruchom porównanie" }).click();
+    await commissionPage.getByRole("status").filter({ hasText: "Analiza została przyjęta" }).waitFor();
+    assert.equal(starts.length, 2);
+    assert.ok(starts[0].idempotencyKey);
+    assert.equal(starts[0].idempotencyKey, starts[1].idempotencyKey, "retrying the same input must reuse the idempotency key");
+    assert.deepEqual(starts[0].fileIds, ["crm", "asf"]);
+    await commissionPage.close();
+    process.stdout.write("security-browser-smoke: CSP, nonce, no-store, anti-frame, idle activity, recovery handling, commission session errors and idempotent retry verified\n");
   } finally {
     await browser?.close();
     child.kill();

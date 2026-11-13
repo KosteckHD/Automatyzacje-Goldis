@@ -13,6 +13,7 @@ test("automation is ready only with available services and fresh live worker con
   assert.equal(ready.automationReady, true);
   assert.equal(ready.worker, "online");
   assert.equal(ready.portalConfig, "valid");
+  assert.equal(ready.message, "Worker i konfiguracja portali są gotowe. Portal może poprosić o logowanie lub kod SMS.");
 });
 
 test("off, stale, future, invalid-config, or unavailable services report specific safe readiness", () => {

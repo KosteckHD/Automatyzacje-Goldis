@@ -1,0 +1,142 @@
+[
+  {
+    "file": "api/infrastructure/config/api-runtime-config.ts",
+    "import": "../../features/account-recovery/auth-mail-settings",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/config/runtime-startup-config.ts",
+    "import": "../../features/account-recovery/auth-mail-settings",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/database.factory.ts",
+    "import": "../../composition/persistence-models",
+    "rule": "infrastructure-imports-composition",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../composition/persistence-models",
+    "rule": "infrastructure-imports-composition",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/notifications",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/account-recovery/account-recovery.model",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/identity/identity.model",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/tools/tool.model",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/audit/audit.model",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/imports",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/enrichment",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/grouping",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/runs",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/interventions",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/results",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/submissions",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/leads",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/imports/imports.model",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  },
+  {
+    "file": "api/infrastructure/database/db.ts",
+    "import": "../../features/commissions/commissions.model",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Rejestr modeli Sequelize dla migracji 066; przenieść rejestrację schematów do warstwy persistence podczas następnego etapu refaktoryzacji."
+  },
+  {
+    "file": "api/infrastructure/http/request-protection.ts",
+    "import": "../../features/auth",
+    "rule": "infrastructure-imports-feature",
+    "scheduledRemoval": "D5",
+    "reason": "Istniejąca zależność wsteczna z bazowego skanu 2026-10-16; przenieść kontrakt/rejestrację modeli do właściwej warstwy w D5."
+  }
+]

@@ -94,4 +94,36 @@ export class RunSubmissionController {
       principal.role,
     );
   }
+
+  @Post("run-submissions/:id/pause")
+  @RequirePermission("submission:cancel", "route-submission")
+  pause(@Param("id") id: string, @Body() body: { expectedVersion?: unknown }, @Req() request: Request) {
+    if (!verifyCsrfRequest(request)) throw new ForbiddenException("Wymagany jest poprawny token CSRF");
+    if (!body || Object.keys(body).some((key) => key !== "expectedVersion"))
+      throw new BadRequestException("Nieprawidłowe żądanie wstrzymania");
+    const principal = readSessionPrincipal(request);
+    if (!principal) throw new ForbiddenException();
+    return this.submissions.pause(
+      id,
+      body.expectedVersion as number,
+      { tenantId: principal.tenantId, actorUserId: principal.userId, sessionId: principal.sessionId },
+      principal.role,
+    );
+  }
+
+  @Post("run-submissions/:id/resume")
+  @RequirePermission("submission:cancel", "route-submission")
+  resume(@Param("id") id: string, @Body() body: { expectedVersion?: unknown }, @Req() request: Request) {
+    if (!verifyCsrfRequest(request)) throw new ForbiddenException("Wymagany jest poprawny token CSRF");
+    if (!body || Object.keys(body).some((key) => key !== "expectedVersion"))
+      throw new BadRequestException("Nieprawidłowe żądanie wznowienia");
+    const principal = readSessionPrincipal(request);
+    if (!principal) throw new ForbiddenException();
+    return this.submissions.resume(
+      id,
+      body.expectedVersion as number,
+      { tenantId: principal.tenantId, actorUserId: principal.userId, sessionId: principal.sessionId },
+      principal.role,
+    );
+  }
 }

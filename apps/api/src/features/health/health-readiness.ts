@@ -31,6 +31,6 @@ export function automationReadiness(input: {
           ? "Portale wyłączone."
           : !input.worker?.portalConfigValid
             ? "Konfiguracja portali nie jest gotowa."
-            : "Automatyzacja gotowa.",
+            : "Worker i konfiguracja portali są gotowe. Portal może poprosić o logowanie lub kod SMS.",
   } as const;
 }

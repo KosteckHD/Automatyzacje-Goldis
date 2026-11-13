@@ -1,0 +1,43 @@
+{
+  "checkedAt": "2026-11-06T17:03:15.689Z",
+  "liveServicesUsed": false,
+  "compiledWorkerSha256": "752b63c1708f88ab1d1acc50bb4deb39a2da92c64706a4d78e99407c7284baec",
+  "results": [
+    {
+      "scenario": "terminal-replay",
+      "initial": {
+        "runStatus": "completed",
+        "dispatchStatus": "completed"
+      },
+      "observed": {
+        "runStatus": "completed",
+        "dispatchStatus": "completed",
+        "snapshotWritten": true,
+        "engineCalls": 1,
+        "successfulAudit": true,
+        "finalRunUpdateAffected": 1,
+        "cancellationInjected": false
+      },
+      "evidenceLevel": "compiled worker control flow with synthetic SQL schedule; PostgreSQL/Redis not exercised",
+      "vulnerabilityObserved": true
+    },
+    {
+      "scenario": "cancel-before-publication",
+      "initial": {
+        "runStatus": "running",
+        "dispatchStatus": "published"
+      },
+      "observed": {
+        "runStatus": "cancel_requested",
+        "dispatchStatus": "completed",
+        "snapshotWritten": true,
+        "engineCalls": 1,
+        "successfulAudit": true,
+        "finalRunUpdateAffected": 0,
+        "cancellationInjected": true
+      },
+      "evidenceLevel": "compiled worker control flow with synthetic SQL schedule; PostgreSQL/Redis not exercised",
+      "vulnerabilityObserved": true
+    }
+  ]
+}

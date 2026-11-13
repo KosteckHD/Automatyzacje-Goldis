@@ -1,0 +1,76 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+Przegląd
+Moje firmy
+Pula firm
+Automatyzacje
+Przebiegi
+Historia importów
+Powiadomienia
+2
+
+ORGANIZACJA
+
+Pracownicy
+Dostępy
+Raporty
+Weryfikacja danych
+Dziennik aktywności
+Moje konto
+Zwiń menu
+Menedżer
+GOLDIS / PRACA
+Przestrzeń operacyjna
+Moje konto
+M
+← Wróć do moich firm
+Transport i Logistyka Alfa sp. z o.o.
+
+ul. Przemysłowa 18, 02-495 Warszawa
+
+completed
+← Poprzednia firmaPrzeglądasz kolejkę z tego widokuTo ostatnia firma w tym widoku
+Kontakt z firmą
+Telefon+48 22 555 01 20
+E-mailkontakt@transportowa.pl
+
+Osoba decyzyjnaMarta Wiśniewska
+
+Status rozmowy
+
+Nie kontaktowano · przydzielono anna.nowak
+
+Wynik OC
+Data odniesienia
+2026-10-10
+Zadania firmowe
+2
+Pozycje wyniku
+4
+Otwórz źródłowy import →
+Szczegółowe raporty
+Zadanie firmowe 1 · 55555555 →
+Dane firmy
+NIP
+5260250275
+REGON
+012345678
+Przydzielono
+anna.nowak
+Identyfikator wyników
+66666666-6666-4666-8666-666666666666
+Wiersze źródłowe
+
+Informacje pochodzą z zaimportowanego pliku.
+
+Otwórz import
+Wiersz 14
+Transport i Logistyka Alfa sp. z o.o.
+
+Marta Wiśniewska · NIP 5260250275 · REGON 012345678
+
+Telefon +48 22 555 01 20 · kontakt@transportowa.pl

@@ -132,7 +132,7 @@ async function main() {
 
     role = "operator";
     await page.goto(`${baseUrl}/my-results`);
-    await page.getByRole("heading", { name: "Moje wyniki" }).waitFor({ state: "visible" });
+    await page.getByRole("heading", { name: "Moje firmy" }).waitFor({ state: "visible" });
     await page.getByRole("link", { name: "Moje korekty" }).click();
     await page.getByRole("heading", { name: "Moje propozycje korekt" }).waitFor({ state: "visible" });
     await page.goto(`${baseUrl}/review?tab=conflicts&status=resolved&batchId=33333333-3333-4333-8333-333333333333`);

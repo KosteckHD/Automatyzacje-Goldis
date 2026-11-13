@@ -7,17 +7,8 @@ import {
   NotFoundException,
   ServiceUnavailableException,
 } from "@nestjs/common";
-import { QueryTypes, type Transaction } from "sequelize";
-import {
-  CanonicalEntity,
-  EntityGroupingConflict,
-  ImportBatch,
-  RegonCorrection,
-  SourceEntityLink,
-  SourceRow,
-  sequelize,
-} from "../../infrastructure/database/db";
-import { sanitizePublicText } from "../../infrastructure/http";
+import type { Transaction } from "sequelize";
+import { sanitizePublicFileName, sanitizePublicText } from "../../infrastructure/http";
 import {
   createListCursor,
   filterFingerprint,
@@ -30,9 +21,15 @@ import {
 } from "../../shared/list-query";
 import { AuditService } from "../audit/public";
 import type { SessionPrincipal } from "../auth";
-import { operationalCollectionScope } from "../authorization";
 import { assessEntityGrouping, EntityGroupingService } from "../grouping/public";
 import { parseConflictResolutionRequest, parseCorrectionDecisionRequest } from "./review.dto";
+import {
+  type ReviewQueueFilters,
+  type ReviewImportOption,
+  ReviewRepository,
+  type ReviewSourceLinkRecord,
+  type ReviewSourceRowRecord,
+} from "./review.repository";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const correctionStatuses = new Set(["pending", "approved", "rejected"]);
@@ -46,6 +43,7 @@ type QueueInput = Readonly<{
   to?: string;
   cursor?: string;
   limit?: string;
+  search?: string;
 }>;
 type QueuePrincipal = Pick<SessionPrincipal, "tenantId" | "userId" | "role">;
 function parseQueue(input: QueueInput, listName: string, statuses: Set<string>, defaultStatus: string | undefined) {
@@ -59,25 +57,8 @@ function parseQueue(input: QueueInput, listName: string, statuses: Set<string>, 
   const limit = parseListLimit(input.limit);
   const fingerprint = filterFingerprint(listName, { status, batchId, toolId, from, to, limit });
   const cursor = parseListCursor(input.cursor, fingerprint);
-  const replacements: Record<string, string | number> = { limit: limit + 1 };
-  if (status) replacements.status = status;
-  if (batchId) replacements.batchId = batchId;
-  if (toolId) replacements.toolId = toolId;
-  if (from) replacements.from = from;
-  if (to) replacements.to = to;
-  if (cursor) {
-    replacements.cursorCreatedAt = cursor.createdAt;
-    replacements.cursorId = cursor.id;
-  }
-  return { limit, fingerprint, cursor, replacements, filters: { status, batchId, toolId, from, to } };
-}
-
-function appendFilters(conditions: string[], filters: ReturnType<typeof parseQueue>["filters"]) {
-  if (filters.status) conditions.push("q.status = :status");
-  if (filters.batchId) conditions.push("b.id = :batchId");
-  if (filters.toolId) conditions.push("b.tool_id = :toolId");
-  if (filters.from) conditions.push("q.created_at >= :from");
-  if (filters.to) conditions.push("q.created_at <= :to");
+  const filters: ReviewQueueFilters = { status, batchId, toolId, from, to };
+  return { limit, fingerprint, cursor, filters };
 }
 
 function pageResult<T extends { id: string; created_at?: Date | string; createdAt?: Date | string }>(
@@ -107,6 +88,7 @@ export class ReviewService {
   constructor(
     @Inject(EntityGroupingService) private readonly grouping: EntityGroupingService,
     @Inject(AuditService) private readonly audit: AuditService,
+    @Inject(ReviewRepository) private readonly repository: ReviewRepository,
   ) {}
 
   async listCorrections(actor: QueuePrincipal, input: QueueInput, ownOnly = false) {
@@ -116,36 +98,14 @@ export class ReviewService {
       correctionStatuses,
       ownOnly ? undefined : "pending",
     );
-    const replacements = { ...parsed.replacements, tenantId: actor.tenantId, userId: actor.userId };
-    const conditions = [operationalCollectionScope(actor.role)];
-    appendFilters(conditions, parsed.filters);
-    if (ownOnly) conditions.push("q.author_ref = :userId");
-    if (parsed.cursor) conditions.push("(q.created_at, q.correction_id) < (:cursorCreatedAt, CAST(:cursorId AS uuid))");
-    const sql = `SELECT q.correction_id AS id, q.status, q.created_at, q.reviewed_at, q.review_reason,
-        q.previous_regon, q.proposed_regon,
-        q.reason, s.row_number, s.row_version, s.company_name, b.id AS batch_id, b.tool_id
-      FROM regon_corrections q
-      JOIN source_rows s ON s.id = q.source_row_id
-      JOIN import_batches b ON b.id = s.batch_id
-      JOIN tools t ON t.tool_id = b.tool_id
-      WHERE ${conditions.join(" AND ")}
-      ORDER BY q.created_at DESC, q.correction_id DESC LIMIT :limit`;
     try {
-      const rows = await sequelize.query<{
-        id: string;
-        status: string;
-        created_at: Date | string;
-        reviewed_at: Date | string | null;
-        review_reason: string | null;
-        previous_regon: string | null;
-        proposed_regon: string;
-        reason: string;
-        row_number: number;
-        row_version: number;
-        company_name: string;
-        batch_id: string;
-        tool_id: string;
-      }>(sql, { replacements, type: QueryTypes.SELECT });
+      const rows = await this.repository.listCorrections({
+        ...actor,
+        filters: parsed.filters,
+        cursor: parsed.cursor,
+        limit: parsed.limit,
+        ownOnly,
+      });
       return pageResult(
         rows.map((row) => ({
           id: row.id,
@@ -172,49 +132,43 @@ export class ReviewService {
     }
   }
 
+  async listImportOptions(actor: QueuePrincipal, input: QueueInput, queue: "corrections" | "conflicts", ownOnly = false) {
+    const search = input.search?.trim() ?? "";
+    if (search.length > 120) throw new BadRequestException("Fraza wyszukiwania może mieć maksymalnie 120 znaków");
+    const allowedStatuses = queue === "conflicts" ? conflictStatuses : correctionStatuses;
+    const defaultStatus = ownOnly ? undefined : queue === "conflicts" ? "open" : "pending";
+    const status = input.status === undefined || input.status === "" ? defaultStatus : input.status;
+    if (status && !allowedStatuses.has(status)) throw new BadRequestException("Nieprawidłowy status kolejki");
+    const toolId = parseToolId(input.toolId);
+    const limit = parseListLimit(input.limit);
+    if (limit > 50) throw new BadRequestException("Limit opcji importu nie może przekraczać 50");
+    const fingerprint = filterFingerprint(`review-import-options:${queue}:${ownOnly ? "own" : "scoped"}`, { search, toolId, status, limit });
+    const cursor = parseListCursor(input.cursor, fingerprint);
+    const filters: ReviewQueueFilters = { search, ...(status ? { status } : {}), ...(toolId ? { toolId } : {}) };
+    let rows: ReviewImportOption[];
+    try {
+      rows = await this.repository.listImportOptions({ ...actor, filters, cursor, limit, queue, ownOnly });
+    } catch {
+      throw new ServiceUnavailableException("Lista dostępnych importów jest chwilowo niedostępna");
+    }
+    const hasMore = rows.length > limit;
+    const items = hasMore ? rows.slice(0, limit) : rows;
+    const last = items.at(-1);
+    return {
+      items: items.map((row) => ({ batchId: row.batch_id, fileName: sanitizePublicFileName(row.file_name), toolId: row.tool_id, createdAt: new Date(row.created_at).toISOString() })),
+      nextCursor: hasMore && last ? createListCursor(last.created_at, last.batch_id, fingerprint) : null,
+    };
+  }
+
   async listConflicts(actor: QueuePrincipal, input: QueueInput) {
     const parsed = parseQueue(input, "review-conflicts", conflictStatuses, "open");
-    const replacements = { ...parsed.replacements, tenantId: actor.tenantId, userId: actor.userId };
-    const conditions = [operationalCollectionScope(actor.role)];
-    appendFilters(conditions, parsed.filters);
-    if (parsed.cursor) conditions.push("(q.created_at, q.conflict_id) < (:cursorCreatedAt, CAST(:cursorId AS uuid))");
     try {
-      const rows = await sequelize.query<{
-        id: string;
-        status: string;
-        created_at: Date | string;
-        reason_code: string;
-        candidate_entity_ids: string[];
-        row_number: number;
-        row_version: number;
-        company_name: string;
-        effective_regon: string | null;
-        batch_id: string;
-        tool_id: string;
-      }>(
-        `SELECT q.conflict_id AS id, q.status, q.created_at, q.reason_code, q.candidate_entity_ids,
-          s.row_number, s.row_version, s.company_name, s.effective_regon, b.id AS batch_id, b.tool_id
-        FROM entity_grouping_conflicts q
-        JOIN source_rows s ON s.id = q.source_row_id
-        JOIN import_batches b ON b.id = s.batch_id
-        JOIN tools t ON t.tool_id = b.tool_id
-        WHERE ${conditions.join(" AND ")}
-        ORDER BY q.created_at DESC, q.conflict_id DESC LIMIT :limit`,
-        { replacements, type: QueryTypes.SELECT },
-      );
-      const candidateIds = [
-        ...new Set(
-          rows
-            .flatMap((row) => (Array.isArray(row.candidate_entity_ids) ? row.candidate_entity_ids : []))
-            .filter((id) => uuidPattern.test(id)),
-        ),
-      ];
-      const candidates = candidateIds.length
-        ? await CanonicalEntity.findAll({
-            where: { tenantId: actor.tenantId, canonicalEntityId: candidateIds },
-            attributes: ["canonicalEntityId", "businessName", "regon"],
-          })
-        : [];
+      const { rows, candidates } = await this.repository.listConflicts({
+        ...actor,
+        filters: parsed.filters,
+        cursor: parsed.cursor,
+        limit: parsed.limit,
+      });
       const candidateById = new Map(candidates.map((candidate) => [candidate.canonicalEntityId, candidate]));
       const items = rows.map((row) => ({
         id: row.id,
@@ -245,48 +199,60 @@ export class ReviewService {
   async decideCorrection(correctionId: string, actor: QueuePrincipal, body: unknown) {
     const input = parseCorrectionDecisionRequest(body);
     if (!uuidPattern.test(correctionId)) throw new BadRequestException("Nieprawidłowa decyzja korekty");
-    const stub = await RegonCorrection.findByPk(correctionId, { attributes: ["sourceRowId"] });
-    if (!stub) throw new NotFoundException();
-    const sourceStub = await SourceRow.findByPk(stub.sourceRowId, { attributes: ["batchId"] });
-    if (!sourceStub) throw new NotFoundException();
+    const route = await this.repository.correctionRoute(correctionId);
+    if (!route) throw new NotFoundException();
 
-    return sequelize.transaction(async (transaction) => {
-      const batch = await ImportBatch.findByPk(sourceStub.batchId, { transaction, lock: transaction.LOCK.UPDATE });
+    return this.repository.withTransaction(async (transaction) => {
+      const batch = await this.repository.lockBatch(route.batchId, transaction);
       if (!batch || batch.tenantId !== actor.tenantId) throw new NotFoundException();
-      await this.assertGrant(actor, batch, transaction);
-      const row = await SourceRow.findOne({
-        where: { id: stub.sourceRowId, batchId: batch.id },
-        transaction,
-        lock: transaction.LOCK.UPDATE,
-      });
-      const correction = await RegonCorrection.findByPk(correctionId, { transaction, lock: transaction.LOCK.UPDATE });
-      if (!row || !correction || correction.sourceRowId !== row.id) throw new NotFoundException();
+      if (!(await this.repository.reviewGrantAllowed({ ...actor, toolId: batch.toolId }, transaction)))
+        throw new NotFoundException();
+      const row = await this.repository.lockSourceRow(route.sourceRowId, transaction);
+      const correction = await this.repository.lockCorrection(correctionId, transaction);
+      if (!row || !correction || row.batchId !== batch.id || correction.sourceRowId !== row.id)
+        throw new NotFoundException();
       if (correction.status !== "pending") throw new ConflictException("Korekta została już rozpatrzona");
       if (row.rowVersion !== input.expectedRowVersion)
         throw new ConflictException("Wiersz zmienił się; odśwież kolejkę przed decyzją");
-      const link = await SourceEntityLink.findByPk(row.id, { transaction, lock: transaction.LOCK.UPDATE });
-      await this.assertNoRuns(row.id, link?.canonicalEntityId ?? null, actor.tenantId, transaction);
+      const link = await this.repository.lockSourceLink(row.id, transaction);
+      const blocker = await this.repository.reviewWriteBlocker(
+        row.id,
+        link?.canonicalEntityId ?? null,
+        actor.tenantId,
+        transaction,
+      );
+      if (blocker === "canonical_missing") throw new NotFoundException();
+      if (blocker === "run_exists")
+        throw new ConflictException("Decyzja jest zablokowana, ponieważ wiersz lub encja ma już przypisane zadanie");
 
       const now = new Date();
-      correction.status = input.decision as "approved" | "rejected";
-      correction.reviewerRef = actor.userId;
-      correction.reviewedAt = now;
-      correction.reviewReason = input.reasonCode;
-      await correction.save({ transaction });
-      row.rowVersion += 1;
+      await this.repository.updateCorrection(
+        correctionId,
+        {
+          status: input.decision,
+          reviewerRef: actor.userId,
+          reviewedAt: now,
+          reviewReason: input.reasonCode,
+        },
+        transaction,
+      );
+      let rowVersion = row.rowVersion + 1;
+      let effectiveRegon = row.effectiveRegon;
+      let issues = [...row.issues];
 
       if (input.decision === "approved") {
         const normalized = normalizeRegon(correction.proposedRegon);
         if (!normalized.normalized || normalized.issues.length)
           throw new ConflictException("Proponowany REGON wymaga ponownej weryfikacji");
-        row.effectiveRegon = normalized.normalized;
-        row.issues = row.issues.filter((issue) => !issue.startsWith("REGON_"));
-        await row.save({ transaction });
-        if (link) await this.updateSoleLinkedEntity(row, link, transaction);
+        effectiveRegon = normalized.normalized;
+        issues = issues.filter((issue) => !issue.startsWith("REGON_"));
+        const updatedRow = { ...row, effectiveRegon, issues, rowVersion };
+        await this.repository.updateSourceRow(row.id, { effectiveRegon, issues, rowVersion }, transaction);
+        if (link) await this.updateSoleLinkedEntity(updatedRow, link, transaction);
         const grouping = await this.grouping.resolveSourceRow(batch.id, row.rowNumber, transaction);
-        row.rowVersion = grouping.rowVersion;
+        rowVersion = grouping.rowVersion;
       } else {
-        await row.save({ transaction });
+        await this.repository.updateSourceRow(row.id, { issues, rowVersion }, transaction);
       }
 
       await this.audit.record(
@@ -303,10 +269,10 @@ export class ReviewService {
       );
       return {
         correctionId: correction.correctionId,
-        decision: correction.status,
+        decision: input.decision,
         rowNumber: row.rowNumber,
-        rowVersion: row.rowVersion,
-        effectiveRegon: row.effectiveRegon,
+        rowVersion,
+        effectiveRegon,
         grouping: input.decision === "approved" ? "rechecked" : "unchanged",
       };
     });
@@ -316,50 +282,61 @@ export class ReviewService {
     const input = parseConflictResolutionRequest(body);
     const action = input.action;
     if (!uuidPattern.test(conflictId)) throw new BadRequestException("Nieprawidłowe rozstrzygnięcie konfliktu");
-    const stub = await EntityGroupingConflict.findByPk(conflictId, { attributes: ["sourceRowId"] });
-    if (!stub) throw new NotFoundException();
-    const sourceStub = await SourceRow.findByPk(stub.sourceRowId, { attributes: ["batchId"] });
-    if (!sourceStub) throw new NotFoundException();
+    const route = await this.repository.conflictRoute(conflictId);
+    if (!route) throw new NotFoundException();
 
-    return sequelize.transaction(async (transaction) => {
-      const batch = await ImportBatch.findByPk(sourceStub.batchId, { transaction, lock: transaction.LOCK.UPDATE });
+    return this.repository.withTransaction(async (transaction) => {
+      const batch = await this.repository.lockBatch(route.batchId, transaction);
       if (!batch || batch.tenantId !== actor.tenantId) throw new NotFoundException();
-      await this.assertGrant(actor, batch, transaction);
-      const row = await SourceRow.findOne({
-        where: { id: stub.sourceRowId, batchId: batch.id },
-        transaction,
-        lock: transaction.LOCK.UPDATE,
-      });
-      const conflict = await EntityGroupingConflict.findByPk(conflictId, {
-        transaction,
-        lock: transaction.LOCK.UPDATE,
-      });
-      if (!row || !conflict || conflict.sourceRowId !== row.id) throw new NotFoundException();
+      if (!(await this.repository.reviewGrantAllowed({ ...actor, toolId: batch.toolId }, transaction)))
+        throw new NotFoundException();
+      const row = await this.repository.lockSourceRow(route.sourceRowId, transaction);
+      const conflict = await this.repository.lockConflict(conflictId, transaction);
+      if (!row || !conflict || row.batchId !== batch.id || conflict.sourceRowId !== row.id)
+        throw new NotFoundException();
       if (conflict.status !== "open") throw new ConflictException("Konflikt został już rozstrzygnięty");
       if (row.rowVersion !== input.expectedRowVersion)
         throw new ConflictException("Wiersz zmienił się; odśwież kolejkę przed decyzją");
-      const link = await SourceEntityLink.findByPk(row.id, { transaction, lock: transaction.LOCK.UPDATE });
-      await this.assertNoRuns(row.id, link?.canonicalEntityId ?? null, actor.tenantId, transaction);
+      const link = await this.repository.lockSourceLink(row.id, transaction);
+      const blocker = await this.repository.reviewWriteBlocker(
+        row.id,
+        link?.canonicalEntityId ?? null,
+        actor.tenantId,
+        transaction,
+      );
+      if (blocker === "canonical_missing") throw new NotFoundException();
+      if (blocker === "run_exists")
+        throw new ConflictException("Decyzja jest zablokowana, ponieważ wiersz lub encja ma już przypisane zadanie");
       const now = new Date();
-      conflict.status = "resolved";
-      conflict.resolutionNote = input.reasonCode;
-      conflict.resolvedBy = actor.userId;
-      conflict.resolvedAt = now;
-      await conflict.save({ transaction });
-      row.rowVersion += 1;
+      await this.repository.updateConflict(
+        conflictId,
+        {
+          status: "resolved",
+          resolutionNote: input.reasonCode,
+          resolvedBy: actor.userId,
+          resolvedAt: now,
+        },
+        transaction,
+      );
+      let rowVersion = row.rowVersion + 1;
+      let issues = [...row.issues];
 
       if (action === "link_existing") {
         const candidateId = input.canonicalEntityId;
         const allowedCandidates = Array.isArray(conflict.candidateEntityIds) ? conflict.candidateEntityIds : [];
         if (!allowedCandidates.includes(candidateId))
           throw new ConflictException("Wybrana encja nie jest kandydatem tego konfliktu");
-        const candidate = await CanonicalEntity.findOne({
-          where: { canonicalEntityId: candidateId, tenantId: actor.tenantId },
-          transaction,
-          lock: transaction.LOCK.UPDATE,
-        });
+        const candidate = await this.repository.lockCandidate(candidateId, actor.tenantId, transaction);
         if (!candidate) throw new NotFoundException();
-        await this.assertNoRuns(row.id, candidate.canonicalEntityId, actor.tenantId, transaction);
+        const candidateBlocker = await this.repository.reviewWriteBlocker(
+          row.id,
+          candidate.canonicalEntityId,
+          actor.tenantId,
+          transaction,
+        );
+        if (candidateBlocker === "canonical_missing") throw new NotFoundException();
+        if (candidateBlocker === "run_exists")
+          throw new ConflictException("Decyzja jest zablokowana, ponieważ wiersz lub encja ma już przypisane zadanie");
         const decision = assessEntityGrouping({
           nipRaw: row.nipRaw,
           effectiveRegon: row.effectiveRegon,
@@ -378,31 +355,22 @@ export class ReviewService {
             "Identyfikatory firmy nie uzasadniają połączenia; rozpatrz korektę REGON lub ponowną kontrolę",
           );
         }
-        const method = await this.grouping.matchMethodForReview(
-          row,
-          decision.nipNormalized,
-          decision.regon,
+        const method = link
+          ? "manual"
+          : await this.grouping.matchMethodForReview(row, decision.nipNormalized, decision.regon, transaction);
+        await this.repository.saveSourceLink(
+          row.id,
+          {
+            sourceRowId: row.id,
+            tenantId: actor.tenantId,
+            canonicalEntityId: candidateId,
+            matchMethod: method,
+            linkedAt: now,
+          },
+          Boolean(link),
           transaction,
         );
-        if (link) {
-          link.tenantId = actor.tenantId;
-          link.canonicalEntityId = candidateId;
-          link.matchMethod = "manual";
-          link.linkedAt = now;
-          await link.save({ transaction });
-        } else {
-          await SourceEntityLink.create(
-            {
-              sourceRowId: row.id,
-              tenantId: actor.tenantId,
-              canonicalEntityId: candidateId,
-              matchMethod: method,
-              linkedAt: now,
-            },
-            { transaction },
-          );
-        }
-        row.issues = row.issues.filter((issue) => issue !== "ENTITY_LINK_REJECTED");
+        issues = issues.filter((issue) => issue !== "ENTITY_LINK_REJECTED");
       } else if (action === "reject_link") {
         if (
           link &&
@@ -410,20 +378,20 @@ export class ReviewService {
             link.canonicalEntityId,
           )
         ) {
-          await link.destroy({ transaction });
+          await this.repository.deleteSourceLink(row.id, transaction);
         }
-        row.issues = [...new Set([...row.issues, "ENTITY_LINK_REJECTED"])];
+        issues = [...new Set([...issues, "ENTITY_LINK_REJECTED"])];
       }
-      await row.save({ transaction });
+      await this.repository.updateSourceRow(row.id, { rowVersion, issues }, transaction);
 
       let grouping: string =
         action === "link_existing" ? "linked" : action === "reject_link" ? "link_rejected" : "rechecked";
       if (action === "recheck") {
-        row.issues = row.issues.filter((issue) => issue !== "ENTITY_LINK_REJECTED");
-        await row.save({ transaction });
+        issues = issues.filter((issue) => issue !== "ENTITY_LINK_REJECTED");
+        await this.repository.updateSourceRow(row.id, { rowVersion, issues }, transaction);
         const outcome = await this.grouping.resolveSourceRow(batch.id, row.rowNumber, transaction);
         grouping = outcome.status;
-        row.rowVersion = outcome.rowVersion;
+        rowVersion = outcome.rowVersion;
       }
       await this.audit.record(
         {
@@ -441,79 +409,32 @@ export class ReviewService {
         conflictId: conflict.conflictId,
         decision: action,
         rowNumber: row.rowNumber,
-        rowVersion: row.rowVersion,
+        rowVersion,
         grouping,
       };
     });
   }
 
-  private async assertGrant(actor: QueuePrincipal, batch: ImportBatch, transaction: Transaction) {
-    if (batch.tenantId !== actor.tenantId) throw new NotFoundException();
-    if (actor.role === "admin") return;
-    const grants = await sequelize.query<{ allowed: boolean }>(
-      `SELECT (t.status <> 'disabled' AND g.can_view_results) AS allowed
-       FROM tool_grants g JOIN tools t ON t.tool_id = g.tool_id
-       WHERE g.tenant_id = :tenantId AND g.tool_id = :toolId AND g.user_id = :userId
-       FOR SHARE OF g, t`,
-      {
-        replacements: { tenantId: actor.tenantId, toolId: batch.toolId, userId: actor.userId },
-        type: QueryTypes.SELECT,
-        transaction,
-      },
-    );
-    if (!grants[0]?.allowed) throw new NotFoundException();
-  }
-
-  private async assertNoRuns(
-    sourceRowId: string,
-    canonicalEntityId: string | null,
-    tenantId: string,
+  private async updateSoleLinkedEntity(
+    row: ReviewSourceRowRecord,
+    link: ReviewSourceLinkRecord,
     transaction: Transaction,
   ) {
-    if (
-      canonicalEntityId &&
-      !(await CanonicalEntity.findOne({
-        where: { canonicalEntityId, tenantId },
-        attributes: ["canonicalEntityId"],
-        transaction,
-        lock: transaction.LOCK.UPDATE,
-      }))
-    )
-      throw new NotFoundException();
-    const runs = await sequelize.query<{ id: string }>(
-      `SELECT run.id
-       FROM automation_runs run
-       LEFT JOIN run_source_rows member ON member.run_id = run.id
-       WHERE (run.source_row_id = :sourceRowId OR member.source_row_id = :sourceRowId
-         OR (:canonicalEntityId IS NOT NULL AND run.canonical_entity_id = CAST(:canonicalEntityId AS uuid)))
-       FOR UPDATE OF run`,
-      { replacements: { sourceRowId, canonicalEntityId }, type: QueryTypes.SELECT, transaction },
-    );
-    if (runs.length)
-      throw new ConflictException("Decyzja jest zablokowana, ponieważ wiersz lub encja ma już przypisane zadanie");
-  }
-
-  private async updateSoleLinkedEntity(row: SourceRow, link: SourceEntityLink, transaction: Transaction) {
-    const entity = await CanonicalEntity.findOne({
-      where: { canonicalEntityId: link.canonicalEntityId, tenantId: link.tenantId },
-      transaction,
-      lock: transaction.LOCK.UPDATE,
-    });
+    const entity = await this.repository.lockCanonicalEntity(link.canonicalEntityId, link.tenantId, transaction);
     if (!entity) throw new NotFoundException();
-    const linkedRows = await SourceEntityLink.count({
-      where: { canonicalEntityId: link.canonicalEntityId, tenantId: link.tenantId },
-      transaction,
-    });
+    const linkedRows = await this.repository.countCanonicalLinks(link.canonicalEntityId, link.tenantId, transaction);
     if (linkedRows !== 1) return;
     const regon = row.effectiveRegon ? normalizeRegon(row.effectiveRegon).normalized : null;
     if (!regon) throw new ConflictException("Encja wymaga poprawnego REGON-u po zatwierdzeniu korekty");
     const nip = normalizeNip(row.nipRaw).normalized;
-    entity.regon = regon;
-    if (nip) entity.nipNormalized = nip;
-    entity.businessName = row.companyName;
-    entity.updatedAt = new Date();
+    const updated = {
+      regon,
+      nipNormalized: nip ?? entity.nipNormalized,
+      businessName: row.companyName,
+      updatedAt: new Date(),
+    };
     try {
-      await entity.save({ transaction });
+      await this.repository.updateCanonicalEntity(link.canonicalEntityId, link.tenantId, updated, transaction);
     } catch {
       throw new ConflictException(
         "REGON koliduje z inną encją w tym tenancie; wymagane jest rozstrzygnięcie konfliktu",

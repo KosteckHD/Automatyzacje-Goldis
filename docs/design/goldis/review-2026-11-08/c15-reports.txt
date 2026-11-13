@@ -1,0 +1,84 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+Przegląd
+Moje firmy
+Pula firm
+Automatyzacje
+Przebiegi
+Historia importów
+Powiadomienia
+2
+
+ORGANIZACJA
+
+Pracownicy
+Dostępy
+Raporty
+Weryfikacja danych
+Dziennik aktywności
+Moje konto
+Zwiń menu
+Menedżer
+GOLDIS / ORGANIZACJA
+Raporty
+Moje konto
+Raporty
+
+Stan obsługi leadów oraz przebieg automatyzacji w wybranym okresie.
+
+Utworzono od
+Do (wyłącznie)
+Pokaż raport
+
+Okres wybiera leady według daty utworzenia. Statusy pokazują ich bieżący stan, a nie historię liczby telefonów.
+
+OBSŁUGA KLIENTÓW
+Wyniki kontaktu
+Otwórz wspólną pulę
+Leadów w okresie
+85
+42 wolnych w puli
+Przydzielone
+43
+Aktualny przydział
+Bez kontaktu
+21
+Wśród leadów z okresu
+Zainteresowani
+15
+Zgadzają się na ofertę
+Niezainteresowani
+7
+Według bieżącego statusu
+Podsumowanie według osoby
+
+Przydziały osób, które obsługują leady.
+
+OSOBA	PRZYDZIELONE	NIE KONTAKTOWANO	ZAINTERESOWANY	NIEZAINTERESOWANY	STATUS KONTA
+
+anna.nowak
+	18	9	5	4	Aktywne
+
+piotr.kowalski
+	12	6	4	2	Aktywne
+AUTOMATYZACJA
+Raport operacyjny
+Szczegóły administracyjne
+Operacje utworzone
+98
+Ukończone
+82
+Brak pasujących polis
+9
+Błędy
+7
+Wymaga działania
+3
+Wygenerowane pliki
+76
+
+Raport operacyjny liczy uruchomienia i zakończenia według ich właściwych dat. „Brak pasujących polis” nie jest błędem.

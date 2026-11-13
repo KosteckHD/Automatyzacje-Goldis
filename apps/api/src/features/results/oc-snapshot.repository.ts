@@ -19,7 +19,7 @@ import {
   SourceRow,
   sequelize,
 } from "../../infrastructure/database/db";
-import { decryptPesel, encryptIdentityForPersistence, peselErrorCodeForLog } from "./pesel-crypto";
+import { decryptIdentityPesel, encryptIdentityForPersistence, peselErrorCodeForLog } from "./pesel-crypto";
 
 export class SnapshotPersistenceError extends Error {
   constructor(
@@ -71,11 +71,7 @@ function sameIdentity(
 ): boolean {
   let pesel: string;
   try {
-    pesel = decryptPesel(
-      { ciphertext: stored.peselCiphertext, keyVersion: stored.peselKeyVersion },
-      { runId, sourceRowId: identity.sourceRowId },
-      environment,
-    );
+    pesel = decryptIdentityPesel(stored, { runId, sourceRowId: identity.sourceRowId }, environment);
   } catch (error) {
     throw new SnapshotPersistenceError(
       peselErrorCodeForLog(error) === "PESEL_DECRYPT_FAILED" ? "IDENTITY_CIPHERTEXT_INVALID" : "SNAPSHOT_WRITE_FAILED",
@@ -145,6 +141,7 @@ export async function persistOcSnapshot(
   let snapshot: OcSnapshotV1;
   try {
     identity = validateIdentityMatchV1(identityInput);
+    if (identity.matchMethod === "regon_unique_pesel") throw new Error("IDENTITY_NAME_NOT_CONFIRMED");
     snapshot = validateOcSnapshotV1(snapshotInput);
   } catch {
     throw new SnapshotPersistenceError("SNAPSHOT_INPUT_INVALID");
@@ -167,7 +164,8 @@ export async function persistOcSnapshot(
         run.sourceRowId !== identity.sourceRowId ||
         source.effectiveRegon !== identity.regon ||
         comparable(source.companyName) !== comparable(identity.companyName) ||
-        (source.decisionMakerName !== null &&
+        (identity.matchMethod === "regon_company_name_decision_maker" &&
+          source.decisionMakerName !== null &&
           comparable(`${identity.firstName} ${identity.lastName}`) !== comparable(source.decisionMakerName))
       ) {
         throw new SnapshotPersistenceError("IDENTITY_RUN_MISMATCH");

@@ -2,7 +2,7 @@ import { type OcPolicy, policyMatchesDate, validateOcSnapshotV1 } from "@goldis/
 import { QueryTypes, Transaction } from "sequelize";
 import { AutomationRun, OcPolicyRecord, OcSnapshot, RunIdentity, sequelize } from "../../infrastructure/database/db";
 import { exportOcWorkbook } from "./export";
-import { decryptPesel } from "./pesel-crypto";
+import { decryptIdentityPesel } from "./pesel-crypto";
 import { type RunInputSnapshotForExport, validateRunInputSnapshotForExport } from "./run-export-snapshot";
 
 export {
@@ -148,10 +148,7 @@ export async function exportRunWorkbook(runId: string): Promise<{
 
         let pesel: string;
         try {
-          pesel = decryptPesel(
-            { ciphertext: identity.peselCiphertext, keyVersion: identity.peselKeyVersion },
-            { runId, sourceRowId: sourceIdentity.sourceRowId },
-          );
+          pesel = decryptIdentityPesel(identity, { runId, sourceRowId: sourceIdentity.sourceRowId });
         } catch {
           throw new RunExportError("IDENTITY_CIPHERTEXT_INVALID");
         }
@@ -170,8 +167,10 @@ export async function exportRunWorkbook(runId: string): Promise<{
         }
 
         if (
-          sourceIdentity.decisionMakerName &&
-          comparable(`${identity.firstName} ${identity.lastName}`) !== comparable(sourceIdentity.decisionMakerName)
+          identity.matchMethod === "regon_unique_pesel" ||
+          (identity.matchMethod === "regon_company_name_decision_maker" &&
+            sourceIdentity.decisionMakerName &&
+            comparable(`${identity.firstName} ${identity.lastName}`) !== comparable(sourceIdentity.decisionMakerName))
         ) {
           throw new RunExportError("EXPORT_DATA_INCOMPLETE");
         }

@@ -246,12 +246,11 @@ test("wspólny odczyt OC zostaje dostępny, a cofnięcie prawa uruchamiania blok
 
     grant.canExecute = true;
     grant.canDownloadResults = false;
-    assert.equal((await request(`/runs/${runId}/download`)).status, 200, "wspólny dostęp obejmuje pobranie wyników OC");
-    assert.equal(
-      calls.length,
-      grantedRequests.length + 8,
-      "dostęp do plików OC pozostaje niezależny od grantu uruchamiania",
-    );
+    assert.equal((await request(`/runs/${runId}/download`)).status, 404, "wspólny podgląd nie nadaje prawa pobrania");
+    assert.equal(calls.length, grantedRequests.length + 7, "brak prawa pobrania blokuje handler artefaktu");
+    grant.canDownloadResults = true;
+    assert.equal((await request(`/runs/${runId}/download`)).status, 200, "jawny grant pozwala pobrać wyniki OC");
+    assert.equal(calls.length, grantedRequests.length + 8, "jawny grant dociera do handlera artefaktu");
   } finally {
     if (app) await app.close();
     restoreModels?.();

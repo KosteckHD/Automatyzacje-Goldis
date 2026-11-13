@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { normalizeNip, normalizeRegon, todayInWarsaw } from "@goldis/core";
+import { normalizeNip, normalizeRegon, type OcPolicy, policyMatchesDate, todayInWarsaw } from "@goldis/core";
 import {
   BadRequestException,
   ConflictException,
@@ -9,14 +9,18 @@ import {
   NotFoundException,
   Optional,
 } from "@nestjs/common";
+import ExcelJS from "exceljs";
 import { type Transaction, UniqueConstraintError } from "sequelize";
+import { isResourceTombstoned } from "../../contracts/deletion-barrier";
 import { normalizeBusinessName } from "../../contracts/registry-result";
 import type { ImportBatch } from "../../infrastructure/database/db";
+import { sanitizePublicText } from "../../infrastructure/http";
 import type { AuditActorContext } from "../audit";
 import { canAccessTool, type ToolPrincipal } from "../authorization/public";
 import { assessEntityGrouping, EntityGroupingService } from "../grouping/public";
 import { BusinessLeadService } from "../leads/public";
 import { NotificationService } from "../notifications/public";
+import { leadResultSnapshotChecksum } from "../results/public";
 import { createLeadIdentityKey } from "../runs/public";
 import {
   digestSubmissionValue as digest,
@@ -35,9 +39,18 @@ const toolId = "oc-policy-verification";
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const keyPattern = /^[A-Za-z0-9._:-]{8,128}$/;
 
+function excelText(value: unknown): string | number {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  const text = value === null || value === undefined ? "" : String(value);
+  return /^[=+\-@]/.test(text) ? `'${text}` : text;
+}
+
 type SnapshotEntry = {
   sourceRowId: string;
   rowNumber: number;
+  companyName: string;
+  nip: string | null;
+  effectiveRegon: string | null;
   expectedRowVersion: number;
   state: "ready" | "review" | "excluded";
   reasonCode: string | null;
@@ -46,6 +59,7 @@ type SnapshotEntry = {
   alreadyActive: boolean;
 };
 type PreviewSnapshot = {
+  preparationId: string | null;
   referenceDate: string;
   selectionFingerprint: string;
   entries: SnapshotEntry[];
@@ -276,6 +290,9 @@ export class RunSubmissionService {
       entries.push({
         sourceRowId: row.id,
         rowNumber: row.rowNumber,
+        companyName: sanitizePublicText(row.companyName),
+        nip: row.nipRaw ? sanitizePublicText(row.nipRaw) : null,
+        effectiveRegon: row.effectiveRegon ? sanitizePublicText(row.effectiveRegon) : null,
         expectedRowVersion: row.rowVersion,
         state,
         reasonCode,
@@ -303,6 +320,7 @@ export class RunSubmissionService {
       ),
     });
     return {
+      preparationId,
       referenceDate,
       selectionFingerprint: fingerprint,
       entries,
@@ -358,13 +376,30 @@ export class RunSubmissionService {
       referenceDate: snapshot.referenceDate,
       selectionFingerprint: snapshot.selectionFingerprint,
       counts: snapshot.counts,
-      items: snapshot.entries.map(({ rowNumber, expectedRowVersion, state, reasonCode, alreadyActive }) => ({
-        rowNumber,
-        expectedRowVersion,
-        state,
-        reasonCode,
-        alreadyActive,
-      })),
+      preparationId: snapshot.preparationId,
+      items: snapshot.entries.map(
+        ({
+          sourceRowId,
+          rowNumber,
+          companyName,
+          nip,
+          effectiveRegon,
+          expectedRowVersion,
+          state,
+          reasonCode,
+          alreadyActive,
+        }) => ({
+          sourceRowId,
+          rowNumber,
+          companyName,
+          nip,
+          effectiveRegon,
+          expectedRowVersion,
+          state,
+          reasonCode,
+          alreadyActive,
+        }),
+      ),
     };
   }
 
@@ -737,7 +772,8 @@ export class RunSubmissionService {
       importBatchId: submission.importBatchId,
       toolId: submission.toolId,
       referenceDate: submission.referenceDate,
-      status: state.status,
+      resultSetId,
+      status: submission.status === "paused" ? "paused" : state.status,
       version: submission.version,
       counts: { items: state.itemCounts, groups: state.groupCounts, selectedRows: itemTotal, uniqueGroups: groupTotal },
       createdAt: submission.createdAt,
@@ -780,6 +816,228 @@ export class RunSubmissionService {
     return { items: page, nextCursor };
   }
 
+  private async assertResultSetAccess(id: string, actor: AuditActorContext, role: string, requireDownload = false) {
+    if (!uuidPattern.test(id)) throw new NotFoundException("Nie znaleziono zestawu wyników");
+    const resultSet = await this.readRepository.findResultSetInTenant(id, actor.tenantId);
+    if (!resultSet || resultSet.toolId !== toolId || !resultSet.batchId)
+      throw new NotFoundException("Nie znaleziono zestawu wyników");
+    if (await isResourceTombstoned("import", resultSet.batchId))
+      throw new NotFoundException("Nie znaleziono zestawu wyników");
+    const batch = await this.readRepository.findBatch(resultSet.batchId);
+    if (!batch) throw new NotFoundException("Nie znaleziono zestawu wyników");
+    await this.assertCanRead(actor, role, batch);
+    if (role !== "admin" && role !== "manager" && batch.ownerUserId !== actor.actorUserId)
+      throw new NotFoundException("Nie znaleziono zestawu wyników");
+    if (requireDownload) {
+      const principal: ToolPrincipal = {
+        tenantId: actor.tenantId,
+        userId: actor.actorUserId,
+        role: role as ToolPrincipal["role"],
+      };
+      if (!(await canAccessTool(principal, toolId, "download_results")))
+        throw new ForbiddenException("Brak prawa do pobrania wyników");
+    }
+    return resultSet;
+  }
+
+  async resultSetSummary(id: string, actor: AuditActorContext, role: string) {
+    const resultSet = await this.assertResultSetAccess(id, actor, role);
+    const counts = await this.readRepository.resultSetStatusCounts(id);
+    const paused = await this.readRepository.countPausedSubmissions(id);
+    return {
+      resultSetId: resultSet.resultSetId,
+      sourceType: resultSet.sourceType,
+      sourceId: resultSet.sourceId,
+      batchId: resultSet.batchId,
+      referenceDate: resultSet.referenceDate,
+      status: paused > 0 ? "paused" : resultSet.status,
+      createdAt: resultSet.createdAt,
+      updatedAt: resultSet.updatedAt,
+      counts,
+    };
+  }
+
+  async resultSetRows(
+    id: string,
+    cursor: string | undefined,
+    actor: AuditActorContext,
+    role: string,
+    search = "",
+    status?: string,
+  ) {
+    await this.assertResultSetAccess(id, actor, role);
+    const query = search.trim();
+    const validStatuses = new Set([
+      "queued",
+      "running",
+      "waiting_attention",
+      "completed",
+      "no_matching_policies",
+      "failed",
+      "cancelled",
+      "needs_review",
+      "review",
+      "excluded",
+    ]);
+    if (
+      query.length > 120 ||
+      Array.from(query).some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)
+    )
+      throw new BadRequestException("Wyszukiwana fraza może mieć maksymalnie 120 znaków");
+    if (status && !validStatuses.has(status)) throw new BadRequestException("Nieprawidłowy filtr wyników");
+    let after: { rowNumber: number; sourceRowId: string } | null = null;
+    if (cursor) {
+      try {
+        const parsed = JSON.parse(Buffer.from(cursor, "base64url").toString("utf8"));
+        if (
+          parsed?.resultSetId !== id ||
+          !Number.isSafeInteger(parsed?.rowNumber) ||
+          !uuidPattern.test(parsed?.sourceRowId)
+        )
+          throw new Error();
+        after = { rowNumber: parsed.rowNumber, sourceRowId: parsed.sourceRowId };
+      } catch {
+        throw new BadRequestException("Nieprawidłowy kursor wyników");
+      }
+    }
+    const items = await this.readRepository.resultSetRows(id, after, 51, query, status ?? null);
+    const hasMore = items.length > 50;
+    const page = items.slice(0, 50);
+    const last = page.at(-1);
+    const nextCursor =
+      hasMore && last
+        ? Buffer.from(
+            JSON.stringify({ resultSetId: id, rowNumber: last.rowNumber, sourceRowId: last.sourceRowId }),
+            "utf8",
+          ).toString("base64url")
+        : null;
+    return { items: page, nextCursor };
+  }
+
+  async exportResultSet(id: string, actor: AuditActorContext, role: string) {
+    const resultSet = await this.assertResultSetAccess(id, actor, role, true);
+    const rows = await this.readRepository.resultSetRows(id, null, 1_000_001);
+    if (rows.length >= 1_000_001)
+      throw new ConflictException("Zestaw jest zbyt duży dla jednego skoroszytu; pobierz wyniki partiami");
+    const saved = await this.readRepository.resultSetSnapshots(id, actor.tenantId);
+    const exportedAt = new Date();
+    const pausedSubmissions = await this.readRepository.countPausedSubmissions(id);
+    const status = pausedSubmissions > 0 ? "paused" : resultSet.status;
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = "Goldis Ubezpieczenia";
+    workbook.created = exportedAt;
+    const info = workbook.addWorksheet("Informacje");
+    info.columns = [{ width: 28 }, { width: 48 }];
+    info.addRows([
+      ["Zestaw wyników", id],
+      ["Stan", status],
+      ["Eksport częściowy", ["completed", "cancelled", "failed"].includes(status) ? "Nie" : "Tak"],
+      ["Data odniesienia", resultSet.referenceDate],
+      ["Wygenerowano", exportedAt.toISOString()],
+      ["Wiersze ujęte w raporcie", rows.length],
+    ]);
+    info.getColumn(1).font = { bold: true };
+    const summary = workbook.addWorksheet("Wyniki");
+    summary.columns = [{ width: 14 }, { width: 42 }, { width: 24 }, { width: 38 }, { width: 38 }, { width: 14 }];
+    summary.addRow(["Wiersz", "Firma", "Wynik", "Szczegóły", "ID zadania", "Liczba polis"]);
+    summary.getRow(1).font = { bold: true };
+    for (const row of rows)
+      summary.addRow([
+        row.rowNumber,
+        excelText(row.companyName),
+        excelText(row.status),
+        excelText(row.reasonCode),
+        excelText(row.runId),
+        row.policyCount,
+      ]);
+    summary.views = [{ state: "frozen", ySplit: 1 }];
+    summary.autoFilter = { from: "A1", to: `F${summary.rowCount}` };
+
+    const policies = workbook.addWorksheet("Polisy OC");
+    policies.columns = [
+      { width: 14 },
+      { width: 38 },
+      { width: 18 },
+      { width: 18 },
+      { width: 34 },
+      { width: 30 },
+      { width: 26 },
+      { width: 18 },
+      { width: 20 },
+      { width: 20 },
+      { width: 24 },
+      { width: 24 },
+      { width: 18 },
+      { width: 18 },
+    ];
+    policies.addRow([
+      "Wiersz",
+      "Firma",
+      "REGON",
+      "Data odniesienia",
+      "Ubezpieczony",
+      "Typ i nr polisy",
+      "Rodzaj umowy",
+      "Liczba szkód",
+      "Nr rejestracyjny",
+      "Grupa pojazdu",
+      "Marka / model",
+      "Ubezpieczyciel",
+      "Ochrona od",
+      "Ochrona do",
+    ]);
+    policies.getRow(1).font = { bold: true };
+    for (const snapshot of saved) {
+      const policiesForRun = snapshot.policies as unknown as OcPolicy[];
+      const checksum = leadResultSnapshotChecksum({
+        leadId: snapshot.leadId,
+        tenantId: actor.tenantId,
+        runId: snapshot.originalRunId,
+        sourceRowId: snapshot.originalSourceRowId,
+        sourceOwnerUserId: snapshot.sourceOwnerUserId,
+        referenceDate: snapshot.referenceDate,
+        companyFields: snapshot.companyFields,
+        peselCiphertext: snapshot.peselCiphertext,
+        peselKeyVersion: snapshot.peselKeyVersion,
+        policies: policiesForRun,
+      });
+      if (
+        snapshot.schemaVersion !== 1 ||
+        snapshot.policyCount !== policiesForRun.length ||
+        checksum !== snapshot.checksum
+      )
+        throw new ConflictException("Zapisany wynik nie przeszedł kontroli integralności");
+      for (const policy of policiesForRun.filter((candidate) =>
+        policyMatchesDate(candidate, resultSet.referenceDate),
+      )) {
+        policies.addRow([
+          snapshot.rowNumber,
+          excelText(snapshot.companyFields.companyName),
+          excelText(snapshot.companyFields.effectiveRegon),
+          resultSet.referenceDate,
+          excelText(policy.insuredName),
+          excelText(policy.policyTypeAndNumber),
+          excelText(policy.contractType),
+          policy.insuredClaimCount,
+          excelText(policy.vehicleRegistration),
+          excelText(policy.vehicleGroup),
+          excelText([policy.vehicleMake, policy.vehicleModel].filter(Boolean).join(" ")),
+          excelText(policy.insurer),
+          excelText(policy.coverageFrom),
+          excelText(policy.coverageTo),
+        ]);
+      }
+    }
+    policies.views = [{ state: "frozen", ySplit: 1 }];
+    policies.autoFilter = { from: "A1", to: `N${policies.rowCount}` };
+    return {
+      fileName: `wyniki-oc-${id.slice(0, 8)}.xlsx`,
+      bytes: Buffer.from(await workbook.xlsx.writeBuffer()),
+      rows: rows.length,
+      policies: policies.rowCount - 1,
+    };
+  }
+
   async cancel(id: string, expectedVersion: number, actor: AuditActorContext & { sessionId?: string }, role: string) {
     if (!uuidPattern.test(id) || !Number.isSafeInteger(expectedVersion) || expectedVersion < 1)
       throw new BadRequestException("Nieprawidłowa wersja partii");
@@ -804,5 +1062,48 @@ export class RunSubmissionService {
         acceptedRunsContinue: await this.cancellationRepository.hasAcceptedRuns(id, transaction),
       };
     });
+  }
+
+  async pause(id: string, expectedVersion: number, actor: AuditActorContext & { sessionId?: string }, role: string) {
+    if (!uuidPattern.test(id) || !Number.isSafeInteger(expectedVersion) || expectedVersion < 1)
+      throw new BadRequestException("Nieprawidłowa wersja partii");
+    await this.cancellationRepository.withLockedSubmission(id, actor, async (submission, batch, transaction) => {
+      if (role !== "admin" && role !== "manager" && submission.actorUserId !== actor.actorUserId)
+        throw new NotFoundException("Nie znaleziono partii");
+      await this.assertCanExecute(actor, role, batch, transaction);
+      if (submission.version !== expectedVersion) throw new ConflictException("Partia została zmieniona; odśwież stan");
+      if (submission.status === "paused") return;
+      const current = await this.readRepository.countState(submission);
+      if (["completed", "cancelled"].includes(current.status) || ["completed", "cancelled"].includes(submission.status))
+        throw new ConflictException("Zakończonej partii nie można wstrzymać");
+      const now = new Date();
+      await this.cancellationRepository.pauseUnadmittedGroups(id, now, transaction);
+      submission.status = "paused";
+      submission.version += 1;
+      submission.updatedAt = now;
+      await this.cancellationRepository.saveSubmission(submission, transaction);
+      await this.cancellationRepository.recordAdmissionControl(id, actor, "paused", transaction);
+    });
+    return this.get(id, actor, role);
+  }
+
+  async resume(id: string, expectedVersion: number, actor: AuditActorContext & { sessionId?: string }, role: string) {
+    if (!uuidPattern.test(id) || !Number.isSafeInteger(expectedVersion) || expectedVersion < 1)
+      throw new BadRequestException("Nieprawidłowa wersja partii");
+    await this.cancellationRepository.withLockedSubmission(id, actor, async (submission, batch, transaction) => {
+      if (role !== "admin" && role !== "manager" && submission.actorUserId !== actor.actorUserId)
+        throw new NotFoundException("Nie znaleziono partii");
+      await this.assertCanExecute(actor, role, batch, transaction);
+      if (submission.version !== expectedVersion) throw new ConflictException("Partia została zmieniona; odśwież stan");
+      if (submission.status !== "paused") throw new ConflictException("Partia nie jest wstrzymana");
+      const now = new Date();
+      await this.cancellationRepository.resumeUnadmittedGroups(id, now, transaction);
+      submission.status = "queued";
+      submission.version += 1;
+      submission.updatedAt = now;
+      await this.cancellationRepository.saveSubmission(submission, transaction);
+      await this.cancellationRepository.recordAdmissionControl(id, actor, "resumed", transaction);
+    });
+    return this.get(id, actor, role);
   }
 }

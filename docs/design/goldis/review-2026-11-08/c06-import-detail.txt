@@ -1,0 +1,100 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+Przegląd
+Moje firmy
+Pula firm
+Automatyzacje
+Przebiegi
+Historia importów
+Powiadomienia
+2
+Moje korekty
+
+KONTO
+
+Moje konto
+Zwiń menu
+Pracownik
+GOLDIS / AUTOMATYZACJE
+anna.nowak · Pracownik
+Moje konto ↗
+
+AUTOMATYZACJE / SPRAWDZANIE OC
+
+Sprawdzanie OC
+
+Pracuj na jednym etapie. Do pozostałych wrócisz w każdej chwili.
+
+Historia importów ↗
+Baza transportowa — październik.xlsx
+Arkusz „Realizacja”
+64 wierszy
+Zmień plik
+KROKI AUTOMATYZACJI
+01
+Plik Excel
+Plik zaimportowany
+02
+Kontrola danych
+Kontrola dostępna
+03
+Uzupełnianie REGON
+Dane do sprawdzenia
+04
+Deduplikacja
+Zestaw przygotowany
+05
+Wybór wierszy
+Wybierz firmy
+06
+Podsumowanie i start
+Oczekuje na podsumowanie
+07
+Przebieg zadań
+Brak uruchomienia
+08
+Wyniki i eksport
+Brak wyników
+
+Wybierz dowolny krok, aby zobaczyć szczegóły.
+
+KROK 2 Z 8
+
+Kontrola danych
+
+KROK 02 / WALIDACJA
+
+Kontrola wierszy importu
+44444444
+64
+wierszy w pliku
+61
+gotowych wstępnie
+3
+do sprawdzenia
+Filtr
+Wszystkie
+Gotowe
+Do sprawdzenia
+Szukaj w danych
+Strona 1 z 1 · 3 pasujących
+Poprzednia
+Następna
+WIERSZ	NAZWA	OSOBA DECYZYJNA	REGON	STAN
+14	Transport i Logistyka Alfa sp. z o.o.	Marta Wiśniewska	012345678	Gotowy
+15	Mazovia Cargo S.A.	Jan Malinowski	123456789	Duplikat — pominięty
+16	Polskie Drogi Transport sp. z o.o.	—	—	Wymaga ustalenia REGON-u
+
+Duplikaty pozostają w źródłowym imporcie; są rozliczane w kroku przygotowania.
+
+←
+Wstecz: plik excel
+
+Przejście do kolejnego kroku nie uruchamia portali.
+
+Otwórz etap: uzupełnianie regon
+→

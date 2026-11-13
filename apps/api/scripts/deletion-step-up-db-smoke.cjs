@@ -39,6 +39,7 @@ module.exports = async function verifyDeletionStepUpDatabase(seed) {
   const { AdminMutationsRepository } = require("../dist/features/admin/admin-mutations.repository");
   const { AdminUsersRepository } = require("../dist/features/admin/admin-users.repository");
   const { AdminUsersService } = require("../dist/features/admin/admin-users.service");
+  const { PrivilegedActionRepository } = require("../dist/features/privileged-actions/privileged-actions.repository");
   const { DeletionController } = require("../dist/features/deletions/public");
   const { hashPrivilegedActionToken, privilegedActionFingerprint, PrivilegedActionService } = require("../dist/features/privileged-actions/privileged-actions.service");
   const { consumeDeletionStepUpGrant, createDeletionStepUpGrant } = require("../dist/features/deletions/deletion-step-up");
@@ -76,7 +77,13 @@ module.exports = async function verifyDeletionStepUpDatabase(seed) {
     assert.equal(grantBefore[0].can_delete_data, false, "migracja nadaje grant domyślnie wyłączony");
     assert.equal(Number(grantBefore[0].deletion_grant_version), 0);
 
-    const admin = new AdminUsersService(new AdminUsersRepository(models.sequelize), new AdminMutationsService(new AdminMutationsRepository(models.sequelize)), audit);
+    const privilegedActionRepository = new PrivilegedActionRepository(models.sequelize);
+    const admin = new AdminUsersService(
+      new AdminUsersRepository(models.sequelize),
+      new AdminMutationsService(new AdminMutationsRepository(models.sequelize)),
+      audit,
+      privilegedActionRepository,
+    );
     const calls = { failed: 0, cleared: 0 };
     const limiter = {
       async consumeReauthAttempt(userId, sessionId) {
@@ -102,12 +109,14 @@ module.exports = async function verifyDeletionStepUpDatabase(seed) {
       async consumeReauthAttempt() { return { allowed: true, retryAfterSeconds: 0, generation: "synthetic" }; },
       async recordReauthFailure() {},
       async clearReauth() {},
-    }, audit);
+    }, audit, privilegedActionRepository);
     const confirmAdminAction = async (action, targetId, payload) => {
       const idempotencyKey = randomUUID();
-      const confirmation = await privilegedActions.create(adminActor, signedRequest({
-        userId: ids.admin, tenantId, sessionId: ids.adminSession, role: "admin",
-      }), { action, targetId, payload, currentPassword: password, idempotencyKey }, { setHeader() {} });
+      const confirmation = await privilegedActions.create(
+        adminActor,
+        { action, targetId, payload, currentPassword: password, idempotencyKey },
+        "203.0.113.31",
+      );
       return { confirmationToken: confirmation.token, idempotencyKey };
     };
     const actorRequest = signedRequest({

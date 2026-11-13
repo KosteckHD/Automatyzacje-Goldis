@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { GoldisLogo } from "../../components/brand/GoldisLogo";
+import { loginHref } from "../lib/return-to";
+import { auditActionLabel, auditResourceLabel, compactAuditId } from "../lib/audit-labels";
 
 type Role = "admin" | "manager" | "operator" | "reviewer" | "auditor";
 type Session = { role?: Role };
@@ -201,7 +203,7 @@ export default function AuditPage() {
       <p className="eyebrow">PLATFORMA / BEZPIECZEŃSTWO</p><h1>Dziennik audytu</h1>
       <p className="history-lede">Przeszukuj zdarzenia organizacji. Wpisy nie zawierają treści plików ani danych formularzy.</p>
       {sessionState === "loading" && <p className="history-notice" role="status">Sprawdzanie sesji…</p>}
-      {sessionState === "signed-out" && <p className="history-notice" role="status">Sesja wygasła. <a href={`/?returnTo=${encodeURIComponent(returnTo)}`}>Zaloguj się, aby wrócić do audytu</a>.</p>}
+      {sessionState === "signed-out" && <p className="history-notice" role="status">Sesja wygasła. <a href={loginHref(returnTo, window.location.origin)}>Zaloguj się, aby wrócić do audytu</a>.</p>}
       {sessionState === "error" && <p className="history-error" role="alert">Nie udało się sprawdzić sesji. Odśwież stronę.</p>}
       {sessionState === "ready" && !permittedRole && <p className="history-error" role="alert">Twoja rola nie ma dostępu do dziennika audytu.</p>}
       {sessionState === "ready" && permittedRole && <>
@@ -223,7 +225,7 @@ export default function AuditPage() {
         {!loading && !error && items.length === 0 && <section className="history-empty"><h2>Brak zdarzeń dla tych filtrów</h2><p>Zmień zakres dat lub usuń część filtrów.</p></section>}
         {!loading && !error && items.length > 0 && <div className="audit-event-list" aria-live="polite">{items.map((event) => <article className="audit-event" key={event.eventId}>
           <div className="audit-event-time"><time dateTime={event.createdAt}>{displayDate(event.createdAt)}</time><span>{event.outcome === "succeeded" ? "Powodzenie" : event.outcome === "denied" ? "Odmowa" : "Błąd"}</span></div>
-          <div className="audit-event-main"><h2><code>{event.action}</code></h2><p>{event.actorUsername ?? "System"} · {event.resourceType}{event.resourceId ? ` · ${event.resourceId}` : ""}</p></div>
+          <div className="audit-event-main"><h2>{auditActionLabel(event.action)}</h2><p>{event.actorUsername ?? "System"} · {auditResourceLabel(event.resourceType)}{event.resourceId ? ` · ${compactAuditId(event.resourceId)}` : ""}</p><details><summary>Szczegóły techniczne</summary><p><code>{event.action}</code> · {event.resourceType}{event.resourceId ? ` · ${event.resourceId}` : ""}</p></details></div>
         </article>)}</div>}
         <div className="history-pagination"><button type="button" onClick={previousPage} disabled={pageIndex === 0 || loading}>Nowsze</button><span>Strona {pageIndex + 1}</span><button type="button" onClick={nextPage} disabled={!nextCursor || loading}>Starsze</button></div>
       </>}

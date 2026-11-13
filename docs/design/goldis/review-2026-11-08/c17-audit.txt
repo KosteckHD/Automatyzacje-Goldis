@@ -1,0 +1,104 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+KONTO
+
+Dziennik aktywności
+Moje konto
+Zwiń menu
+Audytor
+GOLDIS / DZIENNIK AKTYWNOŚCI
+auditor.goldis · Audytor
+Moje konto ↗
+
+PLATFORMA / BEZPIECZEŃSTWO
+
+Dziennik audytu
+
+Przeszukuj zdarzenia organizacji. Wpisy nie zawierają treści plików ani danych formularzy.
+
+Od dnia (Warszawa)
+Do dnia (Warszawa)
+Aktor ID
+Czynność
+Wszystkie
+login.succeeded
+login.failed
+logout.succeeded
+session.revoked
+password.changed
+import.created
+import.preparation.started
+import.preparation.completed
+import.preparation.cancelled
+import.preparation.workflow.started
+import.preparation.workflow.completed
+import.preparation.workflow.cancelled
+import.preparation.workflow.failed
+run.created
+run.cancelled
+run.auth_resumed
+run.review_resumed
+run.manual_data_corrected
+sms.submitted
+regon.correction.proposed
+regon.correction.reviewed
+entity.conflict.reviewed
+enrichment.job.created
+enrichment.job.cancelled
+enrichment.job.completed
+artifact.downloaded
+intervention.assigned
+intervention.unassigned
+intervention.priority_changed
+intervention.resolved
+user.created
+user.updated
+tool.grant.created
+tool.grant.updated
+tool.grant.revoked
+settings.updated
+Rodzaj zasobu
+Wszystkie
+import
+preparation_workflow
+run
+artifact
+intervention
+correction
+entity_conflict
+enrichment_job
+user
+session
+tool
+settings
+challenge
+ID zasobu
+Wynik
+Dowolny
+Powodzenie
+Błąd
+Odmowa
+Narzędzie ID
+Szukaj zdarzeń
+
+Zakres dni jest interpretowany w strefie Europe/Warsaw; koniec zakresu obejmuje cały wybrany dzień.
+
+11 paź 2026, 11:20
+Powodzenie
+lead.allocated
+
+ewa.zielinska · lead · 77777777-7777-4777-8777-777777777777
+
+11 paź 2026, 11:10
+Powodzenie
+lead.contact_status_updated
+
+anna.nowak · lead · 99999999-9999-4999-8999-999999999998
+
+Nowsze
+Strona 1
+Starsze

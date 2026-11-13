@@ -23,8 +23,9 @@ const token = "55555555-5555-4555-8555-555555555555.synthetic-token-secret-12345
 
 async function modules() {
   const actions = await import("./privileged-actions.service");
+  const { PrivilegedActionRepository } = await import("./privileged-actions.repository");
   const { sequelize } = await import("../../infrastructure/database/db");
-  return { ...actions, sequelize };
+  return { ...actions, sequelize, persistence: new PrivilegedActionRepository(sequelize) };
 }
 
 test("potwierdzenie admina jest ograniczone do dozwolonej roli, akcji, tenantowego celu i payloadu", async () => {
@@ -36,6 +37,8 @@ test("potwierdzenie admina jest ograniczone do dozwolonej roli, akcji, tenantowe
   assert.equal(privilegedActionAllowed("operator", "team.user.recovery-link"), false);
   assert.equal(privilegedActionAllowed("admin", "admin.user.recovery-link"), true);
   assert.equal(privilegedActionAllowed("manager", "admin.user.recovery-email"), false);
+  assert.equal(privilegedActionAllowed("admin", "admin.user.commission-dictionary-grant"), true);
+  assert.equal(privilegedActionAllowed("manager", "admin.user.commission-dictionary-grant"), false);
   assert.equal(privilegedActionAllowed("manager", "admin.user.role"), false);
   assert.equal(privilegedActionAllowed("operator", "team.user.status"), false);
   assert.equal(privilegedActionAllowed("admin", "unknown.action"), false);
@@ -54,8 +57,13 @@ test("potwierdzenie admina jest ograniczone do dozwolonej roli, akcji, tenantowe
 });
 
 test("mutacja zużywa potwierdzenie raz i bezpiecznie odtwarza jej wynik dla tego samego klucza idempotencji", async () => {
-  const { sequelize, runConfirmedPrivilegedAction, hashPrivilegedActionToken, privilegedActionFingerprint } =
-    await modules();
+  const {
+    sequelize,
+    persistence,
+    runConfirmedPrivilegedAction,
+    hashPrivilegedActionToken,
+    privilegedActionFingerprint,
+  } = await modules();
   const originalQuery = sequelize.query;
   const expiresAt = new Date(Date.now() + 60_000);
   const row: Record<string, unknown> = {
@@ -77,6 +85,8 @@ test("mutacja zużywa potwierdzenie raz i bezpiecznie odtwarza jej wynik dla teg
   let businessCalls = 0;
   let completionUsedSelectQuery = false;
   let activeRevision = 4;
+  let sessionExpiresAt = expiresAt;
+  let sessionRevokedAt: Date | null = null;
   (sequelize as unknown as { query: (...args: unknown[]) => Promise<unknown> }).query = async (
     sql: unknown,
     options?: unknown,
@@ -91,8 +101,8 @@ test("mutacja zużywa potwierdzenie raz i bezpiecznie odtwarza jej wynik dla teg
           membershipStatus: "active",
           role: "admin",
           sessionRevision: activeRevision,
-          sessionExpiresAt: expiresAt,
-          sessionRevokedAt: null,
+          sessionExpiresAt,
+          sessionRevokedAt,
         },
       ];
     }
@@ -115,34 +125,55 @@ test("mutacja zużywa potwierdzenie raz i bezpiecznie odtwarza jej wynik dla teg
   };
   try {
     const input = { actor, action, targetId, payload, token, idempotencyKey, transaction };
-    const first = await runConfirmedPrivilegedAction(input, async () => {
-      businessCalls += 1;
-      return { userId: targetId, mustChangePassword: true };
-    });
+    const first = await runConfirmedPrivilegedAction(
+      input,
+      async () => {
+        businessCalls += 1;
+        return { userId: targetId, mustChangePassword: true };
+      },
+      persistence,
+    );
     assert.deepEqual(first, { userId: targetId, mustChangePassword: true });
-    const replay = await runConfirmedPrivilegedAction(input, async () => {
-      businessCalls += 1;
-      return { impossible: true };
-    });
+    const replay = await runConfirmedPrivilegedAction(
+      input,
+      async () => {
+        businessCalls += 1;
+        return { impossible: true };
+      },
+      persistence,
+    );
     assert.deepEqual(replay, first);
     assert.equal(businessCalls, 1, "replay cannot execute the underlying update twice");
     await assert.rejects(() =>
-      runConfirmedPrivilegedAction({ ...input, idempotencyKey: "66666666-6666-4666-8666-666666666666" }, async () => ({
-        unexpected: true,
-      })),
+      runConfirmedPrivilegedAction(
+        { ...input, idempotencyKey: "66666666-6666-4666-8666-666666666666" },
+        async () => ({ unexpected: true }),
+        persistence,
+      ),
     );
     await assert.rejects(() =>
       runConfirmedPrivilegedAction(
         { ...input, payload: { temporaryPassword: "Different-password-2026!" } },
         async () => ({ unexpected: true }),
+        persistence,
       ),
     );
     activeRevision = 5;
     await assert.rejects(
-      () => runConfirmedPrivilegedAction(input, async () => ({ unexpected: true })),
+      () => runConfirmedPrivilegedAction(input, async () => ({ unexpected: true }), persistence),
       /potwierdzenie/i,
     );
     assert.equal(businessCalls, 1, "credential revision changes invalidate outstanding confirmations");
+    activeRevision = 4;
+    sessionRevokedAt = new Date();
+    await assert.rejects(() => runConfirmedPrivilegedAction(input, async () => ({ unexpected: true }), persistence));
+    sessionRevokedAt = null;
+    sessionExpiresAt = new Date(Date.now() - 1);
+    await assert.rejects(() => runConfirmedPrivilegedAction(input, async () => ({ unexpected: true }), persistence));
+    sessionExpiresAt = new Date(Date.now() + 60_000);
+    row.expiresAt = new Date(Date.now() - 1);
+    await assert.rejects(() => runConfirmedPrivilegedAction(input, async () => ({ unexpected: true }), persistence));
+    assert.equal(businessCalls, 1, "expired or revoked session and expired confirmation cannot repeat the mutation");
     assert.equal(
       completionUsedSelectQuery,
       true,

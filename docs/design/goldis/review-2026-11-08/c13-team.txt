@@ -1,0 +1,60 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+Przegląd
+Moje firmy
+Pula firm
+Automatyzacje
+Przebiegi
+Historia importów
+Powiadomienia
+2
+
+ORGANIZACJA
+
+Pracownicy
+Dostępy
+Raporty
+Weryfikacja danych
+Dziennik aktywności
+Moje konto
+Zwiń menu
+Menedżer
+GOLDIS / ORGANIZACJA
+Pracownicy
+Moje konto
+Pracownicy
+
+Twórz konta pracowników i zarządzaj ich dostępem do uruchamiania automatyzacji.
+
+Otwórz dostęp do narzędzi
+Dodaj pracownika
+
+Nowe konto otrzyma rolę pracownika i będzie wymagać zmiany hasła przy pierwszym logowaniu.
+
+Login
+Hasło tymczasowe
+Minimum 15 znaków.
+Utwórz konto
+Lista pracowników
+
+3 kont · zarządzanie dotyczy wyłącznie kont o roli pracownika.
+
+Szukaj pracownika
+Szukaj
+PRACOWNIK	STATUS KONTA	ADRES ODZYSKIWANIA	OSTATNIE LOGOWANIE	PRZYDZIELONE LEADY	URUCHAMIANIE OC	
+
+anna.nowak
+Utworzono 16 wrz 2026 · 1 aktywnych sesji
+	Aktywne	Brak	11 paź 2026	18	Dozwolone	Zarządzaj
+
+piotr.kowalski
+Utworzono 12 wrz 2026 · 0 aktywnych sesji
+	Aktywne	Brak	10 paź 2026	12	Brak dostępu	Zarządzaj
+
+ewa.zielinska
+Utworzono 2 sie 2026 · 1 aktywnych sesji
+	Aktywne	Brak	11 paź 2026	6	Dozwolone	Zarządzaj

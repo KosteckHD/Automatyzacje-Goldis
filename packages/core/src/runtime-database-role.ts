@@ -3,6 +3,7 @@ export type RuntimeDatabaseRoleName =
   | "goldis_api"
   | "goldis_worker"
   | "goldis_enrichment"
+  | "goldis_commission"
   | "goldis_migrator";
 
 /** Read-only role metadata returned by the PostgreSQL startup probe. */

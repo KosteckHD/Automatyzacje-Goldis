@@ -13,8 +13,8 @@ let smokeStage = "startup";
 let tenantScopeSeed = null;
 let groupingPerfBatchId = null;
 const templateUrl = process.env.DATABASE_URL;
-if (!templateUrl || !["empty", "from-006", "policies", "pesel", "snapshot", "evaluation", "artifacts", "export", "finalize", "download", "mfa", "registry", "corrections", "enrichment", "groups", "grouping-perf", "users", "users-empty", "tenant-scope", "teams", "admin-users", "registry-jobs", "reports", "deletion", "backup-restore", "run-control"].includes(mode) || !/^goldis_migration_smoke_[a-z0-9_]+$/.test(targetDatabase ?? "")) {
-  console.error("MIGRATION_SMOKE_USAGE: mode empty|from-006|policies|pesel|snapshot|evaluation|artifacts|export|finalize|download|mfa|registry|corrections|enrichment|groups|grouping-perf|users|users-empty|tenant-scope|teams|registry-jobs|reports|backup-restore and a disposable goldis_migration_smoke_* database name are required");
+if (!templateUrl || !["empty", "from-006", "policies", "pesel", "snapshot", "evaluation", "artifacts", "export", "finalize", "download", "mfa", "registry", "corrections", "enrichment", "groups", "grouping-perf", "users", "users-empty", "tenant-scope", "teams", "admin-users", "registry-jobs", "reports", "deletion", "backup-restore", "run-control", "commission"].includes(mode) || !/^goldis_migration_smoke_[a-z0-9_]+$/.test(targetDatabase ?? "")) {
+  console.error("MIGRATION_SMOKE_USAGE: mode empty|from-006|policies|pesel|snapshot|evaluation|artifacts|export|finalize|download|mfa|registry|corrections|enrichment|groups|grouping-perf|users|users-empty|tenant-scope|teams|registry-jobs|reports|backup-restore|commission and a disposable goldis_migration_smoke_* database name are required");
   process.exit(2);
 }
 
@@ -23,8 +23,8 @@ parsedUrl.pathname = `/${targetDatabase}`;
 const databaseUrl = parsedUrl.toString();
 process.env.DATABASE_URL = databaseUrl;
 const currentSourceModes = ["snapshot", "evaluation", "export", "finalize", "download", "mfa", "registry", "corrections"];
-const tenantScopeModes = ["registry", "corrections", "enrichment", "groups", "grouping-perf", "users", "users-empty", "tenant-scope", "teams", "admin-users", "registry-jobs", "reports", "deletion", "backup-restore", "run-control"];
-const latestMigration = tenantScopeModes.includes(mode) ? 62 : currentSourceModes.includes(mode) ? 12 : ["empty", "artifacts"].includes(mode) ? 9 : ["policies", "pesel"].includes(mode) ? 8 : 7;
+const tenantScopeModes = ["registry", "corrections", "enrichment", "groups", "grouping-perf", "users", "users-empty", "tenant-scope", "teams", "admin-users", "registry-jobs", "reports", "deletion", "backup-restore", "run-control", "commission"];
+const latestMigration = mode === "commission" ? 67 : tenantScopeModes.includes(mode) ? 66 : currentSourceModes.includes(mode) ? 12 : ["empty", "artifacts"].includes(mode) ? 9 : ["policies", "pesel"].includes(mode) ? 8 : 7;
 
 function createImportService() {
   const { ImportService } = require("../dist/features/imports/import.service");
@@ -42,7 +42,15 @@ function createAuditService() {
 }
 
 const sequelize = new Sequelize(databaseUrl, { logging: false });
-const migrationPattern = latestMigration === 62
+const migrationPattern = latestMigration === 67
+  ? "0{0[1-9],1[0-9],2[0-9],3[0-9],4[0-9],5[0-9],6[0-7]}-*.js"
+  : latestMigration === 66
+  ? "0{0[1-9],1[0-9],2[0-9],3[0-9],4[0-9],5[0-9],6[0-6]}-*.js"
+  : latestMigration === 65
+  ? "0{0[1-9],1[0-9],2[0-9],3[0-9],4[0-9],5[0-9],6[0-5]}-*.js"
+  : latestMigration === 63
+  ? "0{0[1-9],1[0-9],2[0-9],3[0-9],4[0-9],5[0-9],6[0-3]}-*.js"
+  : latestMigration === 62
   ? "0{0[1-9],1[0-9],2[0-9],3[0-9],4[0-9],5[0-9],6[0-2]}-*.js"
   : latestMigration === 61
   ? "0{0[1-9],1[0-9],2[0-9],3[0-9],4[0-9],5[0-9],6[01]}-*.js"
@@ -154,7 +162,7 @@ async function upThrough(targetName) {
 }
 
 async function upThroughLatestTenantSchema() {
-  for (const migration of [
+  const tenantMigrations = [
     "035-import-preparation-revisions.js", "036-import-preparation-audit-actions.js",
     "037-import-preparation-workflows.js", "038-prepared-set-executions.js",
     "039-run-input-snapshots.js", "040-prepared-set-pause-resume.js",
@@ -173,7 +181,13 @@ async function upThroughLatestTenantSchema() {
     "059-privileged-action-confirmations.js",
     "060-account-recovery-and-auth-mail.js", "061-optional-run-contact-person.js",
     "062-enrichment-worker-row-lock-capability.js",
-  ]) {
+    "063-company-run-identities.js",
+    "064-run-submission-admission-pause.js",
+    "065-run-submission-results-audit.js",
+    "066-commission-comparison.js",
+  ];
+  if (latestMigration >= 67) tenantMigrations.push("067-commission-execution-lease.js");
+  for (const migration of tenantMigrations) {
     smokeStage = `tenant_schema_${migration}`;
     await upThrough(migration);
   }
@@ -1838,7 +1852,7 @@ async function verifyUserSchema(seeded = null, queuedSeed = null, legacyGrantUse
   const managerAccess = await readToolAccess({ tenantId: tenant.tenantId, userId: managerUser.userId, role: managerRole }, "oc-policy-verification");
   const { canPerform } = require("../dist/features/authorization/index");
   if (managerRole !== "manager" || !managerAccess?.canExecute || !managerAccess.canViewResults
-    || !managerAccess.canDownloadResults || canPerform("manager", "user:manage", {})) {
+    || managerAccess.canDownloadResults || canPerform("manager", "user:manage", {})) {
     throw new Error("MANAGER_MEMBERSHIP_GRANT_OR_ADMIN_BOUNDARY_MISMATCH");
   }
   const managerGrant = await models.ToolGrant.findOne({ where: {
@@ -1846,17 +1860,17 @@ async function verifyUserSchema(seeded = null, queuedSeed = null, legacyGrantUse
   } });
   const managerGrantCases = [
     { name: "none", canDiscover: false, canExecute: false, canViewResults: false, canDownloadResults: false,
-      expected: [true, false, true, true] },
+      expected: [true, false, true, false] },
     { name: "discover", canDiscover: true, canExecute: false, canViewResults: false, canDownloadResults: false,
-      expected: [true, false, true, true] },
+      expected: [true, false, true, false] },
     { name: "execute", canDiscover: true, canExecute: true, canViewResults: false, canDownloadResults: false,
-      expected: [true, true, true, true] },
+      expected: [true, true, true, false] },
     { name: "view", canDiscover: false, canExecute: false, canViewResults: true, canDownloadResults: false,
-      expected: [true, false, true, true] },
+      expected: [true, false, true, false] },
     { name: "discover-view", canDiscover: true, canExecute: false, canViewResults: true, canDownloadResults: false,
-      expected: [true, false, true, true] },
+      expected: [true, false, true, false] },
     { name: "execute-view", canDiscover: true, canExecute: true, canViewResults: true, canDownloadResults: false,
-      expected: [true, true, true, true] },
+      expected: [true, true, true, false] },
     { name: "view-download", canDiscover: false, canExecute: false, canViewResults: true, canDownloadResults: true,
       expected: [true, false, true, true] },
     { name: "discover-view-download", canDiscover: true, canExecute: false, canViewResults: true, canDownloadResults: true,
@@ -3197,9 +3211,11 @@ async function verifyReviewDecisionFlows(models, goldisEntity, otherEntity) {
   const { randomUUID } = require("node:crypto");
   const { EntityGroupingService } = require("../dist/features/grouping/grouping.service");
   const { ReviewService } = require("../dist/features/review/review.service");
+  const { ReviewRepository } = require("../dist/features/review/review.repository");
+  const { sequelize: database } = require("../dist/infrastructure/database/db");
   const imports = createImportService();
   const grouping = new EntityGroupingService();
-  const review = new ReviewService(grouping, createAuditService());
+  const review = new ReviewService(grouping, createAuditService(), new ReviewRepository(database));
   const actor = { tenantId: tenantScopeSeed.goldisTenantId, userId: tenantScopeSeed.goldisActorId, role: "admin" };
   const reviewerId = randomUUID();
   const now = new Date();
@@ -3555,9 +3571,12 @@ async function verifyEnrichmentJobFlows() {
   }, actor);
   const manualCorrectionRegon = makeValidRegon(81234002);
   const { ReviewService } = require("../dist/features/review/review.service");
+  const { ReviewRepository } = require("../dist/features/review/review.repository");
+  const { sequelize: database } = require("../dist/infrastructure/database/db");
   const reviewService = new ReviewService(
     new (require("../dist/features/grouping/grouping.service").EntityGroupingService)(),
     createAuditService(),
+    new ReviewRepository(database),
   );
   let approvedCorrectionId = null;
   const resolvedCorrectionRunner = new RegistryEnrichmentJobRunner({
@@ -4107,6 +4126,20 @@ async function verifyRunSubmissionFlows() {
       submission: persistedSubmission?.toJSON() ?? null, batch: persistedBatch?.toJSON() ?? null, actor,
     })}`);
   }
+  smokeStage = "run_submission_result_set_database_scope";
+  const scopedResultSetId = persistedSubmission.resultSetId;
+  const scopedSummary = await service.resultSetSummary(scopedResultSetId, actor, "admin");
+  const scopedRows = await service.resultSetRows(scopedResultSetId, undefined, actor, "admin");
+  const scopedReviewRows = await service.resultSetRows(scopedResultSetId, undefined, actor, "admin", "Synthetic Review Company", "review");
+  const scopedExcludedRows = await service.resultSetRows(scopedResultSetId, undefined, actor, "admin", "", "excluded");
+  if (scopedSummary.counts.rows !== 5 || scopedSummary.counts.uniqueGroups !== 2 || scopedRows.items.length !== 5
+    || scopedReviewRows.items.length !== 1 || scopedReviewRows.items[0]?.companyName !== "Synthetic Review Company"
+    || scopedExcludedRows.items.length !== 2 || scopedRows.items.some((item) => ![first.id, duplicate.id, secondPerson.id, reviewRow.id, excluded.id].includes(item.sourceRowId))) {
+    throw new Error(`RUN_SUBMISSION_RESULT_SET_QUERY_SCOPE_MISMATCH_${JSON.stringify({
+      summary: scopedSummary.counts, rows: scopedRows.items.map((item) => item.sourceRowId),
+      reviewRows: scopedReviewRows.items.length, excludedRows: scopedExcludedRows.items.length,
+    })}`);
+  }
   smokeStage = "run_submission_direct_get_after_create";
   await service.get(created.submissionId, actor, "admin");
   smokeStage = "run_submission_idempotency_replay";
@@ -4119,10 +4152,13 @@ async function verifyRunSubmissionFlows() {
   let crossTenantStatus = null;
   try { await service.get(created.submissionId, { tenantId: tenantScopeSeed.otherTenantId, actorUserId: tenantScopeSeed.otherActorId }, "admin"); }
   catch (error) { crossTenantStatus = error?.getStatus?.() ?? null; }
+  let crossTenantResultSetStatus = null;
+  try { await service.resultSetSummary(scopedResultSetId, { tenantId: tenantScopeSeed.otherTenantId, actorUserId: tenantScopeSeed.otherActorId }, "admin"); }
+  catch (error) { crossTenantResultSetStatus = error?.getStatus?.() ?? null; }
   const items = await service.listItems(created.submissionId, undefined, actor, "admin");
   const storedItems = await models.RunSubmissionItem.findAll({ where: { submissionId: created.submissionId } });
   const storedGroups = await models.RunSubmissionGroup.findAll({ where: { submissionId: created.submissionId } });
-  if (created.submissionId !== replay.submissionId || changedKeyStatus !== 409 || crossTenantStatus !== 404
+  if (created.submissionId !== replay.submissionId || changedKeyStatus !== 409 || crossTenantStatus !== 404 || crossTenantResultSetStatus !== 404
     || items.items.length !== 5 || storedItems.length !== 5 || storedGroups.length !== 2
     || storedItems.filter((item) => item.preparationState === "ready").length !== 2
     || storedItems.filter((item) => item.preparationState === "review").length !== 1
@@ -4270,6 +4306,18 @@ async function verifyRunSubmissionFlows() {
     rowNumbers: [revokedGrantRow.rowNumber], selectionFingerprint: managerPreview.selectionFingerprint,
     idempotencyKey: `synthetic-manager-revoke-${randomUUID().slice(0, 12)}`,
   }, managerActor, "manager");
+  const managerOwnResultSetSummary = await service.resultSetSummary(managerSubmission.resultSetId, managerActor, "manager");
+  const managerSharedResultSetSummary = await service.resultSetSummary(scopedResultSetId, managerActor, "manager");
+  let managerDownloadWithoutGrantStatus = null;
+  try { await service.exportResultSet(scopedResultSetId, managerActor, "manager"); }
+  catch (error) { managerDownloadWithoutGrantStatus = error?.getStatus?.() ?? null; }
+  if (managerOwnResultSetSummary.counts.rows !== 1 || managerSharedResultSetSummary.counts.rows !== 5
+    || managerDownloadWithoutGrantStatus !== 403) {
+    throw new Error(`RUN_SUBMISSION_RESULT_SET_MANAGER_SCOPE_MISMATCH_${JSON.stringify({
+      ownRows: managerOwnResultSetSummary.counts.rows, sharedRows: managerSharedResultSetSummary.counts.rows,
+      downloadWithoutGrant: managerDownloadWithoutGrantStatus,
+    })}`);
+  }
   const managerGroup = await models.RunSubmissionGroup.findOne({ where: { submissionId: managerSubmission.submissionId } });
   if (!managerGroup || managerGroup.admissionState !== "pending" || managerGroup.runId) {
     throw new Error("MANAGER_REVOCATION_FIXTURE_GROUP_NOT_PENDING");
@@ -4308,7 +4356,7 @@ async function verifyRunSubmissionFlows() {
   if (durablePayload.includes("1234563218") || durablePayload.includes("Synthetic Submission Company") || durablePayload.includes("Synthetic Decision Maker")) {
     throw new Error("RUN_SUBMISSION_QUEUE_PERSISTED_SOURCE_DATA");
   }
-  console.log("RUN_SUBMISSION_SMOKE_PASS previewReadOnly=true fingerprintCAS=true mixedRows=true idempotency=true tenantRead=404 sharedRunLimit=true pauseAndCapacityReady=true outboxAtomic=true cancelCAS=true terminalNoReplay=true auditRollback=true managerGrantRevokedAfterLeaseBlocksAdmission=true noRunOrOutboxOnRevocation=true regrantDoesNotAutoResume=true rawQueueScan=clean");
+  console.log("RUN_SUBMISSION_SMOKE_PASS previewReadOnly=true fingerprintCAS=true mixedRows=true idempotency=true tenantRead=404 resultSetSqlScope=true resultSetFilterAggregates=true resultSetTenantIsolation=true managerSharedRead=true downloadGrantEnforced=true sharedRunLimit=true pauseAndCapacityReady=true outboxAtomic=true cancelCAS=true terminalNoReplay=true auditRollback=true managerGrantRevokedAfterLeaseBlocksAdmission=true noRunOrOutboxOnRevocation=true regrantDoesNotAutoResume=true rawQueueScan=clean");
 }
 
 async function verifyPreparedSetExecutionFlows() {
@@ -4608,7 +4656,7 @@ async function verifyImportPreparationFlow() {
   }
   if (!await service.processOne()) throw new Error("IMPORT_PREPARATION_WORKER_DID_NOT_CLAIM");
   const completed = await service.get(batch.id, started.preparationId, actor);
-  const resultRows = await service.rows(batch.id, started.preparationId, 1, undefined, actor);
+  const resultRows = await service.rows(batch.id, started.preparationId, 1, undefined, "", actor);
   if (completed.status !== "completed_with_attention" || completed.stage !== "sealed"
     || completed.counts.ready !== 1 || completed.counts.review !== 0
     || completed.counts.skippedNoIdentifiers !== 1 || completed.counts.duplicates !== 1
@@ -4896,7 +4944,7 @@ async function run() {
     await verifyUserSchema(seeded, queuedSeed, legacyGrantUsers);
     await verifyOperationalSettingsAndRunControls();
     await require("./worker-result-smoke.cjs")(seedLegacyRun);
-  } else if (mode === "tenant-scope" || mode === "teams" || mode === "admin-users" || mode === "deletion" || mode === "run-control") {
+  } else if (mode === "tenant-scope" || mode === "teams" || mode === "admin-users" || mode === "deletion" || mode === "run-control" || mode === "commission") {
     await upThrough("014-canonical-run-groups.js");
     tenantScopeSeed = {
       goldis: await seedLegacyRun("failed"),
@@ -4961,6 +5009,8 @@ async function run() {
       await require("./admin-reports-db-smoke.cjs")(tenantScopeSeed);
       smokeStage = "business-leads-db-smoke";
       await require("./business-leads-db-smoke.cjs")(tenantScopeSeed);
+      smokeStage = "security-resource-scope-db-smoke";
+      await require("./security-resource-scope-db-smoke.cjs")(tenantScopeSeed);
     }
     if (mode === "deletion") {
       smokeStage = "deletion-preview-step-up";
@@ -4971,6 +5021,10 @@ async function run() {
     if (mode === "run-control") {
       await verifyRunPauseControl();
       await require("./run-control-db-smoke.cjs")(tenantScopeSeed);
+    }
+    if (mode === "commission") {
+      smokeStage = "commission-db-smoke";
+      await require("./commission-db-smoke.cjs")(tenantScopeSeed);
     }
     if (mode === "teams") {
       smokeStage = "team-db-smoke";

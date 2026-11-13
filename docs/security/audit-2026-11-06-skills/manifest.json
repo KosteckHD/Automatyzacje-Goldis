@@ -1,0 +1,59 @@
+{
+  "runId": "CYBER-SKILLS-20261106-01",
+  "recordedAt": "2026-11-06T12:38:12.382829+00:00",
+  "baseCommit": "af512e9502218d336b4b73df0c5f612905c6ac7b",
+  "workingTreeDirty": true,
+  "skillRepository": "https://github.com/mukul975/anthropic-cybersecurity-skills",
+  "skillCommit": "54a798831d2266a3ca61ce68a7acb80b81160d57",
+  "skills": [
+    {
+      "name": "performing-web-application-penetration-test",
+      "reviewedContentMatchesInstalled": true,
+      "skill": "C:\\Users\\micha\\.codex\\skills\\performing-web-application-penetration-test\\SKILL.md",
+      "sha256": "0c1f45f85bdd2ce34bfa2a476cbda205fa2746e41bf50acce9a06d9543ceed99"
+    },
+    {
+      "name": "conducting-api-security-testing",
+      "reviewedContentMatchesInstalled": true,
+      "skill": "C:\\Users\\micha\\.codex\\skills\\conducting-api-security-testing\\SKILL.md",
+      "sha256": "d7c01bde62507b200c57a34b0d4ba04a520b1a6c0cd02ac2ac1b08fe2852c3ef"
+    },
+    {
+      "name": "detecting-broken-object-property-level-authorization",
+      "reviewedContentMatchesInstalled": true,
+      "skill": "C:\\Users\\micha\\.codex\\skills\\detecting-broken-object-property-level-authorization\\SKILL.md",
+      "sha256": "b188612767ec2e5316250117dd47d329f793cd4fca107ecbdb48fd46779d8e22"
+    },
+    {
+      "name": "performing-web-application-vulnerability-triage",
+      "reviewedContentMatchesInstalled": true,
+      "skill": "C:\\Users\\micha\\.codex\\skills\\performing-web-application-vulnerability-triage\\SKILL.md",
+      "sha256": "3801fe80bd342c0c01b33ffd518b7914cc08afe0089f7020002342c57faea769"
+    }
+  ],
+  "sourceSha256": {
+    "apps/api/src/features/commissions/commissions.controller.ts": "e9faaabc27ed20fafeca675c47dfe498d3c5ffe2539f44ec3d57d470b1ce329d",
+    "apps/api/src/features/commissions/commissions.service.ts": "3179b18780f31c57e6c34f6908f65e6ee327588b136dde18912bac17a35cdcda",
+    "apps/api/src/features/commissions/commissions.repository.ts": "030573f2d7750887ee532dad265c7bf8cbf0ad9fb6dbdca547669d47e4fb8504",
+    "apps/api/src/features/commissions/commissions.model.ts": "3a0aa46c1b1d98f6dc4195e676916e0378ea7847c87b6a454bb98e4814533710",
+    "apps/api/src/features/commissions/commission-engine-client.ts": "29b327a4be194a3a7be516a351e9098221b9b92537628d9b7675d751d217cfd1",
+    "apps/api/src/features/commissions/commission-file-store.ts": "163d9ff42b0873b5c01f3187b1a35859dcf9efe1c09b9583521947101443a6d6",
+    "apps/api/src/commission-worker.ts": "c956d593fc0daa0b77c36a1c0928d3c48a493d891794ee9632178aeda1d6b792",
+    "apps/api/src/features/imports/import-parser-client.ts": "799cc432d4fe6f4189986c91296b34e5fa4789477e00fdf6d0978a00995cb751",
+    "apps/api/src/infrastructure/http/http-bootstrap.ts": "61ad1f68dc0415007080f87fd7427dcc16c2de935d2d63cc211c5b35923f617b",
+    "services/commission-engine/src/goldis_commissions/transport/app.py": "0d9b43b840dbdf69ae2ac46a60c0ff5ae2f6d5c9a88130bde701906e88e730e5",
+    "services/commission-engine/src/goldis_commissions/transport/process_supervisor.py": "1cb50920bc995967561c4d6b2534ae0c1bc088656eba2760443479ac95f4eaab",
+    "apps/api/dist/features/commissions/commissions.service.js": "d8e0e1ea2c0b6aa979c9eaec064c89decb0c63d23405da86ba209ba29493c1a6"
+  },
+  "routeInventorySha256": "d8415d2d7aca1c1a523be4455495429b7b1082d615addd54e17d7dba83b119c3",
+  "reproductionScope": "Real compiled service; in-memory persistence and audit adapters; isolated child processes; no HTTP/DB/customer/external systems.",
+  "applicationCodeChanged": false,
+  "completePentest": false,
+  "evidenceSha256": {
+    "findings.json": "6ee567c2567cb96c5380947967af373f728a98c184b0d96d6c42e0f6069b12ff",
+    "README.md": "cd689fe2965037da8aacc4d7a474e559dacacdfe0120cbb29b6cdc3f8cf9dfae",
+    "reproduce-commission-findings.cjs": "06a26c82fabd38a6512a35e35bd3d4b9ff016cde15a833373a7022d99a33cf16",
+    "route-review.csv": "d2226a0489e7e841e32d400ef914ed79ca1c4e9e07b45021dbe34c317e035700",
+    "service-reproductions.json": "f2f99463d30cdc31fd46fd2add203acc1741e43dd16c3b4a41f979663aa5f240"
+  }
+}

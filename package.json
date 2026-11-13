@@ -20,12 +20,14 @@
     "check:backend:style": "biome check apps/api/src/features",
     "test:architecture": "node scripts/check-feature-boundaries.cjs && node --test scripts/check-feature-boundaries.test.cjs",
     "test:transaction-audit": "node scripts/backend-refactor-transaction-audit.cjs && node --test scripts/backend-refactor-transaction-audit.test.cjs",
-    "test:inventory": "node --test scripts/backend-refactor-inventory.test.cjs",
+    "test:inventory": "node --test scripts/backend-refactor-inventory.test.cjs scripts/backend-persistence-inventory.test.cjs",
     "test:http-contract": "node --test scripts/backend-refactor-http-contract.test.cjs && node scripts/check-legacy-http-contract.cjs",
     "test:scenarios": "node --test scripts/backend-refactor-scenarios.test.cjs",
     "test:scenario-runtime": "node --test scripts/backend-refactor-runtime-scenarios.test.cjs",
     "test:scenario-runtime:build": "npm run build -w @goldis/api && npm run build -w @goldis/worker && npm run test:scenario-runtime",
     "backend:refactor:inventory": "node scripts/backend-refactor-inventory.cjs --write",
+    "backend:production:persistence-inventory": "node scripts/backend-persistence-inventory.cjs --write",
+    "backend:production:readiness": "node scripts/write-production-readiness-records.cjs",
     "backend:refactor:scenarios": "node scripts/backend-refactor-scenarios.cjs --write",
     "backend:refactor:runtime-scenarios": "npm run build -w @goldis/api && npm run build -w @goldis/worker && node scripts/backend-refactor-runtime-scenarios.cjs --write",
     "backend:refactor:import-effects": "node scripts/backend-refactor-import-effects.cjs --write",
@@ -100,5 +102,13 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15"
+  },
+  "overrides": {
+    "exceljs": { "uuid": "11.1.1" },
+    "sequelize": { "uuid": "11.1.1" },
+    "multer": "2.5.0",
+    "@nestjs/platform-express": {
+      "multer": "2.5.0"
+    }
   }
 }

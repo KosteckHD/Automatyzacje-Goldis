@@ -1,0 +1,143 @@
+{
+  "recordedAt": "2026-11-06T12:26:34.408167+00:00",
+  "status": "LOCAL_CHECKS_PASS_WITH_LIMITATIONS",
+  "productionAcceptance": "NOT_COMPLETED",
+  "checks": [
+    {
+      "name": "npm-test",
+      "startedAt": "2026-11-06T12:15:37.221Z",
+      "endedAt": "2026-11-06T12:18:15.735Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "npm-test.log",
+      "report": "docs/acceptance/2026-11-06-npm-retest/checks.json"
+    },
+    {
+      "name": "native-security-db",
+      "startedAt": "2026-11-06T12:09:08.818Z",
+      "endedAt": "2026-11-06T12:10:12.028Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "native-security-db.log",
+      "report": "docs/acceptance/2026-11-06-extra-native-retest3/checks.json"
+    },
+    {
+      "name": "native-commission-db",
+      "startedAt": "2026-11-06T12:10:12.031Z",
+      "endedAt": "2026-11-06T12:10:36.504Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "native-commission-db.log",
+      "report": "docs/acceptance/2026-11-06-extra-native-retest3/checks.json"
+    },
+    {
+      "name": "commission-python",
+      "startedAt": "2026-11-06T12:20:34.625Z",
+      "endedAt": "2026-11-06T12:20:39.821Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "commission-python.log",
+      "report": "docs/acceptance/2026-11-06-python-final/checks.json"
+    },
+    {
+      "name": "extra-browser-coverage",
+      "startedAt": "2026-11-06T12:22:12.384Z",
+      "endedAt": "2026-11-06T12:22:20.492Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "extra-browser-coverage.log",
+      "report": "docs/acceptance/2026-11-06-browser-coverage/checks.json"
+    },
+    {
+      "name": "build",
+      "startedAt": "2026-11-06T12:13:51.351Z",
+      "endedAt": "2026-11-06T12:14:43.421Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "build.log",
+      "report": "docs/acceptance/2026-11-06-final/checks.json"
+    },
+    {
+      "name": "backend-style",
+      "startedAt": "2026-11-06T12:14:43.423Z",
+      "endedAt": "2026-11-06T12:14:45.006Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "backend-style.log",
+      "report": "docs/acceptance/2026-11-06-final/checks.json"
+    },
+    {
+      "name": "security-browser",
+      "startedAt": "2026-11-06T12:14:50.731Z",
+      "endedAt": "2026-11-06T12:15:01.258Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "security-browser.log",
+      "report": "docs/acceptance/2026-11-06-final/checks.json"
+    },
+    {
+      "name": "return-to",
+      "startedAt": "2026-11-06T12:15:01.259Z",
+      "endedAt": "2026-11-06T12:15:01.779Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "return-to.log",
+      "report": "docs/acceptance/2026-11-06-final/checks.json"
+    },
+    {
+      "name": "production-compose",
+      "startedAt": "2026-11-06T12:15:01.780Z",
+      "endedAt": "2026-11-06T12:15:02.865Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "production-compose.log",
+      "report": "docs/acceptance/2026-11-06-final/checks.json"
+    },
+    {
+      "name": "everest-browser",
+      "startedAt": "2026-11-06T11:59:12.675Z",
+      "endedAt": "2026-11-06T12:00:28.303Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "everest-browser.log",
+      "report": "docs/acceptance/2026-11-06-extra/checks.json"
+    },
+    {
+      "name": "compensa-browser",
+      "startedAt": "2026-11-06T12:00:28.305Z",
+      "endedAt": "2026-11-06T12:01:26.688Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "compensa-browser.log",
+      "report": "docs/acceptance/2026-11-06-extra/checks.json"
+    },
+    {
+      "name": "ufg-browser",
+      "startedAt": "2026-11-06T12:01:26.690Z",
+      "endedAt": "2026-11-06T12:01:56.295Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "ufg-browser.log",
+      "report": "docs/acceptance/2026-11-06-extra/checks.json"
+    },
+    {
+      "name": "module-roster-after-fixture-extension",
+      "status": "PASS",
+      "exitCode": 0,
+      "evidence": "docs/acceptance/2026-11-06-final/module-roster-final.log"
+    }
+  ]
+}

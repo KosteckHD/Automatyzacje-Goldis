@@ -15,6 +15,7 @@ test("API runtime config applies safe local defaults and returns no secret value
     loginRateLimitKeyPrefix: undefined,
     workerInternalUrl: undefined,
     importParserUrl: undefined,
+    commissionEngineUrl: undefined,
     apiExportDirectory: undefined,
     deletionJournalDirectory: undefined,
     artifactEncryptionRequired: false,
@@ -35,6 +36,7 @@ test("API runtime config parses the listener port and preserves configured proxy
     port: 4100, trustProxyIps: "127.0.0.1", appEnvironment: "development", nodeEnvironment: undefined,
     publicAppOrigin: undefined, loginRateLimitKeyPrefix: undefined, workerInternalUrl: undefined,
     importParserUrl: undefined, apiExportDirectory: undefined, deletionJournalDirectory: undefined,
+    commissionEngineUrl: undefined,
     artifactEncryptionRequired: false, deletionWorkerEnabled: true, deletionRestoreMaintenance: false,
     build: { version: "0.1.0", commit: null, imageDigest: null },
   });

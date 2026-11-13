@@ -37,20 +37,33 @@ $authorityHost = if ($databaseUri.Host.Contains(":")) { "[$($databaseUri.Host)]"
 $authorityPort = if ($databaseUri.IsDefaultPort) { "" } else { ":$($databaseUri.Port)" }
 $databaseTarget = "$authorityHost$authorityPort$($databaseUri.AbsolutePath)$($databaseUri.Query)"
 $rolePasswords = @{}
-foreach ($role in @("MIGRATOR", "API", "WORKER", "ENRICHMENT")) {
+foreach ($role in @("MIGRATOR", "API", "WORKER", "ENRICHMENT", "COMMISSION")) {
   $key = "${role}_DB_PASSWORD"
   $configured = $values[$key]
   $rolePasswords[$role] = if ($configured -match '^[a-fA-F0-9]{64}$') { $configured } else { New-RolePassword }
 }
+if (-not $values.REDIS_URL) { throw "LOCAL_REDIS_SETTINGS_MISSING" }
+try { $redisUri = [Uri]$values.REDIS_URL } catch { throw "LOCAL_REDIS_URL_INVALID" }
+if ($redisUri.Scheme -notin @("redis", "rediss") -or $redisUri.Host -notin @("127.0.0.1", "localhost", "::1") -or $redisUri.AbsolutePath -ne "/0") {
+  throw "LOCAL_REDIS_URL_MUST_USE_LOOPBACK_DATABASE_ZERO"
+}
+$redisCommissionPassword = if ($values.REDIS_COMMISSION_PASSWORD -match '^[a-fA-F0-9]{64}$') { $values.REDIS_COMMISSION_PASSWORD } else { New-RolePassword }
+$redisAuthorityHost = if ($redisUri.Host.Contains(":")) { "[$($redisUri.Host)]" } else { $redisUri.Host }
+$redisAuthorityPort = if ($redisUri.IsDefaultPort) { "" } else { ":$($redisUri.Port)" }
+$redisTarget = "$redisAuthorityHost$redisAuthorityPort/0"
 $updates = [ordered]@{
   MIGRATOR_DB_PASSWORD = $rolePasswords.MIGRATOR
   API_DB_PASSWORD = $rolePasswords.API
   WORKER_DB_PASSWORD = $rolePasswords.WORKER
   ENRICHMENT_DB_PASSWORD = $rolePasswords.ENRICHMENT
+  COMMISSION_DB_PASSWORD = $rolePasswords.COMMISSION
   DATABASE_URL = "postgres://goldis_api:$($rolePasswords.API)@$databaseTarget"
   MIGRATOR_DATABASE_URL = "postgres://goldis_migrator:$($rolePasswords.MIGRATOR)@$databaseTarget"
   WORKER_DATABASE_URL = "postgres://goldis_worker:$($rolePasswords.WORKER)@$databaseTarget"
   ENRICHMENT_DATABASE_URL = "postgres://goldis_enrichment:$($rolePasswords.ENRICHMENT)@$databaseTarget"
+  COMMISSION_DATABASE_URL = "postgres://goldis_commission:$($rolePasswords.COMMISSION)@$databaseTarget"
+  REDIS_COMMISSION_PASSWORD = $redisCommissionPassword
+  COMMISSION_REDIS_URL = "redis://goldis_commission:$redisCommissionPassword@$redisTarget"
 }
 $written = @{}
 $nextLines = foreach ($line in $lines) {
@@ -75,4 +88,4 @@ try {
 }
 
 Write-Host "Local database role credentials are ready in $envPath. Existing database contents were not changed."
-Write-Host "The next local start provisions the four isolated roles and applies the explicit permission matrix after migrations."
+Write-Host "The next local start provisions the five isolated roles and applies the explicit permission matrix after migrations."

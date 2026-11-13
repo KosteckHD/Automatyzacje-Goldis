@@ -8,11 +8,13 @@ if [ -n "${MIGRATOR_DB_PASSWORD_FILE:-}" ]; then MIGRATOR_DB_PASSWORD="$(cat "$M
 if [ -n "${API_DB_PASSWORD_FILE:-}" ]; then API_DB_PASSWORD="$(cat "$API_DB_PASSWORD_FILE")"; fi
 if [ -n "${WORKER_DB_PASSWORD_FILE:-}" ]; then WORKER_DB_PASSWORD="$(cat "$WORKER_DB_PASSWORD_FILE")"; fi
 if [ -n "${ENRICHMENT_DB_PASSWORD_FILE:-}" ]; then ENRICHMENT_DB_PASSWORD="$(cat "$ENRICHMENT_DB_PASSWORD_FILE")"; fi
+if [ -n "${COMMISSION_DB_PASSWORD_FILE:-}" ]; then COMMISSION_DB_PASSWORD="$(cat "$COMMISSION_DB_PASSWORD_FILE")"; fi
 : "${DB_PASSWORD:?DB_PASSWORD is required}"
 : "${MIGRATOR_DB_PASSWORD:?MIGRATOR_DB_PASSWORD is required}"
 : "${API_DB_PASSWORD:?API_DB_PASSWORD is required}"
 : "${WORKER_DB_PASSWORD:?WORKER_DB_PASSWORD is required}"
 : "${ENRICHMENT_DB_PASSWORD:?ENRICHMENT_DB_PASSWORD is required}"
+: "${COMMISSION_DB_PASSWORD:?COMMISSION_DB_PASSWORD is required}"
 export PGPASSWORD="$DB_PASSWORD"
 
 ensure_role() {
@@ -37,6 +39,7 @@ ensure_role goldis_migrator "$MIGRATOR_DB_PASSWORD"
 ensure_role goldis_api "$API_DB_PASSWORD"
 ensure_role goldis_worker "$WORKER_DB_PASSWORD"
 ensure_role goldis_enrichment "$ENRICHMENT_DB_PASSWORD"
+ensure_role goldis_commission "$COMMISSION_DB_PASSWORD"
 
 # Remove every inherited membership and prior broad/default grant before rebuilding the allowlist.
 psql --set=ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" \
@@ -49,25 +52,25 @@ BEGIN
       FROM pg_auth_members m
       JOIN pg_roles granted ON granted.oid = m.roleid
       JOIN pg_roles member ON member.oid = m.member
-     WHERE member.rolname IN ('goldis_api', 'goldis_worker', 'goldis_enrichment')
+     WHERE member.rolname IN ('goldis_api', 'goldis_worker', 'goldis_enrichment', 'goldis_commission')
   LOOP
     EXECUTE format('REVOKE %I FROM %I', membership.granted_role, membership.member_role);
   END LOOP;
 END $$;
 
-REVOKE ALL PRIVILEGES ON DATABASE :"database_name" FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment;
-GRANT CONNECT ON DATABASE :"database_name" TO goldis_migrator, goldis_api, goldis_worker, goldis_enrichment;
+REVOKE ALL PRIVILEGES ON DATABASE :"database_name" FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
+GRANT CONNECT ON DATABASE :"database_name" TO goldis_migrator, goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
 GRANT TEMPORARY ON DATABASE :"database_name" TO goldis_migrator;
-REVOKE ALL PRIVILEGES ON SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
 ALTER SCHEMA public OWNER TO goldis_migrator;
 GRANT USAGE, CREATE ON SCHEMA public TO goldis_migrator;
-GRANT USAGE ON SCHEMA public TO goldis_api, goldis_worker, goldis_enrichment;
-REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment;
-REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment;
-REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment;
-ALTER DEFAULT PRIVILEGES FOR ROLE goldis_migrator IN SCHEMA public REVOKE ALL ON TABLES FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment;
-ALTER DEFAULT PRIVILEGES FOR ROLE goldis_migrator IN SCHEMA public REVOKE ALL ON SEQUENCES FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment;
-ALTER DEFAULT PRIVILEGES FOR ROLE goldis_migrator IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment;
+GRANT USAGE ON SCHEMA public TO goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
+REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
+ALTER DEFAULT PRIVILEGES FOR ROLE goldis_migrator IN SCHEMA public REVOKE ALL ON TABLES FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
+ALTER DEFAULT PRIVILEGES FOR ROLE goldis_migrator IN SCHEMA public REVOKE ALL ON SEQUENCES FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
+ALTER DEFAULT PRIVILEGES FOR ROLE goldis_migrator IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission;
 
 DO $$
 DECLARE object record;
@@ -76,7 +79,7 @@ BEGIN
     SELECT n.nspname, c.relname, c.relkind
       FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
      WHERE n.nspname = 'public' AND c.relkind IN ('r', 'p', 'v', 'm', 'S', 'f')
-       AND pg_get_userbyid(c.relowner) IN ('goldis', 'goldis_api', 'goldis_worker', 'goldis_enrichment')
+       AND pg_get_userbyid(c.relowner) IN ('goldis', 'goldis_api', 'goldis_worker', 'goldis_enrichment', 'goldis_commission')
        AND (c.relkind <> 'S' OR NOT EXISTS (
          SELECT 1 FROM pg_depend d
           WHERE d.classid = 'pg_class'::regclass AND d.objid = c.oid
@@ -97,7 +100,7 @@ BEGIN
     SELECT p.oid, n.nspname, p.proname, p.prokind, pg_get_function_identity_arguments(p.oid) AS args
       FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
      WHERE n.nspname = 'public'
-       AND pg_get_userbyid(p.proowner) IN ('goldis', 'goldis_api', 'goldis_worker', 'goldis_enrichment')
+       AND pg_get_userbyid(p.proowner) IN ('goldis', 'goldis_api', 'goldis_worker', 'goldis_enrichment', 'goldis_commission')
   LOOP
     IF object.prokind = 'p' THEN
       EXECUTE format('ALTER PROCEDURE %I.%I(%s) OWNER TO goldis_migrator', object.nspname, object.proname, object.args);

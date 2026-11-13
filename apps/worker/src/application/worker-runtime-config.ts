@@ -11,6 +11,7 @@ export type WorkerRuntimeConfig = Readonly<{
   browserChannel: "chrome" | "msedge" | undefined;
   databasePoolMax: number;
   livePortals: boolean;
+  startPaused: boolean;
   internalHost: string;
   internalPort: number;
   serviceSecret: string;
@@ -31,6 +32,13 @@ function flag(value: string | undefined, fallback: "0" | "1", errorCode: string)
   const configured = value ?? fallback;
   if (configured !== "0" && configured !== "1") throw new Error(errorCode);
   return configured === "1";
+}
+
+function assertLivePortalCredentials(environment: WorkerRuntimeEnvironment): void {
+  const required = ["PZU_LOGIN", "PZU_PASSWORD", "COMPENSA_LOGIN", "COMPENSA_PASSWORD"] as const;
+  if (required.some((name) => !environment[name]?.trim())) {
+    throw new Error("WORKER_LIVE_PORTAL_CREDENTIALS_REQUIRED");
+  }
 }
 
 function port(value: string | undefined): number {
@@ -72,6 +80,10 @@ export function loadWorkerRuntimeConfig(environment: WorkerRuntimeEnvironment = 
   if (!serviceSecret) throw new Error("WORKER_AUTH_SECRET_REQUIRED");
   const internalHost = (environment.WORKER_INTERNAL_HOST ?? "0.0.0.0").trim();
   if (!internalHost) throw new Error("WORKER_INTERNAL_HOST_INVALID");
+  const livePortals = flag(environment.WORKER_LIVE_PORTALS, "0", "WORKER_LIVE_PORTALS_INVALID");
+  const startPaused = flag(environment.WORKER_START_PAUSED, "0", "WORKER_START_PAUSED_INVALID");
+  if (startPaused && livePortals) throw new Error("WORKER_START_PAUSED_LIVE_INVALID");
+  if (livePortals) assertLivePortalCredentials(environment);
 
   const readinessEnvironment = Object.freeze({ GOLDIS_API_READY_URL: workerApiReadinessUrl(environment).toString() });
 
@@ -101,7 +113,8 @@ export function loadWorkerRuntimeConfig(environment: WorkerRuntimeEnvironment = 
     chromiumSandbox: flag(environment.WORKER_CHROMIUM_SANDBOX, "0", "WORKER_CHROMIUM_SANDBOX_INVALID"),
     browserChannel,
     databasePoolMax,
-    livePortals: flag(environment.WORKER_LIVE_PORTALS, "0", "WORKER_LIVE_PORTALS_INVALID"),
+    livePortals,
+    startPaused,
     internalHost,
     internalPort: port(environment.WORKER_INTERNAL_PORT),
     serviceSecret,

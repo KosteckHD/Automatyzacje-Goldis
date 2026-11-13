@@ -151,7 +151,7 @@ function ownerFor(area, basename, sourceText = "") {
   const feature = basename.replace(/\.(?:http\.)?spec\.ts$/, "")
     .replace(/\.contract\.ts$/, "").replace(/\.ts$/, "");
   if (area === "apps/api") {
-    if (["main.ts", "migrate.ts", "apply-runtime-grants.ts", "bootstrap-admin-main.ts", "import-parser-main.ts", "import-parser-child.ts", "enrichment-worker.ts"].includes(basename)) {
+    if (["main.ts", "migrate.ts", "apply-runtime-grants.ts", "bootstrap-admin-main.ts", "import-parser-main.ts", "import-parser-child.ts", "enrichment-worker.ts", "commission-worker.ts"].includes(basename)) {
       return { owner: "process-entrypoint", stage: "P14" };
     }
     const currentFeature = feature.match(/^features\/([^/]+)/)?.[1];

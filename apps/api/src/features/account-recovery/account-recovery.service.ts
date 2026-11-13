@@ -19,7 +19,11 @@ import {
   type SessionPrincipal,
   verifyPassword,
 } from "../auth";
-import { runConfirmedPrivilegedAction } from "../privileged-actions/public";
+import {
+  PRIVILEGED_ACTION_PERSISTENCE,
+  type PrivilegedActionPersistence,
+  runConfirmedPrivilegedAction,
+} from "../privileged-actions/public";
 import { AccountRecoveryRepository } from "./account-recovery.repository";
 import { strictBody } from "./account-recovery.request";
 import {
@@ -68,6 +72,7 @@ export class PasswordRecoveryService {
     @Inject(LoginRateLimiter) private readonly rateLimiter: LoginRateLimiter,
     @Inject(AuditService) private readonly audit: AuditService,
     @Inject(AccountRecoveryRepository) private readonly repository: AccountRecoveryRepository,
+    @Inject(PRIVILEGED_ACTION_PERSISTENCE) private readonly privilegedActionPersistence: PrivilegedActionPersistence,
   ) {}
 
   private async lockRecoveryActor(
@@ -402,6 +407,7 @@ export class PasswordRecoveryService {
           );
           return { userId: targetUserId, status: "queued" };
         },
+        this.privilegedActionPersistence,
       ),
     );
   }
@@ -489,6 +495,7 @@ export class PasswordRecoveryService {
           );
           return { userId: targetUserId, status: "pending_verification" };
         },
+        this.privilegedActionPersistence,
       ),
     );
   }

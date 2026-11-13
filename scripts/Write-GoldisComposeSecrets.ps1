@@ -42,20 +42,38 @@ if (-not $authMailKeyring) {
   }
 }
 
+$commissionEngineToken = $values.COMMISSION_ENGINE_TOKEN
+if (-not $commissionEngineToken) {
+  $existingCommissionToken = Join-Path $secretsPath "commission_engine_secret"
+  if (Test-Path -LiteralPath $existingCommissionToken -PathType Leaf) {
+    $commissionEngineToken = [System.IO.File]::ReadAllText($existingCommissionToken).Trim()
+  } else {
+    $tokenBytes = [byte[]]::new(48)
+    $rng = [Security.Cryptography.RandomNumberGenerator]::Create()
+    try { $rng.GetBytes($tokenBytes) } finally { $rng.Dispose() }
+    $commissionEngineToken = [BitConverter]::ToString($tokenBytes).Replace("-", "").ToLowerInvariant()
+    [Array]::Clear($tokenBytes, 0, $tokenBytes.Length)
+  }
+}
+
 $contents = [ordered]@{
   database_password = $values.DB_PASSWORD
   migrator_db_password = $values.MIGRATOR_DB_PASSWORD
   api_db_password = $values.API_DB_PASSWORD
   worker_db_password = $values.WORKER_DB_PASSWORD
   enrichment_db_password = $values.ENRICHMENT_DB_PASSWORD
+  commission_db_password = $values.COMMISSION_DB_PASSWORD
   redis_api_password = $values.REDIS_API_PASSWORD
   redis_worker_password = $values.REDIS_WORKER_PASSWORD
+  redis_commission_password = $values.REDIS_COMMISSION_PASSWORD
   database_url_migrator = Get-ContainerDatabaseUrl "MIGRATOR_DATABASE_URL"
   database_url_api = Get-ContainerDatabaseUrl "DATABASE_URL"
   database_url_worker = Get-ContainerDatabaseUrl "WORKER_DATABASE_URL"
   database_url_enrichment = Get-ContainerDatabaseUrl "ENRICHMENT_DATABASE_URL"
+  database_url_commission = Get-ContainerDatabaseUrl "COMMISSION_DATABASE_URL"
   redis_url_api = "redis://goldis_api:$($values.REDIS_API_PASSWORD)@redis:6379/0"
   redis_url_worker = "redis://goldis_worker:$($values.REDIS_WORKER_PASSWORD)@redis:6379/0"
+  redis_url_commission = "redis://goldis_commission:$($values.REDIS_COMMISSION_PASSWORD)@redis:6379/0"
   session_secret = $values.SESSION_SECRET
   login_rate_limit_secret = $values.LOGIN_RATE_LIMIT_SECRET
   privileged_action_binding_key = $values.PRIVILEGED_ACTION_BINDING_KEY
@@ -65,6 +83,7 @@ $contents = [ordered]@{
   artifact_keyring = $values.ARTIFACT_ENCRYPTION_KEYS_BASE64
   worker_auth_secret = $values.WORKER_AUTH_SECRET
   import_parser_secret = $values.IMPORT_PARSER_SHARED_SECRET
+  commission_engine_secret = $commissionEngineToken
   registry_cache_key = $values.REGISTRY_CACHE_HMAC_KEY
   pzu_login = $values.PZU_LOGIN
   pzu_password = $values.PZU_PASSWORD

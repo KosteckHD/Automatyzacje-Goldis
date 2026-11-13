@@ -34,7 +34,25 @@ export class RunSubmissionAdmissionService implements OnModuleInit, OnModuleDest
     if (!target) return;
     const { submission: observedSubmission } = target;
     await this.admissionRepository.withAdmissionTransaction(target, async (base, transaction) => {
-      const { settings, actorUser, membership, tool, grant, batch } = base;
+      const { submission, settings, actorUser, membership, tool, grant, batch } = base;
+      if (!submission || submission.status === "cancelled") {
+        const group = await this.admissionRepository.lockGroup(groupId, transaction);
+        if (group?.leaseOwner === this.dispatcherId && !group.runId)
+          await this.admissionRepository.defer(
+            group,
+            transaction,
+            submission?.status === "cancelled" ? "cancelled" : "blocked",
+            submission?.status === "cancelled" ? "SUBMISSION_CANCELLED" : "SUBMISSION_MISSING",
+            0,
+          );
+        return;
+      }
+      if (submission.status === "paused") {
+        const group = await this.admissionRepository.lockGroup(groupId, transaction);
+        if (group?.leaseOwner === this.dispatcherId && !group.runId)
+          await this.admissionRepository.defer(group, transaction, "waiting_paused", "SUBMISSION_PAUSED", 0);
+        return;
+      }
       if (!settings || !actorUser || !membership || !tool || !batch) {
         const group = await this.admissionRepository.lockGroup(groupId, transaction);
         if (group?.leaseOwner === this.dispatcherId && !group.runId)

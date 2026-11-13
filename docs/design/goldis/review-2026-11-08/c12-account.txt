@@ -1,0 +1,52 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+Przegląd
+Moje firmy
+Pula firm
+Automatyzacje
+Przebiegi
+Historia importów
+Powiadomienia
+2
+Moje korekty
+
+KONTO
+
+Moje konto
+Zwiń menu
+Pracownik
+GOLDIS / KONTO I BEZPIECZEŃSTWO
+anna.nowak · Pracownik
+Moje konto ↗
+
+KONTO I BEZPIECZEŃSTWO
+
+Twoje sesje,
+Twoje hasło.
+Adres odzyskiwania
+
+Administrator nie włączył jeszcze odzyskiwania hasła dla platformy.
+
+Zmień hasło
+
+Minimum 15 znaków. Po zmianie pozostałe sesje zostaną wylogowane.
+
+anna.nowak
+Obecne hasło
+Nowe hasło
+Powtórz nowe hasło
+Zapisz nowe hasło
+Aktywne sesje
+
+Każda sesja jest sprawdzana po stronie serwera. Cofnięcie działa od następnego żądania.
+
+0 aktywnych
+URZĄDZENIE I PRZEGLĄDARKA	UTWORZONA	OSTATNIA AKTYWNOŚĆ	WYGASA	STATUS	
+Chrome · Windows	11.10.2026, 09:58:00	11.10.2026, 11:31:00	11.10.2026, 17:58:00	Wygasła	
+Edge · Windows	9.10.2026, 13:12:00	10.10.2026, 18:45:00	9.10.2026, 21:12:00	Wygasła	
+
+← Powrót do platformy

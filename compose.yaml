@@ -10,6 +10,7 @@ services:
       API_DB_PASSWORD_FILE: /run/secrets/api_db_password
       WORKER_DB_PASSWORD_FILE: /run/secrets/worker_db_password
       ENRICHMENT_DB_PASSWORD_FILE: /run/secrets/enrichment_db_password
+      COMMISSION_DB_PASSWORD_FILE: /run/secrets/commission_db_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/ensure-runtime-roles.sh:/docker-entrypoint-initdb.d/010-goldis-runtime-roles.sh:ro
@@ -19,6 +20,7 @@ services:
       - api_db_password
       - worker_db_password
       - enrichment_db_password
+      - commission_db_password
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U goldis -d goldis"]
       interval: 5s
@@ -36,6 +38,7 @@ services:
     environment:
       REDIS_API_PASSWORD_FILE: /run/secrets/redis_api_password
       REDIS_WORKER_PASSWORD_FILE: /run/secrets/redis_worker_password
+      REDIS_COMMISSION_PASSWORD_FILE: /run/secrets/redis_commission_password
     volumes:
       - redis_data:/data
     healthcheck:
@@ -47,6 +50,7 @@ services:
     secrets:
       - redis_api_password
       - redis_worker_password
+      - redis_commission_password
     networks:
       - goldis_data
 
@@ -62,6 +66,7 @@ services:
       API_DB_PASSWORD_FILE: /run/secrets/api_db_password
       WORKER_DB_PASSWORD_FILE: /run/secrets/worker_db_password
       ENRICHMENT_DB_PASSWORD_FILE: /run/secrets/enrichment_db_password
+      COMMISSION_DB_PASSWORD_FILE: /run/secrets/commission_db_password
     volumes:
       - ./docker/postgres/ensure-runtime-roles.sh:/ensure-runtime-roles.sh:ro
     secrets:
@@ -70,6 +75,7 @@ services:
       - api_db_password
       - worker_db_password
       - enrichment_db_password
+      - commission_db_password
     entrypoint: ["sh", "-c", "until pg_isready -h postgres -U goldis -d goldis; do sleep 1; done; sh /ensure-runtime-roles.sh"]
     depends_on:
       postgres:
@@ -150,6 +156,8 @@ services:
       WORKER_AUTH_SECRET_FILE: /run/secrets/worker_auth_secret
       IMPORT_PARSER_URL: http://import-parser:3010
       IMPORT_PARSER_SHARED_SECRET_FILE: /run/secrets/import_parser_secret
+      COMMISSION_ENGINE_URL: http://commission-engine:8000
+      COMMISSION_ENGINE_TOKEN_FILE: /run/secrets/commission_engine_secret
     volumes:
       - export_data:/var/lib/goldis/exports
       - deletion_journal:/var/lib/goldis/deletion-journal
@@ -163,6 +171,7 @@ services:
       - artifact_keyring
       - worker_auth_secret
       - import_parser_secret
+      - commission_engine_secret
       - resend_api_key
       - auth_mail_keyring
     depends_on:
@@ -182,6 +191,7 @@ services:
       - goldis_frontend
       - goldis_data
       - goldis_parser
+      - goldis_commission_engine
 
   import-parser:
     image: ${GOLDIS_API_IMAGE:-goldis-api:local}
@@ -211,6 +221,87 @@ services:
       - goldis_parser
     secrets:
       - import_parser_secret
+
+  commission-engine:
+    group_add:
+      - "1000"
+    image: ${GOLDIS_COMMISSION_ENGINE_IMAGE:-goldis-commission-engine:local}
+    build:
+      context: .
+      dockerfile: services/commission-engine/Dockerfile
+    environment:
+      COMMISSION_INTERNAL_TOKEN_FILE: /run/secrets/commission_engine_secret
+      COMMISSION_MAX_REQUEST_BYTES: 104857600
+      COMMISSION_EXECUTION_TIMEOUT_SECONDS: 600
+      PYTHONDONTWRITEBYTECODE: "1"
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=96m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 1536m
+    cpus: 1.0
+    pids_limit: 32
+    restart: unless-stopped
+    networks:
+      - goldis_commission_engine
+    secrets:
+      - commission_engine_secret
+
+  commission-worker:
+    image: ${GOLDIS_API_IMAGE:-goldis-api:local}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: ${APP_ENV:-development}
+      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL_FILE: /run/secrets/database_url_commission
+      REDIS_URL_FILE: /run/secrets/redis_url_commission
+      API_EXPORT_DIR: /var/lib/goldis/exports
+      ARTIFACT_REQUIRE_ENCRYPTION: "1"
+      ARTIFACT_ENCRYPTION_ACTIVE_KEY_VERSION: ${ARTIFACT_ENCRYPTION_ACTIVE_KEY_VERSION:-}
+      ARTIFACT_ENCRYPTION_KEYS_BASE64_FILE: /run/secrets/artifact_keyring
+      COMMISSION_ENGINE_URL: http://commission-engine:8000
+      COMMISSION_ENGINE_TOKEN_FILE: /run/secrets/commission_engine_secret
+    command: ["node", "apps/api/dist/commission-worker.js"]
+    volumes:
+      - export_data:/var/lib/goldis/exports
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      commission-engine:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 768m
+    cpus: 1.0
+    pids_limit: 64
+    restart: unless-stopped
+    networks:
+      - goldis_data
+      - goldis_commission_engine
+    secrets:
+      - database_url_commission
+      - redis_url_commission
+      - artifact_keyring
+      - commission_engine_secret
 
   enrichment-worker:
     image: ${GOLDIS_API_IMAGE:-goldis-api:local}
@@ -254,6 +345,7 @@ services:
       WORKER_PROFILE_DIR: /home/pwuser/goldis-profile
       WORKER_DB_POOL_MAX: ${WORKER_DB_POOL_MAX:-8}
       WORKER_LIVE_PORTALS: ${WORKER_LIVE_PORTALS:-0}
+      WORKER_START_PAUSED: ${WORKER_START_PAUSED:-0}
       WORKER_PORTAL_CONFIG_PATH: /run/config/portal-selectors.json
       PZU_LOGIN_FILE: /run/secrets/pzu_login
       PZU_PASSWORD_FILE: /run/secrets/pzu_password
@@ -281,6 +373,7 @@ services:
     security_opt:
       - no-new-privileges:true
       - seccomp:./deploy/docker/chromium-seccomp.json
+    stop_grace_period: 60s
     shm_size: 1gb
     depends_on:
       api:
@@ -315,6 +408,7 @@ services:
     environment:
       NODE_ENV: production
       API_INTERNAL_URL: http://api:3001
+      OC_AUTOMATION_WORKSPACE_ENABLED: ${OC_AUTOMATION_WORKSPACE_ENABLED:-1}
     depends_on:
       - api
     healthcheck:
@@ -328,7 +422,7 @@ services:
     restart: unless-stopped
     networks:
       goldis_frontend:
-        ipv4_address: 172.30.10.10
+        ipv4_address: ${GOLDIS_FRONTEND_WEB_IP:-172.30.10.10}
 
 volumes:
   postgres_data:
@@ -342,10 +436,13 @@ networks:
   goldis_frontend:
     ipam:
       config:
-        - subnet: 172.30.10.0/24
+        - subnet: ${GOLDIS_FRONTEND_SUBNET:-172.30.10.0/24}
   goldis_data:
     driver: bridge
   goldis_parser:
+    driver: bridge
+    internal: true
+  goldis_commission_engine:
     driver: bridge
     internal: true
 
@@ -360,10 +457,14 @@ secrets:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/worker_db_password
   enrichment_db_password:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/enrichment_db_password
+  commission_db_password:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/commission_db_password
   redis_api_password:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/redis_api_password
   redis_worker_password:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/redis_worker_password
+  redis_commission_password:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/redis_commission_password
   database_url_migrator:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/database_url_migrator
   database_url_api:
@@ -372,10 +473,14 @@ secrets:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/database_url_worker
   database_url_enrichment:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/database_url_enrichment
+  database_url_commission:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/database_url_commission
   redis_url_api:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/redis_url_api
   redis_url_worker:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/redis_url_worker
+  redis_url_commission:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/redis_url_commission
   session_secret:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/session_secret
   login_rate_limit_secret:
@@ -394,16 +499,18 @@ secrets:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/worker_auth_secret
   import_parser_secret:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/import_parser_secret
+  commission_engine_secret:
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/commission_engine_secret
   registry_cache_key:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/registry_cache_key
   pzu_login:
-    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/pzu_login
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/${GOLDIS_PZU_LOGIN_SECRET_FILE:-pzu_login}
   pzu_password:
-    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/pzu_password
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/${GOLDIS_PZU_PASSWORD_SECRET_FILE:-pzu_password}
   compensa_login:
-    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/compensa_login
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/${GOLDIS_COMPENSA_LOGIN_SECRET_FILE:-compensa_login}
   compensa_password:
-    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/compensa_password
+    file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/${GOLDIS_COMPENSA_PASSWORD_SECRET_FILE:-compensa_password}
   worker_staging_key:
     file: ${GOLDIS_SECRETS_DIR:?Set GOLDIS_SECRETS_DIR in .env}/worker_staging_key
   resend_api_key:

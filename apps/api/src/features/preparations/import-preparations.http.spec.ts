@@ -132,7 +132,7 @@ test("import preparation APIs enforce session, CSRF, role scope, and forward wor
     assert.equal((await request(path, "operator", "POST", startBody)).status, 201);
     assert.equal((await request(path, "auditor")).status, 403);
     assert.equal((await request(`${path}/${preparationId}`, "reviewer")).status, 200);
-    assert.equal((await request(`${path}/${preparationId}/rows?page=2&state=review`, "manager")).status, 200);
+    assert.equal((await request(`${path}/${preparationId}/rows?page=2&state=review&q=Alfa`, "manager")).status, 200);
     const exportPath = `${path}/${preparationId}/export`;
     assert.equal((await request(exportPath)).status, 401);
     assert.equal((await request(exportPath, "reviewer")).status, 403);
@@ -170,8 +170,8 @@ test("import preparation APIs enforce session, CSRF, role scope, and forward wor
       { tenantId, userId: users.admin, role: "admin" },
     );
     const rowsCall = calls.find((call) => call.method === "rows")!;
-    assert.deepEqual(rowsCall.args.slice(0, 4), [batchId, preparationId, 2, "review"]);
-    assert.equal((rowsCall.args[4] as { role: string }).role, "manager");
+    assert.deepEqual(rowsCall.args.slice(0, 5), [batchId, preparationId, 2, "review", "Alfa"]);
+    assert.equal((rowsCall.args[5] as { role: string }).role, "manager");
     const workflowStartCall = calls.find((call) => call.method === "workflowStart")!;
     assert.deepEqual(workflowStartCall.args.slice(0, 3), [batchId, preparationId, workflowBody]);
     assert.equal((workflowStartCall.args[3] as { role: string }).role, "manager");

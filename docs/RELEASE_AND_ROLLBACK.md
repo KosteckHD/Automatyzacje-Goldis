@@ -1,5 +1,7 @@
 # Wydanie i rollback
 
+Kolejność przygotowania kodu, testów modułów, odtwarzania, CI i odbioru konkretnej instalacji opisuje [plan produkcyjny PROD-00–14](PLAN_WDROZENIA_PRODUKCYJNEGO_2026-10-16.md). Poniższa procedura dotyczy operacji wydania; sam plan nie uruchamia wdrożenia ani portali live.
+
 ## Skład release
 
 Każdy release musi wskazywać czysty commit, z którego zbudowano wszystkie obrazy. Wartości `GOLDIS_BUILD_VERSION`, `GOLDIS_BUILD_COMMIT` i `GOLDIS_IMAGE_DIGEST` przekazywane do API są publicznymi identyfikatorami; endpoint admina odczytuje je przez `runtimeBuildManifest`. Digestów nie wpisuje się do kodu obrazu jako samoodniesienia.

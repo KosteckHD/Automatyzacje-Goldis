@@ -1,0 +1,65 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+Przegląd
+Moje firmy
+Pula firm
+Automatyzacje
+Przebiegi
+Historia importów
+Powiadomienia
+2
+
+ORGANIZACJA
+
+Pracownicy
+Dostępy
+Raporty
+Weryfikacja danych
+Dziennik aktywności
+Moje konto
+Zwiń menu
+Menedżer
+GOLDIS / AUTOMATYZACJE
+ewa.zielinska · Menedżer
+Moje konto ↗
+Porównywarka prowizji
+
+Sprawdź kompletność rozliczeń ASF i Warty oraz zgodność procentów z wersją słownika przypiętą do analizy.
+
+Słownik v1 aktywny
+Nowa analiza
+Słownik prowizji
+Historia analiz
+Pliki źródłowe
+
+Dodaj zestaw danych dla wybranego okresu. Identyczne pliki zostaną wykryte po zawartości.
+
+3 plików
+Lista polis CRM
+Arkusz Excel .xlsx
+Wybierz plik
+Raport ASF
+Arkusz Excel .xlsx
+Wybierz plik
+Raport Warty
+Arkusz Excel .xlsx
+Wybierz plik
+DO ANALIZY	RODZAJ	PLIK	ROZMIAR	DODANO
+	Lista polis CRM	CRM-listopad-demo.xlsx	0.02 MB	8.11.2026
+	Raport ASF	ASF-listopad-demo.xlsx	0.02 MB	8.11.2026
+	Raport Warty	WARTA-listopad-demo.xlsx	0.02 MB	8.11.2026
+Zakres dat i analiza
+
+Zakres dotyczy daty wystawienia polisy w CRM. Dzień początkowy i końcowy wliczają się do analizy.
+
+0 wybranych plików
+Od dnia
+Do dnia
+Aktywny słownik
+Wersja 1
+Otwórz słownik
+Uruchom porównanie

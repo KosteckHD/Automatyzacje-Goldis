@@ -89,8 +89,8 @@ async function main() {
       ] };
       else if (path === `/api/imports/${batchId}/enrichment`) body = { page: 1, pageSize: 50, totalRows: 0, summary: { missingRegonRows: 0, pendingCorrectionRows: 0, openConflictRows: 0, lookupStatuses: {} }, rows: [] };
       else if (path === "/api/imports" && method === "POST") body = { id: batchId, totalRows: 1, invalidRows: 0, readyRows: 1, sha256: "b".repeat(64) };
-      else if (path === "/api/runs" && method === "GET") body = mode === "view" ? [{ id: runId, rowNumber: 18001, status: "completed", currentStep: "completed", referenceDate: "2026-10-01", errorCode: null, createdAt: "2026-10-02T08:00:00.000Z", artifactAvailable: true }] : [];
-      else if (path === `/api/runs/${runId}`) body = { id: runId, rowNumber: 18001, status: "completed", currentStep: "completed", referenceDate: "2026-10-01", errorCode: null, createdAt: "2026-10-02T08:00:00.000Z", artifactAvailable: true, events: [] };
+      else if (path === "/api/runs" && method === "GET") body = mode === "view" ? [{ id: runId, batchId, toolId: "oc-policy-verification", rowNumber: 18001, status: "completed", currentStep: "completed", referenceDate: "2026-10-01", errorCode: null, createdAt: "2026-10-02T08:00:00.000Z", artifactAvailable: true }] : [];
+      else if (path === `/api/runs/${runId}`) body = { id: runId, batchId, toolId: "oc-policy-verification", rowNumber: 18001, status: "completed", currentStep: "completed", referenceDate: "2026-10-01", errorCode: null, createdAt: "2026-10-02T08:00:00.000Z", artifactAvailable: true, events: [] };
       else { body = { message: "Unexpected synthetic request" }; status = 404; }
       await route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body), headers: { "cache-control": "private, no-store" } });
     });
@@ -124,7 +124,7 @@ async function main() {
 
     mode = "execute";
     calls.length = 0;
-    await page.goto(`${baseUrl}/tools/oc-policy-verification`);
+    await page.goto(`${baseUrl}/tools/oc-policy-verification?view=legacy`);
     await page.locator(".upload-card").waitFor({ state: "visible" });
     assert.equal(await page.locator("#workspace-result").count(), 0, "wykonanie bez odczytu nie pokazuje wyników");
     await page.locator('input[type="file"]').setInputFiles({ name: "synthetic.xlsx", mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", buffer: Buffer.from("synthetic-only") });
@@ -139,11 +139,13 @@ async function main() {
     assert.equal(calls.some((item) => item.path.startsWith(`/api/imports/${batchId}/preparations/`)), true, "wykonujący widzi przygotowanie własnego importu");
 
     mode = "view";
-    await page.goto(`${baseUrl}/tools/oc-policy-verification?import=${batchId}`);
+    await page.goto(`${baseUrl}/tools/oc-policy-verification?import=${batchId}&view=legacy`);
     await page.locator("#workspace-result .table-note").waitFor({ state: "visible" });
     assert.equal(await page.locator("#workspace-runs form").count(), 0, "grant odczytu bez wykonania ukrywa start zadania");
     await page.getByRole("button", { name: /Wiersz 18001/ }).click();
-    await page.getByRole("heading", { name: /Wiersz 18001: Zakończono/ }).waitFor({ state: "visible" });
+    await page.getByRole("heading", { name: /Wiersz 18001: Zakończono/ }).waitFor({ state: "visible", timeout: 5_000 }).catch(async () => {
+      throw new Error(`RUN_DETAIL_COPY url=${page.url()} body=${(await page.locator("body").innerText()).slice(-1800)} pageErrors=${JSON.stringify(pageErrors)}`);
+    });
     assert.equal(await page.locator(`.download-link[href="/api/runs/${runId}/artifact"]`).count(), 1,
       "wspólny dostęp pracownika do wyników obejmuje pobranie Excel zadania");
     await page.setViewportSize({ width: 1440, height: 1000 });

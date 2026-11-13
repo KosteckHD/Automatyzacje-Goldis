@@ -52,4 +52,32 @@ export class PreparedSetExecutionController {
     if (!principal) throw new ForbiddenException();
     return this.executions.cancel(batchId, executionId, body, principal);
   }
+
+  @Post("imports/:batchId/prepared-set-executions/:executionId/pause")
+  @RequirePermission("run:create", "route-batch")
+  pause(
+    @Param("batchId") batchId: string,
+    @Param("executionId") executionId: string,
+    @Body() body: unknown,
+    @Req() request: Request,
+  ) {
+    if (!verifyCsrfRequest(request)) throw new ForbiddenException("Wymagany jest poprawny token CSRF");
+    const principal = readSessionPrincipal(request);
+    if (!principal) throw new ForbiddenException();
+    return this.executions.pause(batchId, executionId, body, principal);
+  }
+
+  @Post("imports/:batchId/prepared-set-executions/:executionId/resume")
+  @RequirePermission("run:create", "route-batch")
+  resume(
+    @Param("batchId") batchId: string,
+    @Param("executionId") executionId: string,
+    @Body() body: unknown,
+    @Req() request: Request,
+  ) {
+    if (!verifyCsrfRequest(request)) throw new ForbiddenException("Wymagany jest poprawny token CSRF");
+    const principal = readSessionPrincipal(request);
+    if (!principal) throw new ForbiddenException();
+    return this.executions.resume(batchId, executionId, body, principal);
+  }
 }

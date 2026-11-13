@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-17",
+  "database": "disposable PostgreSQL 18 cluster, loopback random port",
+  "migrations": 62,
+  "queryIdentity": "postgres; runtime least privilege independently checked by security-db smoke",
+  "syntheticDataOnly": true,
+  "findingsReproduced": [
+    {
+      "id": "SEC-01",
+      "capability": "view_results",
+      "granted": false,
+      "role": "operator",
+      "toolId": "synthetic-confidential-tool",
+      "endpoint": "/api/imports?toolId=synthetic-confidential-tool",
+      "status": 200,
+      "leakedFileName": "SYNTHETIC_CONFIDENTIAL_FILENAME.xlsx",
+      "detailStatus": 404
+    },
+    {
+      "id": "SEC-02",
+      "capability": "view_results",
+      "granted": false,
+      "role": "operator",
+      "toolId": "synthetic-confidential-tool",
+      "endpoint": "/api/dashboard",
+      "status": 200,
+      "leakedFileName": "SYNTHETIC_CONFIDENTIAL_FILENAME.xlsx",
+      "toolsListsUnauthorizedTool": false,
+      "operationListsUnauthorizedTool": true
+    }
+  ],
+  "injectionFilterReturnedRows": 0,
+  "forcedTransactionRollback": true
+}

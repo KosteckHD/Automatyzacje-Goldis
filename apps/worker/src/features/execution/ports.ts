@@ -10,7 +10,7 @@ import type {
 /** Data the worker re-reads from PostgreSQL for a single run. */
 export type WorkerRunContext = Readonly<{
   run: RunInputV1;
-  source: SourceRow & { id: string };
+  source: SourceRow & { id: string; expectedPersonName?: string };
   status: RunStatus;
   errorCode?: AutomationErrorCodeV1 | null;
   cancelRequested: boolean;

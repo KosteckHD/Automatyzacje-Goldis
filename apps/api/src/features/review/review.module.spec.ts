@@ -8,6 +8,7 @@ import { AuthorizationModule } from "../authorization/public";
 import { GroupingModule } from "../grouping/public";
 import { ReviewController } from "./review.controller";
 import { ReviewModule } from "./review.module";
+import { ReviewRepository } from "./review.repository";
 import { ReviewService } from "./review.service";
 
 test("ReviewModule owns review routes and consumes grouping through its public module", () => {
@@ -19,5 +20,5 @@ test("ReviewModule owns review routes and consumes grouping through its public m
     GroupingModule,
   ]);
   assert.deepEqual(Reflect.getMetadata("controllers", ReviewModule), [ReviewController]);
-  assert.deepEqual(Reflect.getMetadata("providers", ReviewModule), [ReviewService]);
+  assert.deepEqual(Reflect.getMetadata("providers", ReviewModule), [ReviewService, ReviewRepository]);
 });

@@ -20,7 +20,7 @@ export function operationalCollectionScope(role: GoldisRole | string): string {
       return "b.tenant_id = :tenantId";
     case "operator":
       return `b.tenant_id = :tenantId AND ${activeTool}
-        AND (b.owner_user_id = :userId OR ${sharedOcResults} OR ${resultGrant})`;
+        AND (${sharedOcResults} OR (b.owner_user_id = :userId AND ${resultGrant}))`;
     case "manager":
       return `b.tenant_id = :tenantId AND ${activeTool} AND (${sharedOcResults} OR ${resultGrant})`;
     case "reviewer":

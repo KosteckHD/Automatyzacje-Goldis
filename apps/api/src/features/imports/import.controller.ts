@@ -92,6 +92,23 @@ export class ImportController {
     return this.imports.rows(id, page, state);
   }
 
+  @Get(":id/rows/search")
+  @RequirePermission("batch:read", "route-batch")
+  searchRows(
+    @Param("id") id: string,
+    @Query("page") rawPage?: string,
+    @Query("state") rawState?: string,
+    @Query("q") search?: string,
+    @Query("issue") issueCode?: string,
+  ) {
+    const page = rawPage ? Number(rawPage) : 1;
+    if (!Number.isInteger(page) || page < 1 || page > 100000) throw new BadRequestException("Nieprawidłowa strona");
+    const state = rawState ?? "all";
+    if (state !== "all" && state !== "ready" && state !== "review")
+      throw new BadRequestException("Nieprawidłowy filtr");
+    return this.imports.searchRows(id, page, state, search ?? "", issueCode);
+  }
+
   @Get(":id/enrichment")
   @RequirePermission("enrichment:read", "route-batch")
   enrichmentReview(@Param("id") id: string, @Query("page") rawPage?: string) {

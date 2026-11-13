@@ -15,6 +15,7 @@ import {
 import type { Request, Response } from "express";
 import { readSessionPrincipal, SessionGuard, verifyCsrfRequest } from "../auth";
 import { BusinessLeadService } from "./business-leads.service";
+import type { LeadScopeInput } from "./lead-query";
 
 type Actor = Readonly<{ tenantId: string; userId: string; role: string }>;
 
@@ -40,8 +41,8 @@ export class BusinessLeadController {
   }
 
   @Get("export")
-  async export(@Req() request: Request, @Res() response: Response) {
-    const file = await this.leads.exportWorkbook(this.actor(request));
+  async export(@Req() request: Request, @Query() query: LeadScopeInput, @Res() response: Response) {
+    const file = await this.leads.exportWorkbook(this.actor(request), query);
     response.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     response.setHeader("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(file.fileName)}`);
     response.setHeader("Cache-Control", "no-store");
@@ -49,19 +50,8 @@ export class BusinessLeadController {
   }
 
   @Get()
-  list(
-    @Req() request: Request,
-    @Query()
-    query: {
-      scope?: string;
-      contactStatus?: string;
-      resultSetId?: string;
-      search?: string;
-      cursor?: string;
-      limit?: string;
-    },
-  ) {
-    return this.leads.list(this.actor(request), { ...query, query: query.search });
+  list(@Req() request: Request, @Query() query: LeadScopeInput) {
+    return this.leads.list(this.actor(request), query);
   }
 
   @Post("allocations")
@@ -82,6 +72,11 @@ export class BusinessLeadController {
     response.setHeader("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(file.fileName)}`);
     response.setHeader("Cache-Control", "no-store");
     response.send(file.bytes);
+  }
+
+  @Get(":id/navigation")
+  navigation(@Req() request: Request, @Param("id") id: string, @Query() query: LeadScopeInput) {
+    return this.leads.navigation(this.actor(request), id, query);
   }
 
   @Get(":id")

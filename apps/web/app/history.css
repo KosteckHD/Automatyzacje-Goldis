@@ -22,6 +22,10 @@
 .history-row h2{margin:5px 0;color:var(--color-text);font-size:1rem;font-weight:650;overflow-wrap:anywhere}
 .history-row p{margin:4px 0;color:var(--color-text-muted);font-size:.78rem;overflow-wrap:anywhere}
 .history-row time{display:block;margin-top:7px;color:#87847e;font-size:.68rem}
+.history-technical-details{display:grid;gap:5px;margin-top:9px;color:var(--color-text-muted);font-size:.68rem}
+.history-technical-details summary{width:max-content;min-height:36px;display:inline-flex;align-items:center;cursor:pointer;color:var(--color-gold-hover);font-weight:650}
+.history-technical-details code{overflow-wrap:anywhere;font:600 .67rem var(--font-data),Consolas,monospace}
+.history-technical-details summary:focus-visible{outline:2px solid var(--color-gold-hover);outline-offset:2px}
 .history-row-actions{display:flex;flex:0 0 auto;flex-direction:column;align-items:flex-end;gap:9px}
 .history-open,.history-download{min-height:38px;display:inline-flex;align-items:center;justify-content:center;padding:7px 12px;border:1px solid var(--color-gold);border-radius:var(--radius-control);color:var(--color-gold-hover);font-size:.74rem;font-weight:700;text-decoration:none;white-space:nowrap}
 .history-open:hover,.history-download:hover{background:#d9b65f18}

@@ -18,6 +18,8 @@ test("admin route groups keep explicit feature ownership and the shared authoriz
         "users",
         "createUser",
         "grants",
+        "commissionDictionaryGrant",
+        "setCommissionDictionaryGrant",
         "setGrant",
         "setDeletionGrant",
         "revokeGrant",

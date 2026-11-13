@@ -98,7 +98,7 @@ export type RunInputV1 = Readonly<{
   toolId: "oc-policy-verification";
 }>;
 
-export type IdentityMatchMethodV1 = "regon_company_name_decision_maker" | "unique_business_identity";
+export type IdentityMatchMethodV1 = "regon_company_name_decision_maker" | "unique_business_identity" | "regon_unique_pesel" | "regon_company";
 
 /** Minimum identity facts required before the worker may open the Compensa flow. */
 export type IdentityMatchV1 = Readonly<{
@@ -160,6 +160,8 @@ export type AutomationErrorCodeV1 =
   | "IDENTITY_UNSUPPORTED_TYPE"
   | "MFA_REQUIRED"
   | "MANUAL_DATA_REQUIRED"
+  | "COMPENSA_PAYER_DATA_SKIPPED"
+  | "COMPENSA_CUSTOMER_DATA_INCOMPLETE"
   | "PORTAL_FAILURE"
   | "PORTAL_SESSION_EXPIRED"
   | "PORTAL_SCHEMA_CHANGED"
@@ -272,15 +274,16 @@ export function isValidPesel(value: unknown): value is string {
 
 /** Ensures the person and business match before any portal data moves to Compensa. */
 export function validateIdentityMatchV1(value: unknown): IdentityMatchV1 {
+  const company = isRecord(value) && value.matchMethod === "regon_company";
+  const pendingName = isRecord(value) && value.matchMethod === "regon_unique_pesel";
   if (!isRecord(value)
     || value.schemaVersion !== 1
     || typeof value.sourceRowId !== "string" || !uuidPattern.test(value.sourceRowId)
     || typeof value.regon !== "string" || !/^\d{9}(?:\d{5})?$/.test(value.regon)
     || !isNonEmptyString(value.companyName)
-    || !isNonEmptyString(value.firstName)
-    || !isNonEmptyString(value.lastName)
-    || !isValidPesel(value.pesel)
-    || (value.matchMethod !== "regon_company_name_decision_maker" && value.matchMethod !== "unique_business_identity")
+    || ((company || pendingName) ? value.firstName !== "" || value.lastName !== "" : !isNonEmptyString(value.firstName) || !isNonEmptyString(value.lastName))
+    || (company ? value.pesel !== "" : !isValidPesel(value.pesel))
+    || !["regon_company_name_decision_maker", "unique_business_identity", "regon_unique_pesel", "regon_company"].includes(String(value.matchMethod))
     || !isNonEmptyString(value.adapterVersion)) {
     throw new Error("CONTRACT_IDENTITY_MATCH_INVALID");
   }
@@ -465,6 +468,7 @@ export function exportFileName(regon: string, companyName: string): string {
 
 export {
   decryptPesel,
+  decryptIdentityPesel,
   encryptIdentityForPersistence,
   encryptPesel,
   peselErrorCodeForLog,
@@ -481,3 +485,19 @@ export {
 } from "./runtime-database-role";
 export { isRunDispatchIntentV1, RUN_DISPATCH_INTENTS_V1 } from "./contracts/run-dispatch";
 export type { RunDispatchIntentV1 } from "./contracts/run-dispatch";
+export {
+  COMMISSION_ENGINE_SCHEMA_VERSION,
+  COMMISSION_TOOL_ID,
+  CommissionEngineContractError,
+  validateCommissionDictionarySnapshotV1,
+  validateCommissionEngineRequestV1,
+  validateCommissionEngineResultV1,
+} from "./commissions/engine-contract";
+export type {
+  CommissionDictionaryImportRequestV1,
+  CommissionEngineRequestV1,
+  CommissionEngineResultV1,
+  CommissionEngineSummaryV1,
+  CommissionInputFileV1,
+  CommissionSourceTypeV1,
+} from "./commissions/engine-contract";

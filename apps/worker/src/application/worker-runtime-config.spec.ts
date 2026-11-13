@@ -17,6 +17,7 @@ test("worker runtime config applies defaults without returning unrelated secrets
   assert.equal(config.chromiumSandbox, false);
   assert.equal(config.databasePoolMax, 8);
   assert.equal(config.livePortals, false);
+  assert.equal(config.startPaused, false);
   assert.equal(config.internalHost, "0.0.0.0");
   assert.equal(config.internalPort, 3022);
   assert.equal(config.redisUrl, validEnvironment.REDIS_URL);
@@ -33,7 +34,8 @@ test("worker runtime config parses explicit runtime options", () => {
     ...validEnvironment, WORKER_HEADLESS: "0", WORKER_CHROMIUM_SANDBOX: "1", WORKER_BROWSER_CHANNEL: "chrome",
     WORKER_DB_POOL_MAX: "12", WORKER_LIVE_PORTALS: "1", WORKER_INTERNAL_HOST: "127.0.0.1",
     WORKER_INTERNAL_PORT: "3030", WORKER_STAGING_DIR: "C:/worker/staging", WORKER_STAGING_KEY_VERSION: "2",
-    WORKER_PORTAL_CONFIG_PATH: "C:/worker/portal.json",
+    WORKER_PORTAL_CONFIG_PATH: "C:/worker/portal.json", PZU_LOGIN: "synthetic-pzu-user", PZU_PASSWORD: "synthetic-pzu-password",
+    COMPENSA_LOGIN: "synthetic-compensa-user", COMPENSA_PASSWORD: "synthetic-compensa-password",
     GOLDIS_API_READY_URL: "http://api:3010/api/health/ready",
   });
   assert.equal(config.headless, false);
@@ -41,6 +43,7 @@ test("worker runtime config parses explicit runtime options", () => {
   assert.equal(config.browserChannel, "chrome");
   assert.equal(config.databasePoolMax, 12);
   assert.equal(config.livePortals, true);
+  assert.equal(config.startPaused, false);
   assert.equal(config.internalHost, "127.0.0.1");
   assert.equal(config.internalPort, 3030);
   assert.equal(config.stagingDirectory, "C:/worker/staging");
@@ -63,4 +66,33 @@ test("worker runtime config rejects missing credentials and invalid options with
   ]) {
     assert.throws(() => loadWorkerRuntimeConfig({ ...validEnvironment, ...patch }));
   }
+});
+
+test("live portal mode requires all four portal credentials without exposing values", () => {
+  const complete = {
+    ...validEnvironment, WORKER_LIVE_PORTALS: "1", PZU_LOGIN: "synthetic-pzu-user", PZU_PASSWORD: "synthetic-pzu-password",
+    COMPENSA_LOGIN: "synthetic-compensa-user", COMPENSA_PASSWORD: "synthetic-compensa-password",
+  };
+  assert.equal(loadWorkerRuntimeConfig(complete).livePortals, true);
+  for (const name of ["PZU_LOGIN", "PZU_PASSWORD", "COMPENSA_LOGIN", "COMPENSA_PASSWORD"] as const) {
+    const incomplete = { ...complete, [name]: "   " };
+    assert.throws(() => loadWorkerRuntimeConfig(incomplete), (error: unknown) => {
+      assert.ok(error instanceof Error);
+      assert.equal(error.message, "WORKER_LIVE_PORTAL_CREDENTIALS_REQUIRED");
+      assert.equal(error.message.includes("synthetic"), false);
+      return true;
+    });
+  }
+  assert.equal(loadWorkerRuntimeConfig({ ...validEnvironment, WORKER_LIVE_PORTALS: "0" }).livePortals, false);
+});
+
+test("worker can start paused for safe preparation, but not as a live-ready worker", () => {
+  const paused = loadWorkerRuntimeConfig({ ...validEnvironment, WORKER_START_PAUSED: "1" });
+  assert.equal(paused.startPaused, true);
+  assert.throws(() => loadWorkerRuntimeConfig({
+    ...validEnvironment, WORKER_START_PAUSED: "1", WORKER_LIVE_PORTALS: "1",
+    PZU_LOGIN: "synthetic-pzu-user", PZU_PASSWORD: "synthetic-pzu-password",
+    COMPENSA_LOGIN: "synthetic-compensa-user", COMPENSA_PASSWORD: "synthetic-compensa-password",
+  }), /WORKER_START_PAUSED_LIVE_INVALID/);
+  assert.throws(() => loadWorkerRuntimeConfig({ ...validEnvironment, WORKER_START_PAUSED: "yes" }), /WORKER_START_PAUSED_INVALID/);
 });

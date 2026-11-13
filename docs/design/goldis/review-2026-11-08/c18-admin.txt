@@ -1,0 +1,303 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+Przegląd
+Moje firmy
+Pula firm
+Automatyzacje
+Przebiegi
+Historia importów
+Powiadomienia
+2
+
+ORGANIZACJA
+
+Weryfikacja danych
+Dziennik aktywności
+Raporty
+Administracja
+Moje konto
+Zwiń menu
+Administrator
+GOLDIS / ADMINISTRACJA
+admin.goldis · Administrator
+Moje konto ↗
+Dostępy do narzędzi
+Konta i sesje
+Centrum operacyjne
+Przydział pracy
+Automatyzacja
+Audyt
+Raporty jakości
+
+PANEL KONTROLI PLATFORMY
+
+Dostęp i jakość pracy
+pod kontrolą.
+
+Przydzielaj narzędzia, pilnuj zgłoszeń i sprawdzaj, co dzieje się z wynikami.
+
+AKTYWNE KONTA
+12
+11
+członkowie organizacji
+OTWARTE ZGŁOSZENIA
+3
+3
+czekają na obsługę
+ZADANIA W TOKU
+4
+4
+przyjęte do realizacji
+NARZĘDZIA
+1
+1
+w katalogu platformy
+
+ZAKRES DOSTĘPU
+
+Dostęp do narzędzi
+
+Każdy grant określa, co dana osoba może zrobić. Brak grantu oznacza brak dostępu.
+
+Konta i przypisane uprawnienia
+
+Wybierz konto, aby edytować dostęp do poszczególnych narzędzi.
+
+Odśwież
+Użytkownik
+admin.goldis · admin · active
+anna.nowak · operator · active
+piotr.kowalski · operator · active
+ewa.zielinska · manager · active
+
+Ostatnie logowanie: 11.10.2026, 10:00 · aktywne sesje: 1 · adres odzyskiwania: brak
+
+Odrębne uprawnienie do usuwania danych
+Menedżer może usuwać importy i wyniki
+
+Nie daje prawa usunięcia całej firmy. Zmiana roli lub wyłączenie konta cofa grant. Kasowanie wymaga osobnego podglądu oraz ponownego potwierdzenia hasłem.
+
+Wersja 0
+Zapisz grant kasowania
+Porównywarka prowizji
+Może edytować i publikować słownik prowizji
+
+To osobne uprawnienie. Dostęp do uruchamiania i odczytu porównywarki ustaw poniżej jako grant narzędzia.
+
+Brak grantu
+Zapisz grant słownika
+Weryfikacja polis OC
+oc-policy-verification · Dostępne
+Widoczność
+Uruchamianie
+Odczyt wyników
+Pobieranie plików
+Wersja 2
+Zapisz grant
+Cofnij dostęp
+Katalog narzędzi
+
+Lista zawiera wyłącznie narzędzia zarejestrowane w platformie.
+
+Weryfikacja polis OC
+oc-policy-verification
+Dostępne
+
+TOŻSAMOŚĆ I SESJE
+
+Konta i bezpieczeństwo
+
+Hasła tymczasowe pokazuj użytkownikowi bezpiecznym kanałem. Aplikacja ich nie wysyła.
+
+Dodaj konto
+Login
+Hasło tymczasowe
+Minimum 15 znaków. Użytkownik zmieni je przy pierwszym logowaniu.
+Rola
+Menedżer
+Operator
+Recenzent
+Audytor
+Administrator
+Utwórz konto
+Zarządzaj kontem
+
+admin.goldis
+11111111-1111-4111-8111-111111111111
+
+Rola
+Menedżer
+Operator
+Recenzent
+Audytor
+Administrator
+Wyłącz konto
+Nowe hasło tymczasowe
+Ustaw hasło i cofnij sesje
+Wyślij link do resetu hasła
+Ustaw adres odzyskiwania dla użytkownika
+Wyślij link weryfikacyjny
+Cofnij wszystkie sesje
+Sesje użytkownika
+
+Sesje są sprawdzane przy każdym żądaniu.
+
+0 aktywnych
+PRZEGLĄDARKA	UTWORZONA	OSTATNIA AKTYWNOŚĆ	WYGASA	STATUS	
+Chrome · Windows	11.10.2026, 10:00	11.10.2026, 11:00	11.10.2026, 18:00	Wygasła	
+
+BIEŻĄCA PRACA
+
+Centrum operacyjne
+Odśwież stan
+API
+Online
+BAZA
+Online
+REDIS
+Online
+WORKER
+Offline
+PORTALE
+Wyłączona · valid
+DISPATCHER
+2 oczekujących
+SUBMISSIONY
+W kolejce 2 · Zakończone 9
+GRUPY ZGŁOSZEŃ
+2 oczekujących · najstarsze 11.10.2026, 10:00
+HOURLY_RUN_LIMIT × 2
+Wersja API
+MVP
+Commit
+2026-10-11
+Digest obrazu
+nie podano
+Schemat
+053-user-notifications · 53 migracji
+Worker rejestru
+Offline · API workera niedostępne
+Dostawca
+GUS BIR
+Joby oczekujące
+1 · najstarszy 11.10.2026, 10:00
+Budżet dzienny
+gus-bir: 182/6000
+Worker wzbogacania offline
+Ostatnie zadania
+
+Strona po 50 rekordów. Filtry są niezależne od ustawień narzędzia i raportów.
+
+Wszystkie narzędzia
+Weryfikacja polis OC
+Wszystkie statusy
+W kolejce
+waiting for sms
+waiting for manual data
+Zakończone
+no matching policies
+Błąd
+Anulowane
+Filtruj zadania
+NARZĘDZIE	ZADANIE	STATUS	KROK	UTWORZONO	BŁĄD
+
+Użyj filtrów, aby pobrać zadania.
+
+Poprzednia
+Strona 1
+Następna
+Kolejka interwencji
+
+Przydział nie zmienia stanu zadania. Konflikt rewizji trzeba odświeżyć przed kolejną zmianą.
+
+Znajdź odbiorcę przydziału
+Otwarte
+Rozwiązane
+Wszystkie
+Wszystkie narzędzia
+Weryfikacja polis OC
+Wszystkie osoby
+admin.goldis · admin
+anna.nowak · operator
+piotr.kowalski · operator
+ewa.zielinska · manager
+Wszystkie priorytety
+Wysoki
+Normalny
+Filtruj zgłoszenia
+PRIORYTET / ZGŁOSZENIE	ZADANIE	OSOBA	TERMIN	REWIZJA	AKCJE
+Pilny
+sms · SMS_TIMEOUT · wiersz 14
+	55555555
+oc-policy-verification · waiting_for_sms
+	
+Nieprzypisane
+admin.goldis · admin
+anna.nowak · operator
+piotr.kowalski · operator
+ewa.zielinska · manager
+	
+Europe/Warsaw. Nieedytowany termin zachowuje dokładny zapis.
+	3	ZapiszHistoria
+Poprzednia
+Strona 1
+Następna
+
+NOWE URUCHOMIENIA
+
+Ustawienia automatyzacji
+
+Zmiany wpływają na tworzenie nowych zadań. Już przyjęte zadania zachowują swój przebieg.
+
+Przyjmuj nowe zadania
+Wyłączenie zatrzymuje nowe starty, nie przerywa zadań w toku.
+Narzędzie
+Weryfikacja polis OC
+Limit startów na godzinę
+Początek okna pracy
+Koniec okna pracy
+Strefa czasowa
+Strefa zapisu: Europe/Warsaw · wersja 4 · zapisano 10.10.2026, 14:00
+Zapisz ustawienia
+
+ZDARZENIA ORGANIZACJI
+
+Audyt z wyszukiwaniem
+
+Wyniki są stronicowane. Metadane mogące zawierać dane klienta nie są zwracane.
+
+Od
+Do (wyłącznie)
+Aktor ID
+Czynność
+Rodzaj zasobu
+ID zasobu
+Wynik
+Dowolny
+Powodzenie
+Błąd
+Odmowa
+Narzędzie
+Dowolne
+Weryfikacja polis OC
+Szukaj zdarzeń
+CZAS	AKTOR	CZYNNOŚĆ	ZASÓB	ID ZASOBU	WYNIK
+
+Ustaw zakres i wyszukaj zdarzenia.
+
+WYNIKI I CZAS OBSŁUGI
+
+Raporty i jakość pracy
+
+Miary ukończenia liczą wyniki po czasie zakończenia. „Brak polis” pozostaje osobną kategorią.
+
+Od
+Do (wyłącznie)
+Narzędzie
+Wszystkie
+Weryfikacja polis OC
+Przelicz zakres

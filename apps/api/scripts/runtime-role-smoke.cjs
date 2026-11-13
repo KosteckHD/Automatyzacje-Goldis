@@ -9,7 +9,7 @@ const path = require("node:path");
 const repositoryRoot = path.resolve(__dirname, "../../..");
 const databaseName = process.argv[2];
 const adminUrlText = process.env.GOLDIS_TEST_DATABASE_ADMIN_URL;
-const roles = ["goldis_migrator", "goldis_api", "goldis_worker", "goldis_enrichment"];
+const roles = ["goldis_migrator", "goldis_api", "goldis_worker", "goldis_enrichment", "goldis_commission"];
 
 function buildRoleUrl(template, database, role, password) {
   const url = new URL(template);
@@ -299,7 +299,7 @@ async function main() {
     }
     await admin.query('ALTER DATABASE "' + databaseName + '" OWNER TO goldis_migrator');
     await admin.query('REVOKE ALL PRIVILEGES ON DATABASE "' + databaseName + '" FROM PUBLIC');
-    await admin.query('GRANT CONNECT ON DATABASE "' + databaseName + '" TO goldis_api, goldis_worker, goldis_enrichment');
+    await admin.query('GRANT CONNECT ON DATABASE "' + databaseName + '" TO goldis_api, goldis_worker, goldis_enrichment, goldis_commission');
     await admin.query('GRANT CONNECT, TEMPORARY ON DATABASE "' + databaseName + '" TO goldis_migrator');
   } finally {
     await admin.end().catch(() => undefined);
@@ -309,13 +309,13 @@ async function main() {
   const dbAdmin = new Client({ connectionString: migratorUrl, connectionTimeoutMillis: 3_000 });
   try {
     await dbAdmin.connect();
-    await dbAdmin.query("REVOKE ALL PRIVILEGES ON SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment");
+    await dbAdmin.query("REVOKE ALL PRIVILEGES ON SCHEMA public FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission");
     await dbAdmin.query("ALTER SCHEMA public OWNER TO goldis_migrator");
     await dbAdmin.query("GRANT USAGE, CREATE ON SCHEMA public TO goldis_migrator");
-    await dbAdmin.query("GRANT USAGE ON SCHEMA public TO goldis_api, goldis_worker, goldis_enrichment");
-    await dbAdmin.query("ALTER DEFAULT PRIVILEGES FOR ROLE goldis_migrator IN SCHEMA public REVOKE ALL ON TABLES FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment");
-    await dbAdmin.query("ALTER DEFAULT PRIVILEGES FOR ROLE goldis_migrator IN SCHEMA public REVOKE ALL ON SEQUENCES FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment");
-    await dbAdmin.query("ALTER DEFAULT PRIVILEGES FOR ROLE goldis_migrator IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment");
+    await dbAdmin.query("GRANT USAGE ON SCHEMA public TO goldis_api, goldis_worker, goldis_enrichment, goldis_commission");
+    await dbAdmin.query("ALTER DEFAULT PRIVILEGES FOR ROLE goldis_migrator IN SCHEMA public REVOKE ALL ON TABLES FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission");
+    await dbAdmin.query("ALTER DEFAULT PRIVILEGES FOR ROLE goldis_migrator IN SCHEMA public REVOKE ALL ON SEQUENCES FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission");
+    await dbAdmin.query("ALTER DEFAULT PRIVILEGES FOR ROLE goldis_migrator IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, goldis_api, goldis_worker, goldis_enrichment, goldis_commission");
   } finally {
     await dbAdmin.end().catch(() => undefined);
   }
@@ -326,6 +326,7 @@ async function main() {
     MIGRATOR_DATABASE_URL: migratorUrl,
     WORKER_DATABASE_URL: buildRoleUrl(adminUrl.toString(), databaseName, "goldis_worker", passwords.goldis_worker),
     ENRICHMENT_DATABASE_URL: buildRoleUrl(adminUrl.toString(), databaseName, "goldis_enrichment", passwords.goldis_enrichment),
+    COMMISSION_DATABASE_URL: buildRoleUrl(adminUrl.toString(), databaseName, "goldis_commission", passwords.goldis_commission),
   };
   runNodeScript("apps/api/dist/infrastructure/database/migrate.js", roleEnvironment);
   runNodeScript("apps/api/dist/infrastructure/database/apply-runtime-grants.js", roleEnvironment);
@@ -337,6 +338,11 @@ async function main() {
   runNodeScript("apps/api/scripts/runtime-permissions-smoke.cjs", {
     ...roleEnvironment,
     DATABASE_URL: buildRoleUrl(adminUrl.toString(), databaseName, "goldis_api", passwords.goldis_api),
+  });
+  runNodeScript("apps/api/scripts/security-resource-scope-db-smoke.cjs", {
+    ...roleEnvironment,
+    DATABASE_URL: buildRoleUrl(adminUrl.toString(), databaseName, "goldis_api", passwords.goldis_api),
+    GOLDIS_MIGRATOR_DATABASE_URL: migratorUrl,
   });
   const runtimeFixture = await seedRuntimeLogin(migratorUrl);
   if (process.env.GOLDIS_TEST_APP_MODULE_SMOKE === "1") {
@@ -431,7 +437,7 @@ async function main() {
     if (!enrichmentFixture) throw new Error("RUNTIME_ENRICHMENT_FIXTURE_NOT_CREATED");
   }
   await exerciseWorkerCheckpoint(roleEnvironment.WORKER_DATABASE_URL, migratorUrl, runtimeFixture);
-  console.log("RUNTIME_DATABASE_ROLE_SMOKE_PASS roles=4 elevated_privileges=false ddl_allowlist=true");
+  console.log("RUNTIME_DATABASE_ROLE_SMOKE_PASS roles=5 elevated_privileges=false ddl_allowlist=true");
 }
 
 main().catch((error) => {

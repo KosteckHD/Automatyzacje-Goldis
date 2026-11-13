@@ -1,0 +1,90 @@
+{
+  "startedAt": "2026-11-06T11:34:08.868Z",
+  "scope": "Local isolated tests; sanitized environment; live portals disabled. Not a full acceptance or production pentest.",
+  "results": [
+    {
+      "name": "architecture",
+      "startedAt": "2026-11-06T11:34:08.870Z",
+      "endedAt": "2026-11-06T11:34:12.846Z",
+      "exitCode": 1,
+      "error": null,
+      "status": "FAIL",
+      "summary": [],
+      "evidence": "architecture.log"
+    },
+    {
+      "name": "packages-core",
+      "startedAt": "2026-11-06T11:34:12.853Z",
+      "endedAt": "2026-11-06T11:34:13.173Z",
+      "exitCode": 0,
+      "error": null,
+      "status": "PASS",
+      "summary": [
+        "ℹ tests 22",
+        "ℹ pass 22",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "evidence": "packages-core.log"
+    },
+    {
+      "name": "apps-api",
+      "startedAt": "2026-11-06T11:34:13.175Z",
+      "endedAt": "2026-11-06T11:35:31.840Z",
+      "exitCode": 1,
+      "error": null,
+      "status": "FAIL",
+      "summary": [
+        "ℹ tests 385",
+        "ℹ pass 383",
+        "ℹ fail 2",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "evidence": "apps-api.log"
+    },
+    {
+      "name": "apps-worker",
+      "startedAt": "2026-11-06T11:35:31.842Z",
+      "endedAt": "2026-11-06T11:35:35.230Z",
+      "exitCode": 1,
+      "error": null,
+      "status": "FAIL",
+      "summary": [
+        "ℹ tests 209",
+        "ℹ pass 123",
+        "ℹ fail 1",
+        "ℹ cancelled 0",
+        "ℹ skipped 85"
+      ],
+      "evidence": "apps-worker.log"
+    },
+    {
+      "name": "return-to",
+      "startedAt": "2026-11-06T11:35:35.232Z",
+      "endedAt": "2026-11-06T11:35:35.915Z",
+      "exitCode": 0,
+      "error": null,
+      "status": "PASS",
+      "summary": [
+        "ℹ tests 2",
+        "ℹ pass 2",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "evidence": "return-to.log"
+    },
+    {
+      "name": "security-browser",
+      "startedAt": "2026-11-06T11:35:35.917Z",
+      "endedAt": "2026-11-06T11:35:45.554Z",
+      "exitCode": 0,
+      "error": null,
+      "status": "PASS",
+      "summary": [],
+      "evidence": "security-browser.log"
+    }
+  ]
+}

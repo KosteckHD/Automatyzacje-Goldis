@@ -8,9 +8,17 @@ node_modules/
 .next/
 .npm-cache/
 .docker-config/
+.goldis-local-secrets/
 dist/
 coverage/
 *.log
 uploads/
 exports/
 worker-profiles/
+
+# Local UI preview server metadata includes a runtime token.
+apps/web/.impeccable/live/
+
+# Local scans, downloaded tools and private diagnostic snapshots.
+output/
+.git-backups/

@@ -88,7 +88,8 @@ module.exports = async function automationFlowSmoke() {
       registrationNumber: "RST22339", adapterVersion: "e2e-v1", parserVersion: "e2e-v1",
       form: { communicationTile: '#compensa-communication-tile', startDialog: '#start-dialog', identifierInput: '[name="insuredIdentifier"]',
         registrationInput: '[name="vehicleRegistration"]', startCommunication: '#start-communication', insuredDataSection: '#insured-data', roleSelect: '[name="role"]',
-        firstNameInput: '[name="firstName"]', lastNameInput: '[name="lastName"]', peselInput: '[name="pesel"]', postalCodeInput: '[name="postalCode"]', countyInput: '[name="county"]', saveButton: '#save-insured' },
+        firstNameInput: '[name="firstName"]', lastNameInput: '[name="lastName"]', peselInput: '[name="pesel"]', postalCodeInput: '[name="postalCode"]', countyInput: '[name="county"]', saveButton: '#save-insured',
+        payerDataDialog: '#payer-data-dialog', payerIdentifierInput: '#payer-identifier', payerCancel: '#cancel-payer', incompleteCustomer: '#incomplete-customer' },
       save: { insuredDataSection: '#insured-data', caseReference: '#offer-reference', saveButton: '#save-insured', savedConfirmation: '#saved-confirmation' },
       ufg: { caseReference: '#offer-reference', verifyUfgButton: '#verify-ufg', summaryTable: '#ufg-summary', openUfgSummary: '#open-ufg-summary' } },
   };
@@ -165,7 +166,8 @@ module.exports = async function automationFlowSmoke() {
       }
       if (url.hostname === "compensa-fixture.test") {
         const tracking = `<script>document.querySelector('#start-communication').addEventListener('click',()=>window.fixtureAction('starts'));document.querySelector('#save-insured').addEventListener('click',()=>window.fixtureAction('saves'));document.querySelector('#verify-ufg').addEventListener('click',()=>window.fixtureAction('ufg'));</script>`;
-        return route.fulfill({ status: 200, contentType: "text/html", body: compensaHtml + tracking });
+        const exceptions = `<script>window.syntheticPayerPrompt=${currentScenario === "payer_skip"};window.syntheticIncompleteCustomer=${currentScenario === "incomplete_customer"};</script>`;
+        return route.fulfill({ status: 200, contentType: "text/html", body: compensaHtml + tracking + exceptions });
       }
       await route.abort();
     });
@@ -412,7 +414,7 @@ module.exports = async function automationFlowSmoke() {
     assert.ok(uiRun.id, "real UI run response should expose its persisted run ID");
     console.log(`BROWSER_BACKEND_FLOW_PASS login=${uiLoginResponse.status()} upload=${uploadResponse.status()} preparation=${preparationResponse.status()} run=${uiRunResponse.status()} sms=${uiSmsResponse.status()} artifact=${uiDownload.suggestedFilename().endsWith(".xlsx") ? 200 : 0} adminOperations=200 logout=${uiLogoutStatus} unauthenticated=${uiUnauthStatus} nonAdminRoles=${roleBoundaryResults.join(",")} adminRead=403 adminMutation=403 adminPage=denied auditRoles=${roleAuditResults.join(",")} runCreateRoles=${roleRunResults.join(",")} reviewerScoped=true externalRequests=0 pageErrors=0`);
     currentScenario = "authenticated";
-    for (const scenario of ["authenticated", "sms", "sms_rejected_reentry", "sms_rejected_resend", "sms_timeout", "sms_retry_limit", "not_found"]) {
+    for (const scenario of ["payer_skip", "incomplete_customer", "authenticated", "sms", "sms_rejected_reentry", "sms_rejected_resend", "sms_timeout", "sms_retry_limit", "not_found"]) {
       currentScenario = scenario;
       const priorCounts = { ...counts };
       const priorSms = observedSmsSubmissions; const priorResends = observedResends;
@@ -525,7 +527,7 @@ module.exports = async function automationFlowSmoke() {
         const run = await models.AutomationRun.findByPk(runId);
         return run && ["completed", "identity_review", "waiting_for_manual_data", "failed"].includes(run.status) ? run : null;
       }, scenario.toUpperCase());
-      const expectedDoneStatus = scenario === "not_found" ? "failed"
+      const expectedDoneStatus = ["not_found", "payer_skip", "incomplete_customer"].includes(scenario) ? "failed"
         : scenario === "sms_retry_limit" ? "waiting_for_manual_data" : "completed";
       if (done.status !== expectedDoneStatus) {
         const pzuPage = await browser.page("pzu");
@@ -546,7 +548,25 @@ module.exports = async function automationFlowSmoke() {
           events: runEvents.map((event) => ({ status: event.status, step: event.step, errorCode: event.errorCode,
             portal: event.metadata?.portal, kind: event.metadata?.kind, reasonCode: event.metadata?.reasonCode })) }));
       }
-      if (scenario === "not_found" || scenario === "sms_retry_limit") {
+      if (scenario === "payer_skip" || scenario === "incomplete_customer") {
+        assert.equal(done.status, "failed");
+        assert.equal(done.errorCode, scenario === "payer_skip" ? "COMPENSA_PAYER_DATA_SKIPPED" : "COMPENSA_CUSTOMER_DATA_INCOMPLETE");
+        assert.equal(counts.starts - priorCounts.starts, 1);
+        assert.equal(counts.saves, priorCounts.saves); assert.equal(counts.ufg, priorCounts.ufg);
+        assert.equal(await models.ExportArtifact.count({ where: { runId } }), 0);
+        assert.equal(await models.ManualIntervention.count({ where: { runId, status: "open" } }), 0);
+        if (scenario === "payer_skip") {
+          assert.equal(await (await browser.page("compensa")).evaluate(() => window.syntheticPayerAccepted === true), false);
+          assert.equal(await (await browser.page("compensa")).evaluate(() => window.syntheticPayerCancelled), true);
+          const skippedContext = await webBrowser.newContext({ extraHTTPHeaders: { cookie } });
+          try {
+            const skippedPage = await skippedContext.newPage();
+            await skippedPage.goto(`${webOrigin}/runs/${runId}`);
+            await skippedPage.getByRole("heading", { name: "Wiersz 2: Pominięto", exact: true }).waitFor({ timeout: 30000 });
+            await skippedPage.getByText("Data odniesienia:", { exact: false }).filter({ hasText: "Pominięto — Compensa wymaga dodatkowych danych ubezpieczającego" }).waitFor();
+          } finally { await skippedContext.close(); }
+        }
+      } else if (scenario === "not_found" || scenario === "sms_retry_limit") {
         assert.equal(done.status, scenario === "not_found" ? "failed" : "waiting_for_manual_data");
         if (scenario === "not_found") assert.equal(done.errorCode, "IDENTITY_NOT_FOUND");
         assert.equal(counts.starts, priorCounts.starts);
@@ -576,7 +596,7 @@ module.exports = async function automationFlowSmoke() {
       }
       console.log(`AUTOMATION_FLOW_SCENARIO_PASS scenario=${scenario} realHTTP=true realQueue=true productionProcessor=true realDB=true browser=fixture`);
     }
-    console.log("AUTOMATION_FLOW_SMOKE_PASS authenticated=true smsPlatformHandoff=true rejectedReentry=true rejectedResend=true concurrentResendFenced=true timeoutResume=true resendLimit=one knownAd=true notFoundStopsCompensa=true xlsx=true livePortals=false modalUI=true realFrontendApi=true");
+    console.log("AUTOMATION_FLOW_SMOKE_PASS payerSkipContinues=true incompleteCustomerStopsRow=true skippedUI=true authenticated=true smsPlatformHandoff=true rejectedReentry=true rejectedResend=true concurrentResendFenced=true timeoutResume=true resendLimit=one knownAd=true notFoundStopsCompensa=true xlsx=true livePortals=false modalUI=true realFrontendApi=true");
   } catch (error) {
     console.error("AUTOMATION_FLOW_CASE_FAILED", currentScenario, error.message);
     throw error;

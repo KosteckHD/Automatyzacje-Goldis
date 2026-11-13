@@ -1,0 +1,55 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+Przegląd
+Moje firmy
+Pula firm
+Automatyzacje
+Przebiegi
+Historia importów
+Powiadomienia
+2
+
+ORGANIZACJA
+
+Pracownicy
+Dostępy
+Raporty
+Weryfikacja danych
+Dziennik aktywności
+Moje konto
+Zwiń menu
+Menedżer
+GOLDIS / AUTOMATYZACJE
+ewa.zielinska · Menedżer
+Moje konto ↗
+Porównywarka prowizji
+
+Sprawdź kompletność rozliczeń ASF i Warty oraz zgodność procentów z wersją słownika przypiętą do analizy.
+
+Słownik v1 aktywny
+Nowa analiza
+Słownik prowizji
+Historia analiz
+Słownik prowizji
+
+Stawki Oli i Maćka są oddzielne; warianty PZU „Nowy” i „Wznowienie aktywne” pozostają osobnymi pozycjami.
+
+Wczytaj Excel
+Wersja
+Wybierz
+v1 · Opublikowana · aktywna
+Towarzystwo
+Wszystkie towarzystwa
+PZU
+Warta
+Szukaj
+
+2 pozycji · aktywna dla nowych analiz
+
+TOWARZYSTWO	RODZAJ RYZYKA / PRODUKT	WARIANT	OLA %	MACIEK %	UWAGI
+PZU	OC komunikacyjne	Nowy	12%	10%	—
+Warta	OC komunikacyjne	Nowy	12%	10%	—

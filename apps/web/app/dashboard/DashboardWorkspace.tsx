@@ -6,6 +6,8 @@ import LeadSidebar from "../leads/LeadSidebar";
 import "../leads/leads.css";
 import "../leads/platform-pages.css";
 import { useAutomationHealth } from "../lib/use-automation-health";
+import SessionRequired from "../../components/ui/SessionRequired";
+import { uiLabels } from "../lib/ui-labels";
 
 type Role = "admin" | "manager" | "operator" | "reviewer" | "auditor";
 type Operation = {
@@ -76,31 +78,40 @@ export default function DashboardWorkspace() {
   const ocTool = data?.tools.find((tool) => tool.toolId === "oc-policy-verification");
   const canExecuteOc = (role === "admin" || role === "manager" || role === "operator") && ocTool?.canExecute === true;
   const canViewOc = role !== "auditor" && ocTool?.canViewResults === true;
-  const primaryHref = canExecuteOc ? "/tools/oc-policy-verification" : canViewOc ? "/results/oc-policy-verification" : null;
-  const primaryLabel = canExecuteOc ? "Przygotuj import OC" : canViewOc ? "Zobacz wyniki OC" : null;
-  const automationHealth = useAutomationHealth(canExecuteOc);
   const metrics = data?.metrics;
+  const priorityOperation = data?.actionRequired[0] ?? null;
+  const canAssignPool = isManager && canViewOc && (metrics?.team?.unassigned ?? 0) > 0;
+  const hasCompaniesToContact = (metrics?.myLeads.notContacted ?? 0) > 0;
+  const primaryHref = priorityOperation?.href ?? (canAssignPool ? "/results/oc-policy-verification"
+    : hasCompaniesToContact ? "/my-results" : canExecuteOc ? "/tools/oc-policy-verification"
+      : role === "auditor" ? "/audit" : role === "reviewer" ? "/review" : canViewOc ? "/results/oc-policy-verification" : null);
+  const primaryLabel = priorityOperation ? "Dokończ sprawdzanie" : canAssignPool ? "Przydziel firmy"
+    : hasCompaniesToContact ? "Otwórz moje firmy" : canExecuteOc ? "Sprawdź nową bazę OC"
+      : role === "auditor" ? "Otwórz dziennik aktywności" : role === "reviewer" ? "Otwórz kolejkę weryfikacji"
+        : canViewOc ? "Otwórz pulę firm" : null;
+  const automationHealth = useAutomationHealth(canExecuteOc);
 
   const quickLinks: QuickLink[] = data ? [
     ...(canViewOc ? [
-      { href: "/results/oc-policy-verification", title: "Pula wyników OC", description: "Przeglądaj dostępne wyniki firm" },
-      { href: "/imports", title: "Importy", description: "Sprawdź historię załadowanych plików" },
+      { href: "/results/oc-policy-verification", title: uiLabels.companyPool, description: "Przeglądaj firmy z zakończonych sprawdzeń OC" },
+      { href: "/imports", title: uiLabels.importHistory, description: "Wróć do załadowanych plików i przygotowania" },
     ] : []),
     ...(role === "auditor"
-      ? [{ href: "/audit", title: "Dziennik aktywności", description: "Sprawdź zdarzenia w platformie" }]
-      : [{ href: "/my-results", title: "Moje wyniki", description: "Sprawdź przydzielone firmy i status rozmów" }]),
-    { href: "/notifications", title: "Powiadomienia", description: `${data.unreadNotifications} nieprzeczytanych informacji` },
+      ? [{ href: "/audit", title: uiLabels.activityLog, description: "Sprawdź zdarzenia w platformie" }]
+      : [{ href: "/my-results", title: uiLabels.myCompanies, description: "Kontaktuj firmy i zapisuj decyzje" }]),
+    { href: "/runs", title: uiLabels.runs, description: "Śledź postęp i problemy uruchomionych przebiegów" },
+    { href: "/notifications", title: uiLabels.notifications, description: `${data.unreadNotifications} nieprzeczytanych informacji` },
   ].filter((link) => link.href !== primaryHref) : [];
 
-  if (!authenticated) return <main className="lead-auth-required"><h1>Zaloguj się, aby otworzyć przegląd</h1><a className="lead-primary" href="/">Przejdź do logowania</a></main>;
+  if (!authenticated) return <SessionRequired returnTo="/dashboard" title="Sesja wygasła" description="Zaloguj się ponownie, aby wrócić do przeglądu i swoich operacji." />;
 
   return <div className={`lead-app-shell${sidebarExpanded ? "" : " is-collapsed"}`}>
-    <LeadSidebar role={role} pathname={pathname} onExpandedChange={setSidebarExpanded} />
+    <LeadSidebar role={role} pathname={pathname} onExpandedChange={setSidebarExpanded} canViewResults={Boolean(data?.tools.some((tool) => tool.canViewResults))} canDiscoverTools={Boolean(data?.tools.length)} />
     <main className="lead-main">
       <header className="lead-topbar"><div><span className="lead-overline">GOLDIS <i>/</i> PRZEGLĄD</span><span className="lead-topbar-name">Twoje miejsce pracy</span></div><div className="lead-topbar-actions"><a href="/notifications">Powiadomienia{data?.unreadNotifications ? ` · ${data.unreadNotifications}` : ""}</a><span className="lead-avatar">{role === "admin" ? "A" : role === "manager" ? "M" : "P"}</span></div></header>
       <div className="lead-content platform-content">
         <div className="lead-page-heading">
-          <div><p className="lead-overline">CENTRUM OPERACYJNE <span>·</span> GOLDIS</p><h1>Przegląd</h1><p>Wróć do rozpoczętych operacji, sprawdź swoje zadania i przejdź prosto do dostępnych wyników.</p></div>
+          <div><p className="lead-overline">CENTRUM OPERACYJNE <span>·</span> GOLDIS</p><h1>{uiLabels.overview}</h1><p>Wróć do rozpoczętych operacji, sprawdź firmy do kontaktu i przejdź prosto do dostępnych wyników.</p></div>
           {dashboardState.status === "loading" && <span className="platform-primary-placeholder" aria-hidden="true" />}
           {dashboardState.status === "ready" && primaryHref && primaryLabel && <div className="platform-primary-action">
             <a className="lead-primary" href={primaryHref}>{primaryLabel} <span aria-hidden="true">↗</span></a>
@@ -108,7 +119,7 @@ export default function DashboardWorkspace() {
               <span aria-hidden="true" />
               {automationHealth.status === "checking" ? "Sprawdzam gotowość automatyzacji…"
                 : automationHealth.status === "unknown" ? automationHealth.message
-                  : automationHealth.data?.automationReady ? "Automatyzacja gotowa."
+                  : automationHealth.data?.automationReady ? "Worker i konfiguracja portali są gotowe. Portal może poprosić o logowanie lub kod SMS."
                     : automationHealth.data?.message ?? "Automatyzacja jest niedostępna."}
             </p>}
           </div>}
@@ -147,13 +158,13 @@ export default function DashboardWorkspace() {
                 </div> : <div className="platform-empty-line"><span className="platform-check" aria-hidden="true">✓</span><span><strong>Nie masz pilnych działań</strong><small>Gdy operacja będzie wymagała wznowienia, pojawi się tutaj.</small></span></div>}
               </section>
 
-              <section className="lead-panel platform-operations-panel"><div className="lead-section-heading"><div><p className="lead-overline">OSTATNIE URUCHOMIENIA</p><h2>Twoje operacje</h2></div><a className="lead-inline-link" href="/runs">Historia zadań →</a></div>
-                {data.operations.length ? <div className="platform-operation-list">{data.operations.map((operation) => <a key={operation.id} href={operation.status === "waiting_attention" ? "/runs" : `/results/oc-policy-verification?resultSetId=${encodeURIComponent(operation.resultSetId)}`} className="platform-operation-row"><span className={`platform-status-dot status-${operation.status}`} aria-hidden="true"/><span className="operation-primary"><strong>{operation.fileName || operation.toolName}</strong><small>{operation.toolName} · ID {operation.resultSetId.slice(0, 8)}</small></span><span className={`platform-status-text status-${operation.status}`}>{operationStatus[operation.status] ?? operation.status}</span><span className="operation-counts">{operation.readyCount} gotowych <small>· {operation.failedCount} z błędem</small></span><time>{formatDate(operation.createdAt)}</time><b aria-hidden="true">→</b></a>)}</div>
+              <section className="lead-panel platform-operations-panel"><div className="lead-section-heading"><div><p className="lead-overline">OSTATNIE URUCHOMIENIA</p><h2>Twoje operacje</h2></div><a className="lead-inline-link" href="/runs">{uiLabels.runs} →</a></div>
+                {data.operations.length ? <div className="platform-operation-list">{data.operations.map((operation) => <a key={operation.id} href={operation.status === "waiting_attention" ? "/runs" : `/tools/oc-policy-verification?resultSetId=${encodeURIComponent(operation.resultSetId)}&step=results`} className="platform-operation-row"><span className={`platform-status-dot status-${operation.status}`} aria-hidden="true"/><span className="operation-primary"><strong>{operation.fileName || operation.toolName}</strong><small>{operation.toolName} · ID {operation.resultSetId.slice(0, 8)}</small></span><span className={`platform-status-text status-${operation.status}`}>{operationStatus[operation.status] ?? operation.status}</span><span className="operation-counts">{operation.readyCount} gotowych <small>· {operation.failedCount} z błędem</small></span><time>{formatDate(operation.createdAt)}</time><b aria-hidden="true">→</b></a>)}</div>
                   : <div className="platform-empty-line">Nie uruchomiono jeszcze żadnej automatyzacji. Dostępne działania znajdziesz powyżej.</div>}
               </section>
             </div>
 
-            <section className="lead-panel platform-quick-panel"><div className="lead-section-heading"><div><p className="lead-overline">SZYBKIE PRZEJŚCIA</p><h2>Twoje narzędzia i wyniki</h2></div></div>
+          <section className="lead-panel platform-quick-panel"><div className="lead-section-heading"><div><p className="lead-overline">SZYBKIE PRZEJŚCIA</p><h2>Twoje narzędzia i wyniki</h2><p>Sprawdzenie OC tworzy pulę firm. Menedżer przydziela firmy, które pracownicy kontaktują w sekcji Moje firmy.</p></div></div>
               <nav className="platform-shortcuts" aria-label="Szybkie przejścia">
                 {quickLinks.map((link) => <a href={link.href} key={link.href}><span className="platform-shortcut-copy"><strong>{link.title}</strong><small>{link.description}</small></span><span aria-hidden="true">→</span></a>)}
               </nav>

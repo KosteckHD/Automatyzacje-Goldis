@@ -9,7 +9,7 @@ import {
   Optional,
 } from "@nestjs/common";
 import ExcelJS from "exceljs";
-import { Op, QueryTypes, type Transaction } from "sequelize";
+import { Op, QueryTypes, type Transaction as SequelizeTransaction, Transaction } from "sequelize";
 import { isResourceTombstoned } from "../../contracts/deletion-barrier";
 import {
   BusinessLead,
@@ -29,6 +29,14 @@ import { recordAuditEvent } from "../audit";
 import { canAccessTool } from "../authorization/public";
 import { NotificationService } from "../notifications/public";
 import { buildLeadSnapshotWorkbook, materializeLeadResultSnapshots } from "../results/public";
+import {
+  encodeLeadCursor,
+  type LeadScopeInput,
+  leadScopePredicate,
+  leadScopeReplacements,
+  normalizeLeadQuery,
+} from "./lead-query";
+import { LeadRecordRepository } from "./lead-record.repository";
 
 const toolId = "oc-policy-verification";
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -36,7 +44,6 @@ const keyPattern = /^[A-Za-z0-9][A-Za-z0-9._:-]{15,119}$/;
 
 type Actor = Readonly<{ tenantId: string; userId: string; role: string }>;
 type GroupInput = Readonly<{ groupId: string; canonicalEntityId: string; leadIdentityKey: string }>;
-type Cursor = Readonly<{ createdAt: string; leadId: string }>;
 
 function hash(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value), "utf8").digest("hex");
@@ -47,31 +54,8 @@ function parseStatus(value: unknown): BusinessLead["contactStatus"] {
   throw new BadRequestException("Wybierz jeden z dostępnych statusów kontaktu");
 }
 
-function parseCursor(value: string | undefined): Cursor | null {
-  if (!value) return null;
-  try {
-    const decoded = JSON.parse(Buffer.from(value, "base64url").toString("utf8")) as Record<string, unknown>;
-    if (
-      typeof decoded.createdAt !== "string" ||
-      !Number.isFinite(Date.parse(decoded.createdAt)) ||
-      typeof decoded.leadId !== "string" ||
-      !uuidPattern.test(decoded.leadId)
-    )
-      throw new Error();
-    return { createdAt: new Date(decoded.createdAt).toISOString(), leadId: decoded.leadId };
-  } catch {
-    throw new BadRequestException("Nieprawidłowy kursor listy wyników");
-  }
-}
-
-function encodeCursor(createdAt: Date | string, leadId: string): string {
-  return Buffer.from(JSON.stringify({ createdAt: new Date(createdAt).toISOString(), leadId }), "utf8").toString(
-    "base64url",
-  );
-}
-
 function roleCanRead(role: string): boolean {
-  return ["operator", "manager", "admin", "reviewer", "auditor"].includes(role);
+  return ["operator", "manager", "admin", "reviewer"].includes(role);
 }
 function roleCanAssign(role: string): boolean {
   return role === "manager" || role === "admin";
@@ -89,6 +73,7 @@ function allocationCandidateWhere(): string {
 
 @Injectable()
 export class BusinessLeadService {
+  private readonly records = new LeadRecordRepository();
   constructor(@Optional() @Inject(NotificationService) private readonly notifications?: NotificationService) {}
 
   /** Adds one company lead per logical result set, even when its people span chunks. */
@@ -98,7 +83,7 @@ export class BusinessLeadService {
     transaction: Transaction,
   ): Promise<void> {
     if (!groups.length) return;
-    const resultSet = await ResultSet.findByPk(resultSetId, { transaction, lock: transaction.LOCK.UPDATE });
+    const resultSet = await this.records.getResultSet(resultSetId, transaction);
     if (!resultSet || !["queued", "running", "waiting_attention"].includes(resultSet.status)) {
       throw new ConflictException("Operacja nie przyjmuje już nowych wyników");
     }
@@ -114,7 +99,7 @@ export class BusinessLeadService {
       byEntity.set(group.canonicalEntityId, entries);
     }
     for (const [canonicalEntityId, companyGroups] of byEntity) {
-      const canonical = await CanonicalEntity.findOne({
+      const canonical = await this.records.getCanonical({
         where: { canonicalEntityId, tenantId: resultSet.tenantId },
         transaction,
       });
@@ -144,7 +129,7 @@ export class BusinessLeadService {
         : [];
       if (!rows.length) throw new ConflictException("Nie znaleziono źródłowych wierszy firmy");
 
-      let lead = await BusinessLead.findOne({
+      let lead = await this.records.getLead({
         where: { resultSetId, canonicalEntityId },
         transaction,
         lock: transaction.LOCK.UPDATE,
@@ -225,7 +210,7 @@ export class BusinessLeadService {
     terminal: "completed" | "cancelled" | "failed",
     transaction: Transaction,
   ) {
-    const resultSet = await ResultSet.findByPk(resultSetId, { transaction, lock: transaction.LOCK.UPDATE });
+    const resultSet = await this.records.getResultSet(resultSetId, transaction);
     if (!resultSet) return;
     const wasTerminal =
       resultSet.finishedAt !== null || ["completed", "cancelled", "failed"].includes(resultSet.status);
@@ -355,43 +340,25 @@ export class BusinessLeadService {
     };
   }
 
-  async list(
-    actor: Actor,
-    input: Readonly<{
-      scope?: string;
-      contactStatus?: string;
-      resultSetId?: string;
-      query?: string;
-      cursor?: string;
-      limit?: string;
-    }>,
-  ) {
+  async list(actor: Actor, input: LeadScopeInput) {
     await this.requireReadAccess(actor);
-    const scope = input.scope ?? "pool";
-    if (scope !== "pool" && scope !== "mine") throw new BadRequestException("Nieprawidłowy zakres listy leadów");
-    if (scope === "mine" && !["operator", "manager", "admin"].includes(actor.role)) throw new ForbiddenException();
-    const contactStatus = input.contactStatus ? parseStatus(input.contactStatus) : null;
-    const resultSetId = input.resultSetId ? input.resultSetId : null;
-    if (resultSetId && !uuidPattern.test(resultSetId))
-      throw new BadRequestException("Nieprawidłowy identyfikator wyników");
-    const query = typeof input.query === "string" ? input.query.trim().slice(0, 120) : "";
-    const limit = input.limit === undefined ? 25 : Number(input.limit);
-    if (!Number.isInteger(limit) || limit < 1 || limit > 50)
-      throw new BadRequestException("Limit wyników musi wynosić od 1 do 50");
-    const cursor = parseCursor(input.cursor);
-    const replacements: Record<string, unknown> = {
-      tenantId: actor.tenantId,
-      toolId,
-      userId: actor.userId,
-      limit: limit + 1,
-      search: query ? `%${query.replace(/[\\%_]/g, "\\$&")}%` : null,
-      contactStatus,
-      resultSetId,
-      cursorCreatedAt: cursor?.createdAt ?? null,
-      cursorLeadId: cursor?.leadId ?? null,
+    const query = normalizeLeadQuery(input);
+    if (query.scope === "mine" && !["operator", "manager", "admin"].includes(actor.role))
+      throw new ForbiddenException();
+    const replacements = {
+      ...leadScopeReplacements(actor, query),
+      limit: query.limit + 1,
+      cursorCreatedAt: query.cursor?.createdAt ?? null,
+      cursorLeadId: query.cursor?.leadId ?? null,
     };
-    const rows = await sequelize.query<Record<string, unknown>>(
-      `SELECT lead.lead_id AS "leadId", lead.result_set_id AS "resultSetId", lead.tenant_id AS "tenantId",
+    const cursorOperator = query.direction === "previous" ? ">" : "<";
+    const order = query.direction === "previous" ? "ASC" : "DESC";
+
+    return sequelize.transaction(
+      { isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ, readOnly: true },
+      async (transaction: SequelizeTransaction) => {
+        const rows = await sequelize.query<Record<string, unknown>>(
+          `SELECT lead.lead_id AS "leadId", lead.result_set_id AS "resultSetId", lead.tenant_id AS "tenantId",
               lead.tool_id AS "toolId", lead.source_row_ids AS "sourceRowIds", lead.company_name AS "companyName",
               lead.nip, lead.regon, lead.address, lead.postal_code AS "postalCode", lead.city,
               lead.decision_maker_names AS "decisionMakerNames", lead.contact_data AS "contactData",
@@ -441,28 +408,115 @@ export class BusinessLeadService {
                     JOIN run_submission_groups grp ON grp.group_id = link.group_id AND grp.tenant_id = link.tenant_id
                    WHERE link.lead_id = lead.lead_id AND link.tenant_id = lead.tenant_id) END AS run_ids
          ) run_stats ON TRUE
-        WHERE lead.tenant_id = :tenantId AND lead.tool_id = :toolId
-          AND result_set.status = 'completed' AND lead.result_status = 'ready'
-          AND (result_set.batch_id IS NULL OR NOT EXISTS (SELECT 1 FROM resource_tombstones deletion WHERE deletion.tenant_id = result_set.tenant_id
-            AND deletion.resource_type = 'import' AND deletion.resource_id = result_set.batch_id AND deletion.state <> 'completed')
-            OR (:scopeMine = TRUE AND lead.assigned_to_user_id = :userId AND EXISTS
-              (SELECT 1 FROM lead_result_snapshots saved WHERE saved.lead_id = lead.lead_id AND saved.tenant_id = lead.tenant_id
-                AND saved.source_owner_user_id <> lead.assigned_to_user_id)))
-          AND (:scopeMine = FALSE OR lead.assigned_to_user_id = :userId)
-          AND (:scopeMine = TRUE OR result_set.batch_id IS NOT NULL)
-          AND (:contactStatus IS NULL OR lead.contact_status = :contactStatus)
-          AND (:resultSetId IS NULL OR lead.result_set_id = CAST(:resultSetId AS uuid))
-          AND (:search IS NULL OR lead.company_name ILIKE :search ESCAPE '\\'
-            OR COALESCE(lead.nip, '') LIKE :search OR COALESCE(lead.regon, '') LIKE :search)
-          AND (:cursorCreatedAt IS NULL OR (lead.created_at, lead.lead_id) < (:cursorCreatedAt, CAST(:cursorLeadId AS uuid)))
-        ORDER BY lead.created_at DESC, lead.lead_id DESC
+        WHERE ${leadScopePredicate()}
+          AND (:cursorCreatedAt IS NULL OR (lead.created_at, lead.lead_id) ${cursorOperator} (:cursorCreatedAt, CAST(:cursorLeadId AS uuid)))
+        ORDER BY lead.created_at ${order}, lead.lead_id ${order}
         LIMIT :limit`,
-      { replacements: { ...replacements, scopeMine: scope === "mine" }, type: QueryTypes.SELECT },
+          { replacements, type: QueryTypes.SELECT, transaction },
+        );
+        const hasMore = rows.length > query.limit;
+        const pageRows = hasMore ? rows.slice(0, query.limit) : rows;
+        if (query.direction === "previous") pageRows.reverse();
+        const items = pageRows.map((row) => this.mapLead(row));
+
+        let nextCursor: string | null = null;
+        let previousCursor: string | null = null;
+        if (items.length) {
+          const first = items[0];
+          const last = items[items.length - 1];
+          if (query.direction === "next") {
+            if (query.cursor) previousCursor = encodeLeadCursor(first.createdAt, String(first.id));
+            if (hasMore) nextCursor = encodeLeadCursor(last.createdAt, String(last.id));
+          } else {
+            if (hasMore) previousCursor = encodeLeadCursor(first.createdAt, String(first.id));
+            if (query.cursor) nextCursor = encodeLeadCursor(last.createdAt, String(last.id));
+          }
+        }
+
+        let summary: Record<string, unknown> | undefined;
+        if (query.includeSummary) {
+          const [aggregate] = await sequelize.query<Record<string, unknown>>(
+            `SELECT
+               count(*) FILTER (WHERE ${leadScopePredicate("scope")})::int AS "scopeTotal",
+               count(*) FILTER (WHERE ${leadScopePredicate("all")})::int AS "matchingTotal",
+               count(*) FILTER (WHERE ${leadScopePredicate("all")} AND lead.contact_status = 'not_contacted')::int AS "notContacted",
+               count(*) FILTER (WHERE ${leadScopePredicate("all")} AND lead.contact_status = 'offer_accepted')::int AS "offerAccepted",
+               count(*) FILTER (WHERE ${leadScopePredicate("all")} AND lead.contact_status = 'not_interested')::int AS "notInterested",
+               CURRENT_TIMESTAMP AS "checkedAt"
+             FROM business_leads lead
+             JOIN result_sets result_set ON result_set.result_set_id = lead.result_set_id AND result_set.tenant_id = lead.tenant_id
+            WHERE lead.tenant_id = :tenantId AND lead.tool_id = :toolId`,
+            { replacements, type: QueryTypes.SELECT, transaction },
+          );
+          summary = {
+            scopeTotal: Number(aggregate?.scopeTotal ?? 0),
+            matchingTotal: Number(aggregate?.matchingTotal ?? 0),
+            byContactStatus: {
+              not_contacted: Number(aggregate?.notContacted ?? 0),
+              offer_accepted: Number(aggregate?.offerAccepted ?? 0),
+              not_interested: Number(aggregate?.notInterested ?? 0),
+            },
+            checkedAt: new Date(String(aggregate?.checkedAt ?? new Date().toISOString())).toISOString(),
+          };
+        }
+
+        return { items, nextCursor, previousCursor, ...(summary ? { summary } : {}) };
+      },
     );
-    const hasMore = rows.length > limit;
-    const items = (hasMore ? rows.slice(0, limit) : rows).map((row) => this.mapLead(row));
-    const last = hasMore ? rows[limit - 1] : null;
-    return { items, nextCursor: last ? encodeCursor(last.createdAt as Date | string, String(last.leadId)) : null };
+  }
+
+  async navigation(actor: Actor, leadId: string, input: LeadScopeInput) {
+    await this.requireReadAccess(actor);
+    if (!uuidPattern.test(leadId)) throw new NotFoundException("Nie znaleziono wyniku firmy");
+    const query = normalizeLeadQuery(input);
+    const anchorScope = normalizeLeadQuery({ ...input, contactStatus: undefined, search: undefined });
+    if (query.scope === "mine" && !["operator", "manager", "admin"].includes(actor.role))
+      throw new ForbiddenException();
+    const replacements = { ...leadScopeReplacements(actor, query), leadId };
+    const anchorReplacements = { ...leadScopeReplacements(actor, anchorScope), leadId };
+
+    return sequelize.transaction(
+      { isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ, readOnly: true },
+      async (transaction: SequelizeTransaction) => {
+        const [anchor] = await sequelize.query<Record<string, unknown>>(
+          `SELECT lead.created_at AS "createdAt", lead.lead_id AS "leadId"
+             FROM business_leads lead
+             JOIN result_sets result_set ON result_set.result_set_id = lead.result_set_id AND result_set.tenant_id = lead.tenant_id
+            WHERE lead.lead_id = :leadId AND ${leadScopePredicate("scope")}
+            LIMIT 1`,
+          { replacements: anchorReplacements, type: QueryTypes.SELECT, transaction },
+        );
+        if (!anchor) throw new NotFoundException("Nie znaleziono firmy w bieżącym zakresie");
+        const anchorValues = {
+          ...replacements,
+          cursorCreatedAt: new Date(String(anchor.createdAt)).toISOString(),
+          cursorLeadId: String(anchor.leadId),
+        };
+        const [previous] = await sequelize.query<Record<string, unknown>>(
+          `SELECT lead.lead_id AS "leadId"
+             FROM business_leads lead
+             JOIN result_sets result_set ON result_set.result_set_id = lead.result_set_id AND result_set.tenant_id = lead.tenant_id
+            WHERE ${leadScopePredicate()}
+              AND (lead.created_at, lead.lead_id) > (:cursorCreatedAt, CAST(:cursorLeadId AS uuid))
+            ORDER BY lead.created_at DESC, lead.lead_id DESC LIMIT 1`,
+          { replacements: anchorValues, type: QueryTypes.SELECT, transaction },
+        );
+        const [next] = await sequelize.query<Record<string, unknown>>(
+          `SELECT lead.lead_id AS "leadId"
+             FROM business_leads lead
+             JOIN result_sets result_set ON result_set.result_set_id = lead.result_set_id AND result_set.tenant_id = lead.tenant_id
+            WHERE ${leadScopePredicate()}
+              AND (lead.created_at, lead.lead_id) < (:cursorCreatedAt, CAST(:cursorLeadId AS uuid))
+            ORDER BY lead.created_at DESC, lead.lead_id DESC LIMIT 1`,
+          { replacements: anchorValues, type: QueryTypes.SELECT, transaction },
+        );
+        return {
+          previousLeadId: previous ? String(previous.leadId) : null,
+          nextLeadId: next ? String(next.leadId) : null,
+          checkedAt: new Date().toISOString(),
+        };
+      },
+    );
   }
 
   async get(actor: Actor, leadId: string) {
@@ -587,7 +641,7 @@ export class BusinessLeadService {
     };
   }
 
-  async exportWorkbook(actor: Actor) {
+  async exportWorkbook(actor: Actor, input: LeadScopeInput = {}) {
     if (
       !roleCanRead(actor.role) ||
       !(await canAccessTool(
@@ -602,6 +656,12 @@ export class BusinessLeadService {
     ) {
       throw new ForbiddenException("Brak prawa do pobrania wyników OC");
     }
+    const query = normalizeLeadQuery(input);
+    if (input.cursor !== undefined || input.direction !== undefined || input.limit !== undefined) {
+      throw new BadRequestException("Eksport obejmuje pełny zakres filtrów i nie obsługuje paginacji");
+    }
+    if (query.scope === "mine" && !["operator", "manager", "admin"].includes(actor.role))
+      throw new ForbiddenException();
     const rows = await sequelize.query<Record<string, unknown>>(
       `SELECT lead.company_name AS company, lead.nip, lead.regon, lead.address, lead.postal_code AS "postalCode", lead.city,
               lead.decision_maker_names AS "decisionMakers", lead.contact_data AS contacts,
@@ -612,16 +672,17 @@ export class BusinessLeadService {
          JOIN result_sets result_set ON result_set.result_set_id = lead.result_set_id AND result_set.tenant_id = lead.tenant_id
          LEFT JOIN tenant_memberships membership ON membership.tenant_id = lead.tenant_id AND membership.user_id = lead.assigned_to_user_id
          LEFT JOIN users assignee ON assignee.user_id = membership.user_id
-        WHERE lead.tenant_id = :tenantId AND lead.tool_id = :toolId AND result_set.status = 'completed' AND lead.result_status = 'ready'
-          AND (result_set.batch_id IS NOT NULL OR lead.assigned_to_user_id = :userId)
-          AND (result_set.batch_id IS NULL OR NOT EXISTS (SELECT 1 FROM resource_tombstones deletion WHERE deletion.tenant_id = result_set.tenant_id
-            AND deletion.resource_type = 'import' AND deletion.resource_id = result_set.batch_id AND deletion.state <> 'completed')
-          )
+        WHERE ${leadScopePredicate()}
         ORDER BY lead.created_at DESC, lead.lead_id DESC LIMIT 50001`,
-      { replacements: { tenantId: actor.tenantId, toolId, userId: actor.userId }, type: QueryTypes.SELECT },
+      { replacements: leadScopeReplacements(actor, query), type: QueryTypes.SELECT },
     );
-    if (rows.length > 50000)
-      throw new BadRequestException("Eksport przekracza limit 50 000 leadów. Zawęź wyniki do jednej automatyzacji.");
+    if (rows.length > 50000) {
+      throw new BadRequestException({
+        code: "LEAD_EXPORT_LIMIT_EXCEEDED",
+        message: "Eksport przekracza limit 50 000 firm. Zawęź zakres albo użyj dostępnych filtrów.",
+        limit: 50000,
+      });
+    }
     const workbook = new ExcelJS.Workbook();
     workbook.creator = "Goldis";
     workbook.created = new Date();
@@ -670,6 +731,21 @@ export class BusinessLeadService {
         contactStatus: row.contactStatus,
       });
     }
+    const scopeSheet = workbook.addWorksheet("Zakres");
+    scopeSheet.columns = [
+      { header: "Ustawienie", key: "label", width: 26 },
+      { header: "Wartość", key: "value", width: 64 },
+    ];
+    scopeSheet.getRow(1).font = { bold: true, color: { argb: "FFD9B65F" } };
+    scopeSheet.addRows([
+      { label: "Zakres firm", value: query.scope === "mine" ? "Moje firmy" : "Pula firm" },
+      { label: "Status kontaktu", value: query.contactStatus ?? "Wszystkie" },
+      { label: "Identyfikator wyników", value: query.resultSetId ?? "Wszystkie" },
+      { label: "Szukana fraza", value: query.search || "Brak" },
+      { label: "Zakres", value: "Wszystkie firmy pasujące do filtrów" },
+      { label: "Liczba firm", value: rows.length },
+      { label: "Wygenerowano", value: new Date().toISOString() },
+    ]);
     const date = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Warsaw" }).format(new Date());
     await recordAuditEvent({
       tenantId: actor.tenantId,
@@ -678,7 +754,14 @@ export class BusinessLeadService {
       resourceType: "artifact",
       resourceId: null,
       outcome: "succeeded",
-      metadata: { toolId, rows: rows.length, format: "xlsx" },
+      metadata: {
+        toolId,
+        rows: rows.length,
+        format: "xlsx",
+        scope: query.scope,
+        contactStatus: query.contactStatus,
+        resultSetId: query.resultSetId,
+      },
     });
     return {
       fileName: `wyniki-oc-${date}.xlsx`,
@@ -704,7 +787,7 @@ export class BusinessLeadService {
     ) {
       throw new ForbiddenException("Brak prawa do pobrania wyników OC");
     }
-    const lead = await BusinessLead.findOne({ where: { leadId, tenantId: actor.tenantId, toolId } });
+    const lead = await this.records.getLead({ where: { leadId, tenantId: actor.tenantId, toolId } });
     if (!lead || lead.assignedToUserId !== actor.userId)
       throw new NotFoundException("Nie znaleziono zachowanego wyniku");
     const resultSet = await ResultSet.findOne({ where: { resultSetId: lead.resultSetId, tenantId: actor.tenantId } });
@@ -920,7 +1003,7 @@ export class BusinessLeadService {
     const status = parseStatus(body.status);
     const now = new Date();
     return sequelize.transaction(async (transaction) => {
-      const lead = await BusinessLead.findOne({
+      const lead = await this.records.getLead({
         where: { leadId, tenantId: actor.tenantId, toolId },
         transaction,
         lock: transaction.LOCK.UPDATE,

@@ -4,6 +4,8 @@ import { test } from "node:test";
 import { AccountRecoveryModule } from "../account-recovery";
 import { AuditModule } from "../audit/public";
 import { AuthModule } from "../auth";
+import { CommissionsModule } from "../commissions/public";
+import { PrivilegedActionsModule } from "../privileged-actions/public";
 import { AdminModule } from "./admin.module";
 import { AdminOnlyGuard } from "./admin.support";
 import { AdminMutationsRepository } from "./admin-mutations.repository";
@@ -22,7 +24,13 @@ import { AdminUsersRepository } from "./admin-users.repository";
 import { AdminUsersService } from "./admin-users.service";
 
 test("AdminModule composes admin routes, authentication, account recovery, and audit", () => {
-  assert.deepEqual(Reflect.getMetadata("imports", AdminModule), [AuthModule, AccountRecoveryModule, AuditModule]);
+  assert.deepEqual(Reflect.getMetadata("imports", AdminModule), [
+    AuthModule,
+    AccountRecoveryModule,
+    AuditModule,
+    PrivilegedActionsModule,
+    CommissionsModule,
+  ]);
   assert.deepEqual(Reflect.getMetadata("controllers", AdminModule), [
     AdminOverviewController,
     AdminUsersController,

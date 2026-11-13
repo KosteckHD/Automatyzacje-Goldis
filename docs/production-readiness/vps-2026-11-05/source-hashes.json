@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-05",
+  "baseHead": "af512e9502218d336b4b73df0c5f612905c6ac7b",
+  "scope": "Selected files of dirty working tree, not a release identifier",
+  "files": {
+    "compose.yaml": "1f7e0637a6ad0beb9cf27cdc95c7b4dd86c242ecf03337fff0bce6ea398fa0d3",
+    "compose.production.yaml": "7cc696310300e32fc442026fb41fa0b523b9048ffbb6b47a5e0263acb2cc4bf9",
+    "deploy/backup/backup.sh": "459c847225ba13ec04430f615e8f0a68e4e7abc1293c4e9d071ecdda2e1f2b25",
+    "deploy/backup/restore.sh": "87d0f6c72d731683e60d144b0b2faf9c48f9b697c707e7eeb9851195f28c4aae",
+    "deploy/backup/manifest.cjs": "2486e9da15614d20a8f2951194b15ce052017659b199cc1ccbb558f7d1a631a4",
+    "apps/worker/src/infrastructure/browser/browser.ts": "b283417b3997e1ba355a8d015bc17463a684bc7df9ed855a57af41e5483ec9e3",
+    "apps/api/src/infrastructure/config/runtime-startup-config.ts": "80b5711a40ff43af68cb525638cec9f7d15b307276cf6f2cea21830cd3068e8e",
+    "apps/api/src/features/leads/business-leads.service.ts": "b6c0ccaa9449769e2d55c29cf6f25072780686ae577620d04311653a674f41a5"
+  }
+}

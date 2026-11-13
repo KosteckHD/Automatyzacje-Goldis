@@ -4,6 +4,7 @@
 !.env.example
 .npm-cache
 .docker-config
+.goldis-local-secrets
 worker-profiles
 playwright
 staging
@@ -16,3 +17,10 @@ node_modules
 docs/*.xlsx
 uploads
 exports
+
+# Exclude local diagnostic artifacts from runtime images.
+output
+.git-backups
+
+# Local UI preview server metadata includes a runtime token.
+apps/web/.impeccable/live/

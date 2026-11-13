@@ -1,0 +1,1 @@
+"""Bounded workbook input adapters."""

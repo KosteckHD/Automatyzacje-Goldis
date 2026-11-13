@@ -1,0 +1,15 @@
+{
+  "startedAt": "2026-11-06T12:15:37.220Z",
+  "scope": "Sequential local regression, synthetic data, no live portals or customer services. VPS acceptance remains separate.",
+  "results": [
+    {
+      "name": "npm-test",
+      "startedAt": "2026-11-06T12:15:37.221Z",
+      "endedAt": "2026-11-06T12:18:15.735Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "npm-test.log"
+    }
+  ]
+}

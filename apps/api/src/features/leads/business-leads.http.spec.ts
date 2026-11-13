@@ -10,6 +10,7 @@ const sessionSecret = "business-leads-synthetic-session-secret";
 const csrfToken = "business-leads-synthetic-csrf-token-123456789";
 const tenantId = "99999999-9999-4999-8999-999999999999";
 const resultSetId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+const leadId = "88888888-8888-4888-8888-888888888888";
 const identities = {
   admin: "11111111-1111-4111-8111-111111111111",
   manager: "22222222-2222-4222-8222-222222222222",
@@ -47,6 +48,7 @@ test("lead allocation summary is authenticated and limited to manager roles", as
   process.env.DATABASE_URL ??= "postgres://goldis:unused@127.0.0.1:5432/goldis";
   let app: Awaited<ReturnType<typeof NestFactory.create>> | undefined;
   const received: Array<{ userId: string; tenantId: string; role: string; resultSetId?: string }> = [];
+  const scopedCalls: Array<{ action: string; userId: string; query: Record<string, unknown> }> = [];
   try {
     const { BusinessLeadController } = await import("./business-leads.controller");
     const { BusinessLeadService } = await import("./business-leads.service");
@@ -56,6 +58,18 @@ test("lead allocation summary is authenticated and limited to manager roles", as
         if (actor.role !== "manager" && actor.role !== "admin") throw new ForbiddenException();
         received.push({ ...actor, resultSetId: scope });
         return { availableCount: 42, resultSetId: scope ?? null, checkedAt: "2026-10-12T08:00:00.000Z" };
+      },
+      async list(actor: { userId: string }, query: Record<string, unknown>) {
+        scopedCalls.push({ action: "list", userId: actor.userId, query: { ...query } });
+        return { items: [], nextCursor: null, previousCursor: null };
+      },
+      async exportWorkbook(actor: { userId: string }, query: Record<string, unknown>) {
+        scopedCalls.push({ action: "export", userId: actor.userId, query: { ...query } });
+        return { fileName: "wyniki-oc-2026-10-22.xlsx", buffer: Buffer.from("synthetic-xlsx") };
+      },
+      async navigation(actor: { userId: string }, id: string, query: Record<string, unknown>) {
+        scopedCalls.push({ action: "navigation", userId: actor.userId, query: { id, ...query } });
+        return { previousLeadId: null, nextLeadId: null, checkedAt: "2026-10-22T09:00:00.000Z" };
       },
     };
     @Module({
@@ -80,6 +94,7 @@ test("lead allocation summary is authenticated and limited to manager roles", as
     await app.listen(0, "127.0.0.1");
     const address = app.getHttpServer().address() as AddressInfo;
     const base = `http://127.0.0.1:${address.port}/api/leads/allocation-summary`;
+    const leadsBase = `http://127.0.0.1:${address.port}/api/leads`;
     const get = (role?: keyof typeof identities, scope?: string) => {
       const url = new URL(base);
       if (scope) url.searchParams.set("resultSetId", scope);
@@ -97,6 +112,47 @@ test("lead allocation summary is authenticated and limited to manager roles", as
     assert.deepEqual(received, [
       { userId: identities.manager, tenantId, role: "manager", resultSetId },
       { userId: identities.admin, tenantId, role: "admin", resultSetId: undefined },
+    ]);
+
+    const listResponse = await fetch(
+      `${leadsBase}?scope=mine&search=Transport&contactStatus=not_contacted&resultSetId=${resultSetId}&includeSummary=1`,
+      { headers: { cookie: cookie("manager") } },
+    );
+    assert.equal(listResponse.status, 200);
+    assert.deepEqual(await listResponse.json(), { items: [], nextCursor: null, previousCursor: null });
+    const exportResponse = await fetch(
+      `${leadsBase}/export?scope=mine&search=Transport&contactStatus=not_contacted&resultSetId=${resultSetId}`,
+      { headers: { cookie: cookie("manager") } },
+    );
+    assert.equal(exportResponse.status, 200);
+    assert.match(exportResponse.headers.get("content-disposition") ?? "", /wyniki-oc-2026-10-22\.xlsx/);
+    assert.equal(await exportResponse.text(), "synthetic-xlsx");
+    const navigationResponse = await fetch(
+      `${leadsBase}/${leadId}/navigation?scope=mine&search=Transport&contactStatus=not_contacted&resultSetId=${resultSetId}`,
+      { headers: { cookie: cookie("manager") } },
+    );
+    assert.equal(navigationResponse.status, 200);
+    assert.deepEqual(await navigationResponse.json(), {
+      previousLeadId: null,
+      nextLeadId: null,
+      checkedAt: "2026-10-22T09:00:00.000Z",
+    });
+    assert.deepEqual(scopedCalls, [
+      {
+        action: "list",
+        userId: identities.manager,
+        query: { scope: "mine", search: "Transport", contactStatus: "not_contacted", resultSetId, includeSummary: "1" },
+      },
+      {
+        action: "export",
+        userId: identities.manager,
+        query: { scope: "mine", search: "Transport", contactStatus: "not_contacted", resultSetId },
+      },
+      {
+        action: "navigation",
+        userId: identities.manager,
+        query: { id: leadId, scope: "mine", search: "Transport", contactStatus: "not_contacted", resultSetId },
+      },
     ]);
   } finally {
     if (app) {

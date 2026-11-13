@@ -1,9 +1,13 @@
 # Wykonanie przebudowy backendu — raport etapu
 
+> Aktualizacja planowania, 16.10.2026: bieżący punkt odniesienia to commit `af512e9502218d336b4b73df0c5f612905c6ac7b`; przed zapisaniem planu domknięcia drzewo robocze było czyste. Starsze wzmianki o niecommitowanych zmianach i HEAD `e3a507e` opisują wcześniejsze checkpointy. Ponowiony `npm test` PASS: core 18/18, API 369/369, worker 115 PASS / 70 SKIP; styl exit 0 z 47 ostrzeżeniami. DB/E2E/Compose i zdalnego CI w tym sprawdzeniu nie powtarzano. [Plan domknięcia](../PLAN_DOMKNIECIA_REFAKTORYZACJI_BACKENDU_2026-10-16.md) wskazuje pozostałe braki rozdzielenia persistence i kryteria formalnego odbioru. Poniżej zachowano wcześniejsze dowody i podsumowania; nie należy odczytywać ich jako jednolitego aktualnego checkpointu.
+
 Data aktualizacji: 16 października 2026  
 Status: przebudowa strukturalna P0–P14 oraz lokalne E2E UI→API i macierz wybranych ról P15 są wykonane i sprawdzone. Izolowany snapshot źródeł przeszedł `npm ci`, pełny build/test i runtime Compose. Formalny odbiór pozostaje otwarty dla porównania historycznego schematu i danych, potwierdzenia `current_user` działającego lokalnego API, zdalnego GitHub Actions, upgrade/rollback poprzedniej paczki oraz pełnej macierzy wszystkich akcji produktowych.  
 Gałąź: `codex/backend-feature-modules`  
 Punkt odniesienia HEAD: `e3a507ea8e534f06d698289bf1165f79691e5a6d`; zmiany są w working tree i nie zostały commitowane.
+
+> Uzupełnienie wykonania planu D0–D7: bieżący kod i wyniki kontroli po wydzieleniu repozytoriów Reports oraz odczytów Review są w [checkpointcie 2026-10-16](execution-checkpoint-2026-10-16.md). W tym przebiegu `test:module:reports` nie uruchomił DB smoke, bo lokalny Docker Engine był niedostępny. Starsze wyniki niżej opisują wcześniejsze przebiegi i nie zastępują tego ograniczenia.
 
 ## Najnowszy checkpoint — 16 października 2026
 

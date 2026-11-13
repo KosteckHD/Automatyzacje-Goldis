@@ -18,6 +18,7 @@ module.exports = async function verifyAdminUserCreation(seed) {
     const { AuditRepository } = require("../dist/features/audit/audit.repository");
     const { AuditService } = require("../dist/features/audit/audit.service");
     const { PrivilegedActionService } = require("../dist/features/privileged-actions/privileged-actions.service");
+    const { PrivilegedActionRepository } = require("../dist/features/privileged-actions/privileged-actions.repository");
     const audit = new AuditService(new AuditRepository());
 
     const now = new Date();
@@ -71,20 +72,20 @@ module.exports = async function verifyAdminUserCreation(seed) {
       csrf: "synthetic-admin-users-csrf-token-0123456789",
       version: 2,
     };
+    const privilegedActions = new PrivilegedActionRepository(models.sequelize);
     const confirmations = new PrivilegedActionService({
       async consumeReauthAttempt() { return { allowed: true, retryAfterSeconds: 0 }; },
       async clearReauth() {},
       async recordReauthFailure() {},
-    }, audit);
+    }, audit, privilegedActions);
     const confirm = async (action, targetId, payload, idempotencyKey) => confirmations.create(
       actor,
-      { ip: "127.0.0.1", socket: { remoteAddress: "127.0.0.1" } },
       { action, targetId, payload, currentPassword: password, idempotencyKey },
-      { setHeader() {} },
+      "127.0.0.1",
     );
     const repository = new AdminUsersRepository(models.sequelize);
     const mutations = new AdminMutationsService(new AdminMutationsRepository(models.sequelize));
-    const service = new AdminUsersService(repository, mutations, audit);
+    const service = new AdminUsersService(repository, mutations, audit, privilegedActions);
 
     const input = {
       username: `Synthetic.Admin.Created.${randomUUID().slice(0, 8)}`,
@@ -238,7 +239,7 @@ module.exports = async function verifyAdminUserCreation(seed) {
         throw new Error("SYNTHETIC_ADMIN_AUDIT_FAILURE");
       },
     });
-    const rollbackService = new AdminUsersService(repository, mutations, failingAudit);
+    const rollbackService = new AdminUsersService(repository, mutations, failingAudit, privilegedActions);
     await assert.rejects(rollbackService.createUser(actor, rollbackRequest), /SYNTHETIC_ADMIN_AUDIT_FAILURE/);
     assert.equal(await models.User.count({ where: { usernameNormalized: rollbackInput.username.toLowerCase() } }), 0,
       "audit failure rolls the user insert back");

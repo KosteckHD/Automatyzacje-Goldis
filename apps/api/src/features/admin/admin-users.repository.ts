@@ -105,6 +105,10 @@ export class AdminUsersRepository {
     await ToolGrant.destroy({ where: { tenantId, userId, toolId }, transaction });
   }
 
+  async deleteAllToolGrants(tenantId: string, userId: string, transaction: Transaction): Promise<number> {
+    return ToolGrant.destroy({ where: { tenantId, userId }, transaction });
+  }
+
   async findDeletionGrantForUpdate(
     tenantId: string,
     userId: string,

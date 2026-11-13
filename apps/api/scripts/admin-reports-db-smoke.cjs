@@ -140,7 +140,8 @@ async function seedOperationalRunPages(tenantId, actorId) {
 module.exports = async function verifyAdminReportTenantAggregation(seed) {
   const { AdminReportsController } = require("../dist/features/reports/admin-reports.controller");
   const { AdminReportsService } = require("../dist/features/reports/admin-reports.service");
-  const controller = new AdminReportsService();
+  const { AdminReportsRepository } = require("../dist/features/reports/admin-reports.repository");
+  const controller = new AdminReportsService(new AdminReportsRepository(sequelize));
   let stage = "seed_goldis";
   try {
   const goldis = await seedTenant(seed.goldisTenantId, seed.goldisActorId, seed.goldis, 1);
@@ -216,6 +217,8 @@ module.exports = async function verifyAdminReportTenantAggregation(seed) {
   const { Module } = require("@nestjs/common");
   const { AdminReportsController: ReportsHttpController } = require("../dist/features/reports/admin-reports.controller");
   const { AdminReportsService: ReportsHttpService } = require("../dist/features/reports/admin-reports.service");
+  const { AdminReportsRepository: ReportsHttpRepository } = require("../dist/features/reports/admin-reports.repository");
+  const { API_DATABASE } = require("../dist/infrastructure/database");
   const secret = `synthetic-reports-session-${randomUUID()}`;
   const previousSecret = process.env.SESSION_SECRET;
   process.env.SESSION_SECRET = secret;
@@ -238,6 +241,8 @@ module.exports = async function verifyAdminReportTenantAggregation(seed) {
     controllers: [ReportsHttpController],
     providers: [
       ReportsHttpService,
+      ReportsHttpRepository,
+      { provide: API_DATABASE, useValue: sequelize },
       SessionGuard, AdminOnlyGuard,
       { provide: APP_GUARD, useClass: RequestProtectionGuard },
       { provide: SESSION_ROLE_RESOLVER, useValue: resolveCurrentSessionRole },

@@ -74,12 +74,12 @@ export default function AccessWorkspace() {
       <div className="lead-content platform-content team-page">
         <div className="lead-page-heading"><div><h1>Dostępy do narzędzi</h1><p>Przydzielaj pracownikom prawo do uruchomienia automatyzacji.</p></div><a className="lead-secondary" href="/team">Zarządzaj pracownikami</a></div>
         {error && <p className="lead-feedback" role="alert">{error}</p>}{notice && <p className="team-notice" role="status">{notice}</p>}
-        <section className="lead-panel access-scope-note"><div><span className="access-note-label">WSPÓLNY ODCZYT</span><h2>Wyniki automatyzacji OC</h2><p>Aktywni pracownicy mogą przeglądać szczegółowe wyniki i pobierać pliki. To ustawienie jest niezależne od prawa uruchamiania automatyzacji.</p></div><span className="team-status active">Dostęp dla zespołu</span></section>
+        <section className="lead-panel access-scope-note"><div><span className="access-note-label">WSPÓLNY ODCZYT</span><h2>Wyniki automatyzacji OC</h2><p>Aktywni pracownicy mogą przeglądać szczegółowe wyniki OC. Pobieranie plików wymaga osobnego uprawnienia, niezależnego od prawa uruchamiania automatyzacji.</p></div><span className="team-status active">Dostęp dla zespołu</span></section>
         <section className="lead-panel team-list-panel">
           <div className="lead-section-heading"><div><h2>Uruchamianie automatyzacji OC</h2><p>Zmiany dostępu zapisują się od razu i są przypisane do konkretnego konta.</p></div></div>
           <div className="access-list">{loading ? <p className="team-empty">Pobieram uprawnienia…</p> : employees.filter((employee) => employee.status === "active").map((employee) => {
             const access = accessByUser[employee.userId];
-            return <article className="access-row" key={employee.userId}><div><strong>{employee.username}</strong><small>Pracownik · odczyt wyników i pobieranie pozostają włączone dla aktywnego konta</small></div>
+            return <article className="access-row" key={employee.userId}><div><strong>{employee.username}</strong><small>Pracownik · wspólny podgląd OC; pobieranie według osobnego uprawnienia</small></div>
               <label className="access-switch"><span>{access?.canExecute ? "Może uruchamiać" : "Bez prawa uruchamiania"}</span><input type="checkbox" checked={Boolean(access?.canExecute)} disabled={!access || busyUser === employee.userId} onChange={() => void changeAccess(employee)} /><span className="access-switch-track" aria-hidden="true" /></label>
             </article>;
           })}{!loading && employees.every((employee) => employee.status !== "active") && <p className="team-empty">Nie ma aktywnych kont pracowników.</p>}</div>

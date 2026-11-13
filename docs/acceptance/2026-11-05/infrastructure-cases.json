@@ -1,0 +1,401 @@
+[
+  {
+    "id": "INF01",
+    "category": "infrastructure",
+    "gate": "G0",
+    "phases": ["A", "B"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "Tożsamość release, pochodzenie obrazów i kompletna paczka recovery",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Związać protokół z zamrożonym SHA i manifestem zakresu; sprawdzić sześć referencji obrazów @sha256, konfigurację dwunastu usług i migrację 066. Commission-worker współdzieli obraz API, a Redis pochodzi z własnego obrazu z ACL.",
+      "Porównać manifest z runtime i zachowaną poza VPS paczką Compose, skryptów, grantów, seccomp, zatwierdzonych selektorów i konfiguracji słownika prowizyjnego; zapisać checksumy niesekretnych plików.",
+      "Ocenić raporty skanów dokładnych obrazów oraz zależności Node i Python, w tym requirements.lock; w fazie B potwierdzić wdrożenie tych samych zaakceptowanych digestów."
+    ],
+    "passCriteria": [
+      "SHA, digest API i cały zestaw sześciu obrazów są zgodne z jednym release; komplet paczki recovery jest dostępny niezależnie od VPS.",
+      "Zakres zawiera commission-engine, commission-worker i migrację 066; nie ma pominiętych wymaganych plików ani niezaakceptowanych krytycznych lub wysokich ryzyk skanowania.",
+      "Każdy wyjątek bezpieczeństwa ma ocenę wpływu, właściciela i decyzję; raporty i paczka nie ujawniają sekretów ani danych klientów."
+    ],
+    "evidence": ["Manifest release i zakresu oraz checksumy paczki recovery.", "Raporty skanowania powiązane z SHA i digestami, rejestr zaakceptowanych wyjątków.", "Bezpieczny odczyt identyfikatorów runtime faz A i B."],
+    "entryPoints": ["npm run release:manifest -- --env <plik-produkcji> --output <manifest-poza-repo>", "NOWA PROCEDURA — do przygotowania"],
+    "references": ["scripts/create-release-manifest.cjs", "compose.yaml", "compose.production.yaml", "services/commission-engine/requirements.lock", "apps/api/src/infrastructure/database/migrations/066-commission-comparison.ts", "docs/RELEASE_AND_ROLLBACK.md"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "INF02",
+    "category": "infrastructure",
+    "gate": "G5",
+    "phases": ["A", "B"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "Rozwiązanie konfiguracji i pierwszy start pełnego stosu Linux",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Na izolowanym Linuxie rozwiązać compose.yaml z compose.production.yaml, sprawdzić obsługę !reset i !override oraz pobranie sześciu rzeczywistych obrazów bez lokalnego builda.",
+      "Na pustych wolumenach odebrać kolejność PostgreSQL, db-roles, migrate z grantami, bootstrap-admin i usług runtime; odczytać kody zakończenia etapów administracyjnych i migration head.",
+      "Sprawdzić dziewięć usług długotrwałych, w tym commission-engine i commission-worker, oraz syntetyczny przebieg prowizyjny; portale i nieodebrane integracje pozostają wyłączone.",
+      "W fazie B powtórzyć walidację i kontrolowany pierwszy start pustej instalacji albo nieinwazyjnie potwierdzić już odebrany start; nie powtarzać inicjalizacji na aktywnych writerach."
+    ],
+    "passCriteria": [
+      "Efektywna konfiguracja obejmuje dwanaście usług, nie zawiera buildów produkcyjnych i wskazuje zaakceptowane digesty.",
+      "Trzy etapy administracyjne kończą się kodem 0, migration head odpowiada release i obejmuje 066, a dziewięć usług runtime osiąga oczekiwany stan.",
+      "Syntetyczna prowizja kończy się poprawnym utrwalonym wynikiem; sam health engine nie jest traktowany jako dowód działania workera."
+    ],
+    "evidence": ["Wersje OS, Engine i Compose oraz wynik validatora i config --quiet.", "Zanonimizowane ps -a, kody etapów i odczyt migration head.", "Identyfikator syntetycznego runu prowizyjnego i porównanie wyniku."],
+    "entryPoints": ["npm run validate:production-compose -- --env <plik-produkcji>", "npm run test:production-compose", "NOWA PROCEDURA — do przygotowania"],
+    "references": ["compose.yaml", "compose.production.yaml", "scripts/validate-production-compose.cjs", "scripts/test-production-compose.cjs", "apps/api/scripts/commission-db-smoke.cjs"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "INF03",
+    "category": "infrastructure",
+    "gate": "G5",
+    "phases": ["A", "B"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "Sekrety, prawa plików i minimalny dostęp procesów non-root",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Spisać mapę usługa, UID/GID i przypisane sekrety, w tym commission_db_password, database_url_commission, redis_commission_password, redis_url_commission, commission_engine_secret i artifact keyring.",
+      "Bez wypisywania wartości sprawdzić test -r pod rzeczywistym UID API, workerów oraz Python engine 10001:10001; osobno sprawdzić PostgreSQL i Redis. Usunąć albo uzasadnić zbędny mount commission_engine_secret w import-parser.",
+      "Wyłącznie w fazie A sprawdzić kontrolowaną odmowę przy brakującym wymaganym pliku i nieprawidłowych prawach; odebrać zgodność nazw portalowych sekretów z backupem i bezpieczne zakończenie bootstrapu.",
+      "W fazie B sprawdzić finalne prawa i zakres mountów bez usuwania sekretów działającej instalacji."
+    ],
+    "passCriteria": [
+      "Każdy runtime odczytuje wymagane sekrety jako właściwy non-root UID, bez globalnego obejścia prawami 0644 i bez zbędnych mountów.",
+      "Brak wymaganej konfiguracji powoduje odmowę zamiast fallbacku; instrukcja bootstrapu nie usuwa pliku nadal wymaganego przez Compose lub backup.",
+      "Wartości sekretów nie trafiają do dowodów, obrazów, Git, logów ani argumentów procesu; zachowane wersje kluczy pozwalają odczytać dane i kopie."
+    ],
+    "evidence": ["Macierz sekretów i UID/GID bez wartości, wyniki test -r i przegląd praw.", "Bezpieczne kody odmowy z fazy A i kontrola mountów fazy B.", "Protokół zakończenia bootstrapu i odczytu próbki szyfrowanych danych."],
+    "entryPoints": ["NOWA PROCEDURA — do przygotowania"],
+    "references": ["compose.yaml", "deploy/secrets/README.md", "deploy/docker/load-runtime-secrets.sh", "apps/api/Dockerfile", "apps/worker/Dockerfile", "services/commission-engine/Dockerfile", "services/commission-engine/src/goldis_commissions/transport/app.py"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "INF04",
+    "category": "infrastructure",
+    "gate": "G5",
+    "phases": ["A", "B"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "Rzeczywiste role PostgreSQL 17 i zakresy ACL Redis",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Potwierdzić current_user rzeczywistych procesów: goldis_api, goldis_worker, goldis_enrichment, goldis_commission oraz migrator goldis_migrator; odczytać granty i flagi ról bez URL z hasłami.",
+      "Na syntetycznej bazie fazy A wykonać pary dozwolonych i zabronionych operacji, w tym prowizyjne tabele, audyt i odmowę dostępu workerów do sesji użytkowników.",
+      "Sprawdzić wyłączonego użytkownika Redis default, rozdział kolejek OC i commission-comparison oraz odmowę ACL, CONFIG, SHUTDOWN, FLUSHALL i FLUSHDB.",
+      "W fazie B potwierdzić tożsamość i allowlisty oraz nieinwazyjny syntetyczny smoke na finalnej konfiguracji."
+    ],
+    "passCriteria": [
+      "Runtime nie ma superuser, CREATEDB, CREATEROLE ani BYPASSRLS i używa wyłącznie właściwych allowlist; migracje i granty wykonuje migrator.",
+      "Redis goldis_commission ma dostęp do wymaganej kolejki prowizyjnej, bez uprawnień do kolejki OC i poleceń administracyjnych; pozostałe konta zachowują uzasadniony zakres.",
+      "Dozwolone scenariusze działają, a zabronione operacje są rzeczywiście odrzucane; nie zastępuje ich przegląd samego pliku SQL."
+    ],
+    "evidence": ["Bezpieczny odczyt current_user, flag i katalogu grantów.", "Macierz allow/deny z kodami odmowy i wersjami PG17/Redis.", "Potwierdzenie zakresów ACL i działania obu kolejek bez ujawniania poświadczeń."],
+    "entryPoints": ["npm run test:module:runtime-roles", "apps/api/scripts/runtime-permissions-smoke.cjs", "apps/api/scripts/commission-db-smoke.cjs", "NOWA PROCEDURA — do przygotowania"],
+    "references": ["docker/postgres/ensure-runtime-roles.sh", "docker/postgres/apply-runtime-grants.sql", "docker/redis/start-with-acl.sh", "apps/api/src/commission-worker.ts", "scripts/test-module.cjs"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "INF05",
+    "category": "infrastructure",
+    "gate": "G5",
+    "phases": ["A", "B"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "Prywatne porty i izolacja sieci parsera oraz silnika prowizji",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Porównać efektywne publikacje portów z nasłuchami hosta i regułami firewall; sprawdzić z oddzielnej sieci IPv4 oraz IPv6, jeśli jest skonfigurowane.",
+      "Sprawdzić osiągalność parsera wyłącznie z API oraz goldis_commission_engine internal: engine dostępny tylko właściwym API i commission-worker, bez sieci frontend/data, DB/Redis i Internetu.",
+      "Sprawdzić odmowę wywołania prywatnej operacji engine bez tokena i z nieprawidłowym tokenem oraz brak publicznego dostępu do portu 8000.",
+      "Powtórzyć kontrolę granic na zakupionym VPS; wynik samego UFW nie zastępuje pomiaru zewnętrznego."
+    ],
+    "passCriteria": [
+      "Publiczne są wyłącznie uzgodnione 80/443 i ograniczony SSH; web ma loopback, a API, parser, engine, workery, DB i Redis nie mają publicznych portów.",
+      "Prywatne sieci ograniczają rzeczywiste połączenia zgodnie z macierzą; engine nie ma poświadczeń DB/Redis ani nieuzasadnionego egress.",
+      "Błędne lub brakujące uwierzytelnienie engine jest odrzucane bez wywołania obliczenia."
+    ],
+    "evidence": ["Mapa efektywnej konfiguracji sieci, bezpieczne ss i reguły firewall.", "Wyniki zewnętrznego skanu uzgodnionych portów IPv4/IPv6.", "Macierz połączeń między usługami oraz odmowy tokena engine."],
+    "entryPoints": ["npm run validate:production-compose -- --env <plik-produkcji>", "NOWA PROCEDURA — do przygotowania"],
+    "references": ["compose.yaml", "compose.production.yaml", "scripts/validate-production-compose.cjs", "services/commission-engine/src/goldis_commissions/transport/app.py", "apps/api/src/features/commissions/commission-engine-client.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "INF06",
+    "category": "infrastructure",
+    "gate": "G5",
+    "phases": ["A", "B"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "HTTPS, DNS, jeden origin i zaufana ścieżka proxy",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "W fazie A skonfigurować testową nazwę i zaufane lokalne CA; odebrać ścieżkę Nginx do Next i API pod jednym HTTPS originem, bez potrzeby zakupu produkcyjnej domeny.",
+      "Sprawdzić cookies, Origin, spoofing forwarding headers, nieznany Host, blokadę /api/internal/ i brak publicznych tras Python engine; wykonać syntetyczny upload/download OC i prowizji.",
+      "W fazie B sprawdzić rzeczywisty DNS, nazwę i łańcuch certyfikatu, HTTP do HTTPS, nginx -t, odnowienie ACME z reloadem oraz dostęp z zewnętrznej sieci."
+    ],
+    "passCriteria": [
+      "Ruch aplikacji przechodzi przez odebrany HTTPS origin, a zaufany adres Next 172.30.10.10 odpowiada finalnej konfiguracji API; klient nie może spoofować zaufanej tożsamości proxy.",
+      "Cookies i ochrona Origin działają przez proxy, wewnętrzne trasy nie są wystawione, a prywatne pliki OC i prowizji zachowują kontrolę dostępu.",
+      "W fazie B DNS i certyfikat są poprawne, a automatyczne odnowienie i reload zostały sprawdzone."
+    ],
+    "evidence": ["Wyniki HTTPS, cookies i nagłówków z usuniętymi wartościami wrażliwymi oraz wynik spoofingu.", "Checksum Nginx i wynik nginx -t; faza B: DNS i wynik próby odnowienia.", "Bezpieczny protokół upload/download i odmów tras wewnętrznych."],
+    "entryPoints": ["scripts/runtime-check.cjs", "NOWA PROCEDURA — do przygotowania"],
+    "references": ["deploy/nginx/goldis.conf.example", "apps/web/next.config.ts", "apps/web/proxy.ts", "apps/api/src/infrastructure/config/runtime-startup-config.ts", "apps/api/src/features/commissions/commissions.controller.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "INF07",
+    "category": "infrastructure",
+    "gate": "G5",
+    "phases": ["A", "B"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "Sandbox Chromium, blokady profilu i bezpieczny shutdown workerów",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Sprawdzić Chromium sandbox pod rzeczywistym kernelem, seccomp i UID workera bez --no-sandbox oraz prawa trwałego profilu i stagingu.",
+      "Wyłącznie w fazie A odebrać odmowę drugiego portal-workera na tym samym profilu/globalnym locku, SIGTERM, SIGKILL i restart hosta na syntetycznych fixture.",
+      "Oddzielnie odebrać drain i restart commission-workera przy dłuższym obliczeniu; sprawdzić zgodność limitu stopu z rzeczywistym zakończeniem pracy i odzyskaniem dispatchu.",
+      "W fazie B wykonać host smoke sandboxu i kontrolę konfiguracji shutdown/locków; nie zabijać aktywnych zadań produkcyjnych w ramach odbioru."
+    ],
+    "passCriteria": [
+      "Chromium działa jako non-root z aktywnym sandboxem, a równoległa instancja nie wykonuje pracy na tym samym profilu.",
+      "Po przerwaniu istnieje odebrana procedura bezpiecznego odzyskania osieroconej blokady bez bezwarunkowego kasowania pliku; checkpointy i profil nie są tracone.",
+      "Shutdown obu workerów nie tworzy pozornego sukcesu, podwójnego efektu ani uszkodzonego snapshotu; niepewne skutki portalowe pozostają do rozstrzygnięcia."
+    ],
+    "evidence": ["Wersje kernela i obrazu, sandbox smoke oraz prawa profilu.", "Oś czasu sygnałów, stanu blokad/checkpointów i zakończeń obu workerów.", "Porównanie syntetycznych skutków oraz procedura odzyskania osieroconej blokady."],
+    "entryPoints": ["node scripts/chromium-sandbox-smoke.cjs", "NOWA PROCEDURA — do przygotowania"],
+    "references": ["deploy/docker/chromium-seccomp.json", "apps/worker/src/infrastructure/browser/browser.ts", "apps/worker/src/application/worker-shutdown.ts", "apps/api/src/commission-worker.ts", "services/commission-engine/src/goldis_commissions/transport/process_supervisor.py", "compose.yaml"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "INF08",
+    "category": "infrastructure",
+    "gate": "G5",
+    "phases": ["A", "B"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "Readiness i odzyskiwanie po awarii zależności całego release",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "W fazie A kontrolowanie wyłączyć DB, Redis i parser na syntetycznej instalacji; porównać health, odpowiedzi biznesowe i trwały stan zadań przed awarią oraz po powrocie.",
+      "Sprawdzić utratę heartbeat portal-workera na podstawie JSON, również gdy HTTP /automation pozostaje 200.",
+      "Przerwać engine i commission-worker; odebrać timeout, anulowanie i retry prowizji, odtworzenie outboxu i wynik zapisany z właściwym tokenem próby.",
+      "W fazie B wykonać wyłącznie nieinwazyjną kontrolę health i syntetyczny smoke; nie przeprowadzać awarii DB ani przerwań aktywnych zadań klienta."
+    ],
+    "passCriteria": [
+      "Awaria zależności powoduje właściwy brak gotowości lub kontrolowany błąd modułu; nie jest uznawana za sukces na podstawie samego HTTP 200.",
+      "Powrót usług nie gubi trwałych zadań i nie wymaga ręcznego ustawiania completed ani czyszczenia checkpointów.",
+      "Prowizje zachowują spójność run, dispatch i snapshot; retry lub anulowanie nie publikuje wyniku z nieaktualnej próby ani pozornego sukcesu."
+    ],
+    "evidence": ["Oś czasu awarii i powrotu oraz bezpieczne health JSON/kody błędów.", "Porównanie syntetycznych stanów DB/outbox i końcowych wyników obu kolejek.", "Identyfikatory runów, dispatchów i prób bez treści dokumentów."],
+    "entryPoints": ["scripts/runtime-check.cjs", "apps/api/scripts/commission-db-smoke.cjs", "NOWA PROCEDURA — do przygotowania"],
+    "references": ["apps/api/src/features/health/health.controller.ts", "apps/api/src/features/health/health-readiness.ts", "apps/api/src/commission-worker.ts", "apps/api/src/features/commissions/commission-engine-client.ts", "services/commission-engine/src/goldis_commissions/transport/process_supervisor.py", "docs/OPERATIONS_AND_INCIDENTS.md"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "DR01",
+    "category": "recovery",
+    "gate": "G5",
+    "phases": ["A", "B"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "Spójny backup wszystkich modułów i powrót usług po maintenance",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Na fazie A wstrzymać nowe przyjęcia i odebrać drain zgodny z kontraktem backupu; uwzględnić API, portal, enrichment, commission-worker i commission-engine.",
+      "Wykonać zaszyfrowaną kopię oraz osobny journal, sprawdzić zakres DB 066, eksporty, commission-files, staging, keyringi, sekrety i env; zmierzyć czas przerwy oraz zapas dysku.",
+      "W fazie A sprawdzić także kontrolowany błąd backupu i wznowienie wyłącznie wcześniej działających usług, z readiness i poprawnym stanem zadań.",
+      "W fazie B odebrać harmonogram i pierwszą kopię w uzgodnionym oknie; nie wykonywać sztucznego uszkodzenia produkcji."
+    ],
+    "passCriteria": [
+      "Powstają dwie zweryfikowane wymagane części, spójne z jednym release i danymi OC oraz prowizji; brak pominiętych kluczy i plików.",
+      "Po sukcesie i błędzie fazy A powracają tylko wcześniej działające usługi, API jest ready, a nowa praca pozostaje zablokowana do bezpiecznego otwarcia.",
+      "Przerwa i zużycie miejsca są zmierzone i zgodne z uzgodnionym oknem; dokumentacja nie przedstawia zatrzymującego skryptu jako backupu online."
+    ],
+    "evidence": ["Kody wyjścia, manifest kopii i head journala bez sekretów.", "Oś czasu stop/start i potwierdzenie readiness oraz stanów runów.", "Rozmiary plików, zapas dysku i protokół odebranego okna kopii."],
+    "entryPoints": ["bash deploy/backup/backup.sh", "bash deploy/backup/verify.sh <archiwum>", "bash deploy/backup/verify.sh --journal <journal>"],
+    "references": ["deploy/backup/backup.sh", "deploy/backup/verify.sh", "deploy/backup/manifest.cjs", "deploy/backup/README.md", "apps/api/src/features/commissions/commission-file-store.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "DR02",
+    "category": "recovery",
+    "gate": "G5",
+    "phases": ["A"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "Integralność kopii i odmowa przy uszkodzeniu lub niebezpiecznym archiwum",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Na kopiach syntetycznych danych potwierdzić pozytywny verify archiwum platformy i zgodnego journala.",
+      "Oddzielnie przygotować złe hasło, zmieniony bajt, ucięte archiwum, zmieniony plik oraz stary lub nieciągły journal.",
+      "Sprawdzić odmowę niebezpiecznych ścieżek i linków w archiwum oraz brak uruchomienia odtworzonej aplikacji lub nadpisania instalacji źródłowej po odmowie."
+    ],
+    "passCriteria": [
+      "Poprawny komplet przechodzi verify, a każdy negatywny wariant jest jednoznacznie odrzucany.",
+      "Odmowa następuje przed otwarciem danych przez aplikację; źródłowe wolumeny i pliki pozostają niezmienione.",
+      "Komunikaty i dowody nie ujawniają hasła, sekretów ani jawnej zawartości archiwum."
+    ],
+    "evidence": ["Macierz wariant wejścia, oczekiwany wynik i rzeczywisty kod odmowy.", "Wyniki verify poprawnych części i kontrola niezmienionego źródła.", "Bezpieczny log odmów przed startem odtworzonej aplikacji."],
+    "entryPoints": ["npm run test:backup-crypto", "npm run test:backup-manifest", "bash deploy/backup/verify.sh <archiwum>", "NOWA PROCEDURA — do przygotowania"],
+    "references": ["scripts/goldis-backup-crypto.cjs", "deploy/backup/manifest.cjs", "deploy/backup/verify.sh", "deploy/backup/restore.sh"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "DR03",
+    "category": "recovery",
+    "gate": "G5",
+    "phases": ["A", "B"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "Komplet offsite, RPO 24 h i brak automatycznego TTL historii kopii",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "W fazie A odebrać upload obu części kopii do odseparowanego magazynu, pobranie niezależnym dostępem recovery oraz verify; sprawdzić alarm przy kontrolowanej odmowie uploadu.",
+      "Sprawdzić konfigurację skryptów, harmonogramów i magazynu: brak automatycznych lifecycle expiration, TTL, purge i usuwania poprzednich kopii po sukcesie nowej.",
+      "W fazie B potwierdzić najnowszy kompletny punkt offsite, osobny wskaźnik aktualności journala, dostęp zastępcy oraz escrow passphrase poza VPS; kontrolować wzrost storage."
+    ],
+    "passCriteria": [
+      "Ostatni kompletny zweryfikowany punkt danych biznesowych poza VPS ma wiek nie większy niż 24 h; lokalny sukces nie maskuje nieudanego offsite.",
+      "Historia kopii nie jest automatycznie kasowana; każde usunięcie wymaga osobnej jawnej ręcznej decyzji i protokołu.",
+      "Utrata VPS nie odbiera dostępu do archiwów, paczki release i klucza recovery, a błąd uploadu wywołuje odebrany alarm."
+    ],
+    "evidence": ["Wiek i identyfikatory kompletnego punktu, wynik pobrania oraz verify obu części.", "Przegląd konfiguracji no-TTL/no-purge i rejestr dostępów recovery bez sekretów.", "Odebrany alarm błędu uploadu i potwierdzenie dostępu zastępcy."],
+    "entryPoints": ["bash deploy/backup/verify.sh <archiwum>", "bash deploy/backup/verify.sh --journal <journal>", "NOWA PROCEDURA — do przygotowania"],
+    "references": ["deploy/backup/README.md", "deploy/backup/backup.sh", "deploy/backup/verify.sh", "docs/PLAN_PELNEGO_ODBIORU_PLATFORMY_2026-11-05.md"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "DR04",
+    "category": "recovery",
+    "gate": "G5",
+    "phases": ["A"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "Cold restore pełnego release, ownership i RTO 8 h na nowym Linuxie",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Rozpocząć pomiar scenariusza utraty hosta na izolowanej instalacji A; pobrać komplet offsite, najnowszy journal, klucze i paczkę tego samego release z sześcioma digestami. Nie odtwarzać na produkcji.",
+      "Użyć nowego projektu i pustych wolumenów, jawnego potwierdzenia RESTORE_TO_NEW_ISOLATED_PROJECT, poprawnej nowej nazwy goldis-restore-<suffix>, root i wolnego loopback 18000–65535; uniknąć kolizji subnet/IP/trust-proxy.",
+      "Odtworzyć DB i właściwy ownership przed migracjami: po pg_restore --no-owner nie zakładać praw migratora. Sprawdzić SequelizeMeta, migracje/granty obejmujące 066 i goldis_commission, właścicieli plików oraz czytelność sekretów przez non-root.",
+      "Odtworzyć eksporty, commission-files, staging i klucze, replay journala oraz unieważnienie recovery; uruchomić panel w kwarantannie i porównać dane OC/prowizji, pozostawiając workery wyłączone do osobnej decyzji."
+    ],
+    "passCriteria": [
+      "Panel z kontrolnymi danymi i plikami OC oraz prowizji jest poprawnie odtworzony w czasie nie większym niż 8 h od początku scenariusza; wznowienie portali/MFA ma osobny czas.",
+      "Ownership, role, sieci, klucze i pliki są poprawne, migrator rzeczywiście odczytuje SequelizeMeta i może wykonać wymagane zmiany schematu.",
+      "Restore nie nadpisuje źródłowego projektu, nie uruchamia niezaakceptowanej pracy i zachowuje bezpieczną kwarantannę; w fazie B nie powtarza się destrukcyjnego restore na produkcji."
+    ],
+    "evidence": ["Oś czasu od początku scenariusza do działającego panelu i zmierzone RTO/RPO.", "Protokół źródła paczki, obrazów, ownership, grantów i nowych zasobów kwarantanny.", "Porównanie liczników, syntetycznych wyników i plików OC/prowizji oraz potwierdzenie wyłączonych workerów."],
+    "entryPoints": ["bash deploy/backup/restore.sh <archiwum>", "NOWA PROCEDURA — do przygotowania"],
+    "references": ["deploy/backup/restore.sh", "deploy/backup/README.md", "docker/postgres/ensure-runtime-roles.sh", "docker/postgres/apply-runtime-grants.sql", "compose.yaml", "compose.production.yaml"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "DR05",
+    "category": "recovery",
+    "gate": "G5",
+    "phases": ["A"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "Kasowanie po backupie, nowszy journal i jawne granice retencji danych",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Wykonać kopię syntetycznego zbioru, następnie zatwierdzone kasowanie zasobów OC i danych prowizyjnych objętych zakresem; zapisać head journala oraz właściwy dla modułu mechanizm trwałego usunięcia.",
+      "Odtworzyć wcześniejszą kopię wyłącznie w kwarantannie A z nowszym kompletem informacji o usunięciach i sprawdzić UI, API oraz download skasowanych zasobów.",
+      "Sprawdzić ciągłość/HMAC i okno asynchronicznego offsite journala, odmowę otwarcia danych przy niepewności oraz jawną procedurę operatora dla danych bez automatycznego TTL."
+    ],
+    "passCriteria": [
+      "Żaden zasób objęty zatwierdzonym kasowaniem nie wraca do dostępnego panelu ani pobierania; brak pokrycia modułu prowizji mechanizmem replay jest wykazanym brakiem, a nie PASS.",
+      "Nowszy journal lub właściwa trwała ewidencja usunięć ma zweryfikowaną ciągłość; niepewny stan blokuje otwarcie odtworzonych danych.",
+      "Brak automatycznego TTL aplikacji jest jawny, a ewentualne ręczne usuwanie ma zakres, właściciela i protokół; kopie nie są automatycznie kasowane."
+    ],
+    "evidence": ["Identyfikatory syntetycznych zasobów i head przed/po kasowaniu.", "Porównanie dostępu i odmów po restore oraz potwierdzenie mechanizmu dla każdego modułu.", "Procedura operatora i dowód odmowy przy nieaktualnej lub niepewnej ewidencji usunięć."],
+    "entryPoints": ["bash deploy/backup/verify.sh --journal <journal>", "apps/api/scripts/apply-deletion-journal.cjs", "NOWA PROCEDURA — do przygotowania"],
+    "references": ["deploy/backup/manifest.cjs", "deploy/backup/restore.sh", "apps/api/src/features/deletions/deletion-journal.ts", "apps/api/src/features/commissions/commissions.repository.ts", "apps/api/src/features/commissions/commission-file-store.ts"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "DR06",
+    "category": "recovery",
+    "gate": "G5",
+    "phases": ["A"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P0",
+    "title": "Bezpieczna kwarantanna, outbox i droga powrotu po awarii release",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "Na odtworzonej kwarantannie A potwierdzić wyłączenie portal-, enrichment- i commission-workera oraz zakres efektów procesów uruchamianych w API; ograniczyć egress do jawnie dopuszczonych testów.",
+      "Sprawdzić unieważnienie reset tokenów i oczekujących maili recovery; odebrać kontrolowane odtworzenie kolejek OC i prowizji z DB/outbox oraz retry i tokeny prób bez pozornego sukcesu.",
+      "Dla pierwszego release odebrać powrót do jego kopii po syntetycznej awarii; przy późniejszych aktualizacjach dodatkowo sprawdzać kompatybilność wcześniejszych obrazów ze zmienionym schematem, zamiast zakładać automatyczne cofanie migracji."
+    ],
+    "passCriteria": [
+      "Kwarantanna nie wykonuje niezaakceptowanych operacji zewnętrznych; stare linki i maile recovery nie wracają do użycia.",
+      "Trwałe dispatch/outbox i checkpointy obu narzędzi pozwalają na kontrolowane wznowienie bez podwójnego skutku ani wyniku ze starej próby.",
+      "Droga powrotu została wykonana bez ręcznego completed, usuwania checkpointów/journala lub down -v; pierwszy release nie wymaga nieistniejącej wcześniejszej wersji."
+    ],
+    "evidence": ["Stan tokenów, maili, workerów i egress kwarantanny bez danych wrażliwych.", "Macierz stanów outbox/run/dispatch i wynik kontrolowanego retry OC/prowizji.", "Protokół wykonanej drogi powrotu i jawne ograniczenia zgodności schematu."],
+    "entryPoints": ["apps/api/scripts/purge-account-recovery.cjs", "bash deploy/backup/restore.sh <archiwum>", "NOWA PROCEDURA — do przygotowania"],
+    "references": ["deploy/backup/restore.sh", "apps/api/src/commission-worker.ts", "apps/api/src/features/runs/run-dispatch.service.ts", "apps/api/src/features/account-recovery/auth-mail-dispatcher.ts", "docs/RELEASE_AND_ROLLBACK.md"],
+    "status": "NOT_RUN",
+    "executions": []
+  },
+  {
+    "id": "OPS01",
+    "category": "operations",
+    "gate": "G5",
+    "phases": ["A", "B"],
+    "applicability": "common",
+    "owner": "operator",
+    "priority": "P1",
+    "title": "Monitoring całego release, alarmy operatora i kontrola zasobów bez auto-TTL",
+    "prerequisites": ["REL01", "REL02"],
+    "steps": [
+      "W fazie A odebrać alarmy utraty hosta, API readiness, parsera i heartbeat portalu oraz postępu commission-workera, wieku obu kolejek/outboxów, błędów i timeoutów engine i zawieszonych procesów potomnych.",
+      "Sprawdzić offsite i journal freshness, disk/inodes, tmpfs, OOM, restarty, ważność TLS oraz limity logów; historia kopii nie ma automatycznego TTL/purge, a wzrost magazynu wywołuje ostrzeżenie.",
+      "Na syntetycznej instalacji zmierzyć pracę 2–5 operatorów równolegle z importem, portalowym fixture i prowizją; uwzględnić aktualną sumę limitów kontenerów około 10,5 GiB zamiast starszej topologii.",
+      "W fazie B odebrać rzeczywistą dostawę kontrolowanego alarmu operatorowi i zastępcy oraz nieinwazyjny smoke finalnego hosta; nie wywoływać destrukcyjnych awarii produkcji."
+    ],
+    "passCriteria": [
+      "Monitor spoza VPS wykrywa utratę hosta, kontrole procesów nie opierają się wyłącznie na HTTP 200, a operator i zastępca faktycznie otrzymują i potwierdzają alarm.",
+      "Przy uzgodnionym obciążeniu 2–5 osób nie ma OOM, niekontrolowanych restartów ani niewyjaśnionego narastania kolejek; pomiary i progi są zapisane.",
+      "Logi są ograniczone i nie ujawniają danych/sekretów/tokenów; wzrost kopii jest monitorowany bez automatycznego kasowania historii, a instrukcja eskalacji i odpowiedzialności jest dostępna."
+    ],
+    "evidence": ["Protokół dostawy i potwierdzenia alarmów z czasami oraz konfiguracją progów.", "Raport obciążenia CPU/RAM/dysk/tmpfs, kolejek i postępu engine/workera prowizji.", "Bezpieczny przegląd logów, konfiguracja ich limitów oraz potwierdzenie no-TTL kopii i runbook operatora."],
+    "entryPoints": ["scripts/runtime-check.cjs", "NOWA PROCEDURA — do przygotowania"],
+    "references": ["scripts/runtime-check.cjs", "compose.yaml", "compose.production.yaml", "apps/api/src/commission-worker.ts", "services/commission-engine/src/goldis_commissions/transport/process_supervisor.py", "docs/OPERATIONS_AND_INCIDENTS.md"],
+    "status": "NOT_RUN",
+    "executions": []
+  }
+]

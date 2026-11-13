@@ -5,7 +5,7 @@
   "selectors": {
     "searchInput": "input[placeholder^=\"PESEL/REGON\"], input[name$=\"-smartsearch\"]",
     "resultRows": "table.gw-ListViewWidget--table tr:has(td.gw-CellWidget)",
-    "noResults": "text=\"Brak wyników wyszukiwania\"",
+    "noResults": "text=/^Brak wyników wyszukiwania(?:\\s*:|$)/",
     "fields": {
       "accountType": "td[id$=\"-AccountType_Cell\"]",
       "personName": "td[id$=\"-Name_Cell\"]",

@@ -281,7 +281,7 @@ export class EntityGroupingService {
   }
 
   private async linkMethod(
-    row: SourceRow,
+    row: Pick<SourceRow, "id">,
     nipNormalized: string | null,
     regon: string | null,
     transaction: Transaction,
@@ -297,7 +297,7 @@ export class EntityGroupingService {
   }
 
   async matchMethodForReview(
-    row: SourceRow,
+    row: Pick<SourceRow, "id">,
     nipNormalized: string | null,
     regon: string | null,
     transaction: Transaction,

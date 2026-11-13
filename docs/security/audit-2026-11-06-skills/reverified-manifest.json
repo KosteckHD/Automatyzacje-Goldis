@@ -1,0 +1,86 @@
+{
+  "recordedAt": "2026-11-06T17:08:53.178372+00:00",
+  "baseCommit": "af512e9502218d336b4b73df0c5f612905c6ac7b",
+  "workingTreeDirty": true,
+  "applicationSourceModifiedByThisAudit": false,
+  "scope": "Source review and bounded synthetic tests; no customer database, live portals or production pentest",
+  "tests": {
+    "authUniquePassed": 63,
+    "backupPassed": 8,
+    "pythonUnitPassed": 11,
+    "sandboxHttpFailuresRetested": 4,
+    "httpRetestPassedIncludingDuplicates": 7
+  },
+  "skillHashes": [
+    {
+      "name": "performing-web-application-penetration-test",
+      "sha256": "0c1f45f85bdd2ce34bfa2a476cbda205fa2746e41bf50acce9a06d9543ceed99",
+      "matchesPreviouslyInstalled": true
+    },
+    {
+      "name": "conducting-api-security-testing",
+      "sha256": "d7c01bde62507b200c57a34b0d4ba04a520b1a6c0cd02ac2ac1b08fe2852c3ef",
+      "matchesPreviouslyInstalled": true
+    },
+    {
+      "name": "detecting-broken-object-property-level-authorization",
+      "sha256": "b188612767ec2e5316250117dd47d329f793cd4fca107ecbdb48fd46779d8e22",
+      "matchesPreviouslyInstalled": true
+    },
+    {
+      "name": "performing-web-application-vulnerability-triage",
+      "sha256": "3801fe80bd342c0c01b33ffd518b7914cc08afe0089f7020002342c57faea769",
+      "matchesPreviouslyInstalled": true
+    }
+  ],
+  "sourceSha256": {
+    "apps/api/src/features/commissions/commissions.controller.ts": "e9faaabc27ed20fafeca675c47dfe498d3c5ffe2539f44ec3d57d470b1ce329d",
+    "apps/api/src/features/commissions/commissions.service.ts": "3179b18780f31c57e6c34f6908f65e6ee327588b136dde18912bac17a35cdcda",
+    "apps/api/src/features/commissions/commissions.repository.ts": "030573f2d7750887ee532dad265c7bf8cbf0ad9fb6dbdca547669d47e4fb8504",
+    "apps/api/src/features/commissions/commissions.model.ts": "3a0aa46c1b1d98f6dc4195e676916e0378ea7847c87b6a454bb98e4814533710",
+    "apps/api/src/features/commissions/commission-engine-client.ts": "29b327a4be194a3a7be516a351e9098221b9b92537628d9b7675d751d217cfd1",
+    "apps/api/src/features/commissions/commission-file-store.ts": "163d9ff42b0873b5c01f3187b1a35859dcf9efe1c09b9583521947101443a6d6",
+    "apps/api/src/commission-worker.ts": "c956d593fc0daa0b77c36a1c0928d3c48a493d891794ee9632178aeda1d6b792",
+    "apps/api/src/features/imports/import-parser-client.ts": "799cc432d4fe6f4189986c91296b34e5fa4789477e00fdf6d0978a00995cb751",
+    "apps/api/src/infrastructure/http/http-bootstrap.ts": "61ad1f68dc0415007080f87fd7427dcc16c2de935d2d63cc211c5b35923f617b",
+    "services/commission-engine/src/goldis_commissions/transport/app.py": "0d9b43b840dbdf69ae2ac46a60c0ff5ae2f6d5c9a88130bde701906e88e730e5",
+    "services/commission-engine/src/goldis_commissions/transport/process_supervisor.py": "1cb50920bc995967561c4d6b2534ae0c1bc088656eba2760443479ac95f4eaab",
+    "apps/api/dist/features/commissions/commissions.service.js": "d8e0e1ea2c0b6aa979c9eaec064c89decb0c63d23405da86ba209ba29493c1a6",
+    "services/commission-engine/src/goldis_commissions/client_dictionary.py": "b74ae464f747dfe48d6c771db6b149dbb9a4b65ea66847399ad20cae4edc0456",
+    "services/commission-engine/src/goldis_commissions/importers/workbook.py": "4164ad5d1f292dfbc448348621f43cc18850170853c507f81d2eb9e3d5e4e971",
+    "services/commission-engine/pyproject.toml": "80e6e32e0d2d6689d2f101e99f97e68bf0f5bc6621701c1207686c8d0fdd42a8",
+    "services/commission-engine/requirements.lock": "9bb786ed9c190a750b2c68d296e8bc4b0b87178850c5209247d6ae12e5573d6d",
+    "package-lock.json": "4c1ab3513f26e57b5a43ea7c663b6f7829ca3efcba9f146db3b23912dfc4e11e",
+    "apps/api/src/features/leads/business-leads.service.ts": "84bb7889233ff725ffa23b1720c36427238046bd322eaad79dfc811dc98ef4c9",
+    "apps/api/src/features/authorization/tool-access.ts": "4b1715083362dc939ff8fe708a0f6b906f2849f6cfe5f24ba05bae3b59d508d8",
+    "apps/api/src/features/authorization/authorization-policy.ts": "41dea8e00f4739a06601830456c3faf53ebb95863a303de83639d0eeab8ff8b3",
+    "apps/web/proxy.ts": "98a64288a287c9e70a9283fb6dc15861def0f274fbd1cbe69fd44b51273d9e3c"
+  },
+  "evidenceSha256": {
+    "docs/security/audit-2026-11-06-skills/audit-python-lock-osv.cjs": "8147200a2ce4e1c9490d004c8fc22feadc67dc9de0a175ab7dcad08a6419210d",
+    "docs/security/audit-2026-11-06-skills/auditor-leads-reproduction.json": "661563972d168c6b8b7a380db39bd0159b18cebb8a0d3f8f417cfef53088963c",
+    "docs/security/audit-2026-11-06-skills/auth-api-review.md": "8b131799bda4a35b5d17840d69d0445ac0c790122045bd28d9b8e12a706b6c7c",
+    "docs/security/audit-2026-11-06-skills/auth-reverified.log": "f27c8f7139182723dada5239cbb10468235038d74798445518f92539a6b4ac2e",
+    "docs/security/audit-2026-11-06-skills/backup-reverified.log": "e5e0dc087a427a918566eb359077e098292488084158b83499fb3693c99d105d",
+    "docs/security/audit-2026-11-06-skills/findings.json": "6ee567c2567cb96c5380947967af373f728a98c184b0d96d6c42e0f6069b12ff",
+    "docs/security/audit-2026-11-06-skills/http-reverified.log": "2701f2cf5a17ed4c3fa2903df3c1079d92e4ec86c9d5aa9e1afa9bd0f992b329",
+    "docs/security/audit-2026-11-06-skills/manifest.json": "44de2098adcf65aab119555fd49ee9ef7971982f7c2040bca788849202038f62",
+    "docs/security/audit-2026-11-06-skills/npm-audit-production-current.json": "201ffbafbadb6affaa1be219dffe8db02d7e82d21f650036b7d2e9c09474fee7",
+    "docs/security/audit-2026-11-06-skills/npm-audit-production-reverified.json": "201ffbafbadb6affaa1be219dffe8db02d7e82d21f650036b7d2e9c09474fee7",
+    "docs/security/audit-2026-11-06-skills/python-lock-osv-current.json": "cbff4db37f2d8fc59873d612f3c9c41068975a3ea768e4609b8c370ed55734ca",
+    "docs/security/audit-2026-11-06-skills/python-merge-evidence.json": "1bfced7afe27308cfab9b6c108240abb10faa912c674d143e87cd1548f83199c",
+    "docs/security/audit-2026-11-06-skills/python-merge-reverified.json": "1bfced7afe27308cfab9b6c108240abb10faa912c674d143e87cd1548f83199c",
+    "docs/security/audit-2026-11-06-skills/python-unit-reverified.log": "41dc88d1707c1beadd3d73ad839d86e4c60b32e7468f42cff0dde39ab28c8fb1",
+    "docs/security/audit-2026-11-06-skills/README.md": "6b2f2701dbf9bdcfe2c5bac68be32e44ce29e4dc01887234426137af859f246c",
+    "docs/security/audit-2026-11-06-skills/reproduce-auditor-leads.cjs": "f5269510d73b4089bcdddeafea2f61e6990e91397df4c666c21e30cf48472963",
+    "docs/security/audit-2026-11-06-skills/reproduce-commission-findings.cjs": "06a26c82fabd38a6512a35e35bd3d4b9ff016cde15a833373a7022d99a33cf16",
+    "docs/security/audit-2026-11-06-skills/reproduce-python-merge-preflight.py": "1957bf3c7e7610ed3ecd5ad30f10ce2168b18175ae3bbcc013c40f6503380032",
+    "docs/security/audit-2026-11-06-skills/reproduce-worker-state-findings.cjs": "8cfca66291dd3d10aa018ab9c172a133eae7371499ce9064711691c90072961f",
+    "docs/security/audit-2026-11-06-skills/route-review.csv": "d2226a0489e7e841e32d400ef914ed79ca1c4e9e07b45021dbe34c317e035700",
+    "docs/security/audit-2026-11-06-skills/service-reproductions.json": "2ca7ea3610c424f0bc8af2ce75afbf75b209b14b1e89d903e622ebd9ba8dcb51",
+    "docs/security/audit-2026-11-06-skills/worker-deploy-review.md": "ae9f4910aed20f62a73ab5a76681c3d254a38de77bdb15ded87a79a5d60f525c",
+    "docs/security/audit-2026-11-06-skills/worker-state-reproductions.json": "3b46c1f688c9999cc3b4c1406707e90b74f32fbae5846e13ffeea16d85dff134",
+    "docs/security/AUDYT_BEZPIECZENSTWA_2026-11-06.md": "3238d2717ac87725d4c4e07184bcf73f93f26990191582dc79aaaf89fe590ca1",
+    "docs/security/PLAN_NAPRAW_BEZPIECZENSTWA_2026-11-06.md": "08f9899b9b5e7d46eda2d39960ce5d547c7b77547353869db775694b1d0dfd60"
+  }
+}

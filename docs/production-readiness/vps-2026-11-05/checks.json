@@ -1,0 +1,80 @@
+{
+  "date": "2026-11-05",
+  "node": "v24.11.1",
+  "scope": "Local Windows build and default tests; live and provider environment removed; no DB/Redis/live acceptance",
+  "results": [
+    {
+      "command": "npm run build",
+      "startedAt": "2026-11-05T11:54:17.220Z",
+      "endedAt": "2026-11-05T11:55:17.199Z",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "command": "npm test",
+      "startedAt": "2026-11-05T11:55:17.203Z",
+      "endedAt": "2026-11-05T11:55:24.610Z",
+      "exitCode": 1,
+      "error": null
+    },
+    {
+      "command": "node scripts/run-node-tests.cjs packages/core/dist",
+      "startedAt": "2026-11-05T11:56:21.688Z",
+      "endedAt": "2026-11-05T11:56:21.979Z",
+      "exitCode": 0,
+      "error": null,
+      "summary": [
+        "ℹ tests 20",
+        "ℹ pass 20",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "NODE_TEST_DISCOVERY_PASS kind=all count=4 root=packages/core/dist"
+      ]
+    },
+    {
+      "command": "node scripts/run-node-tests.cjs apps/api/dist",
+      "startedAt": "2026-11-05T11:56:21.980Z",
+      "endedAt": "2026-11-05T12:13:38.148Z",
+      "status": "INCOMPLETE",
+      "exitCode": null,
+      "note": "Interrupted after approximately 16 minutes without completion; no PASS/FAIL assigned; captured child output unavailable after interruption. Worker was not reached by this runner."
+    },
+    {
+      "command": "node scripts/test-production-compose.cjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "provenance": "Executed by infra_readiness reviewer during this audit; synthetic fixtures, no service start."
+    },
+    {
+      "command": "node --test scripts/goldis-backup-crypto.test.cjs deploy/backup/manifest.test.cjs scripts/runtime-check.test.cjs scripts/create-release-manifest.test.cjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "tests": 10,
+      "pass": 10,
+      "fail": 0,
+      "skipped": 0,
+      "provenance": "Executed by infra_readiness reviewer during this audit."
+    },
+    {
+      "command": "docker version",
+      "status": "BLOCKED_RUNTIME",
+      "note": "Docker CLI 29.2.0 available; Linux Engine pipe dockerDesktopLinuxEngine unavailable. No production containers started."
+    },
+    {
+      "command": "node --test --test-timeout=45000 <discovered apps/worker/dist spec files>",
+      "startedAt": "2026-11-05T12:13:38.251Z",
+      "endedAt": "2026-11-05T12:13:42.223Z",
+      "status": "FAIL",
+      "exitCode": 1,
+      "error": null,
+      "summary": [
+        "ℹ tests 209",
+        "ℹ pass 118",
+        "ℹ fail 6",
+        "ℹ cancelled 0",
+        "ℹ skipped 85"
+      ]
+    }
+  ]
+}

@@ -98,7 +98,7 @@ function fixtureRows(rows: readonly EverestCandidate[]): Array<Record<string, st
   }));
 }
 
-test("a company-only source obtains the person's name from a verified business lookup instead of splitting the company name", {
+test("a unique PESEL without a contact defers names to the Communication form without looking up another portal", {
   skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
 }, async () => {
   const directory = await mkdtemp(join(tmpdir(), "goldis-everest-business-name-"));
@@ -111,16 +111,18 @@ test("a company-only source obtains the person's name from a verified business l
     await page.locator("#fixture").textContent();
     await page.evaluate(rows => { document.querySelector("#fixture")!.textContent = JSON.stringify(rows); },
       fixtureRows([candidate("person", { personName: companyName }), candidate("sole_proprietor", { personName: companyName })]));
-    let resolutions = 0;
     const provider = new EverestIdentityProvider(browser, new PzuEverestSession(browser, sessionOptions), {
       selectors: resultSelectors, adapterVersion: "business-name-fixture-v1",
-      resolvePersonName: async (input, pesel) => { resolutions++; assert.equal(input.source.companyName, companyName); assert.equal(pesel, "90010100016"); return "Ala Testowa"; },
     });
     const input = context(null);
     const result = await provider.findIdentity({ ...input, source: { ...input.source, companyName } });
     assert.equal(result.kind, "matched");
-    if (result.kind === "matched") assert.deepEqual([result.identity.firstName, result.identity.lastName, result.identity.matchMethod], ["Ala", "Testowa", "unique_business_identity"]);
-    assert.equal(resolutions, 1);
+    if (result.kind === "matched") {
+      assert.equal(result.identity.matchMethod, "regon_unique_pesel");
+      assert.equal(result.identity.firstName, ""); assert.equal(result.identity.lastName, "");
+      assert.equal(result.identity.pesel, "90010100016");
+    }
+    assert.deepEqual((await browser.open()).pages().map(p => p.url()).filter(url => url !== "about:blank"), [entryUrl], "identity lookup stays in Everest");
   } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
 });
 
@@ -128,6 +130,53 @@ test("Everest adapter wymaga selektorów jawnych i bezpiecznej wersji", () => {
   assert.throws(() => new EverestIdentityProvider({} as BrowserSession, {} as PzuEverestSession, {
     selectors: resultSelectors, adapterVersion: "version with spaces",
   }), /EVEREST_ADAPTER_CONFIG_INVALID/);
+});
+
+test("Firma uses the exact returned REGON and name ordering does not create a false ambiguity", {
+  skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
+}, async () => {
+  const directory = await mkdtemp(join(tmpdir(), "goldis-everest-company-"));
+  const browser = new BrowserSession({ profileDirectory: directory });
+  try {
+    const page = await browser.page("pzu");
+    await page.route("https://goldis.test/**", route => route.fulfill({ contentType: "text/html; charset=utf-8", body: fixtureHtml() }));
+    await page.goto(entryUrl);
+    const provider = new EverestIdentityProvider(browser, new PzuEverestSession(browser, sessionOptions), { selectors: resultSelectors, adapterVersion: "company-fixture-v3" });
+    const setRows = (rows: Array<Record<string, unknown>>) => page.evaluate(data => { document.querySelector("#fixture")!.textContent = JSON.stringify(data); }, rows);
+    await setRows([{ kindLabel: "Firma", personName: "Fikcyjna Firma Testowa", pesel: "012345678" }]);
+    const company = await provider.findIdentity(context("Other Contact"));
+    assert.equal(company.kind, "matched");
+    if (company.kind === "matched") { assert.equal(company.identity.matchMethod, "regon_company"); assert.equal(company.identity.pesel, ""); assert.equal(company.identity.regon, "012345678"); }
+    await setRows([{ kindLabel: "Firma", personName: "Fikcyjna Firma Testowa", pesel: "987654321" }]);
+    assert.equal((await provider.findIdentity(context("Ala Testowa"))).kind, "identity_review");
+    await setRows([
+      { kindLabel: "Osoba fizyczna", personName: "Fikcyjna Firma Testowa Ala Testowa", pesel: "90010100016" },
+      { kindLabel: "Osoba fizyczna prowadząca działalność gospodarczą", personName: "Fikcyjna Firma Testowa Ala Testowa", pesel: "90010100016" },
+    ]);
+    const person = await provider.findIdentity(context("Testowa Ala"));
+    assert.equal(person.kind, "matched");
+    if (person.kind === "matched") assert.equal(person.identity.matchMethod, "regon_unique_pesel");
+    const strict = context("Testowa Ala");
+    await setRows([{ kindLabel: "Osoba fizyczna", personName: "Jan Inny Fikcyjna Firma Testowa", pesel: "90010100016" }]);
+    assert.equal((await provider.findIdentity({ ...strict, source: { ...strict.source, expectedPersonName: "Ala Testowa" } })).kind, "identity_review");
+  } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
+});
+
+test("the observed no-result marker accepts the searched identifier suffix and a following successful search", {
+  skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
+}, async () => {
+  const directory = await mkdtemp(join(tmpdir(), "goldis-everest-not-found-"));
+  const browser = new BrowserSession({ profileDirectory: directory });
+  try {
+    const page = await browser.page("pzu");
+    const html = fixtureHtml().replace('Brak wynikow</div>', 'Brak wyników wyszukiwania: 012345678</div>');
+    await page.route("https://goldis.test/**", route => route.fulfill({ contentType: "text/html; charset=utf-8", body: html }));
+    await page.goto(entryUrl);
+    const provider = new EverestIdentityProvider(browser, new PzuEverestSession(browser, sessionOptions), { selectors: { ...resultSelectors, noResults: 'text=/^Brak wyników wyszukiwania(?:\\s*:|$)/' }, adapterVersion: "no-results-fixture-v3" });
+    assert.deepEqual(await provider.findIdentity(context(null)), { kind: "not_found" });
+    await page.evaluate(rows => { document.querySelector("#fixture")!.textContent = JSON.stringify(rows); }, fixtureRows([candidate("person")]));
+    assert.equal((await provider.findIdentity(context("Ala Testowa"))).kind, "matched");
+  } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
 });
 
 test("Everest never chooses the first of ambiguous navigation buttons or search inputs", {
@@ -249,9 +298,7 @@ test("Everest pobiera PESEL z wiersza osoby fizycznej po wyszukaniu REGON", {
 
     assert.deepEqual(await runScenario([]), { kind: "not_found" });
     assert.equal((await runScenario([candidate("person")])).kind, "matched", "kolejne wyszukiwanie wraca z ekranu bez wyników");
-    assert.deepEqual(await runScenario([candidate("person"), candidate("person", { pesel: "90010100016" })]), {
-      kind: "ambiguous", candidateCount: 2,
-    });
+    assert.equal((await runScenario([candidate("person"), candidate("person", { pesel: "90010100016" })])).kind, "matched", "duplicate accounts with one PESEL are one identity");
     const disambiguated = await runScenario([candidate("person"), candidate("person", { personName: "Jan Testowy", pesel: "90010100016" })]);
     assert.equal(disambiguated.kind, "matched", "oczekiwana osoba rozstrzyga listę kilku osób");
     if (disambiguated.kind === "matched") assert.equal(disambiguated.identity.pesel, "90010100016");
@@ -289,9 +336,7 @@ test("Everest pobiera PESEL z wiersza osoby fizycznej po wyszukaniu REGON", {
     assert.deepEqual(await runScenario([candidate("unknown"), candidate("unknown", { personName: "Inna firma" })]), {
       kind: "identity_review", reason: "unsupported_entity_type", candidateCount: 2,
     });
-    assert.deepEqual(await runScenario([candidate("sole_proprietor")]), {
-      kind: "identity_review", reason: "missing_expected_person", candidateCount: 1,
-    });
+    assert.equal((await runScenario([candidate("sole_proprietor")])).kind, "matched");
 
     const syntheticPesel = "98765432109";
     const capturedLogs: string[] = [];

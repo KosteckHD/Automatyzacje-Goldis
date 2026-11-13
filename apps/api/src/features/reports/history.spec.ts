@@ -3,11 +3,12 @@ import { test } from "node:test";
 
 async function historyHarness() {
   process.env.DATABASE_URL ??= "postgres://goldis:unused@127.0.0.1:5432/goldis";
-  const [{ sequelize }, { HistoryService }] = await Promise.all([
+  const [{ sequelize }, { HistoryService }, { HistoryRepository }] = await Promise.all([
     import("../../infrastructure/database/db"),
     import("./history.service"),
+    import("./history.repository"),
   ]);
-  return { sequelize, HistoryService };
+  return { sequelize, HistoryService, HistoryRepository };
 }
 
 const tenantId = "99999999-9999-4999-8999-999999999999";
@@ -17,7 +18,7 @@ const secondId = "33333333-3333-4333-8333-333333333333";
 const actor = { tenantId, userId: ownerId, role: "operator" as const };
 
 test("lista importów stosuje scope w SQL, liczy przegląd z danych bieżących i nie zwraca danych wrażliwych", async () => {
-  const { sequelize, HistoryService } = await historyHarness();
+  const { sequelize, HistoryService, HistoryRepository } = await historyHarness();
   const originalQuery = sequelize.query.bind(sequelize);
   let capturedSql = "";
   let capturedReplacements: Record<string, unknown> = {};
@@ -37,11 +38,13 @@ test("lista importów stosuje scope w SQL, liczy przegląd z danych bieżących 
     ];
   };
   try {
-    const service = new HistoryService();
+    const service = new HistoryService(new HistoryRepository(sequelize));
     const page = await service.imports(actor, { dataState: "needs_review", limit: "20" });
     assert.match(capturedSql, /b\.tenant_id = :tenantId/);
     assert.match(capturedSql, /b\.owner_user_id = :userId/);
     assert.match(capturedSql, /tg\.can_view_results = TRUE/);
+    assert.match(capturedSql, /b\.owner_user_id = :userId[\s\S]*tg\.can_view_results = TRUE/);
+    assert.match(capturedSql, /oc-policy-verification[\s\S]*OR \(b\.owner_user_id = :userId/);
     assert.doesNotMatch(capturedSql, /tg\.can_download_results = TRUE/);
     assert.ok(capturedSql.indexOf("WHERE b.tenant_id") < capturedSql.indexOf("ORDER BY created_at DESC"));
     assert.equal(capturedReplacements.tenantId, tenantId);
@@ -72,7 +75,7 @@ test("lista importów stosuje scope w SQL, liczy przegląd z danych bieżących 
 });
 
 test("historia wyników zwraca jawny zerowy wynik, counts i kursor stabilny po created_at/id", async () => {
-  const { sequelize, HistoryService } = await historyHarness();
+  const { sequelize, HistoryService, HistoryRepository } = await historyHarness();
   const originalQuery = sequelize.query.bind(sequelize);
   const calls: Array<{ sql: string; replacements: Record<string, unknown> }> = [];
   (sequelize as unknown as { query: (...args: unknown[]) => Promise<unknown> }).query = async (sql, options) => {
@@ -126,7 +129,7 @@ test("historia wyników zwraca jawny zerowy wynik, counts i kursor stabilny po c
     ];
   };
   try {
-    const service = new HistoryService();
+    const service = new HistoryService(new HistoryRepository(sequelize));
     const firstPage = await service.results(actor, { limit: "1" });
     assert.equal(firstPage.items.length, 1);
     assert.deepEqual(firstPage.items[0].policyCounts, { totalOcCount: 4, currentOcCount: 0 });
@@ -136,12 +139,18 @@ test("historia wyników zwraca jawny zerowy wynik, counts i kursor stabilny po c
     assert.ok(firstPage.nextCursor);
     assert.match(calls[0].sql, /r\.status IN \('completed', 'no_matching_policies'\)/);
     assert.match(calls[0].sql, /ORDER BY r\.created_at DESC, r\.id DESC/);
+    assert.match(calls[0].sql, /rt\.tenant_id = b\.tenant_id/);
+    assert.match(calls[0].sql, /JOIN import_batches b ON b\.id = r\.batch_id\b/);
+    assert.doesNotMatch(calls[0].sql, /r\.tenant_id/);
     assert.doesNotMatch(calls[0].sql, /pesel|source_rows|oc_policies\.insured_name/i);
 
     await service.results(actor, { limit: "1", cursor: firstPage.nextCursor! });
     assert.equal(calls[1].replacements.cursorId, firstId);
     assert.equal(calls[1].replacements.cursorCreatedAt, "2026-10-05T12:00:00.000Z");
-    assert.match(calls[0].sql, /resource_tombstones rt WHERE rt\.resource_type = 'artifact'/);
+    assert.match(
+      calls[0].sql,
+      /resource_tombstones rt WHERE rt\.resource_type = 'artifact' AND rt\.tenant_id = b\.tenant_id/,
+    );
     const artifactPage = await service.results(actor, { limit: "1", cursor: firstPage.nextCursor! });
     assert.equal(artifactPage.items[0].artifactId, "77777777-7777-4777-8777-777777777777");
     await assert.rejects(

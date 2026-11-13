@@ -1,0 +1,24 @@
+{
+  "startedAt": "2026-11-06T12:02:27.980Z",
+  "scope": "Disposable native PG18 security tests and local portal fixtures. No live portals. Does not replace Linux PG17/Redis restore acceptance.",
+  "results": [
+    {
+      "name": "native-security-db",
+      "startedAt": "2026-11-06T12:02:27.982Z",
+      "endedAt": "2026-11-06T12:03:42.719Z",
+      "status": "FAIL",
+      "exitCode": 1,
+      "error": null,
+      "evidence": "native-security-db.log"
+    },
+    {
+      "name": "native-commission-db",
+      "startedAt": "2026-11-06T12:03:42.723Z",
+      "endedAt": "2026-11-06T12:04:12.269Z",
+      "status": "FAIL",
+      "exitCode": 1,
+      "error": null,
+      "evidence": "native-commission-db.log"
+    }
+  ]
+}

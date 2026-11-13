@@ -1,0 +1,41 @@
+{
+  "findingId": "CYB-007",
+  "status": "behavior_reproduced_policy_conflict_requires_resolution",
+  "execution": "compiled_service_with_in_memory_database_adapters",
+  "runtime": "v24.11.1",
+  "observedAt": "2026-11-06T17:03:27.116Z",
+  "auditorWithoutGrant": "403",
+  "auditorWithViewGrant": {
+    "items": 1,
+    "syntheticContactReturned": true
+  },
+  "corePolicyAllowsBatchRead": false,
+  "scopedQueryCount": 1,
+  "limitations": [
+    "No real HTTP session or PostgreSQL",
+    "Role-change retention inferred from source, not executed",
+    "Whether auditor grants are intended to override the role requires policy resolution"
+  ],
+  "sources": [
+    {
+      "file": "apps/api/src/features/leads/business-leads.service.ts",
+      "sha256": "84bb7889233ff725ffa23b1720c36427238046bd322eaad79dfc811dc98ef4c9"
+    },
+    {
+      "file": "apps/api/src/features/authorization/tool-access.ts",
+      "sha256": "4b1715083362dc939ff8fe708a0f6b906f2849f6cfe5f24ba05bae3b59d508d8"
+    },
+    {
+      "file": "apps/api/src/features/authorization/authorization-policy.ts",
+      "sha256": "41dea8e00f4739a06601830456c3faf53ebb95863a303de83639d0eeab8ff8b3"
+    },
+    {
+      "file": "apps/api/src/features/admin/admin-users.service.ts",
+      "sha256": "6e5fd52df2ba86eaebcd47c7948b6ae6b79dc035285149ba696e97c6efe76e24"
+    },
+    {
+      "file": "docs/INSTRUKCJA_ADMINA.md",
+      "sha256": "21afe31e8f65db567b1a7ef71100e22a1d4a59c290692b9ad3c611f1ef46a997"
+    }
+  ]
+}

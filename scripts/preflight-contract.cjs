@@ -37,12 +37,17 @@ function inspectRuntimeEnvironment(env) {
     if (!/^postgres(?:ql)?:\/\//i.test(value)) return false;
     try { return new URL(value).username === "goldis_enrichment"; } catch { return false; }
   });
+  required("COMMISSION_DATABASE_URL", (value) => {
+    if (!/^postgres(?:ql)?:\/\//i.test(value)) return false;
+    try { return new URL(value).username === "goldis_commission"; } catch { return false; }
+  });
   if (env.DATABASE_URL && /^postgres(?:ql)?:\/\//i.test(env.DATABASE_URL)) {
     try { if (new URL(env.DATABASE_URL).username !== "goldis_api") errors.push("DATABASE_URL_ROLE"); }
     catch { /* The URL validator reports malformed input. */ }
   }
   const redisApiPassword = required("REDIS_API_PASSWORD", (value) => /^[A-Fa-f0-9]{64,128}$/.test(value));
   const redisWorkerPassword = required("REDIS_WORKER_PASSWORD", (value) => /^[A-Fa-f0-9]{64,128}$/.test(value));
+  const redisCommissionPassword = required("REDIS_COMMISSION_PASSWORD", (value) => /^[A-Fa-f0-9]{64,128}$/.test(value));
   required("REDIS_URL", (value) => {
     if (!/^rediss?:\/\//i.test(value)) return false;
     try {
@@ -56,6 +61,14 @@ function inspectRuntimeEnvironment(env) {
     try {
       const redis = new URL(value);
       return redis.username === "goldis_worker" && redis.password === redisWorkerPassword && redis.pathname === "/0"
+        && !redis.search && !redis.hash;
+    } catch { return false; }
+  });
+  required("COMMISSION_REDIS_URL", (value) => {
+    if (!/^rediss?:\/\//i.test(value)) return false;
+    try {
+      const redis = new URL(value);
+      return redis.username === "goldis_commission" && redis.password === redisCommissionPassword && redis.pathname === "/0"
         && !redis.search && !redis.hash;
     } catch { return false; }
   });
@@ -81,6 +94,16 @@ function inspectRuntimeEnvironment(env) {
     if (Buffer.byteLength(env.IMPORT_PARSER_SHARED_SECRET || "") < 32) errors.push("IMPORT_PARSER_SHARED_SECRET");
   }
   if (isProduction && env.IMPORT_PARSER_URL !== "http://import-parser:3010") errors.push("IMPORT_PARSER_URL");
+  if (env.COMMISSION_ENGINE_URL || isProduction) {
+    try {
+      const engineUrl = new URL(env.COMMISSION_ENGINE_URL || "");
+      if (!(engineUrl.protocol === "http:" || engineUrl.protocol === "https:") || engineUrl.username || engineUrl.password
+        || engineUrl.search || engineUrl.hash || engineUrl.pathname !== "/") throw new Error();
+    } catch { errors.push("COMMISSION_ENGINE_URL"); }
+    if (!absolutePath(env.COMMISSION_ENGINE_TOKEN_FILE)) errors.push("COMMISSION_ENGINE_TOKEN_FILE");
+    if (!absolutePath(env.COMMISSION_INTERNAL_TOKEN_FILE)) errors.push("COMMISSION_INTERNAL_TOKEN_FILE");
+  }
+  if (isProduction && env.COMMISSION_ENGINE_URL !== "http://commission-engine:8000") errors.push("COMMISSION_ENGINE_URL");
   const port = Number(env.WORKER_INTERNAL_PORT || "3022");
   if (!Number.isInteger(port) || port < 1 || port > 65535) errors.push("WORKER_INTERNAL_PORT");
   if (!new Set(["127.0.0.1", "localhost", "::1", "0.0.0.0"]).has(env.WORKER_INTERNAL_HOST || "127.0.0.1")) errors.push("WORKER_INTERNAL_HOST");

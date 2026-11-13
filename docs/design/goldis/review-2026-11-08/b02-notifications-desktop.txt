@@ -1,0 +1,4 @@
+- link "Przejdź do głównej treści":
+  - /url: "#main-content"
+- status: Sprawdzam sesję…
+- alert

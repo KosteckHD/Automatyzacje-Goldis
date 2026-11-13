@@ -1,0 +1,73 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+Przegląd
+Moje firmy
+Pula firm
+Automatyzacje
+Przebiegi
+Historia importów
+Powiadomienia
+2
+
+ORGANIZACJA
+
+Pracownicy
+Dostępy
+Raporty
+Weryfikacja danych
+Dziennik aktywności
+Moje konto
+Zwiń menu
+Menedżer
+GOLDIS / ZADANIA
+ewa.zielinska · Menedżer
+Moje konto ↗
+
+PLATFORMA / OC
+
+Przebiegi
+
+Śledź wykonanie zadań dla dozwolonych importów.
+
+Narzędzie
+Wszystkie z dostępem
+Weryfikacja polis OC
+Status
+Wszystkie
+W kolejce
+Sprawdzanie danych
+Oczekuje na adapter portali
+Logowanie w Everest
+Oczekuje na SMS
+Wyszukiwanie w Everest
+Weryfikacja tożsamości
+Logowanie do Compensy
+Formularz Compensy
+Wymaga uzupełnienia
+Weryfikacja UFG
+Odczyt polis OC
+Przygotowanie wyniku
+Brak aktualnych polis OC
+Zakończono
+Anulowano
+Błąd
+Od dnia (Warszawa)
+Do dnia (Warszawa)
+Zastosuj filtry
+
+Daty filtrowane według strefy Europe/Warsaw. Czasy zdarzeń wyświetlamy w tej samej strefie.
+
+Wiersz 14
+Zakończono
+
+Import 44444444-4444-4444-8444-444444444444 · data sprawdzenia 2026-10-10
+
+10 paź 2026, 16:10
+Otwórz zadanie
+Poprzednia strona
+Strona 1
+Następna strona

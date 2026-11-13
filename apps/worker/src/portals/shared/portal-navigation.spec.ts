@@ -47,15 +47,29 @@ for (const scenario of ["foreign_origin", "unrelated_path", "popup"] as const) {
       await browser.assertNavigationAllowed("pzu", true);
       const target = scenario === "unrelated_path" ? "https://goldis.test/billing" : "https://evil.test/wrong";
       if (scenario === "popup") {
-        const originalPageCount = (await browser.open()).pages().length;
-        await page.evaluate(url => window.open(url, "_blank"), target);
-        await page.waitForTimeout(200);
-        assert.equal((await browser.open()).pages().length, originalPageCount, "the unrequested window is closed");
+        await page.setContent(`<button id="open" type="button">Otwórz pomoc</button>
+          <script>document.querySelector('#open').addEventListener('click', () => {
+            window.popupAttempts = (window.popupAttempts || 0) + 1;
+            window.open(${JSON.stringify(target)}, '_blank');
+          });</script>`);
+        const popupPromise = page.waitForEvent("popup", { timeout: 5_000 });
+        await page.click("#open");
+        const popup = await popupPromise;
+        assert.equal(await page.evaluate(() => (window as Window & { popupAttempts?: number }).popupAttempts), 1,
+          "a trusted click reached the popup fixture handler");
+        if (!popup.isClosed()) await popup.waitForEvent("close", { timeout: 5_000 });
+        assert.equal(popup.isClosed(), true, "the created popup is closed");
       } else {
         await assert.rejects(page.goto(target), /BLOCKED_BY_CLIENT|ERR_FAILED|blocked/i);
       }
       assert.equal(requested.includes(target), false);
-      await assert.rejects(browser.assertNavigationAllowed("pzu"), /PORTAL_NAVIGATION_BLOCKED/);
+      let nextPortalActionCount = 0;
+      const nextPortalAction = async () => {
+        await browser.assertNavigationAllowed("pzu");
+        nextPortalActionCount += 1;
+      };
+      await assert.rejects(nextPortalAction(), /PORTAL_NAVIGATION_BLOCKED/);
+      assert.equal(nextPortalActionCount, 0, "a fenced portal action does not type, send SMS, save or continue to UFG");
       const other = await browser.page("compensa");
       await other.goto(compensa.entryUrl);
       await browser.assertNavigationAllowed("compensa", true);

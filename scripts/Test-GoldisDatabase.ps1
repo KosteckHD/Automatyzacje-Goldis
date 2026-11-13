@@ -1,11 +1,21 @@
-param([switch]$Automation, [switch]$PlatformOnly, [ValidateSet('migrations','migrations-upgrade','password-recovery','tenant-scope','teams-db','admin-users-db','grouping','registry-jobs','reports','deletion','backup-restore','security-db','run-control','runtime-roles','app-module')][string]$Module)
+param(
+    [switch]$Automation,
+    [switch]$PlatformOnly,
+    [switch]$NativePostgres,
+    [ValidateSet('migrations','migrations-upgrade','password-recovery','tenant-scope','teams-db','admin-users-db','grouping','registry-jobs','reports','deletion','backup-restore','security-db','run-control','runtime-roles','app-module','commission')][string]$Module
+)
 $ErrorActionPreference = 'Stop'
 if ($Module -and ($Automation -or $PlatformOnly)) { throw 'MODULE_TEST_CANNOT_ENABLE_AUTOMATION' }
+if ($NativePostgres -and $Module -in @('backup-restore', 'app-module')) { throw 'NATIVE_POSTGRES_MODE_REQUIRES_DOCKER_REDIS_OR_BACKUP' }
 $testId = [Guid]::NewGuid().ToString('N')
 $testContainer = "goldis-db-smoke-$testId"
 $testPassword = [Guid]::NewGuid().ToString('N')
 $previousAdminUrl = $env:GOLDIS_TEST_DATABASE_ADMIN_URL
 $created = $false
+$nativePostgresRoot = $null
+$nativePostgresData = $null
+$nativePostgresStarted = $false
+$nativePostgresBin = $null
 $redisCreated = $false
 $testRedis = "goldis-automation-redis-$testId"
 $previousRedisUrl = $env:REDIS_URL
@@ -41,23 +51,47 @@ try {
         node node_modules/typescript/bin/tsc -p $compileProject
         if ($LASTEXITCODE -ne 0) { throw 'TEST_BUILD_FAILED' }
     }
-    docker run --detach --name $testContainer --label "goldis.test.owner=$testId" -e "POSTGRES_PASSWORD=$testPassword" -p '127.0.0.1::5432' postgres:17-alpine | Out-Null
-    if ($LASTEXITCODE -ne 0) { throw 'TEST_POSTGRES_START_FAILED' }
-    $created = $true
-    $env:GOLDIS_TEST_POSTGRES_CONTAINER = $testContainer
-    $env:GOLDIS_TEST_POSTGRES_OWNER = $testId
-    $ready = $false
-    for ($attempt = 0; $attempt -lt 40; $attempt++) {
-        docker exec $testContainer pg_isready -U postgres -d postgres *> $null
-        if ($LASTEXITCODE -eq 0) { $ready = $true; break }
-        Start-Sleep -Milliseconds 500
+    if ($NativePostgres) {
+        $nativePostgresBin = if ($env:GOLDIS_TEST_POSTGRES_BIN) { $env:GOLDIS_TEST_POSTGRES_BIN } else { 'C:\Program Files\PostgreSQL\18\bin' }
+        if (-not (Test-Path -LiteralPath (Join-Path $nativePostgresBin 'initdb.exe')) -or -not (Test-Path -LiteralPath (Join-Path $nativePostgresBin 'pg_ctl.exe'))) {
+            throw 'NATIVE_POSTGRES_BINARIES_NOT_FOUND'
+        }
+        $nativePostgresRoot = Join-Path $env:TEMP "goldis-db-smoke-native-$testId"
+        $nativePostgresData = Join-Path $nativePostgresRoot 'data'
+        $nativePostgresLog = Join-Path $nativePostgresRoot 'postgres.log'
+        New-Item -ItemType Directory -Path $nativePostgresRoot | Out-Null
+        & (Join-Path $nativePostgresBin 'initdb.exe') -D $nativePostgresData -U postgres --locale=C --encoding=UTF8 --auth-local=trust --auth-host=trust --no-sync | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw 'NATIVE_POSTGRES_INIT_FAILED' }
+        $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 0)
+        $listener.Start()
+        $testPort = $listener.LocalEndpoint.Port
+        $listener.Stop()
+        & (Join-Path $nativePostgresBin 'pg_ctl.exe') -D $nativePostgresData -o "-h 127.0.0.1 -p $testPort -c listen_addresses=127.0.0.1" -l $nativePostgresLog -w -t 30 start
+        if ($LASTEXITCODE -ne 0) { throw 'NATIVE_POSTGRES_START_FAILED' }
+        $nativePostgresStarted = $true
+        $env:GOLDIS_TEST_POSTGRES_CONTAINER = $null
+        $env:GOLDIS_TEST_POSTGRES_OWNER = $null
+        $env:GOLDIS_TEST_DATABASE_ADMIN_URL = "postgresql://postgres@127.0.0.1:$testPort/postgres"
+        Write-Output "NATIVE_POSTGRES_READY port=$testPort"
+    } else {
+        docker run --detach --name $testContainer --label "goldis.test.owner=$testId" -e "POSTGRES_PASSWORD=$testPassword" -p '127.0.0.1::5432' postgres:17-alpine | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw 'TEST_POSTGRES_START_FAILED' }
+        $created = $true
+        $env:GOLDIS_TEST_POSTGRES_CONTAINER = $testContainer
+        $env:GOLDIS_TEST_POSTGRES_OWNER = $testId
+        $ready = $false
+        for ($attempt = 0; $attempt -lt 40; $attempt++) {
+            docker exec $testContainer pg_isready -U postgres -d postgres *> $null
+            if ($LASTEXITCODE -eq 0) { $ready = $true; break }
+            Start-Sleep -Milliseconds 500
+        }
+        if (-not $ready) { throw 'TEST_POSTGRES_READY_TIMEOUT' }
+        $binding = (docker port $testContainer 5432/tcp).Trim()
+        if ($LASTEXITCODE -ne 0 -or $binding -notmatch '^127\.0\.0\.1:(\d+)$') { throw 'TEST_POSTGRES_BINDING_INVALID' }
+        $testPort = $Matches[1]
+        $env:GOLDIS_TEST_DATABASE_ADMIN_URL = "postgresql://postgres:$testPassword@127.0.0.1:$testPort/postgres"
     }
-    if (-not $ready) { throw 'TEST_POSTGRES_READY_TIMEOUT' }
-    $binding = (docker port $testContainer 5432/tcp).Trim()
-    if ($LASTEXITCODE -ne 0 -or $binding -notmatch '^127\.0\.0\.1:(\d+)$') { throw 'TEST_POSTGRES_BINDING_INVALID' }
-    $testPort = $Matches[1]
-    $env:GOLDIS_TEST_DATABASE_ADMIN_URL = "postgresql://postgres:$testPassword@127.0.0.1:$testPort/postgres"
-    if ($Automation -or $Module -eq 'app-module' -or (-not $Module -and -not $PlatformOnly)) {
+    if ($Automation -or $Module -in @('app-module', 'commission') -or (-not $Module -and -not $PlatformOnly)) {
         docker run --detach --name $testRedis --label "goldis.test.owner=$testId" -p '127.0.0.1::6379' redis:7-alpine | Out-Null
         if ($LASTEXITCODE -ne 0) { throw 'TEST_REDIS_START_FAILED' }
         $redisCreated = $true
@@ -70,6 +104,7 @@ try {
     if ($Module -eq 'migrations') { $env:GOLDIS_TEST_DB_MODES = 'users-empty' }
     elseif ($Module -eq 'migrations-upgrade') { $env:GOLDIS_TEST_DB_MODES = 'upgrade-061-062' }
     elseif ($Module -eq 'password-recovery') { $env:GOLDIS_TEST_DB_MODES = 'users-empty' }
+    elseif ($Module -eq 'commission') { $env:GOLDIS_TEST_DB_MODES = 'commission' }
     elseif ($Module -eq 'tenant-scope') { $env:GOLDIS_TEST_DB_MODES = 'tenant-scope' }
     elseif ($Module -eq 'teams-db') { $env:GOLDIS_TEST_DB_MODES = 'teams' }
     elseif ($Module -eq 'admin-users-db') { $env:GOLDIS_TEST_DB_MODES = 'admin-users' }
@@ -88,6 +123,7 @@ try {
         $env:GOLDIS_TEST_APP_MODULE_SMOKE = '1'
     }
     elseif ($PlatformOnly) { $env:GOLDIS_TEST_DB_MODES = 'users,tenant-scope' }
+    Write-Output "DATABASE_SMOKE_BEGIN modes=$($env:GOLDIS_TEST_DB_MODES)"
     npm run test:db-integration
     if ($LASTEXITCODE -ne 0) { throw 'DB_INTEGRATION_FAILED' }
 } finally {
@@ -106,6 +142,21 @@ try {
     if ($redisCreated) {
         $redisInspection = docker inspect $testRedis | ConvertFrom-Json
         if ($LASTEXITCODE -eq 0 -and $redisInspection[0].Config.Labels.'goldis.test.owner' -eq $testId) { docker rm --force $testRedis | Out-Null }
+    }
+    if ($nativePostgresStarted) {
+        & (Join-Path $nativePostgresBin 'pg_ctl.exe') -D $nativePostgresData -m fast -w -t 30 stop | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw 'NATIVE_POSTGRES_STOP_FAILED' }
+        $nativePostgresStarted = $false
+    }
+    if ($nativePostgresRoot -and (Test-Path -LiteralPath $nativePostgresRoot)) {
+        $tempRoot = [System.IO.Path]::GetFullPath($env:TEMP).TrimEnd('\') + '\'
+        $resolvedNativeRoot = [System.IO.Path]::GetFullPath($nativePostgresRoot)
+        $nativeRootInsideTemp = $resolvedNativeRoot.StartsWith($tempRoot, [System.StringComparison]::OrdinalIgnoreCase)
+        $nativeRootNameOwned = (Split-Path -Leaf $resolvedNativeRoot).StartsWith("goldis-db-smoke-native-$testId")
+        if (-not $nativeRootInsideTemp -or -not $nativeRootNameOwned) {
+            throw 'NATIVE_POSTGRES_CLEANUP_PATH_INVALID'
+        }
+        Remove-Item -LiteralPath $resolvedNativeRoot -Recurse -Force
     }
     if ($created) {
         $inspection = docker inspect $testContainer | ConvertFrom-Json

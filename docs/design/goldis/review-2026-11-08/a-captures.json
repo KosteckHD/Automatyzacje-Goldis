@@ -1,0 +1,184 @@
+[
+  {
+    "name": "a01-dashboard-desktop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\a01-dashboard-desktop.png",
+    "url": "http://127.0.0.1:4178/dashboard",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "errors": []
+  },
+  {
+    "name": "a02-oc-upload-desktop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\a02-oc-upload-desktop.png",
+    "url": "http://127.0.0.1:4178/tools/oc-policy-verification",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "errors": []
+  },
+  {
+    "name": "a03-oc-validation-desktop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\a03-oc-validation-desktop.png",
+    "url": "http://127.0.0.1:4178/tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "errors": []
+  },
+  {
+    "name": "a04-oc-selection-desktop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\a04-oc-selection-desktop.png",
+    "url": "http://127.0.0.1:4178/tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=selection",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "errors": []
+  },
+  {
+    "name": "a05-oc-progress-desktop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\a05-oc-progress-desktop.png",
+    "url": "http://127.0.0.1:4178/tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=progress&run=55555555-5555-4555-8555-555555555555",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "errors": []
+  },
+  {
+    "name": "a06-lead-desktop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\a06-lead-desktop.png",
+    "url": "http://127.0.0.1:4178/my-results/77777777-7777-4777-8777-777777777777",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "errors": []
+  },
+  {
+    "name": "a07-commission-desktop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\a07-commission-desktop.png",
+    "url": "http://127.0.0.1:4178/tools/commission-comparison",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "errors": []
+  },
+  {
+    "name": "a08-commission-dictionary-desktop",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\a08-commission-dictionary-desktop.png",
+    "url": "http://127.0.0.1:4178/tools/commission-comparison",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "errors": []
+  },
+  {
+    "name": "a09-dashboard-mobile",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\a09-dashboard-mobile.png",
+    "url": "http://127.0.0.1:4178/dashboard",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": {
+      "client": 390,
+      "scroll": 390
+    },
+    "errors": []
+  },
+  {
+    "name": "a10-oc-mobile",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\a10-oc-mobile.png",
+    "url": "http://127.0.0.1:4178/tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=selection",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": {
+      "client": 390,
+      "scroll": 390
+    },
+    "errors": []
+  },
+  {
+    "name": "a11-commission-mobile",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\a11-commission-mobile.png",
+    "url": "http://127.0.0.1:4178/tools/commission-comparison",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": {
+      "client": 390,
+      "scroll": 390
+    },
+    "errors": []
+  },
+  {
+    "name": "a12-commission-empty-mobile",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\a12-commission-empty-mobile.png",
+    "url": "http://127.0.0.1:4178/tools/commission-comparison",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": {
+      "client": 390,
+      "scroll": 390
+    },
+    "errors": []
+  },
+  {
+    "name": "a13-commission-error-mobile",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\a13-commission-error-mobile.png",
+    "url": "http://127.0.0.1:4178/tools/commission-comparison",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": {
+      "client": 390,
+      "scroll": 390
+    },
+    "errors": []
+  }
+]

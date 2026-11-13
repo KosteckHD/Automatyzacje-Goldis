@@ -9,8 +9,8 @@ export type PeselEncryptionContext = Readonly<{ runId: string; sourceRowId: stri
 export type EncryptedPeselV1 = Readonly<{ keyVersion: number; ciphertext: string }>;
 export type EncryptedRunIdentityRecord = Readonly<Omit<IdentityMatchV1, "pesel" | "schemaVersion"> & {
   runId: string;
-  peselCiphertext: string;
-  peselKeyVersion: number;
+  peselCiphertext: string | null;
+  peselKeyVersion: number | null;
 }>;
 type Environment = Readonly<Record<string, string | undefined>>;
 
@@ -79,12 +79,15 @@ function decodeBase64Url(value: string): Buffer {
 }
 
 /** Returns the exact identity fields safe to persist; plaintext PESEL is intentionally absent. */
+export function encryptIdentityForPersistence(identity: IdentityMatchV1 & { matchMethod: "regon_company_name_decision_maker" | "unique_business_identity" | "regon_unique_pesel" }, runId: string, environment?: Environment): EncryptedRunIdentityRecord & { peselCiphertext: string; peselKeyVersion: number };
+export function encryptIdentityForPersistence(identity: IdentityMatchV1, runId: string, environment?: Environment): EncryptedRunIdentityRecord;
 export function encryptIdentityForPersistence(
   identity: IdentityMatchV1,
   runId: string,
   environment: Environment = process.env,
 ): EncryptedRunIdentityRecord {
-  const encrypted = encryptPesel(identity.pesel, { runId, sourceRowId: identity.sourceRowId }, environment);
+  const encrypted = identity.matchMethod === "regon_company" ? null : encryptPesel(identity.pesel, { runId, sourceRowId: identity.sourceRowId }, environment);
+  if (identity.matchMethod === "regon_company" && (identity.pesel || identity.firstName || identity.lastName)) throw new PeselEncryptionError("PESEL_FORMAT_INVALID");
   return {
     runId,
     sourceRowId: identity.sourceRowId,
@@ -92,11 +95,21 @@ export function encryptIdentityForPersistence(
     companyName: identity.companyName,
     firstName: identity.firstName,
     lastName: identity.lastName,
-    peselCiphertext: encrypted.ciphertext,
-    peselKeyVersion: encrypted.keyVersion,
+    peselCiphertext: encrypted?.ciphertext ?? null,
+    peselKeyVersion: encrypted?.keyVersion ?? null,
     matchMethod: identity.matchMethod,
     adapterVersion: identity.adapterVersion,
   };
+}
+
+/** A company has no PESEL; missing person ciphertext is never treated as a company. */
+export function decryptIdentityPesel(record: Readonly<{ matchMethod: string; peselCiphertext: string | null; peselKeyVersion: number | null }>, context: PeselEncryptionContext, environment: Environment = process.env): string {
+  if (record.matchMethod === "regon_company") {
+    if (record.peselCiphertext !== null || record.peselKeyVersion !== null) throw new PeselEncryptionError("PESEL_CIPHERTEXT_INVALID");
+    return "";
+  }
+  if (!record.peselCiphertext || record.peselKeyVersion === null) throw new PeselEncryptionError("PESEL_CIPHERTEXT_INVALID");
+  return decryptPesel({ ciphertext: record.peselCiphertext, keyVersion: record.peselKeyVersion }, context, environment);
 }
 
 /** Safe log token for known errors; never serialize arbitrary exception messages. */

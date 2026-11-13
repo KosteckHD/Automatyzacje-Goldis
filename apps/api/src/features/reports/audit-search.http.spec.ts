@@ -5,6 +5,7 @@ import type { AddressInfo } from "node:net";
 import { test } from "node:test";
 import { Module } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import { API_DATABASE } from "../../infrastructure/database";
 
 const secret = "audit-search-synthetic-session-secret-123456";
 const csrf = "synthetic-audit-csrf-token-12345678901234567890";
@@ -40,6 +41,7 @@ test("audit API scopes roles, filters reviewer events to current grants and bind
     const { sequelize } = await import("../../infrastructure/database/db");
     const { AdminReportsController, AuditSearchController } = await import("./admin-reports.controller");
     const { AdminReportsService } = await import("../reports/admin-reports.service");
+    const { AdminReportsRepository } = await import("../reports/admin-reports.repository");
     const { AdminOnlyGuard } = await import("../admin/admin.support");
     const { SESSION_PASSWORD_CHANGE_RESOLVER, SESSION_ROLE_RESOLVER, SessionGuard } = await import("../auth");
     const { PERMISSION_RESOURCE_RESOLVER, PermissionGuard } = await import("../authorization");
@@ -112,6 +114,8 @@ test("audit API scopes roles, filters reviewer events to current grants and bind
         AdminOnlyGuard,
         PermissionGuard,
         AdminReportsService,
+        AdminReportsRepository,
+        { provide: API_DATABASE, useValue: sequelize },
         {
           provide: SESSION_ROLE_RESOLVER,
           useValue: async (_userId: string, _tenantId: string, _sessionId?: string) => {

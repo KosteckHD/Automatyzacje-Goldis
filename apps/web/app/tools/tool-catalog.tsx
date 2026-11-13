@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { uiLabels } from "../lib/ui-labels";
 
 type Tool = {
   toolId: string; displayName: string; description: string; status: "available" | "maintenance" | "disabled";
@@ -33,11 +34,14 @@ export default function ToolCatalog() {
     {loading ? <p className="lead-loading" role="status">Wczytuję dostępne narzędzia…</p>
       : items.length ? <section className="tool-catalog-grid" aria-label="Dostępne narzędzia">{items.map((tool) => {
         const isOc = tool.toolId === "oc-policy-verification";
-        const href = isOc ? tool.access.canExecute ? "/tools/oc-policy-verification" : tool.access.canViewResults || tool.access.canDownloadResults ? "/results/oc-policy-verification" : null : null;
-        const action = tool.access.canExecute ? "Otwórz narzędzie" : tool.access.canViewResults || tool.access.canDownloadResults ? "Przeglądaj wyniki" : "Dostęp ograniczony";
+        const isCommission = tool.toolId === "commission-comparison";
+        const href = isOc ? tool.access.canExecute ? "/tools/oc-policy-verification" : tool.access.canViewResults || tool.access.canDownloadResults ? "/results/oc-policy-verification" : null
+          : isCommission && (tool.access.canExecute || tool.access.canViewResults || tool.access.canDownloadResults) ? "/tools/commission-comparison" : null;
+        const action = isCommission ? tool.access.canExecute ? "Otwórz porównywarkę" : "Przeglądaj analizy"
+          : tool.access.canExecute ? `Otwórz ${uiLabels.ocVerification}` : tool.access.canViewResults || tool.access.canDownloadResults ? `Przeglądaj pulę firm` : "Dostęp ograniczony";
         return <article className="lead-panel tool-catalog-card" key={tool.toolId}>
-          <div className="tool-catalog-card-head"><span className="tool-catalog-mark" aria-hidden="true">{isOc ? "OC" : "AU"}</span><span className={`tool-catalog-status status-${tool.status}`}>{statusLabels[tool.status] ?? tool.status}</span></div>
-          <p className="lead-overline">{tool.toolId}</p><h2>{tool.displayName}</h2><p>{tool.description}</p>
+          <div className="tool-catalog-card-head"><span className="tool-catalog-mark" aria-hidden="true">{isOc ? "OC" : isCommission ? "PR" : "AU"}</span><span className={`tool-catalog-status status-${tool.status}`}>{statusLabels[tool.status] ?? tool.status}</span></div>
+          <h2>{isOc ? uiLabels.ocVerification : tool.displayName}</h2><p>{isOc ? "Wgraj bazę firm, sprawdź dane i odbierz wyniki OC." : tool.description}</p>
           <div className="tool-catalog-capabilities"><span>{tool.access.canExecute ? "Uruchamianie dostępne" : "Bez prawa uruchamiania"}</span><span>{tool.access.canViewResults ? "Podgląd wyników" : "Bez podglądu wyników"}</span></div>
           {href ? <a className="lead-primary" href={href}>{action}<span aria-hidden="true">↗</span></a>
             : <span className="tool-catalog-disabled" aria-label={`${action}; interfejs tego narzędzia nie jest częścią MVP`}>{action}</span>}

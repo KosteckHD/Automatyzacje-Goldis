@@ -22,7 +22,7 @@ function main() {
   const config = configuredCompose();
   if (!config) return finish();
   const services = config.services || {};
-  const expectedImages = ["postgres", "db-roles", "redis", "migrate", "bootstrap-admin", "api", "import-parser", "enrichment-worker", "worker", "web"];
+  const expectedImages = ["postgres", "db-roles", "redis", "migrate", "bootstrap-admin", "api", "import-parser", "commission-engine", "commission-worker", "enrichment-worker", "worker", "web"];
   for (const name of expectedImages) {
     const service = services[name];
     if (!service) { fail(`SERVICE_MISSING_${name.toUpperCase().replace(/-/g, "_")}`); continue; }
@@ -30,7 +30,7 @@ function main() {
     if (!/^.+@sha256:[a-f0-9]{64}$/i.test(service.image || "")) fail(`IMAGE_DIGEST_REQUIRED_${name.toUpperCase().replace(/-/g, "_")}`);
   }
 
-  for (const name of ["postgres", "redis", "api", "import-parser", "enrichment-worker", "worker"]) {
+  for (const name of ["postgres", "redis", "api", "import-parser", "commission-engine", "commission-worker", "enrichment-worker", "worker"]) {
     if ((services[name]?.ports || []).length) fail(`HOST_PORT_FORBIDDEN_${name.toUpperCase().replace(/-/g, "_")}`);
   }
   const webPorts = services.web?.ports || [];
@@ -42,6 +42,15 @@ function main() {
   if (!hasNetwork(services.web, "goldis_frontend") || hasNetwork(services.web, "goldis_data") || hasNetwork(services.web, "goldis_parser")) fail("WEB_NETWORK_SCOPE_INVALID");
   if (!hasNetwork(services.api, "goldis_frontend") || !hasNetwork(services.api, "goldis_data") || !hasNetwork(services.api, "goldis_parser")) fail("API_NETWORK_SCOPE_INVALID");
   if (!hasNetwork(services["import-parser"], "goldis_parser") || Object.keys(services["import-parser"]?.networks || {}).length !== 1) fail("PARSER_NETWORK_SCOPE_INVALID");
+  if (networks.goldis_commission_engine?.internal !== true
+    || !hasNetwork(services.api, "goldis_commission_engine")
+    || !hasNetwork(services["commission-worker"], "goldis_commission_engine")
+    || !hasNetwork(services["commission-engine"], "goldis_commission_engine")
+    || Object.keys(services["commission-engine"]?.networks || {}).length !== 1
+    || Object.hasOwn(services["commission-engine"]?.networks || {}, "goldis_frontend")) fail("COMMISSION_ENGINE_NETWORK_SCOPE_INVALID");
+  if (services.api?.environment?.COMMISSION_ENGINE_URL !== "http://commission-engine:8000"
+    || services.api?.environment?.COMMISSION_ENGINE_TOKEN_FILE !== "/run/secrets/commission_engine_secret"
+    || !services.api?.secrets?.some((secret) => secret.source === "commission_engine_secret")) fail("COMMISSION_ENGINE_API_AUTH_CONFIG_INVALID");
   if (!hasNetwork(services.worker, "goldis_data") || Object.keys(services.worker?.networks || {}).length !== 1) fail("PORTAL_WORKER_NETWORK_SCOPE_INVALID");
 
   const apiEnv = services.api?.environment || {};

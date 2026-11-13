@@ -1,0 +1,16 @@
+{
+  "code": "PYTHON_DICTIONARY_MERGE_BEFORE_LIMITS",
+  "openpyxl": "3.1.5",
+  "fixtureBytes": 4895,
+  "zipValidationAccepted": true,
+  "applicationImportReachedEagerMerge": true,
+  "largeAllocationPreventedByTestGuard": true,
+  "observedMerge": {
+    "reference": "A1:XFD1048576",
+    "rows": 1048576,
+    "columns": 16384,
+    "expandedCells": 17179869184
+  },
+  "boundedControlMaterializedCells": 10003,
+  "limits": "No OOM or service outage attempted; runtime HTTP and container effect not tested."
+}

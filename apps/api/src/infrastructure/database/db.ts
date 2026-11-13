@@ -17,6 +17,11 @@ import { AuthChallengeModel, ManualInterventionModel, InterventionActivityModel,
 import { OcSnapshotModel, OcPolicyRecordModel, ExportArtifactModel, ResultSetModel, LeadResultSnapshotModel } from "../../features/results";
 import { RunSubmissionModel, RunSubmissionGroupModel, RunSubmissionItemModel } from "../../features/submissions";
 import { BusinessLeadModel, LeadRunLinkModel, LeadAllocationModel } from "../../features/leads";
+import {
+  CommissionAgentModel, CommissionDictionaryGrantModel, CommissionDictionaryVersionModel, CommissionDispatchModel,
+  CommissionExportModel, CommissionFileModel, CommissionResolutionModel, CommissionRunFileModel,
+  CommissionRunModel, CommissionRunSnapshotModel,
+} from "../../features/commissions/commissions.model";
 export type { EnrichmentJobStatus, EnrichmentJobItemStatus } from "../../features/enrichment";
 export type { ImportPreparationStatus, ImportPreparationStage, ImportPreparationWorkflowStatus, PreparedRowStatus, PreparedSetExecutionStatus, PreparedSetChunkStatus } from "../../features/imports/imports.model";
 export type { AuthMailOutboxStatus, RecoveryTokenPurpose } from "../../features/account-recovery/account-recovery.model";
@@ -528,3 +533,23 @@ export type LeadRunLink = InstanceType<typeof LeadRunLinkModel>;
 export const LeadRunLink = lazyModelProxy(LeadRunLinkModel, "LeadRunLink");
 export type LeadAllocation = InstanceType<typeof LeadAllocationModel>;
 export const LeadAllocation = lazyModelProxy(LeadAllocationModel, "LeadAllocation");
+export type CommissionAgent = InstanceType<typeof CommissionAgentModel>;
+export const CommissionAgent = lazyModelProxy(CommissionAgentModel, "CommissionAgent");
+export type CommissionFile = InstanceType<typeof CommissionFileModel>;
+export const CommissionFile = lazyModelProxy(CommissionFileModel, "CommissionFile");
+export type CommissionDictionaryVersion = InstanceType<typeof CommissionDictionaryVersionModel>;
+export const CommissionDictionaryVersion = lazyModelProxy(CommissionDictionaryVersionModel, "CommissionDictionaryVersion");
+export type CommissionDictionaryGrant = InstanceType<typeof CommissionDictionaryGrantModel>;
+export const CommissionDictionaryGrant = lazyModelProxy(CommissionDictionaryGrantModel, "CommissionDictionaryGrant");
+export type CommissionRun = InstanceType<typeof CommissionRunModel>;
+export const CommissionRun = lazyModelProxy(CommissionRunModel, "CommissionRun");
+export type CommissionRunFile = InstanceType<typeof CommissionRunFileModel>;
+export const CommissionRunFile = lazyModelProxy(CommissionRunFileModel, "CommissionRunFile");
+export type CommissionRunSnapshot = InstanceType<typeof CommissionRunSnapshotModel>;
+export const CommissionRunSnapshot = lazyModelProxy(CommissionRunSnapshotModel, "CommissionRunSnapshot");
+export type CommissionDispatch = InstanceType<typeof CommissionDispatchModel>;
+export const CommissionDispatch = lazyModelProxy(CommissionDispatchModel, "CommissionDispatch");
+export type CommissionResolution = InstanceType<typeof CommissionResolutionModel>;
+export const CommissionResolution = lazyModelProxy(CommissionResolutionModel, "CommissionResolution");
+export type CommissionExport = InstanceType<typeof CommissionExportModel>;
+export const CommissionExport = lazyModelProxy(CommissionExportModel, "CommissionExport");

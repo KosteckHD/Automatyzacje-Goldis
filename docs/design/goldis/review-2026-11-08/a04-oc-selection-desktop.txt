@@ -1,0 +1,114 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+Przegląd
+Moje firmy
+Pula firm
+Automatyzacje
+Przebiegi
+Historia importów
+Powiadomienia
+2
+
+ORGANIZACJA
+
+Pracownicy
+Dostępy
+Raporty
+Weryfikacja danych
+Dziennik aktywności
+Moje konto
+Zwiń menu
+Menedżer
+GOLDIS / AUTOMATYZACJE
+ewa.zielinska · Menedżer
+Moje konto ↗
+
+AUTOMATYZACJE / SPRAWDZANIE OC
+
+Sprawdzanie OC
+
+Pracuj na jednym etapie. Do pozostałych wrócisz w każdej chwili.
+
+Historia importów ↗
+Baza transportowa — październik.xlsx
+Arkusz „Realizacja”
+64 wierszy
+Zmień plik
+KROKI AUTOMATYZACJI
+01
+Plik Excel
+Plik zaimportowany
+02
+Kontrola danych
+Kontrola dostępna
+03
+Uzupełnianie REGON
+Dane do sprawdzenia
+04
+Deduplikacja
+Zestaw przygotowany
+05
+Wybór wierszy
+Wybierz firmy
+06
+Podsumowanie i start
+Oczekuje na podsumowanie
+07
+Przebieg zadań
+Brak uruchomienia
+08
+Wyniki i eksport
+Brak wyników
+
+Wybierz dowolny krok, aby zobaczyć szczegóły.
+
+KROK 5 Z 8
+
+Wybór wierszy
+
+KROK 05 / ZAKRES
+
+Wybierz wiersze do sprawdzenia
+Wyczyść zapisany wybór
+Wszystkie gotowe firmy
+
+System użyje najnowszej zamkniętej rewizji i podzieli ją na porcje do 500. Przed startem pokaże liczbę gotowych firm i problemów.
+
+Sprawdź wszystkie gotowe firmy
+Wybierz firmy
+Zakres lub numery wierszy
+Wybrane firmy
+
+Wyszukuj w przygotowanej rewizji. Zaznaczenia zachowują się przy przejściu między stronami.
+
+0 / 500 wybranych
+Szukaj po nazwie, NIP, REGON lub numerze wiersza
+64 firm pasuje do wyszukiwania
+Zaznacz firmy na tej stronie (3)
+Transport i Logistyka Alfa sp. z o.o.
+NIP: 5260250275 · REGON: 012345678 · wiersz 14
+Gotowa do sprawdzenia
+Polskie Drogi Transport sp. z o.o.
+NIP: 5260250275 · REGON: — · wiersz 16
+Wymaga kontroli · Należy najpierw ustalić REGON w rejestrze.
+Transport i Logistyka Alfa sp. z o.o.
+NIP: 5260250275 · REGON: 012345678 · wiersz 18
+Duplikat · Zostanie użyty wskazany wiersz reprezentujący firmę.
+Poprzednia
+Strona 1 z 2
+Następna
+
+Podgląd obejmie wyłącznie zaznaczone firmy; zaznaczanie dotyczy tylko bieżącej strony, a wybór zachowuje się między stronami.
+
+Sprawdź podsumowanie (0)
+←
+Wstecz: deduplikacja
+
+Przejście do kolejnego kroku nie uruchamia portali.
+
+Otwórz etap: podsumowanie i start
+→

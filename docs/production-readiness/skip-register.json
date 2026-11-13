@@ -1,0 +1,697 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-16T22:15:02.302Z",
+  "generatedFrom": "docs/backend-refactor/test-scenarios.json",
+  "defaultRun": {
+    "command": "npm test",
+    "snapshot": "sourceSnapshotSha256 in verification-matrix.json",
+    "observedRuntimeSkippedTests": 70,
+    "note": "The manifest contains title patterns (including dynamic-title patterns); runtime skip count is the observed test-run count."
+  },
+  "summary": {
+    "scenarioPatternsWithSkipCondition": 59,
+    "distinctSourceFiles": 10,
+    "dedicatedFixtureSuites": [
+      "test:module:compensa-browser",
+      "test:module:everest-browser",
+      "test:module:security-browser",
+      "test:module:ufg-browser"
+    ],
+    "fixtureRun": "PASS",
+    "dedicatedFixtureEvidence": [
+      {
+        "suite": "test:module:security-browser",
+        "status": "PASS",
+        "result": "Security browser smoke verified CSP, nonce, cache, framing, idle activity and recovery flow."
+      },
+      {
+        "suite": "test:module:everest-browser",
+        "status": "PASS",
+        "tests": "27/27",
+        "result": "Includes PZU session, Everest identity and navigation fixtures."
+      },
+      {
+        "suite": "test:module:compensa-browser",
+        "status": "PASS",
+        "tests": "39/39"
+      },
+      {
+        "suite": "test:module:ufg-browser",
+        "status": "PASS",
+        "tests": "14/14",
+        "result": "Includes browser guard and OC table fixture."
+      }
+    ]
+  },
+  "entries": [
+    {
+      "id": "TC-031932ca0042",
+      "owner": "infrastructure/browser",
+      "sourcePath": "apps/worker/src/infrastructure/browser/browser.spec.ts",
+      "titlePattern": "profil Chromium zachowuje sesję, a tabela OC jest czytana w całości",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:security-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-033cea7f54c6",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "manual login or a closed MFA tab cannot be recorded as an accepted platform code",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-0c196529c75d",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "PZU does not submit an expired code, including expiry immediately before the browser action",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-12c11028c934",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "kod SMS w ramce PZU jest podawany do właściwej ramki i zerowany",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-12e590b047df",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-session.spec.ts",
+      "titlePattern": "Compensa dismisses a planned-maintenance notice before continuing, delay=${*}",
+      "dynamicTitle": true,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-15cb1936c734",
+      "owner": "infrastructure/browser",
+      "sourcePath": "apps/worker/src/infrastructure/browser/browser.spec.ts",
+      "titlePattern": "zero OC without a details button produces an empty complete snapshot",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:security-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-18d77aa3c8ae",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "PZU zaznacza zapamiętanie urządzenia przed przekazaniem SMS, gdy portal pokazuje tę opcję",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-1b33d5dd277b",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-session.spec.ts",
+      "titlePattern": "Compensa waits for the SPA login screen before sending credentials once",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-1c619f234fd6",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "po SMS-ie sesja przechodzi ze strony usług SSO do Everest bez drugiego logowania",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-2b50dad044bd",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-offer-saver.spec.ts",
+      "titlePattern": "anulowanie po trwałym zamiarze, ale przed akcją portalu nie klika Zapisz",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-2e530bd74f27",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-offer-saver.spec.ts",
+      "titlePattern": "wznowienie zapisu po zniknięciu formularza: potwierdzenie=${*}, bez nowego kliknięcia",
+      "dynamicTitle": true,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-344f141db7fe",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-ufg.spec.ts",
+      "titlePattern": "UFG weryfikuje raz, zbiera pełny snapshot i filtr daty pozostawia osobnym krokiem",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:ufg-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-374df333f3bb",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/everest-identity-provider.spec.ts",
+      "titlePattern": "Everest never chooses the first of ambiguous navigation buttons or search inputs",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-4d7dee843ebb",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "utrzymany formularz SMS bez jawnego markera jest niepewny, a markery odróżniają błędny i wygasły kod",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-4e3eab551110",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-ufg.spec.ts",
+      "titlePattern": "verified zero OC returns a complete empty snapshot without opening unavailable details",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:ufg-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-529b055b0f17",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "sesja Everest rozpoznaje istniejące logowanie i ekrany wymagające interwencji na fikcyjnej stronie",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-59fdf7078e66",
+      "owner": "portals/shared",
+      "sourcePath": "apps/worker/src/portals/shared/portal-navigation.spec.ts",
+      "titlePattern": "browser blocks ${*} before its fixture receives a navigation and fences subsequent actions",
+      "dynamicTitle": true,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-5b6f0a47e125",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "Compensa zaznacza rolę Ubezpieczający, gdy portal pokazuje przycisk radio",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-60caa27ecf2b",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "observed PZU selectors submit through the SMS frame and remember the device",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-62a4573d2090",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "kod SMS z bufora ręcznego jest wysłany raz, a bufor zostaje wyzerowany",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-67197734fc9a",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-ufg.spec.ts",
+      "titlePattern": "widoczna tabela przed odpowiedzią UFG nie jest potwierdzeniem wykonanej weryfikacji",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:ufg-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-6a5c8f814f6f",
+      "owner": "infrastructure/browser",
+      "sourcePath": "apps/worker/src/infrastructure/browser/browser.spec.ts",
+      "titlePattern": "summary ignores hidden stale tables and rejects ambiguous or unsafe counts",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:security-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-6b0011bd87df",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "wznowienie otwartego szkicu nie rozpoczyna drugiej oferty, gdy formularz zniknął",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-6c8542af7468",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/everest-identity-provider.spec.ts",
+      "titlePattern": "Everest pobiera PESEL z wiersza osoby fizycznej po wyszukaniu REGON",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-70e141af2dae",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "Compensa form wybiera Ubezpieczającego, podaje PESEL i tablicę, zachowuje dane i nie klika Zapisz",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-795cc4ef705b",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-offer-saver.spec.ts",
+      "titlePattern": "Compensa normalizuje odstępy w numerze oferty przed checkpointem",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-7a5ff470f113",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-offer-saver.spec.ts",
+      "titlePattern": "nierozstrzygnięty wynik lookup zatrzymuje run przed drugim kliknięciem Zapisz",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-7bbdbd350bf8",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "Compensa CEP: ${*}, bez ponawiania rozpoczęcia",
+      "dynamicTitle": true,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-804378ba2d93",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "Compensa chooses the matching business card before waiting for the new insured form",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-805a02640dce",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "ambiguous login targets never receive credentials or a submit click",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-812247fec967",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "błąd nawigacji kończy sprawdzenie sesji kodem bez retry ani obejścia TLS",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-8a6166511d5c",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-session.spec.ts",
+      "titlePattern": "a confirmed successful login permits authentication again after a fresh application entry",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-9041038d4ba9",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-client-choice.spec.ts",
+      "titlePattern": "missing source contact name is read from a verified business card without starting an offer",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-917c08c50024",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-client-choice.spec.ts",
+      "titlePattern": "Compensa chooses a business card by type and identifiers: ${*}",
+      "dynamicTitle": true,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-97f22bb7943d",
+      "owner": "infrastructure/browser",
+      "sourcePath": "apps/worker/src/infrastructure/browser/browser.spec.ts",
+      "titlePattern": "wirtualizowana tabela OC przewijana wewnątrz modalu zwraca wszystkie rekordy albo jawny błąd",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:security-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-a2cfeb4c7ca3",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-ufg.spec.ts",
+      "titlePattern": "UFG wymaga zatwierdzenia niepewnej weryfikacji, właściwego case i pełnej liczby rekordów",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:ufg-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-a9cbf1da62f8",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "logowanie jest pojedynczą próbą i zatrzymuje się na prawdziwym ekranie SMS",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-ad22b77121e8",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "Compensa zatrzymuje formularz przy konflikcie osoby przed zapisem",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-b8bd8eae5456",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-offer-saver.spec.ts",
+      "titlePattern": "retry klika ponownie dopiero po autorytatywnym potwierdzeniu braku zapisu dla tej samej sprawy",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-ba6936d6549a",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "observed PZU resend waits for a delayed link and never falls back to login",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-bd4f0efe2b0f",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-offer-saver.spec.ts",
+      "titlePattern": "Compensa Save intent zapisuje jedną akcję i retry zwraca already_saved",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-bd7ad12be447",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "a fresh row navigates home even when the previous row left an authenticated open case",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-c577da5e8dbb",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "PZU nie klika przycisku SMS, gdy selektor obejmuje więcej niż jedną akcję",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-c711a973d3a7",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "missing contact keeps the normal Communication, PESEL, registration, then business-card order",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-cc9b92eefac4",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/everest-identity-provider.spec.ts",
+      "titlePattern": "a company-only source obtains the person's name from a verified business lookup instead of splitting the company name",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-ccd1f1b296b9",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "Compensa wybiera wyłącznie istniejącą opcję powiatu z zatwierdzonej poprawki",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-d3936ebe3c17",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "brak poświadczeń nie powoduje wpisywania ani wysłania pustego formularza",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-d3f14fae837f",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-session.spec.ts",
+      "titlePattern": "Compensa never guesses between duplicate notice close buttons",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-e73adc83bf05",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/everest-identity-provider.spec.ts",
+      "titlePattern": "Everest waits for the new REGON render and ignores unrelated page mutations",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-e81bda880ec6",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "PZU ponawia SMS tylko przez jednoznaczny przycisk dostępny po timeoutcie",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-e8878a17df35",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-portal.spec.ts",
+      "titlePattern": "syntetyczny CPortal otwiera Compensa Komunikacja i pokazuje Dane ubezpieczonych",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-e8f8c945ae0d",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-offer-saver.spec.ts",
+      "titlePattern": "po niepotwierdzonym timeoutcie Compensa retry najpierw uzgadnia portal i nie klika drugi raz",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-ea99074096c0",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "Compensa uzupełnia tylko puste pola z tego samego wiersza, a brak powiatu wymaga operatora",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-f00ac37c165c",
+      "owner": "portals/pzu",
+      "sourcePath": "apps/worker/src/portals/pzu/pzu-session.spec.ts",
+      "titlePattern": "po timeoutcie PZU otwiera nowy cykl logowania zamiast używać starego formularza SMS",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:everest-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-f2403fdace86",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "a collapsed customer editor opens once only after the current draft is confirmed: ${*}",
+      "dynamicTitle": true,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-f2509e21fc8a",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-session.spec.ts",
+      "titlePattern": "an active maintenance page is not dismissed as a future announcement",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-fc2f215dc5bb",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-session.spec.ts",
+      "titlePattern": "aktywna sesja Compensy jest używana ponownie, a ekran MFA tylko zgłasza interwencję",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-fc91eab3339b",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "Compensa wybiera Ubezpieczającego w oknie startowym przed wpisaniem danych",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    },
+    {
+      "id": "TC-fe20e041bf61",
+      "owner": "portals/compensa",
+      "sourcePath": "apps/worker/src/portals/compensa/compensa-form.spec.ts",
+      "titlePattern": "Compensa zatrzymuje produkcyjny przebieg, gdy wyszukiwanie nie wypełni danych osoby",
+      "dynamicTitle": false,
+      "condition": "process.env.PLAYWRIGHT_INTEGRATION !== \"1\"",
+      "defaultResult": "SKIP",
+      "dedicatedFixtureSuite": "test:module:compensa-browser",
+      "dedicatedFixtureResult": "PASS"
+    }
+  ]
+}

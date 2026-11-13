@@ -14,6 +14,7 @@ function validProduction() {
     PESEL_ENCRYPTION_ACTIVE_KEY_VERSION: "1", PESEL_ENCRYPTION_KEYS_BASE64: keyring,
     ARTIFACT_ENCRYPTION_ACTIVE_KEY_VERSION: "1", ARTIFACT_ENCRYPTION_KEYS_BASE64: keyring,
     IMPORT_PARSER_URL: "http://import-parser:3010", IMPORT_PARSER_SHARED_SECRET: "p".repeat(40),
+    COMMISSION_ENGINE_URL: "http://commission-engine:8000", COMMISSION_ENGINE_TOKEN_FILE: "/run/secrets/commission_engine_secret",
     PRIVILEGED_ACTION_BINDING_KEY: "q".repeat(64),
   };
 }

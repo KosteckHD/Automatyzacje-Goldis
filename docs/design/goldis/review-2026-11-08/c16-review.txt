@@ -1,0 +1,63 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+Przegląd
+Moje firmy
+Pula firm
+Automatyzacje
+Przebiegi
+Historia importów
+Powiadomienia
+2
+
+KONTO
+
+Weryfikacja danych
+Dziennik aktywności
+Moje konto
+Zwiń menu
+Recenzent
+GOLDIS / WERYFIKACJA DANYCH
+reviewer.goldis · Recenzent
+Moje konto ↗
+
+KOLEJKI DECYZYJNE
+
+Korekty REGON
+
+Rozstrzygaj zgłoszenia z kontrolą wersji i aktualnych uprawnień. Każda decyzja jest zapisywana w dzienniku audytu.
+
+R
+Korekty REGON
+Konflikty encji
+Status
+Oczekujące
+Oczekujące
+Zatwierdzone
+Odrzucone
+Identyfikator importu
+Skopiuj go z adresu strony importu.
+Narzędzie
+Zastosuj filtry
+
+KOREKTA REGON · WIERSZ 16
+
+Polskie Drogi Transport sp. z o.o.
+
+oc-policy-verification · import 44444444-4444-4444-8444-444444444444 · 10 paź 2026, 12:00
+
+Oczekuje na weryfikację
+REGON operacyjny przed decyzją
+Brak
+→
+Proponowana wartość
+987654321
+Wersja wiersza
+2
+
+Uzasadnienie operatora: Potwierdzono dane firmy w rejestrze GUS.
+
+Otwórz importRozpatrz korektę

@@ -54,6 +54,29 @@ services:
     cap_drop:
       - ALL
 
+  commission-engine:
+    image: ${GOLDIS_COMMISSION_ENGINE_IMAGE:?Set GOLDIS_COMMISSION_ENGINE_IMAGE to a verified image digest}
+    build: !reset null
+    read_only: true
+    cap_drop:
+      - ALL
+    mem_limit: 1536m
+    cpus: 1.0
+    pids_limit: 32
+
+  commission-worker:
+    image: ${GOLDIS_API_IMAGE:?Set GOLDIS_API_IMAGE to a verified image digest}
+    build: !reset null
+    environment:
+      APP_ENV: production
+      NODE_ENV: production
+      ARTIFACT_REQUIRE_ENCRYPTION: "1"
+    cap_drop:
+      - ALL
+    mem_limit: 768m
+    cpus: 1.0
+    pids_limit: 64
+
   enrichment-worker:
     image: ${GOLDIS_API_IMAGE:?Set GOLDIS_API_IMAGE to a verified image digest}
     build: !reset null

@@ -1,0 +1,9 @@
+{
+  "pid": 8496,
+  "nextPid": 29220,
+  "port": 4178,
+  "nextPort": 4177,
+  "url": "http://127.0.0.1:4178",
+  "startedAt": "2026-11-08T21:24:48.424Z",
+  "stop": "Stop-Process -Id 8496,29220"
+}

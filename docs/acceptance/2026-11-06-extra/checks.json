@@ -1,0 +1,51 @@
+{
+  "startedAt": "2026-11-06T11:57:03.098Z",
+  "scope": "Disposable native PG18 security tests and local portal fixtures. No live portals. Does not replace Linux PG17/Redis restore acceptance.",
+  "results": [
+    {
+      "name": "native-security-db",
+      "startedAt": "2026-11-06T11:57:03.100Z",
+      "endedAt": "2026-11-06T11:59:12.669Z",
+      "status": "FAIL",
+      "exitCode": 1,
+      "error": null,
+      "evidence": "native-security-db.log"
+    },
+    {
+      "name": "everest-browser",
+      "startedAt": "2026-11-06T11:59:12.675Z",
+      "endedAt": "2026-11-06T12:00:28.303Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "everest-browser.log"
+    },
+    {
+      "name": "compensa-browser",
+      "startedAt": "2026-11-06T12:00:28.305Z",
+      "endedAt": "2026-11-06T12:01:26.688Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "compensa-browser.log"
+    },
+    {
+      "name": "ufg-browser",
+      "startedAt": "2026-11-06T12:01:26.690Z",
+      "endedAt": "2026-11-06T12:01:56.295Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "ufg-browser.log"
+    },
+    {
+      "name": "production-compose",
+      "startedAt": "2026-11-06T12:01:56.296Z",
+      "endedAt": "2026-11-06T12:01:57.734Z",
+      "status": "PASS",
+      "exitCode": 0,
+      "error": null,
+      "evidence": "production-compose.log"
+    }
+  ]
+}

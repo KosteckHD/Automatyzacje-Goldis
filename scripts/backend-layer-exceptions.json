@@ -1,0 +1,121 @@
+[
+  {
+    "file": "features/grouping/grouping.service.ts",
+    "rule": "service-controller-global-db-import",
+    "maximum": 1,
+    "scheduledRemoval": "D3",
+    "reason": "Istniejące naruszenie uchwycone w bazowym skanie 2026-10-16; usunąć w D3."
+  },
+  {
+    "file": "features/grouping/grouping.service.ts",
+    "rule": "service-controller-persistence-call",
+    "maximum": 17,
+    "scheduledRemoval": "D3",
+    "reason": "Istniejące naruszenie uchwycone w bazowym skanie 2026-10-16; usunąć w D3."
+  },
+  {
+    "file": "features/health/health.service.ts",
+    "rule": "service-controller-global-db-import",
+    "maximum": 1,
+    "scheduledRemoval": "D5",
+    "reason": "Istniejące naruszenie uchwycone w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/health/health.service.ts",
+    "rule": "service-controller-persistence-call",
+    "maximum": 2,
+    "scheduledRemoval": "D5",
+    "reason": "Istniejące naruszenie uchwycone w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/health/health.service.ts",
+    "rule": "service-controller-sql-text",
+    "maximum": 2,
+    "scheduledRemoval": "D5",
+    "reason": "Stan bazowy skanu architektury 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/imports/import.service.ts",
+    "rule": "service-controller-persistence-call",
+    "maximum": 2,
+    "scheduledRemoval": "D5",
+    "reason": "Istniejące naruszenie uchwycone w bazowym skanie 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/leads/business-leads.service.ts",
+    "rule": "service-controller-global-db-import",
+    "maximum": 1,
+    "scheduledRemoval": "D3",
+    "reason": "Istniejące naruszenie uchwycone w bazowym skanie 2026-10-16; usunąć w D3."
+  },
+  {
+    "file": "features/leads/business-leads.service.ts",
+    "rule": "service-controller-persistence-call",
+    "maximum": 36,
+    "scheduledRemoval": "D3",
+    "reason": "Istniejące naruszenie uchwycone w bazowym skanie 2026-10-16; usunąć w D3."
+  },
+  {
+    "file": "features/leads/business-leads.service.ts",
+    "rule": "service-controller-sql-text",
+    "maximum": 7,
+    "scheduledRemoval": "D3",
+    "reason": "Stan bazowy skanu architektury 2026-10-16; usunąć w D3."
+  },
+  {
+    "file": "features/preparations/preparation-workflows.service.ts",
+    "rule": "service-controller-sql-text",
+    "maximum": 1,
+    "scheduledRemoval": "D5",
+    "reason": "Stan bazowy skanu architektury 2026-10-16; usunąć w D5."
+  },
+  {
+    "file": "features/results/export-finalization.service.ts",
+    "rule": "service-controller-global-db-import",
+    "maximum": 1,
+    "scheduledRemoval": "D4",
+    "reason": "Istniejące naruszenie uchwycone w bazowym skanie 2026-10-16; usunąć w D4."
+  },
+  {
+    "file": "features/results/export-finalization.service.ts",
+    "rule": "service-controller-persistence-call",
+    "maximum": 8,
+    "scheduledRemoval": "D4",
+    "reason": "Istniejące naruszenie uchwycone w bazowym skanie 2026-10-16; usunąć w D4."
+  },
+  {
+    "file": "features/runs/run-admission.service.ts",
+    "rule": "service-controller-global-db-import",
+    "maximum": 1,
+    "scheduledRemoval": "D4",
+    "reason": "Istniejące naruszenie uchwycone w bazowym skanie 2026-10-16; usunąć w D4."
+  },
+  {
+    "file": "features/runs/run-admission.service.ts",
+    "rule": "service-controller-persistence-call",
+    "maximum": 12,
+    "scheduledRemoval": "D4",
+    "reason": "Istniejące naruszenie uchwycone w bazowym skanie 2026-10-16; usunąć w D4."
+  },
+  {
+    "file": "features/runs/run-dispatch.service.ts",
+    "rule": "service-controller-global-db-import",
+    "maximum": 1,
+    "scheduledRemoval": "D4",
+    "reason": "Istniejące naruszenie uchwycone w bazowym skanie 2026-10-16; usunąć w D4."
+  },
+  {
+    "file": "features/runs/run-dispatch.service.ts",
+    "rule": "service-controller-persistence-call",
+    "maximum": 10,
+    "scheduledRemoval": "D4",
+    "reason": "Istniejące naruszenie uchwycone w bazowym skanie 2026-10-16; usunąć w D4."
+  },
+  {
+    "file": "features/submissions/run-submissions.service.ts",
+    "rule": "service-controller-sql-text",
+    "maximum": 2,
+    "scheduledRemoval": "D5",
+    "reason": "Stan bazowy skanu architektury 2026-10-16; usunąć w D5."
+  }
+]

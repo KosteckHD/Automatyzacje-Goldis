@@ -27,6 +27,7 @@ export type RunSubmissionAdmissionTarget = Readonly<{
 }>;
 
 export type RunSubmissionAdmissionBase = Readonly<{
+  submission: RunSubmission | null;
   settings: ToolSettings | null;
   actorUser: User | null;
   membership: TenantMembership | null;
@@ -56,7 +57,7 @@ export class RunSubmissionAdmissionRepository {
     });
     if (!group || group.leaseOwner !== dispatcherId || group.runId) return null;
     const submission = await RunSubmission.findByPk(group.submissionId, {
-      attributes: ["importBatchId", "actorUserId", "tenantId", "toolId", "referenceDate"],
+      attributes: ["submissionId", "importBatchId", "actorUserId", "tenantId", "toolId", "referenceDate"],
     });
     return submission ? { groupId, group, submission } : null;
   }
@@ -67,12 +68,16 @@ export class RunSubmissionAdmissionRepository {
   ): Promise<T> {
     return sequelize.transaction(async (transaction) => {
       const { submission } = target;
-      const settings = await ToolSettings.findOne({
-        where: { tenantId: submission.tenantId, toolId: submission.toolId },
+      const actorUser = await User.findByPk(submission.actorUserId, {
         transaction,
         lock: transaction.LOCK.UPDATE,
       });
-      const actorUser = await User.findByPk(submission.actorUserId, {
+      const lockedSubmission = await RunSubmission.findByPk(submission.submissionId, {
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+      const settings = await ToolSettings.findOne({
+        where: { tenantId: submission.tenantId, toolId: submission.toolId },
         transaction,
         lock: transaction.LOCK.UPDATE,
       });
@@ -91,7 +96,7 @@ export class RunSubmissionAdmissionRepository {
         transaction,
         lock: transaction.LOCK.UPDATE,
       });
-      return work({ settings, actorUser, membership, tool, grant, batch }, transaction);
+      return work({ submission: lockedSubmission, settings, actorUser, membership, tool, grant, batch }, transaction);
     });
   }
 
@@ -186,6 +191,7 @@ export class RunSubmissionAdmissionRepository {
           runId: null,
           admissionState: { [Op.in]: ["pending", "waiting_capacity", "waiting_window", "waiting_paused", "leased"] },
           [Op.and]: [
+            { [Op.or]: [{ reasonCode: null }, { reasonCode: { [Op.ne]: "SUBMISSION_PAUSED" } }] },
             { [Op.or]: [{ nextAttemptAt: null }, { nextAttemptAt: { [Op.lte]: now } }] },
             { [Op.or]: [{ leaseExpiresAt: null }, { leaseExpiresAt: { [Op.lte]: now } }] },
           ],

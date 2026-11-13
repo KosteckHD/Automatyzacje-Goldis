@@ -17,6 +17,7 @@ import type {
   PreparedRowStatus,
   SourceRow,
 } from "../../infrastructure/database/db";
+import { sanitizePublicText } from "../../infrastructure/http";
 import { AuditService } from "../audit/public";
 import type { SessionPrincipal } from "../auth";
 import { canAccessTool } from "../authorization/public";
@@ -48,6 +49,12 @@ type PreparedSnapshot = Readonly<{
   issues: string[];
   regonProvenance: "none" | "import" | "approved_correction" | "registry";
 }>;
+
+function publicCompanyName(sourceSnapshot: unknown): string | null {
+  if (!sourceSnapshot || typeof sourceSnapshot !== "object" || Array.isArray(sourceSnapshot)) return null;
+  const value = (sourceSnapshot as Record<string, unknown>).companyName;
+  return typeof value === "string" ? sanitizePublicText(value) : null;
+}
 
 function digest(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value), "utf8").digest("hex");
@@ -373,17 +380,27 @@ export class ImportPreparationService implements OnModuleInit, OnModuleDestroy {
     return publicPreparation(preparation);
   }
 
-  async rows(batchId: string, preparationId: string, page: number, state: string | undefined, actor: Actor) {
+  async rows(
+    batchId: string,
+    preparationId: string,
+    page: number,
+    state: string | undefined,
+    search: string,
+    actor: Actor,
+  ) {
+    const query = search.trim();
     if (
       !Number.isSafeInteger(page) ||
       page < 1 ||
       page > 100_000 ||
+      query.length > 120 ||
+      Array.from(query).some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127) ||
       (state !== undefined &&
         !["pending", "ready", "review", "skipped_no_identifiers", "duplicate", "waiting_registry", "excluded"].includes(
           state,
         ))
     ) {
-      throw new BadRequestException("Nieprawidłowa strona lub filtr przygotowania");
+      throw new BadRequestException("Nieprawidłowa strona, filtr lub wyszukiwanie przygotowania");
     }
     const preparation = await this.get(batchId, preparationId, actor);
     const [items, total] = await this.repository.findPreparedPage(
@@ -391,6 +408,7 @@ export class ImportPreparationService implements OnModuleInit, OnModuleDestroy {
       state as PreparedRowStatus | undefined,
       page,
       PAGE_SIZE,
+      query,
     );
     return {
       preparationId,
@@ -398,6 +416,7 @@ export class ImportPreparationService implements OnModuleInit, OnModuleDestroy {
       page,
       pageSize: PAGE_SIZE,
       total,
+      search: query,
       rows: items.map((item) => ({
         rowNumber: item.rowNumber,
         sourceRowId: item.sourceRowId,
@@ -405,6 +424,7 @@ export class ImportPreparationService implements OnModuleInit, OnModuleDestroy {
         status: item.status,
         reasonCode: item.reasonCode,
         representativeRowNumber: item.representativeRowNumber,
+        companyName: publicCompanyName(item.sourceSnapshot),
         normalizedName: item.normalizedName,
         normalizedNip: item.normalizedNip,
         effectiveRegon: item.effectiveRegon,

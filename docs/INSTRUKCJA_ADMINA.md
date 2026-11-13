@@ -14,6 +14,15 @@ Interfejs wykorzystuje oryginalne logo Goldis, ciemne powierzchnie z ciepłym z�
 
 Widoczność narzędzia, uruchamianie, odczyt wyników i pobranie pliku są w UI rozdzielone zgodnie z grantem otrzymanym przez sesję. Te stany mają ułatwiać obsługę; API ponownie autoryzuje każde żądanie i jest jedynym zabezpieczeniem danych. Przepływy z syntetycznym API można sprawdzić poleceniami `npm run test:tool-grants-ui-smoke -w @goldis/web` i `npm run test:admin-ui-smoke -w @goldis/web`.
 
+## Codzienna praca pracownika i menedżera
+
+- **Moje firmy** zawiera firmy przydzielone zalogowanemu pracownikowi. Otwórz firmę, użyj bezpośredniego linku telefonu lub e-maila, zapisz status kontaktu i wybierz „Następna firma”. Lista pamięta filtry, stronę i pozycję powrotu w tej karcie.
+- **Pula firm** zawiera gotowe wyniki OC. Menedżer najpierw wybiera odbiorcę i liczbę firm, sprawdza podsumowanie przydziału, a zapisuje go dopiero osobnym potwierdzeniem. Pracownik nie widzi formularza przydziału.
+- **Automatyzacje → Sprawdzanie OC** prowadzi przez osiem etapów: plik, kontrola danych, REGON, deduplikacja, wybór wierszy, podsumowanie i start, przebieg oraz wyniki. Można otwierać etapy bez uruchamiania operacji. Import nie wysyła zapytań do portali.
+- Wybór „Wszystkie gotowe firmy” pokazuje liczby całej rewizji i paginowaną listę firm do przejrzenia. Przy wyborze częściowym zaznaczenia obejmują tylko widoczne strony, a zakres wierszy i lista numerów są w trybie zaawansowanym. Podgląd wyjaśnia, które firmy są gotowe, wymagają kontroli lub zostaną pominięte.
+- Zadania zaczynają się dopiero po osobnym potwierdzeniu aktualnego podsumowania. Po odświeżeniu odtwarza się lokalny wybór bez zgody i bez startu. Jeśli serwer nie potwierdzi startu, „Ponów tę samą próbę” używa tego samego payloadu i klucza idempotencji.
+- Stan dostępności mówi, co można zrobić w danej chwili. Szczegóły workera, usług i konfiguracji są w sekcji „Szczegóły techniczne”. Przejście do kolejnego etapu samo nie uruchamia portali.
+
 ## Role i zakres danych
 
 | Rola | Dane i działania |
@@ -32,11 +41,13 @@ Grant do narzędzia ma cztery niezależne flagi:
 
 Reguły implikacji są egzekwowane przez bazę i API: uruchamianie wymaga widoczności, a pobieranie wymaga odczytu wyników. Administrator ma dostęp do każdego narzędzia w tenancie; ustawienie narzędzia w konserwacji blokuje nowe uruchomienia również administratorowi. Operator bez grantu nie uzyskuje dostępu przez wpisanie znanego adresu URL.
 
+Roli Audytor nie można nadać grantu narzędzia. Przy zmianie użytkownika na tę rolę system cofa jego granty narzędziowe w danym tenancie, unieważnia sesje i zapisuje korektę w audycie. Dla starszych rekordów najpierw uruchom `node apps/api/scripts/auditor-tool-grants.cjs` jako dry-run; po sprawdzeniu identyfikatorów tenantów i użytkowników wykonaj `node apps/api/scripts/auditor-tool-grants.cjs --apply`. Komenda usuwa wyłącznie granty członkostw z rolą Audytor i zapisuje zdarzenie `tool.grant.revoked` dla każdego usuniętego grantu.
+
 ## Konta i sesje
 
 Utwórz konto w sekcji **Konta i bezpieczeństwo**. Login jest unikatowy bez względu na wielkość liter. Hasło tymczasowe musi mieć co najmniej 14 znaków. Po pierwszym logowaniu użytkownik musi zmienić hasło; platforma go nie wysyła, więc przekaż je bezpiecznym kanałem.
 
-Nowe konto nie ma grantów do narzędzi. Nadaj rolę i granty osobno, zgodnie z obowiązkami użytkownika. Po zmianie roli platforma cofa wszystkie jego sesje; przy zmianie roli na inną niż administrator zdejmuje też otwarte przydziały. Odebranie odczytu lub wykonania z grantu zdejmuje tylko te przydziały, których uprawnienia zostały odebrane. Wyłączenie konta również cofa sesje i usuwa przydziały z otwartych interwencji. Ponowne włączenie konta nie przywraca cofniętych sesji ani zdjętych przydziałów.
+Nowe konto nie ma grantów do narzędzi. Nadaj rolę i granty osobno, zgodnie z obowiązkami użytkownika. Po zmianie roli platforma cofa wszystkie jego sesje; przy zmianie roli na inną niż administrator zdejmuje też otwarte przydziały. Zmiana roli na Audytora dodatkowo usuwa jego granty narzędziowe. Odebranie odczytu lub wykonania z grantu zdejmuje tylko te przydziały, których uprawnienia zostały odebrane. Wyłączenie konta również cofa sesje i usuwa przydziały z otwartych interwencji. Ponowne włączenie konta nie przywraca cofniętych sesji ani zdjętych przydziałów.
 
 Hasło można zresetować z ekranu zarządzania kontem. Wprowadzone hasło nie jest później wyświetlane; następne logowanie wymaga jego zmiany. Użytkownik może obejrzeć własne sesje pod `/account` i cofnąć pojedynczą sesję. Administrator widzi sesje użytkowników i może cofnąć jedną lub wszystkie. Cofnięcie bieżącej sesji wyloguje administratora po następnym żądaniu.
 
@@ -60,7 +71,7 @@ Ustawienia są przypisane do narzędzia i mają wersję. Zmiana z nieaktualną w
 - **Limit startów na godzinę** ogranicza liczbę zadań utworzonych w poprzednich 60 minutach dla organizacji i narzędzia. Przekroczenie zwraca `429`.
 - **Okno pracy** wymaga podania obu godzin albo wyczyszczenia obu. Godziny są interpretowane w wybranej strefie czasowej; okno może przechodzić przez północ.
 
-Ustawienia nie włączają portali live. `WORKER_LIVE_PORTALS=0` pozostaje domyślną bezpieczną konfiguracją; odbiór PZU/Compensy ma osobne bramki.
+Ustawienia nie włączają portali live. `WORKER_LIVE_PORTALS=0` pozostaje domyślną bezpieczną konfiguracją; odbiór PZU/Compensy ma osobne bramki. Status gotowości workera i konfiguracji nie potwierdza zalogowanej sesji portalu; portal może ponownie wymagać logowania lub kodu SMS.
 
 ## Audyt i raporty
 

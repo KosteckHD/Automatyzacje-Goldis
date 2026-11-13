@@ -1,0 +1,130 @@
+- link "Przejdź do głównej treści":
+  - /url: "#main-content"
+- complementary:
+  - link "GOLDIS platforma operacyjna":
+    - /url: /dashboard
+    - strong: GOLDIS
+    - text: platforma operacyjna
+  - paragraph: PRACA
+  - navigation "Główna nawigacja":
+    - link "Przegląd":
+      - /url: /dashboard
+    - link "Moje firmy":
+      - /url: /my-results
+    - link "Pula firm":
+      - /url: /results/oc-policy-verification
+    - link "Automatyzacje":
+      - /url: /tools
+    - link "Przebiegi":
+      - /url: /runs
+    - link "Historia importów":
+      - /url: /imports
+    - link "Powiadomienia":
+      - /url: /notifications
+      - text: Powiadomienia 2
+    - link "Moje korekty":
+      - /url: /review
+  - paragraph: KONTO
+  - navigation "Zarządzanie":
+    - link "Moje konto":
+      - /url: /account
+  - button "Zwiń nawigację": Zwiń menu
+  - text: Pracownik
+- banner:
+  - text: GOLDIS / AUTOMATYZACJE anna.nowak · Pracownik
+  - link "Moje konto":
+    - /url: /account
+- main:
+  - paragraph: Automatyzacje Sprawdzanie OC
+  - heading "Sprawdzanie OC" [level=1]
+  - paragraph: Pracuj na jednym etapie. Do pozostałych wrócisz w każdej chwili.
+  - link "Historia importów":
+    - /url: /imports
+  - region "Bieżący import":
+    - strong: Baza transportowa — październik.xlsx
+    - text: Arkusz „Realizacja” 64 wierszy
+    - link "Zmień plik":
+      - /url: /tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=upload
+  - complementary "Kroki automatyzacji":
+    - heading "Kroki automatyzacji" [level=2]
+    - navigation "Przejdź do kroku":
+      - link "Plik Excel Plik zaimportowany":
+        - /url: /tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=upload
+        - strong: Plik Excel
+        - text: Plik zaimportowany
+      - link "Kontrola danych Kontrola dostępna":
+        - /url: /tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=validation
+        - strong: Kontrola danych
+        - text: Kontrola dostępna
+      - link "Uzupełnianie REGON Dane do sprawdzenia":
+        - /url: /tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=regon
+        - strong: Uzupełnianie REGON
+        - text: Dane do sprawdzenia
+      - link "Deduplikacja Zestaw przygotowany":
+        - /url: /tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=deduplication
+        - strong: Deduplikacja
+        - text: Zestaw przygotowany
+      - link "Wybór wierszy Wybierz firmy":
+        - /url: /tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=selection
+        - strong: Wybór wierszy
+        - text: Wybierz firmy
+      - link "Podsumowanie i start Oczekuje na podsumowanie":
+        - /url: /tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=launch
+        - strong: Podsumowanie i start
+        - text: Oczekuje na podsumowanie
+      - link "Przebieg zadań Brak uruchomienia":
+        - /url: /tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=progress
+        - strong: Przebieg zadań
+        - text: Brak uruchomienia
+      - link "Wyniki i eksport Brak wyników":
+        - /url: /tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=results
+        - strong: Wyniki i eksport
+        - text: Brak wyników
+    - paragraph: Wybierz dowolny krok, aby zobaczyć szczegóły.
+  - region "Wybór wierszy":
+    - paragraph: Krok 5 z 8
+    - heading "Wybór wierszy" [level=2]
+    - region "Wybierz wiersze do sprawdzenia":
+      - paragraph: KROK 05 / ZAKRES
+      - heading "Wybierz wiersze do sprawdzenia" [level=2]
+      - button "Wyczyść zapisany wybór"
+      - heading "Wszystkie gotowe firmy" [level=3]
+      - paragraph: System użyje najnowszej zamkniętej rewizji i podzieli ją na porcje do 500. Przed startem pokaże liczbę gotowych firm i problemów.
+      - button "Sprawdź wszystkie gotowe firmy"
+      - group "Tryb wyboru firm":
+        - button "Wybierz firmy" [pressed]
+        - button "Zakres lub numery wierszy"
+      - region "Wybrane firmy":
+        - heading "Wybrane firmy" [level=3]
+        - paragraph: Wyszukuj w przygotowanej rewizji. Zaznaczenia zachowują się przy przejściu między stronami.
+        - strong: 0 / 500 wybranych
+        - text: Szukaj po nazwie, NIP, REGON lub numerze wiersza
+        - searchbox "Szukaj po nazwie, NIP, REGON lub numerze wiersza"
+        - text: 64 firm pasuje do wyszukiwania
+        - checkbox "Zaznacz firmy na tej stronie (3)"
+        - text: Zaznacz firmy na tej stronie (3)
+        - list "Firmy z przygotowanej rewizji":
+          - listitem:
+            - checkbox
+            - strong: Transport i Logistyka Alfa sp. z o.o.
+            - text: "NIP: 5260250275 · REGON: 012345678 · wiersz 14 Gotowa do sprawdzenia"
+          - listitem:
+            - checkbox
+            - strong: Polskie Drogi Transport sp. z o.o.
+            - text: "NIP: 5260250275 · REGON: — · wiersz 16 Wymaga kontroli · Należy najpierw ustalić REGON w rejestrze."
+          - listitem:
+            - checkbox
+            - strong: Transport i Logistyka Alfa sp. z o.o.
+            - text: "NIP: 5260250275 · REGON: 012345678 · wiersz 18 Duplikat · Zostanie użyty wskazany wiersz reprezentujący firmę."
+        - navigation "Strony firm":
+          - button "Poprzednia" [disabled]
+          - text: Strona 1 z 2
+          - button "Następna"
+      - paragraph: Podgląd obejmie wyłącznie zaznaczone firmy; zaznaczanie dotyczy tylko bieżącej strony, a wybór zachowuje się między stronami.
+      - button "Sprawdź podsumowanie (0)" [disabled]
+  - 'link "Wstecz: deduplikacja"':
+    - /url: /tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=deduplication
+  - paragraph: Przejście do kolejnego kroku nie uruchamia portali.
+  - 'link "Otwórz etap: podsumowanie i start"':
+    - /url: /tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444&step=launch
+- alert

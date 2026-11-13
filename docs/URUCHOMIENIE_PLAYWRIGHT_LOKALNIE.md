@@ -13,7 +13,7 @@ Worker utrzymuje jeden dedykowany profil Chromium i jest jego jedynym właścici
 
    Skrypt automatycznie uruchamia tylko PostgreSQL i Redis w odizolowanym projekcie Compose `goldis-local`, buduje workspace’y, wykonuje preflight bez ujawniania wartości środowiska, uruchamia migracje, ponawia preflight schematu i dopiero potem startuje API, panel oraz workery. `Ctrl+C` zamyka procesy aplikacji wraz z ich potomkami; kontenery bazy/Redis i ich dane pozostają. Logi usług trafiają do `%LOCALAPPDATA%\Goldis\logs`. Aby pominąć start kontenerów, użyj `npm run start:local -- -SkipDataServices`.
 
-3. Otwórz `http://127.0.0.1:3000`. Panel rozróżnia dostępność API/DB/Redis, heartbeat workera i stan „Portale wyłączone”. `/api/health/live` to liveness, `/api/health/ready` sprawdza DB/Redis, a `/api/health/automation` pokazuje bezpieczny stan workera/configu bez sekretów i ścieżek.
+3. Otwórz `http://127.0.0.1:3000`. Panel rozróżnia dostępność API/DB/Redis, heartbeat workera i stan „Portale wyłączone”. `/api/health/live` to liveness, `/api/health/ready` sprawdza DB/Redis, a `/api/health/automation` pokazuje bezpieczny stan workera/configu bez sekretów i ścieżek. `automationReady=true` oznacza gotowy worker i konfigurację; nie potwierdza aktywnej sesji w portalu ani tego, czy portal zażąda logowania lub SMS.
 
 W trybie `off` nie są wymagane loginy i hasła portali, ale wymagane są dostępne usługi, klucz szyfrowania PESEL, sekret wewnętrznego kanału i prywatny trwały katalog profilu. Runy zostają w stanie oczekiwania na adapter i nie otwierają portali.
 
@@ -25,7 +25,9 @@ Pełen Compose uruchamia headless worker. Używaj go zamiast lokalnego workera, 
 docker compose up -d --build
 ```
 
-Compose ma osobny trwały wolumen profilu i stagingu; plik selektorów jest montowany tylko do odczytu. `WORKER_LIVE_PORTALS` domyślnie wynosi `0`. Nie wpisuj sekretów do przykładowego pliku konfiguracji selektorów. Worker blokuje drugiego właściciela portali wspólną blokadą w PostgreSQL.
+Compose ma osobny trwały wolumen profilu i stagingu; plik selektorów jest montowany tylko do odczytu. `WORKER_LIVE_PORTALS` i `WORKER_START_PAUSED` domyślnie wynoszą `0`. `WORKER_START_PAUSED=1` przygotowuje workera bez pobierania zadań i jest dozwolone tylko przy `WORKER_LIVE_PORTALS=0`. Nie wpisuj sekretów do przykładowego pliku konfiguracji selektorów.
+
+W Docker Desktop katalog sekretów wskazany w `.env.local` musi być dostępny jako pliki dla silnika Docker. W głównej lokalnej instalacji pliki znajdują się w ignorowanym przez Git i zabezpieczonym ACL katalogu `.goldis-local-secrets`. Nie kopiuj go do repozytorium ani nie zmieniaj ACL. Worker rezerwuje profil plikiem `.goldis-worker.lock`, więc blokada działa także między workerami podłączonymi do różnych baz. Jeśli worker po awarii zgłasza `WORKER_PROFILE_ALREADY_IN_USE`, sprawdź wszystkie procesy i kontenery używające tego wolumenu; usuń blokadę dopiero po potwierdzeniu, że żaden z nich nie działa.
 
 ## Włączenie portali
 

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { Inject, Injectable } from "@nestjs/common";
-import { Op, QueryTypes, Sequelize, type Transaction } from "sequelize";
+import { Op, QueryTypes, Sequelize, type Transaction, type WhereOptions } from "sequelize";
 import { API_DATABASE } from "../../infrastructure/database";
 import { ImportBatchModel, SourceRowModel } from "./imports.model";
 
@@ -64,19 +64,45 @@ export class ImportsRepository {
     return ImportBatchModel.findByPk(id);
   }
 
-  findRows(batchId: string, page: number, state: "all" | "ready" | "review"): Promise<SourceRowModel[]> {
-    const condition =
-      state === "all"
-        ? undefined
-        : Sequelize.where(Sequelize.fn("jsonb_array_length", Sequelize.col("issues")), {
-            [state === "ready" ? Op.eq : Op.gt]: 0,
-          });
+  private rowConditions(batchId: string, state: "all" | "ready" | "review", search = "", issueCode?: string) {
+    const conditions: WhereOptions[] = [{ batchId }];
+    if (state !== "all")
+      conditions.push(
+        Sequelize.where(Sequelize.fn("jsonb_array_length", Sequelize.col("issues")), {
+          [state === "ready" ? Op.eq : Op.gt]: 0,
+        }) as unknown as WhereOptions,
+      );
+    if (search) {
+      const pattern = `%${search.replace(/[\\%_]/g, (character) => `\\${character}`)}%`;
+      conditions.push({
+        [Op.or]: ["companyName", "decisionMakerName", "regonRaw", "nipRaw", "address", "postalCode", "city"].map(
+          (field) => ({
+            [field]: { [Op.iLike]: pattern },
+          }),
+        ),
+      });
+    }
+    if (issueCode) conditions.push({ issues: { [Op.contains]: [issueCode] } });
+    return { [Op.and]: conditions };
+  }
+
+  findRows(
+    batchId: string,
+    page: number,
+    state: "all" | "ready" | "review",
+    search = "",
+    issueCode?: string,
+  ): Promise<SourceRowModel[]> {
     return SourceRowModel.findAll({
-      where: condition ? { [Op.and]: [{ batchId }, condition] } : { batchId },
+      where: this.rowConditions(batchId, state, search, issueCode),
       order: [["rowNumber", "ASC"]],
       limit: 50,
       offset: (page - 1) * 50,
     });
+  }
+
+  countRows(batchId: string, state: "all" | "ready" | "review", search = "", issueCode?: string) {
+    return SourceRowModel.count({ where: this.rowConditions(batchId, state, search, issueCode) });
   }
 
   async findEnrichmentReview(id: string, page: number) {

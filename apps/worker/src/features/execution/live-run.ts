@@ -5,7 +5,6 @@ import { createAuthChallenge, fingerprintPortalAccount, invalidateUncertainAuthC
 import { BrowserSession, type Portal } from "../../infrastructure/browser/browser";
 import { OneTimeCodeInbox } from "../authentication/code-inbox";
 import { CompensaFormAssistant } from "../../portals/compensa/compensa-form";
-import { CompensaClientChoice } from "../../portals/compensa/compensa-client-choice";
 import { PgCompensaOfferCheckpointStore } from "../../portals/compensa/compensa-offer-checkpoint";
 import { CompensaOfferSaver } from "../../portals/compensa/compensa-offer-saver";
 import { CompensaPortalSession } from "../../portals/compensa/compensa-session";
@@ -80,12 +79,6 @@ export class LiveRunProcessor {
       selectors: config.pzu.everest,
       adapterVersion: config.pzu.adapterVersion,
       credentials: () => this.credentials("pzu"),
-      resolvePersonName: config.compensa.form.customerMatches && config.compensa.form.customerMatchSelect
-        ? (context, pesel) => new CompensaClientChoice(browser, this.compensaSession, {
-          selectors: { cards: config.compensa.form.customerMatches!, selectButton: config.compensa.form.customerMatchSelect! },
-          credentials: () => this.credentials("compensa"), beforeAction: () => this.beforePortalAction("compensa"),
-        }).resolvePersonName(context.source.effectiveRegon!, pesel)
-        : undefined,
       beforeAction: () => this.beforePortalAction("pzu", true),
     });
     this.form = new CompensaFormAssistant(browser, this.compensaSession, {
@@ -406,6 +399,10 @@ export class LiveRunProcessor {
         const safeStep = checkpoint.rows[0]?.last_safe_step;
         if (safeStep === "compensa_offer_draft_open" || safeStep === "compensa_start_intent") {
           const result = await this.form.prepareInsuredForm(context, context.identity, signal, true);
+          if (result.kind === "skipped" || result.kind === "blocked") {
+            await this.fail(runId, status, result.kind === "skipped" ? "COMPENSA_PAYER_DATA_SKIPPED" : "COMPENSA_CUSTOMER_DATA_INCOMPLETE");
+            return;
+          }
           if (result.kind === "waiting_for_sms") { if (!await this.awaitSms(runId, "compensa", signal)) return; continue; }
           if (result.kind === "identity_review") {
             await this.repository.pauseForReview(runId, status, "identity_review", {
@@ -414,10 +411,12 @@ export class LiveRunProcessor {
             return;
           }
           if (result.kind === "waiting_for_manual_data" || result.kind === "portal_error") {
-            await this.fail(runId, status, result.kind === "portal_error" ? result.errorCode : "MANUAL_DATA_REQUIRED");
+            if (result.kind === "portal_error") await this.fail(runId, status, result.errorCode);
+            else await this.repository.pauseForReview(runId, status, "waiting_for_manual_data", { portal: "compensa", kind: "portal_error", reasonCode: "MANUAL_DATA_REQUIRED", fieldCode: result.fieldCode });
             return;
           }
           if (result.kind === "cancelled") return;
+          if (result.kind === "ready_to_save" && result.identity) await this.repository.saveIdentity(runId, result.identity);
           await this.move(runId, status, "compensa_form");
           continue;
         }
@@ -448,6 +447,10 @@ export class LiveRunProcessor {
         // No checkpoint means a new case: enter Compensa Komunikacja from the home page.
         // Requiring an already open draft here prevented every fresh production run.
         const result = await this.form.prepareInsuredForm(context, context.identity, signal);
+        if (result.kind === "skipped" || result.kind === "blocked") {
+          await this.fail(runId, status, result.kind === "skipped" ? "COMPENSA_PAYER_DATA_SKIPPED" : "COMPENSA_CUSTOMER_DATA_INCOMPLETE");
+          return;
+        }
         if (result.kind === "waiting_for_sms") {
           if (!await this.awaitSms(runId, "compensa", signal)) return;
           continue;
@@ -459,7 +462,7 @@ export class LiveRunProcessor {
           return;
         }
         if (result.kind === "waiting_for_manual_data") {
-          await this.fail(runId, status, "MANUAL_DATA_REQUIRED");
+          await this.repository.pauseForReview(runId, status, "waiting_for_manual_data", { portal: "compensa", kind: "portal_error", reasonCode: "MANUAL_DATA_REQUIRED", fieldCode: result.fieldCode });
           return;
         }
         if (result.kind === "cancelled") return;
@@ -467,10 +470,12 @@ export class LiveRunProcessor {
           await this.fail(runId, status, result.errorCode);
           return;
         }
+        if (result.kind === "ready_to_save" && result.identity) await this.repository.saveIdentity(runId, result.identity);
         await this.move(runId, status, "compensa_form");
         continue;
       }
       if (status === "compensa_form") {
+        if (!context.identity || context.identity.matchMethod === "regon_unique_pesel") { await this.fail(runId, status, "INPUT_INVALID"); return; }
         const result = await this.saver.saveInsuredData(runId, signal);
         if (result.kind === "waiting_for_sms") {
           await this.move(runId, status, "compensa_login");
@@ -478,7 +483,7 @@ export class LiveRunProcessor {
           continue;
         }
         if (result.kind === "waiting_for_manual_data" || result.kind === "outcome_uncertain") {
-          await this.fail(runId, status, "OFFER_SAVE_UNCONFIRMED");
+          await this.repository.pauseForReview(runId, status, "waiting_for_manual_data", { portal: "compensa", kind: "portal_error", reasonCode: "OFFER_SAVE_UNCONFIRMED", fieldCode: result.kind === "waiting_for_manual_data" ? result.fieldCode : "OFFER_SAVE_REVIEW" });
           return;
         }
         if (result.kind === "cancelled") return;
@@ -505,7 +510,7 @@ export class LiveRunProcessor {
           continue;
         }
         if (result.kind === "waiting_for_manual_data") {
-          await this.fail(runId, status, "PORTAL_FAILURE");
+          await this.repository.pauseForReview(runId, status, "waiting_for_manual_data", { portal: "compensa", kind: "portal_error", reasonCode: "PORTAL_FAILURE", fieldCode: result.fieldCode });
           return;
         }
         if (result.kind === "portal_error") {

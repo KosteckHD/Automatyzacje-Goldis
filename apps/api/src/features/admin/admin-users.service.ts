@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
@@ -11,7 +12,12 @@ import { containsControlCharacters } from "../../shared/control-characters";
 import { AuditService } from "../audit/public";
 import type { SessionPrincipal } from "../auth";
 import { applyPasswordChange, hashPassword, passwordPolicyFailure } from "../auth";
-import { runConfirmedPrivilegedAction } from "../privileged-actions/public";
+import { CommissionsService } from "../commissions/public";
+import {
+  PRIVILEGED_ACTION_PERSISTENCE,
+  type PrivilegedActionPersistence,
+  runConfirmedPrivilegedAction,
+} from "../privileged-actions/public";
 import { uuidPattern } from "./admin.support";
 import { AdminMutationsService } from "./admin-mutations.service";
 import type {
@@ -29,6 +35,8 @@ export class AdminUsersService {
     @Inject(AdminUsersRepository) private readonly repository: AdminUsersRepository,
     @Inject(AdminMutationsService) private readonly mutations: AdminMutationsService,
     @Inject(AuditService) private readonly audit: AuditService,
+    @Inject(PRIVILEGED_ACTION_PERSISTENCE) private readonly privilegedActionPersistence: PrivilegedActionPersistence,
+    @Inject(CommissionsService) private readonly commissions: CommissionsService,
   ) {}
 
   async createUser(actor: SessionPrincipal, input: AdminCreateUserInput) {
@@ -80,6 +88,7 @@ export class AdminUsersService {
             );
             return { ...user, role: input.role };
           },
+          this.privilegedActionPersistence,
         ),
       );
     } catch (error) {
@@ -132,6 +141,7 @@ export class AdminUsersService {
           const member = await this.repository.findMembershipForUpdate(actor.tenantId, userId, transaction);
           const tool = await this.repository.findTool(toolId, transaction);
           if (member?.status !== "active" || !tool) throw new NotFoundException();
+          if (member.role === "auditor") throw new ForbiddenException("Audytor nie może otrzymać grantu narzędzia");
           const existing = await this.repository.findToolGrantForUpdate(actor.tenantId, userId, toolId, transaction);
           if ((existing?.version ?? 0) !== input.expectedVersion)
             throw new ConflictException("Uprawnienia zmieniły się w innej sesji");
@@ -195,6 +205,7 @@ export class AdminUsersService {
             unassignedInterventions,
           };
         },
+        this.privilegedActionPersistence,
       ),
     );
   }
@@ -245,6 +256,55 @@ export class AdminUsersService {
           );
           return { userId, canDeleteData: input.canDeleteData, version };
         },
+        this.privilegedActionPersistence,
+      ),
+    );
+  }
+
+  async commissionDictionaryGrant(
+    actor: SessionPrincipal,
+    userId: string,
+  ): Promise<{ userId: string; granted: boolean }> {
+    const member = await this.repository.findGrantMeta(actor.tenantId, userId);
+    if (!member) throw new NotFoundException();
+    return { userId, granted: await this.commissions.hasDictionaryGrant(actor.tenantId, userId) };
+  }
+
+  async setCommissionDictionaryGrant(
+    actor: SessionPrincipal,
+    input: {
+      userId: string;
+      granted: boolean;
+      confirmationToken: unknown;
+      idempotencyKey: unknown;
+    },
+  ) {
+    return this.repository.transaction(async (transaction) =>
+      runConfirmedPrivilegedAction(
+        {
+          actor,
+          action: "admin.user.commission-dictionary-grant",
+          targetId: input.userId,
+          payload: { granted: input.granted },
+          token: input.confirmationToken,
+          idempotencyKey: input.idempotencyKey,
+          transaction,
+        },
+        async () => {
+          await this.mutations.lockTenantAdminChanges(actor, transaction, [input.userId]);
+          const member = await this.repository.findMembershipForUpdate(actor.tenantId, input.userId, transaction);
+          if (member?.status !== "active") throw new NotFoundException();
+          return this.commissions.setDictionaryGrant(
+            {
+              tenantId: actor.tenantId,
+              userId: input.userId,
+              grantedBy: actor.userId,
+              granted: input.granted,
+            },
+            transaction,
+          );
+        },
+        this.privilegedActionPersistence,
       ),
     );
   }
@@ -290,6 +350,7 @@ export class AdminUsersService {
           );
           return { userId, toolId, revoked: Boolean(grant), unassignedInterventions };
         },
+        this.privilegedActionPersistence,
       ),
     );
   }
@@ -350,6 +411,7 @@ export class AdminUsersService {
           );
           return { sessionId: input.sessionId, revoked: true, currentSession: input.sessionId === actor.sessionId };
         },
+        this.privilegedActionPersistence,
       ),
     );
   }
@@ -399,6 +461,7 @@ export class AdminUsersService {
           );
           return { revokedCount: count };
         },
+        this.privilegedActionPersistence,
       ),
     );
   }
@@ -499,6 +562,7 @@ export class AdminUsersService {
           );
           return { userId: input.userId, status: "active" as const };
         },
+        this.privilegedActionPersistence,
       ),
     );
   }
@@ -533,6 +597,10 @@ export class AdminUsersService {
               throw new ConflictException("Organizacja musi mieć co najmniej jednego aktywnego administratora");
           }
           const oldRole = member.role;
+          const revokedToolGrants =
+            input.role === "auditor" && oldRole !== "auditor"
+              ? await this.repository.deleteAllToolGrants(actor.tenantId, input.userId, transaction)
+              : 0;
           if (input.role !== "manager")
             await this.mutations.clearDeletionGrantForMembership(actor.tenantId, input.userId, transaction);
           const now = new Date();
@@ -575,12 +643,13 @@ export class AdminUsersService {
               resourceType: "user",
               resourceId: input.userId,
               outcome: "succeeded",
-              metadata: { oldRole, role: input.role, unassignedInterventions },
+              metadata: { oldRole, role: input.role, unassignedInterventions, revokedToolGrants },
             },
             transaction,
           );
-          return { userId: input.userId, role: member.role, unassignedInterventions };
+          return { userId: input.userId, role: member.role, unassignedInterventions, revokedToolGrants };
         },
+        this.privilegedActionPersistence,
       ),
     );
   }
@@ -625,6 +694,7 @@ export class AdminUsersService {
           });
           return { userId: input.userId, mustChangePassword: true };
         },
+        this.privilegedActionPersistence,
       ),
     );
   }

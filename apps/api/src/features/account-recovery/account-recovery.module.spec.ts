@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { AuditModule, AuditService } from "../audit/public";
 import { AuthModule, LoginRateLimiter } from "../auth";
+import { PrivilegedActionsModule } from "../privileged-actions/public";
 import { PasswordRecoveryController } from "./account-recovery.controller";
 import { AccountRecoveryModule } from "./account-recovery.module";
 import { AccountRecoveryRepository } from "./account-recovery.repository";
@@ -12,7 +13,11 @@ import { AUTH_MAIL_PROVIDER } from "./auth-mail-provider";
 import { ResendMailProvider } from "./resend-mail-provider";
 
 test("AccountRecoveryModule owns recovery routes and the mail adapter behind its provider token", () => {
-  assert.deepEqual(Reflect.getMetadata("imports", AccountRecoveryModule), [AuthModule, AuditModule]);
+  assert.deepEqual(Reflect.getMetadata("imports", AccountRecoveryModule), [
+    AuthModule,
+    AuditModule,
+    PrivilegedActionsModule,
+  ]);
   assert.deepEqual(Reflect.getMetadata("controllers", AccountRecoveryModule), [PasswordRecoveryController]);
   const providers = Reflect.getMetadata("providers", AccountRecoveryModule) as Array<
     unknown | { provide?: unknown; useClass?: unknown }
@@ -22,6 +27,7 @@ test("AccountRecoveryModule owns recovery routes and the mail adapter behind its
     LoginRateLimiter,
     AuditService,
     AccountRecoveryRepository,
+    Object,
   ]);
   assert.ok((Reflect.getMetadata("providers", AccountRecoveryModule) as unknown[]).includes(AccountRecoveryRepository));
   assert.ok(providers.includes(AuthMailDispatcher));

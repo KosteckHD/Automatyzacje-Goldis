@@ -14,6 +14,8 @@ test("zakres kolekcji wymaga tenant, ownership i view_results według roli", () 
   assert.match(operator, /b\.tenant_id = :tenantId/);
   assert.match(operator, /b\.owner_user_id = :userId/);
   assert.match(operator, /tg\.can_view_results = TRUE/);
+  assert.match(operator, /b\.owner_user_id = :userId[\s\S]*tg\.can_view_results = TRUE/);
+  assert.match(operator, /oc-policy-verification[\s\S]*OR \(b\.owner_user_id = :userId/);
   assert.doesNotMatch(operator, /tg\.can_download_results = TRUE/);
   assert.match(reviewer, /b\.tenant_id = :tenantId/);
   assert.doesNotMatch(reviewer, /owner_user_id/);

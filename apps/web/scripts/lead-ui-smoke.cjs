@@ -87,7 +87,11 @@ async function main() {
       }
       if (url.pathname === "/api/leads" && request.method() === "GET") {
         const items = Array.from({ length: 25 }, (_, index) => lead(index + 1, url.searchParams.get("scope") === "mine" ? employeeId : null));
-        return json({ items, nextCursor: null });
+        return json({ items, nextCursor: "next-page-cursor", previousCursor: null, summary: {
+          scopeTotal: 80, matchingTotal: 80,
+          byContactStatus: { not_contacted: 80, contacted: 0, callback_requested: 0, offer_accepted: 0, not_interested: 0, unreachable: 0 },
+          checkedAt: "2026-10-12T08:00:00.000Z",
+        } });
       }
       if (url.pathname === "/api/leads/allocations" && request.method() === "POST") {
         const body = request.postDataJSON();
@@ -109,9 +113,9 @@ async function main() {
     });
 
     await page.goto(`${base}/results/oc-policy-verification?resultSetId=${resultSetId}`);
-    await page.getByRole("heading", { name: "Wyniki automatyzacji OC" }).waitFor({ state: "visible" });
+    await page.getByRole("heading", { name: "Pula firm" }).waitFor({ state: "visible" });
     await page.getByText("Dostępne do przydziału: 80", { exact: false }).waitFor({ state: "visible" });
-    await page.getByText("25 na stronie", { exact: true }).waitFor({ state: "visible" });
+    await page.getByText("25 firm na stronie · 80 w tym widoku", { exact: true }).waitFor({ state: "visible" });
     await page.getByLabel("Odbiorca").selectOption(employeeId);
     await page.getByLabel("Liczba leadów").fill("81");
     assert.equal(await page.getByRole("button", { name: "Sprawdź przydział" }).isDisabled(), true,
@@ -162,7 +166,7 @@ async function main() {
     role = "operator";
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${base}/my-results`);
-    await page.getByRole("heading", { name: "Moje wyniki" }).waitFor({ state: "visible" });
+    await page.getByRole("heading", { name: "Moje firmy" }).waitFor({ state: "visible" });
     assert.equal(await page.locator(".lead-allocation").count(), 0, "operator never sees the assignment form");
     await page.getByRole("button", { name: "Otwórz menu nawigacji" }).click();
     await page.getByRole("dialog", { name: "Nawigacja" }).getByRole("link", { name: "Moje korekty" }).click();

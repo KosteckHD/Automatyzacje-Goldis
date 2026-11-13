@@ -1,0 +1,34 @@
+{
+  "runId": "remediation-2026-10-17",
+  "baseCommit": "af512e9502218d336b4b73df0c5f612905c6ac7b",
+  "environment": {
+    "os": "Windows 10.0.26200",
+    "node": "v24.11.1",
+    "npm": "11.6.2",
+    "postgresql": "18 (disposable local instance)",
+    "productionOrStagingTested": false,
+    "externalProviderTargetsContacted": false
+  },
+  "results": [
+    {
+      "id": "PT04-01",
+      "status": "PASS_RETEST",
+      "evidence": "reports DB+HTTP smoke and runtime role smoke; operator without current view_results sees no own private import metadata; detail is 404; same-session revocation and old cursor are denied; discover/execute-only grants are insufficient; OC positive control passes."
+    },
+    {
+      "id": "PT04-02",
+      "status": "PASS_RETEST",
+      "evidence": "reports DB smoke; private operation is absent from operations and actionRequired; OC remains visible; runtime role smoke repeats query as goldis_api."
+    },
+    {
+      "id": "PT12-04",
+      "status": "PASS_RETEST_FIXTURE_CORRECTED",
+      "evidence": "real Playwright click invoked the popup handler and emitted popup; disallowed request did not reach fixture; popup closed; next portal action was rejected before action count changed; independent Compensa page remained usable."
+    }
+  ],
+  "notRetested": {
+    "historicalScenarioTotalsRemainUnchanged": true,
+    "remainingBlockedOrInconclusiveCountFromOriginalPentest": 60,
+    "reason": "Full PG17, Redis, HTTPS/proxy, image/backup inspection and remaining scenario coverage require the unavailable Docker-backed environment."
+  }
+}

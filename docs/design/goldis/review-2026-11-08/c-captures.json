@@ -1,0 +1,583 @@
+[
+  {
+    "name": "c01-login",
+    "title": "Logowanie",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c01-login.png",
+    "requestedUrl": "/",
+    "url": "http://127.0.0.1:4178/",
+    "role": "none",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-signed-out",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Czytelny formularz i jedno główne CTA. Pomniejszyć dominujące logo/hasło oraz skrócić instrukcję resetu do konkretnego dostępnego działania."
+    ]
+  },
+  {
+    "name": "c02-tools",
+    "title": "Automatyzacje",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c02-tools.png",
+    "requestedUrl": "/tools",
+    "url": "http://127.0.0.1:4178/tools",
+    "role": "operator",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Dwa narzędzia są łatwe do odróżnienia. Status Dostępne oraz dwa badge uprawnień powtarzają informację; można je skompresować."
+    ]
+  },
+  {
+    "name": "c03-my-results",
+    "title": "Moje firmy",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c03-my-results.png",
+    "requestedUrl": "/my-results",
+    "url": "http://127.0.0.1:4178/my-results",
+    "role": "operator",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Status rozmowy jest dostępny bez otwierania firmy. Kontakty na desktopie sklejają etykiety z wartościami; eksport i odświeżanie mają różne style."
+    ]
+  },
+  {
+    "name": "c04-pool",
+    "title": "Pula firm",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c04-pool.png",
+    "requestedUrl": "/results/oc-policy-verification",
+    "url": "http://127.0.0.1:4178/results/oc-policy-verification",
+    "role": "manager",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Przydział ma osobny panel i liczbę dostępnych firm. Panel zajmuje dużo miejsca przed listą; kontakty desktop są sklejone."
+    ],
+    "mockOverrides": [
+      "GET /api/leads/allocation-summary => {availableCount:1,resultSetId:null,checkedAt:ISO}; fixture contract corrected via browser route"
+    ]
+  },
+  {
+    "name": "c05-imports",
+    "title": "Historia importów",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c05-imports.png",
+    "requestedUrl": "/imports",
+    "url": "http://127.0.0.1:4178/imports",
+    "role": "manager",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Nazwa pliku i CTA Otwórz import są czytelne. Zamiast technicznego oc-policy-verification pokazać nazwę narzędzia; uprościć duży nagłówek i objaśnienie strefy."
+    ]
+  },
+  {
+    "name": "c06-import-detail",
+    "title": "Szczegóły importu",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c06-import-detail.png",
+    "requestedUrl": "/imports/44444444-4444-4444-8444-444444444444",
+    "url": "http://127.0.0.1:4178/tools/oc-policy-verification?import=44444444-4444-4444-8444-444444444444",
+    "role": "operator",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Adres importu poprawnie otwiera kontrolę danych OC z zachowanym plikiem. Ramki i powtarzane nazwy etapu można uprościć."
+    ]
+  },
+  {
+    "name": "c07-runs",
+    "title": "Przebiegi",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c07-runs.png",
+    "requestedUrl": "/runs",
+    "url": "http://127.0.0.1:4178/runs",
+    "role": "manager",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Status i Otwórz zadanie są łatwe do znalezienia. Zamiast UUID importu wyświetlić nazwę pliku lub firmy, aby można było rozpoznać zadanie."
+    ]
+  },
+  {
+    "name": "c08-run-detail",
+    "title": "Szczegóły zadania",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c08-run-detail.png",
+    "requestedUrl": "/runs/55555555-5555-4555-8555-555555555555",
+    "url": "http://127.0.0.1:4178/tools/oc-policy-verification?run=55555555-5555-4555-8555-555555555555",
+    "role": "operator",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Zadanie otwiera kontekst OC i udostępnia pobranie wyniku. Zmniejszyć liczbę paneli oraz lepiej uporządkować relację zadania do całego sprawdzenia."
+    ]
+  },
+  {
+    "name": "c09-result-history",
+    "title": "Historia wyników",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c09-result-history.png",
+    "requestedUrl": "/results/history",
+    "url": "http://127.0.0.1:4178/results/history",
+    "role": "manager",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Wyraźnie oddzielono Otwórz wynik i Pobierz Excel. Wiersz i identyfikator importu słabo pomagają rozpoznać firmę; przyda się nazwa źródła."
+    ]
+  },
+  {
+    "name": "c10-submission",
+    "title": "Szczegóły zgłoszenia",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c10-submission.png",
+    "requestedUrl": "/submissions/88888888-8888-4888-8888-888888888888",
+    "url": "http://127.0.0.1:4178/submissions/88888888-8888-4888-8888-888888888888",
+    "role": "operator",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Widać powód oczekiwania na limit zadań. Dziewięć równorzędnych liczników i termin Przyjęte runy utrudniają szybkie ustalenie następnego działania."
+    ]
+  },
+  {
+    "name": "c11-notifications",
+    "title": "Powiadomienia",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c11-notifications.png",
+    "requestedUrl": "/notifications",
+    "url": "http://127.0.0.1:4178/notifications",
+    "role": "operator",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "blocked-ui-loading",
+    "synthetic": true,
+    "errors": [],
+    "failure": "Successful auth branch never calls setAuthenticated(true), NotificationWorkspace.tsx:52-58,89",
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Blokada: ekran stale pokazuje Sprawdzam sesję… przy poprawnej sesji. NotificationWorkspace.tsx w ścieżce sukcesu nie ustawia setAuthenticated(true), a warunek authenticated===null zatrzymuje render."
+    ]
+  },
+  {
+    "name": "c12-account",
+    "title": "Konto i bezpieczeństwo",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c12-account.png",
+    "requestedUrl": "/account",
+    "url": "http://127.0.0.1:4178/account",
+    "role": "operator",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Dobre rozdzielenie odzyskiwania, hasła i sesji. Nagłówek Twoje sesje, Twoje hasło zajmuje dużo przestrzeni; wymagania i skutki zmiany są czytelne. Statusy wygaśnięcia pochodzą z dat fixture."
+    ]
+  },
+  {
+    "name": "c13-team",
+    "title": "Pracownicy",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c13-team.png",
+    "requestedUrl": "/team",
+    "url": "http://127.0.0.1:4178/team",
+    "role": "manager",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Tworzenie konta i lista pracowników są oddzielone. Zmniejszyć pionowe puste przestrzenie formularza oraz szerokość tabeli, bo Zarządzaj jest schowane za prawą krawędzią."
+    ]
+  },
+  {
+    "name": "c14-access",
+    "title": "Dostępy",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c14-access.png",
+    "requestedUrl": "/access",
+    "url": "http://127.0.0.1:4178/access",
+    "role": "manager",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Prosty wiersz pracownika z jawnym przełącznikiem. Można skrócić powtarzany pod każdym kontem opis wspólnego podglądu i odrębnych uprawnień."
+    ]
+  },
+  {
+    "name": "c15-reports",
+    "title": "Raporty",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c15-reports.png",
+    "requestedUrl": "/reports",
+    "url": "http://127.0.0.1:4178/reports",
+    "role": "manager",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Czytelny podział na kontakt z klientami i operacje, z wyjaśnieniem zakresu dat. Warto wyróżnić wskaźnik wymagający reakcji zamiast równorzędnych kart wszystkich liczb."
+    ]
+  },
+  {
+    "name": "c16-review",
+    "title": "Weryfikacja danych",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c16-review.png",
+    "requestedUrl": "/review",
+    "url": "http://127.0.0.1:4178/review?tab=corrections",
+    "role": "reviewer",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Porównanie starego i proponowanego REGON-u dobrze wspiera decyzję. Otwórz import i Rozpatrz korektę stykają się; filtry wymagają ręcznie kopiowanego ID i technicznego ID narzędzia."
+    ]
+  },
+  {
+    "name": "c17-audit",
+    "title": "Dziennik aktywności",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c17-audit.png",
+    "requestedUrl": "/audit",
+    "url": "http://127.0.0.1:4178/audit?fromDay=2026-11-02&toDay=2026-11-08",
+    "role": "auditor",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Daty i wynik zdarzeń są widoczne. Techniczne kody czynności oraz UUID warto uzupełnić polską nazwą zdarzenia; podstawowe filtry oddzielić od zaawansowanych ID."
+    ]
+  },
+  {
+    "name": "c18-admin",
+    "title": "Administracja",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c18-admin.png",
+    "requestedUrl": "/admin",
+    "url": "http://127.0.0.1:4178/admin",
+    "role": "admin",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Sekcje mają kotwice w górnym pasku i konsekwentne grupowanie. To bardzo długa strona z wieloma równorzędnymi formularzami; rozdzielić obszary na osobne widoki lub zwijane sekcje."
+    ]
+  },
+  {
+    "name": "c19-login-mobile",
+    "title": "Logowanie na telefonie",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c19-login-mobile.png",
+    "requestedUrl": "/",
+    "url": "http://127.0.0.1:4178/",
+    "role": "none",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "synthetic-signed-out",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 390,
+      "scroll": 390
+    },
+    "notes": [
+      "Formularz mieści się na telefonie i ma wygodne pola. Duży blok logo i hasła przesuwa początek logowania; można go skrócić."
+    ]
+  },
+  {
+    "name": "c20-my-results-mobile",
+    "title": "Moje firmy na telefonie",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c20-my-results-mobile.png",
+    "requestedUrl": "/my-results",
+    "url": "http://127.0.0.1:4178/my-results",
+    "role": "operator",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 390,
+      "scroll": 390
+    },
+    "notes": [
+      "Karta firmy czytelnie rozdziela telefon, e-mail i status rozmowy. Przed pierwszą firmą są metryki, eksport i filtry; eksport jest ściśnięty do trzech linijek."
+    ]
+  },
+  {
+    "name": "c21-pool-mobile",
+    "title": "Pula firm na telefonie",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c21-pool-mobile.png",
+    "requestedUrl": "/results/oc-policy-verification",
+    "url": "http://127.0.0.1:4178/results/oc-policy-verification",
+    "role": "manager",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 390,
+      "scroll": 390
+    },
+    "notes": [
+      "Przydział mieści się na telefonie bez overflow całej strony. Pierwsza karta firmy pojawia się dopiero po długim bloku metryk, przydziału i filtrów; warto zwijać narzędzia."
+    ],
+    "mockOverrides": [
+      "GET /api/leads/allocation-summary => {availableCount:1,resultSetId:null,checkedAt:ISO}; fixture contract corrected via browser route"
+    ]
+  },
+  {
+    "name": "c22-admin-mobile",
+    "title": "Administracja na telefonie",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c22-admin-mobile.png",
+    "requestedUrl": "/admin",
+    "url": "http://127.0.0.1:4178/admin",
+    "role": "admin",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 390,
+      "scroll": 390
+    },
+    "notes": [
+      "Układ przechodzi do jednej kolumny. Strona ma około 7,6 tysiąca pikseli wysokości; podzielić administrację na sekcje do otwierania i uprościć szerokie tabele."
+    ]
+  },
+  {
+    "name": "c23-lead-detail",
+    "title": "Szczegóły firmy",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c23-lead-detail.png",
+    "requestedUrl": "/my-results/77777777-7777-4777-8777-777777777777",
+    "url": "http://127.0.0.1:4178/my-results/77777777-7777-4777-8777-777777777777",
+    "role": "operator",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Wynik OC gotowy i zapis statusu rozmowy są prawidłowo widoczne. Nawigacja poprzednia/kolejka/ostatnia i etykiety kontaktów sklejają się na desktopie."
+    ]
+  },
+  {
+    "name": "c24-commission-history",
+    "title": "Historia analiz prowizji",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c24-commission-history.png",
+    "requestedUrl": "/tools/commission-comparison",
+    "url": "http://127.0.0.1:4178/tools/commission-comparison",
+    "role": "operator",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Zakres, status oraz liczba braków są w jednym wierszu; Otwórz wynik jest jasne. Dodać rozpoznawalną nazwę analizy lub zestawu źródeł przy większej historii."
+    ]
+  },
+  {
+    "name": "c25-commission-result",
+    "title": "Wynik analizy prowizji",
+    "file": "C:\\Users\\micha\\Desktop\\Goldis-Automatyzacje\\docs\\design\\goldis\\review-2026-11-08\\c25-commission-result.png",
+    "requestedUrl": "/tools/commission-comparison",
+    "url": "http://127.0.0.1:4178/tools/commission-comparison",
+    "role": "operator",
+    "viewport": {
+      "width": 1440,
+      "height": 1040
+    },
+    "state": "synthetic-populated",
+    "synthetic": true,
+    "errors": [],
+    "failure": null,
+    "overflow": {
+      "client": 1440,
+      "scroll": 1440
+    },
+    "notes": [
+      "Wynik pokazuje problem, stawkę otrzymaną i oczekiwaną oraz eksport. Wynik otwarty z historii jest pod pełnym formularzem nowej analizy; przewinąć i skupić go lub otworzyć w osobnym widoku. Sześć metryk nierówno zawija się do drugiego rzędu."
+    ]
+  }
+]

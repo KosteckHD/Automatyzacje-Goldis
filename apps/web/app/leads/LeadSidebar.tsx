@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import Link from "next/link";
+import { uiLabels } from "../lib/ui-labels";
 
 type Role = "admin" | "manager" | "operator" | "reviewer" | "auditor" | null;
 type IconName = "home" | "automation" | "upload" | "results" | "assigned" | "tasks" | "bell" | "people" | "access" | "report" | "audit" | "review" | "settings" | "account" | "collapse" | "expand" | "menu" | "close";
@@ -31,17 +33,17 @@ function SidebarIcon({ name, className }: { name: IconName; className?: string }
 }
 
 const baseLinks: Link[] = [
-  { label: "Przegląd", href: "/dashboard", icon: "home", section: "work" },
-  { label: "Automatyzacje", href: "/tools", icon: "automation", section: "work" },
-  { label: "Importy", href: "/imports", icon: "upload", section: "work" },
-  { label: "Wyniki", href: "/results/oc-policy-verification", icon: "results", section: "work" },
-  { label: "Moje wyniki", href: "/my-results", icon: "assigned", section: "work" },
-  { label: "Zadania", href: "/runs", icon: "tasks", section: "work" },
-  { label: "Powiadomienia", href: "/notifications", icon: "bell", section: "work" },
+  { label: uiLabels.overview, href: "/dashboard", icon: "home", section: "work" },
+  { label: uiLabels.myCompanies, href: "/my-results", icon: "assigned", section: "work" },
+  { label: uiLabels.companyPool, href: "/results/oc-policy-verification", icon: "results", section: "work" },
+  { label: uiLabels.automations, href: "/tools", icon: "automation", section: "work" },
+  { label: uiLabels.runs, href: "/runs", icon: "tasks", section: "work" },
+  { label: uiLabels.importHistory, href: "/imports", icon: "upload", section: "work" },
+  { label: uiLabels.notifications, href: "/notifications", icon: "bell", section: "work" },
 ];
 
-export default function LeadSidebar({ role, pathname, onExpandedChange }: {
-  role: Role; pathname: string; onExpandedChange: (expanded: boolean) => void;
+export default function LeadSidebar({ role, pathname, onExpandedChange, canViewResults = true, canDiscoverTools = true }: {
+  role: Role; pathname: string; onExpandedChange: (expanded: boolean) => void; canViewResults?: boolean; canDiscoverTools?: boolean;
 }) {
   const [pinned, setPinned] = useState(true);
   const [hovered, setHovered] = useState(false);
@@ -51,7 +53,9 @@ export default function LeadSidebar({ role, pathname, onExpandedChange }: {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const expanded = pinned || hovered;
   const roleLabel = role === "admin" ? "Administrator" : role === "manager" ? "Menedżer" : role === "reviewer" ? "Recenzent" : role === "auditor" ? "Audytor" : "Pracownik";
-  const links = [...(role === "auditor" ? [] : baseLinks),
+  const links = [...(role === "auditor" ? [] : baseLinks.filter((link) =>
+      (canViewResults || !["/my-results", "/results/oc-policy-verification"].includes(link.href))
+      && (canDiscoverTools || link.href !== "/tools"))),
     ...(role === "operator" ? [
       { label: "Moje korekty", href: "/review", icon: "review" as const, section: "work" as const },
     ] : []),
@@ -63,7 +67,7 @@ export default function LeadSidebar({ role, pathname, onExpandedChange }: {
     ...(role && ["manager", "admin", "reviewer"].includes(role)
       ? [{ label: "Weryfikacja danych", href: "/review", icon: "review" as const, section: "manage" as const }] : []),
     ...(role && ["manager", "admin", "reviewer", "auditor"].includes(role)
-      ? [{ label: "Dziennik aktywności", href: "/audit", icon: "audit" as const, section: "manage" as const }] : []),
+      ? [{ label: uiLabels.activityLog, href: "/audit", icon: "audit" as const, section: "manage" as const }] : []),
     ...(role === "admin" ? [
       { label: "Raporty", href: "/reports", icon: "report" as const, section: "manage" as const },
       { label: "Administracja", href: "/admin", icon: "settings" as const, section: "manage" as const },
@@ -120,27 +124,27 @@ export default function LeadSidebar({ role, pathname, onExpandedChange }: {
   const renderLinks = (mobile = false) => <>
     <p className="lead-nav-label">PRACA</p>
     <nav aria-label="Główna nawigacja" className="lead-nav">
-      {links.filter((link) => link.section === "work").map((link) => <a key={link.href} className={active(link.href) ? "active" : ""}
+      {links.filter((link) => link.section === "work").map((link) => <Link key={link.href} className={active(link.href) ? "active" : ""}
         href={link.href} title={!mobile && !expanded ? link.label : undefined} aria-label={link.label} aria-current={active(link.href) ? "page" : undefined}
-        onClick={() => { if (mobile) setMobileOpen(false); }}><span className="lead-nav-icon"><SidebarIcon name={link.icon} /></span><span className="lead-nav-text">{link.label}</span>{link.href === "/notifications" && unreadCount > 0 && <span className="lead-nav-badge" aria-label={`${unreadCount} nieprzeczytanych`}>{unreadCount > 99 ? "99+" : unreadCount}</span>}</a>)}
+        onClick={() => { if (mobile) setMobileOpen(false); }}><span className="lead-nav-icon"><SidebarIcon name={link.icon} /></span><span className="lead-nav-text">{link.label}</span>{link.href === "/notifications" && unreadCount > 0 && <span className="lead-nav-badge" aria-label={`${unreadCount} nieprzeczytanych`}>{unreadCount > 99 ? "99+" : unreadCount}</span>}</Link>)}
     </nav>
     {links.some((link) => link.section === "manage") && <>
       <p className="lead-nav-label lead-manage-label">{role === "admin" || role === "manager" ? "ORGANIZACJA" : "KONTO"}</p>
       <nav aria-label="Zarządzanie" className="lead-nav">
-        {links.filter((link) => link.section === "manage").map((link) => <a key={link.href} className={active(link.href) ? "active" : ""}
+        {links.filter((link) => link.section === "manage").map((link) => <Link key={link.href} className={active(link.href) ? "active" : ""}
           href={link.href} title={!mobile && !expanded ? link.label : undefined} aria-label={link.label} aria-current={active(link.href) ? "page" : undefined}
-          onClick={() => { if (mobile) setMobileOpen(false); }}><span className="lead-nav-icon"><SidebarIcon name={link.icon} /></span><span className="lead-nav-text">{link.label}</span></a>)}
+          onClick={() => { if (mobile) setMobileOpen(false); }}><span className="lead-nav-icon"><SidebarIcon name={link.icon} /></span><span className="lead-nav-text">{link.label}</span></Link>)}
       </nav>
     </>}
   </>;
 
   return <>
     <aside className={`lead-sidebar${expanded ? " is-expanded" : " is-collapsed"}`} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-      <a className="lead-brand" href="/dashboard" title={expanded ? undefined : "Goldis"}>
+      <Link className="lead-brand" href="/dashboard" title={expanded ? undefined : "Goldis"}>
         <img className="lead-logo" src="/brand/goldis-logo.jpg" alt="" />
         <span className="lead-brand-copy"><strong>GOLDIS</strong><small>platforma operacyjna</small></span>
-      </a>
-      {renderLinks()}
+      </Link>
+      <div className="lead-sidebar-nav">{renderLinks()}</div>
       <div className="lead-sidebar-bottom">
         <button type="button" className="lead-pin-control" onClick={() => { setPinned((value) => !value); setHovered(false); }}
           aria-label={pinned ? "Zwiń nawigację" : "Przypnij rozwiniętą nawigację"} title={pinned ? "Zwiń nawigację" : "Przypnij nawigację"}>
@@ -150,7 +154,7 @@ export default function LeadSidebar({ role, pathname, onExpandedChange }: {
       </div>
     </aside>
     <div className="lead-mobile-bar">
-      <a className="lead-mobile-brand" href="/dashboard"><img src="/brand/goldis-logo.jpg" alt="Goldis Ubezpieczenia" /><span>Goldis <small>platforma operacyjna</small></span></a>
+      <Link className="lead-mobile-brand" href="/dashboard"><img src="/brand/goldis-logo.jpg" alt="Goldis Ubezpieczenia" /><span>Goldis <small>platforma operacyjna</small></span></Link>
       <button ref={triggerRef} type="button" className="lead-mobile-menu-button" aria-label="Otwórz menu nawigacji" aria-expanded={mobileOpen}
         onClick={() => setMobileOpen(true)}><SidebarIcon name="menu" /></button>
     </div>

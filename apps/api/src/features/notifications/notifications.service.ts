@@ -10,7 +10,7 @@ export class NotificationService {
   constructor(@Inject(NotificationsRepository) private readonly repository: NotificationsRepository) {}
 
   async recordResultSetEvent(resultSet: ResultSet, eventType: NotificationEventType, transaction: Transaction) {
-    const operationUrl = `/results/oc-policy-verification?resultSetId=${encodeURIComponent(resultSet.resultSetId)}`;
+    const operationUrl = `/tools/oc-policy-verification?resultSetId=${encodeURIComponent(resultSet.resultSetId)}&step=results`;
     const config =
       eventType === "result_ready"
         ? {

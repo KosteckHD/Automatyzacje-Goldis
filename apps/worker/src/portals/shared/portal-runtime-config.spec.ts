@@ -47,6 +47,18 @@ async function inTempConfig(config: unknown, action: (path: string) => Promise<v
   finally { await rm(directory, { recursive: true, force: true }); }
 }
 
+test("payer exception selectors are kept together and incomplete configurations are rejected", async () => {
+  const fixture = verifiedFixture();
+  Object.assign(fixture.compensa.form, { payerDataDialog: "#payer", payerIdentifierInput: "#identifier", payerCancel: "#cancel", incompleteCustomer: "#incomplete" });
+  await inTempConfig(fixture, async path => {
+    const loaded = await loadPortalRuntimeConfig(path);
+    assert.equal(loaded.compensa.form.payerCancel, "#cancel");
+    assert.equal(loaded.compensa.form.incompleteCustomer, "#incomplete");
+  });
+  delete fixture.compensa.form.payerCancel;
+  await inTempConfig(fixture, path => assert.rejects(loadPortalRuntimeConfig(path), /PORTAL_CONFIG_INVALID/));
+});
+
 test("runtime config accepts explicit selector fixture and typed optional PZU SMS/overlay selectors", async () => {
   await inTempConfig(verifiedFixture(), async (path) => {
     const config = await loadPortalRuntimeConfig(path);
@@ -68,6 +80,19 @@ test("runtime config rejects generic SMS submit selectors and unverified placeho
   await inTempConfig(placeholder, async (path) => {
     await assert.rejects(loadPortalRuntimeConfig(path), /PORTAL_CONFIG_UNVERIFIED_SELECTOR/);
   });
+});
+
+test("runtime config preserves the observed SMS frame path and rejects URLs or missing frame selectors", async () => {
+  const fixture = verifiedFixture();
+  fixture.pzu.session.smsFramePath = "/internalauth/authenticate/sms";
+  await inTempConfig(fixture, async path => {
+    assert.equal((await loadPortalRuntimeConfig(path)).pzu.session.smsFramePath, "/internalauth/authenticate/sms");
+  });
+  fixture.pzu.session.smsFramePath = "https://goldis.test/internalauth/authenticate/sms";
+  await inTempConfig(fixture, path => assert.rejects(loadPortalRuntimeConfig(path), /PORTAL_CONFIG_INVALID/));
+  fixture.pzu.session.smsFramePath = "/internalauth/authenticate/sms";
+  delete fixture.pzu.session.smsFrame;
+  await inTempConfig(fixture, path => assert.rejects(loadPortalRuntimeConfig(path), /PORTAL_CONFIG_INVALID/));
 });
 
 test("runtime config validates the complete optional Compensa notice selector pair", async () => {

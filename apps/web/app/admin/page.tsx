@@ -6,6 +6,7 @@ import { StatValue } from "../../components/ui/StatValue";
 import { AdminConfirmDialog, type AdminConfirmation } from "./AdminConfirmDialog";
 import { formatWarsawDateTimeLocal, warsawDateTimeCandidates, warsawUtcOffsetLabel } from "../../lib/warsaw-date-time";
 import { performPrivilegedMutation } from "../lib/privileged-action";
+import { auditActionLabel, auditResourceLabel, compactAuditId } from "../lib/audit-labels";
 
 type Role = "admin" | "manager" | "operator" | "reviewer" | "auditor";
 type Me = { role: Role; username: string; csrfToken: string; mustChangePassword: boolean };
@@ -113,6 +114,8 @@ export default function AdminPage() {
   const [grants, setGrants] = useState<GrantRow[]>([]);
   const [deletionGrant, setDeletionGrant] = useState<DeletionGrant | null>(null);
   const [deletionGrantDraft, setDeletionGrantDraft] = useState(false);
+  const [commissionDictionaryGrant, setCommissionDictionaryGrant] = useState(false);
+  const [commissionDictionaryGrantDraft, setCommissionDictionaryGrantDraft] = useState(false);
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [settings, setSettings] = useState<ToolSettings | null>(null);
   const [interventions, setInterventions] = useState<InterventionRow[]>([]);
@@ -168,22 +171,17 @@ export default function AdminPage() {
       const current = await api<Me>("/auth/me");
       setMe(current);
       if (current.role !== "admin") { setError("Ta strona jest dostępna wyłącznie dla administratora."); return; }
-      const [summary, userPage, catalog, ops, runtime, interventionResult] = await Promise.all([
+      const [summary, userPage, catalog] = await Promise.all([
         api<Overview>("/admin/overview"),
         api<{ items: UserRow[]; nextCursor: string | null }>("/admin/users?limit=100"),
         api<{ items: ToolRow[] }>("/admin/tools"),
-        api<Ops>("/admin/operations/summary"),
-        api<RuntimeInfo>("/admin/runtime"),
-        api<{ items: InterventionRow[]; page: number; hasMore: boolean }>("/admin/interventions?status=open&page=1"),
       ]);
       setOverview(summary); setUsers((current) => {
         const firstPageIds = new Set(userPage.items.map((user) => user.userId));
         const selectedOutsidePage = current.find((user) => user.userId === selectedUserId && !firstPageIds.has(user.userId));
         return selectedOutsidePage ? [...userPage.items, selectedOutsidePage] : userPage.items;
       });
-      setUserCursor(userPage.nextCursor); setTools(catalog.items); setOperations(ops); setInterventions(interventionResult.items);
-      setRuntimeInfo(runtime);
-      setInterventionPage(interventionResult.page); setInterventionHasMore(interventionResult.hasMore);
+      setUserCursor(userPage.nextCursor); setTools(catalog.items);
       if (!selectedUserId && userPage.items[0]) setSelectedUserId(userPage.items[0].userId);
       if (!selectedToolId && catalog.items[0]) setSelectedToolId(catalog.items[0].toolId);
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Nie udało się pobrać danych panelu."); }
@@ -192,53 +190,53 @@ export default function AdminPage() {
   useEffect(() => { void loadAdminData(); }, []);
 
   useEffect(() => {
-    let frame = 0;
-    const updateActiveSection = () => {
-      window.cancelAnimationFrame(frame);
-      frame = window.requestAnimationFrame(() => {
-        let active: (typeof adminSectionIds)[number] = adminSectionIds[0];
-        for (const id of adminSectionIds) {
-          const section = document.getElementById(id);
-          if (section && section.getBoundingClientRect().top <= window.innerHeight * 0.8) active = id;
-        }
-        setActiveAdminSection(active);
-      });
+    const syncSection = () => {
+      const requested = window.location.hash.slice(1);
+      const section = adminSectionIds.find((id) => id === requested) ?? "resources";
+      setActiveAdminSection(section);
+      if (!requested || !adminSectionIds.includes(requested as (typeof adminSectionIds)[number]))
+        window.history.replaceState(window.history.state, "", `${window.location.pathname}${window.location.search}#resources`);
     };
-    window.addEventListener("scroll", updateActiveSection, { passive: true });
-    window.addEventListener("resize", updateActiveSection);
-    window.addEventListener("hashchange", updateActiveSection);
-    updateActiveSection();
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", updateActiveSection);
-      window.removeEventListener("resize", updateActiveSection);
-      window.removeEventListener("hashchange", updateActiveSection);
-    };
+    syncSection();
+    window.addEventListener("hashchange", syncSection);
+    window.addEventListener("popstate", syncSection);
+    return () => { window.removeEventListener("hashchange", syncSection); window.removeEventListener("popstate", syncSection); };
   }, []);
+
+  useEffect(() => {
+    if (activeAdminSection !== "accounts") { setTemporaryPassword(""); setRecoveryEmailDraft(""); }
+  }, [activeAdminSection]);
 
   useEffect(() => {
     if (!me || me.role !== "admin" || !selectedUserId) return;
     let active = true;
-    Promise.all([
-      api<{ items: GrantRow[]; canDeleteData: boolean; deletionGrantVersion: number }>(`/admin/users/${selectedUserId}/grants`),
-      api<{ items: SessionRow[] }>(`/admin/users/${selectedUserId}/sessions`),
-    ]).then(([grantPage, sessionPage]) => {
-      if (active) {
-        setGrants(grantPage.items); setSessions(sessionPage.items);
+    if (activeAdminSection === "resources") {
+      Promise.all([
+        api<{ items: GrantRow[]; canDeleteData: boolean; deletionGrantVersion: number }>(`/admin/users/${selectedUserId}/grants`),
+        api<{ granted: boolean }>(`/admin/users/${selectedUserId}/commission-dictionary-grant`),
+      ]).then(([grantPage, dictionaryGrant]) => {
+        if (!active) return;
+        setGrants(grantPage.items);
         const current = { canDeleteData: grantPage.canDeleteData, version: grantPage.deletionGrantVersion };
         setDeletionGrant(current); setDeletionGrantDraft(current.canDeleteData);
-      }
-    }).catch((cause) => { if (active) setError(cause instanceof Error ? cause.message : "Nie udało się pobrać dostępów użytkownika."); });
+        setCommissionDictionaryGrant(dictionaryGrant.granted); setCommissionDictionaryGrantDraft(dictionaryGrant.granted);
+      }).catch((cause) => { if (active) setError(cause instanceof Error ? cause.message : "Nie udało się pobrać dostępów użytkownika."); });
+    }
+    if (activeAdminSection === "accounts") {
+      api<{ items: SessionRow[] }>(`/admin/users/${selectedUserId}/sessions`)
+        .then((sessionPage) => { if (active) setSessions(sessionPage.items); })
+        .catch((cause) => { if (active) setError(cause instanceof Error ? cause.message : "Nie udało się pobrać sesji użytkownika."); });
+    }
     return () => { active = false; };
-  }, [me?.role, selectedUserId, detailsRevision]);
+  }, [activeAdminSection, me?.role, selectedUserId, detailsRevision]);
 
   useEffect(() => {
-    if (!me || me.role !== "admin" || !selectedToolId) return;
+    if (!me || me.role !== "admin" || activeAdminSection !== "automation" || !selectedToolId) return;
     let active = true;
     api<ToolSettings>(`/admin/tools/${selectedToolId}/settings`).then((value) => { if (active) { setSettings(value); setNewRunLimit(value.maxNewRunsPerHour === null ? "" : String(value.maxNewRunsPerHour)); } })
       .catch((cause) => { if (active) setError(cause instanceof Error ? cause.message : "Nie udało się pobrać ustawień narzędzia."); });
     return () => { active = false; };
-  }, [me?.role, selectedToolId]);
+  }, [activeAdminSection, me?.role, selectedToolId]);
 
   async function mutate(path: string, method: string, body?: unknown) {
     if (!me?.csrfToken) throw new Error("Brak tokenu CSRF. Odśwież stronę i zaloguj się ponownie.");
@@ -265,7 +263,16 @@ export default function AdminPage() {
 
   async function perform(label: string | ((result: unknown) => string), action: () => Promise<unknown>, reload = true) {
     setBusy(true); setNotice(""); setError("");
-    try { const result = await action(); setNotice(typeof label === "function" ? label(result) : label); if (reload) { await loadAdminData(); setDetailsRevision((value) => value + 1); } }
+    try {
+      const result = await action();
+      setNotice(typeof label === "function" ? label(result) : label);
+      if (reload) {
+        await loadAdminData();
+        setDetailsRevision((value) => value + 1);
+        if (activeAdminSection === "operations") await loadOperations(operationPage);
+        if (activeAdminSection === "interventions") await loadInterventions(interventionPage);
+      }
+    }
     catch (cause) { setError(cause instanceof Error ? cause.message : "Operacja nie powiodła się."); }
     finally { setBusy(false); }
   }
@@ -303,6 +310,15 @@ export default function AdminPage() {
     }));
   }
 
+  async function saveCommissionDictionaryGrant() {
+    if (!selectedUserId) return;
+    await perform(
+      commissionDictionaryGrantDraft ? "Uprawnienie do edycji słownika prowizji nadano." : "Uprawnienie do edycji słownika prowizji cofnięto.",
+      () => mutatePrivileged("admin.user.commission-dictionary-grant", selectedUserId,
+        `/admin/users/${selectedUserId}/commission-dictionary-grant`, "PUT", { granted: commissionDictionaryGrantDraft }),
+    );
+  }
+
   async function loadMoreUsers() {
     if (!userCursor) return;
     setLoadingUsers(true); setError("");
@@ -337,7 +353,7 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    if (!me || me.role !== "admin") return;
+    if (!me || me.role !== "admin" || activeAdminSection !== "interventions") return;
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
       setLoadingAssignees(true);
@@ -349,7 +365,7 @@ export default function AdminPage() {
         .finally(() => { if (!controller.signal.aborted) setLoadingAssignees(false); });
     }, 250);
     return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [me?.role, assigneeSearch]);
+  }, [activeAdminSection, me?.role, assigneeSearch]);
 
   async function loadInterventions(pageNumber = 1) {
     if (interventionsInFlight.current) return;
@@ -363,12 +379,14 @@ export default function AdminPage() {
     } catch (cause) {
       if (requestNumber === interventionRequest.current) setError(cause instanceof Error ? cause.message : "Nie udało się pobrać interwencji.");
     } finally {
-      interventionsInFlight.current = false;
-      if (requestNumber === interventionRequest.current) setLoadingInterventions(false);
+      if (requestNumber === interventionRequest.current) {
+        interventionsInFlight.current = false;
+        setLoadingInterventions(false);
+      }
     }
   }
 
-  async function loadOperations(pageNumber = 1) {
+  async function loadOperations(pageNumber = 1, announce = false) {
     if (operationsInFlight.current) return;
     operationsInFlight.current = true;
     const requestNumber = ++operationRequest.current;
@@ -383,22 +401,41 @@ export default function AdminPage() {
       ]);
       if (requestNumber !== operationRequest.current) return;
       setOperations(ops); setRunRows(result.items); setOperationPage(result.page); setOperationHasMore(result.hasMore);
-      setNotice(`Centrum operacyjne odświeżone · strona ${result.page}, ${result.items.length} zadań.`);
+      if (announce) setNotice(`Centrum operacyjne odświeżone · strona ${result.page}, ${result.items.length} zadań.`);
     } catch (cause) {
       if (requestNumber === operationRequest.current) setError(cause instanceof Error ? cause.message : "Nie udało się pobrać zadań operacyjnych.");
     } finally {
-      operationsInFlight.current = false;
-      if (requestNumber === operationRequest.current) setLoadingOperations(false);
+      if (requestNumber === operationRequest.current) {
+        operationsInFlight.current = false;
+        setLoadingOperations(false);
+      }
     }
   }
 
   useEffect(() => {
     if (!me || me.role !== "admin") return;
+    const controller = new AbortController();
+    if (activeAdminSection === "operations") {
+      void loadOperations(operationPage);
+      api<RuntimeInfo>("/admin/runtime", { signal: controller.signal })
+        .then((value) => setRuntimeInfo(value))
+        .catch((cause) => { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : "Nie udało się pobrać wersji środowiska."); });
+    }
+    if (activeAdminSection === "interventions") void loadInterventions(1);
+    return () => {
+      controller.abort(); operationRequest.current += 1; interventionRequest.current += 1;
+      operationsInFlight.current = false; interventionsInFlight.current = false;
+      setLoadingOperations(false); setLoadingInterventions(false);
+    };
+  }, [activeAdminSection, me?.role]);
+
+  useEffect(() => {
+    if (!me || me.role !== "admin" || activeAdminSection !== "operations") return;
     const timer = window.setInterval(() => {
       if (document.visibilityState === "visible" && !operationsInFlight.current) void loadOperations(operationPage);
     }, 30_000);
     return () => window.clearInterval(timer);
-  }, [me?.role, operationPage, selectedOperationToolId, selectedRunStatus]);
+  }, [activeAdminSection, me?.role, operationPage, selectedOperationToolId, selectedRunStatus]);
 
   async function saveSettings(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -516,7 +553,7 @@ export default function AdminPage() {
             <article><small>NARZĘDZIA</small><strong><StatValue value={overview?.toolCount ?? "—"} /></strong><span>w katalogu platformy</span></article>
           </section>
 
-          <section id="resources" className="admin-section">
+          <section id="resources" className="admin-section" hidden={activeAdminSection !== "resources"}>
             <div className="admin-section-title"><div><p className="eyebrow">ZAKRES DOSTĘPU</p><h2>Dostęp do narzędzi</h2></div><p>Każdy grant określa, co dana osoba może zrobić. Brak grantu oznacza brak dostępu.</p></div>
             <div className="admin-grid admin-grid-wide">
               <article className="admin-card">
@@ -532,6 +569,14 @@ export default function AdminPage() {
                   <p className="admin-muted">Nie daje prawa usunięcia całej firmy. Zmiana roli lub wyłączenie konta cofa grant. Kasowanie wymaga osobnego podglądu oraz ponownego potwierdzenia hasłem.</p>
                   <div className="admin-row-actions"><span>Wersja {deletionGrant.version}</span><button className="admin-button small" disabled={busy || (chosenUser.role !== "manager" && deletionGrantDraft === deletionGrant.canDeleteData) || deletionGrantDraft === deletionGrant.canDeleteData} onClick={() => void saveDeletionGrant()}>Zapisz grant kasowania</button></div>
                 </fieldset>}
+                {chosenUser && <fieldset className="admin-grant">
+                  <legend>Porównywarka prowizji</legend>
+                  <div className="admin-checks"><label><input type="checkbox" checked={commissionDictionaryGrantDraft}
+                    disabled={busy || chosenUser.role === "admin" || chosenUser.status !== "active"}
+                    onChange={(event) => setCommissionDictionaryGrantDraft(event.target.checked)} />Może edytować i publikować słownik prowizji</label></div>
+                  <p className="admin-muted">To osobne uprawnienie. Dostęp do uruchamiania i odczytu porównywarki ustaw poniżej jako grant narzędzia.</p>
+                  <div className="admin-row-actions"><span>{commissionDictionaryGrant ? "Grant aktywny" : "Brak grantu"}</span><button className="admin-button small" disabled={busy || chosenUser.role === "admin" || chosenUser.status !== "active" || commissionDictionaryGrantDraft === commissionDictionaryGrant} onClick={() => void saveCommissionDictionaryGrant()}>Zapisz grant słownika</button></div>
+                </fieldset>}
                 <div className="admin-grants">
                   {grants.map((grant) => <fieldset key={grant.toolId} className="admin-grant">
                     <legend>{grant.displayName}<small>{grant.toolId} · {readableStatus(grant.status)}</small></legend>
@@ -546,7 +591,7 @@ export default function AdminPage() {
             </div>
           </section>
 
-          <section id="accounts" className="admin-section">
+          <section id="accounts" className="admin-section" hidden={activeAdminSection !== "accounts"}>
             <div className="admin-section-title"><div><p className="eyebrow">TOŻSAMOŚĆ I SESJE</p><h2>Konta i bezpieczeństwo</h2></div><p>Hasła tymczasowe pokazuj użytkownikowi bezpiecznym kanałem. Aplikacja ich nie wysyła.</p></div>
             <div className="admin-grid">
               <article className="admin-card"><h3>Dodaj konto</h3><form className="admin-form" onSubmit={createUser}>
@@ -570,19 +615,23 @@ export default function AdminPage() {
             </article>
           </section>
 
-            <section id="operations" className="admin-section">
-            <div className="admin-section-title"><div><p className="eyebrow">BIEŻĄCA PRACA</p><h2>Centrum operacyjne</h2></div><button className="admin-quiet" disabled={loadingOperations} onClick={() => void loadOperations(operationPage)}>Odśwież stan</button></div>
-            {operations && <div className="admin-service-strip"><span>API <b>{readableStatus(operations.api)}</b></span><span>Baza <b>{readableStatus(operations.database)}</b></span><span>Redis <b>{readableStatus(operations.redis)}</b></span><span>Worker <b>{readableStatus(operations.worker)}</b></span><span>Portale <b>{readableStatus(operations.portalMode)} · {readableStatus(operations.portalConfig)}</b></span><span>Dispatcher <b>{operations.dispatch.pendingCount} oczekujących</b></span><span>Submissiony <b>{Object.entries(operations.submissionCounts).map(([status, count]) => `${readableStatus(status)} ${count}`).join(" · ") || "brak"}</b></span><span>Grupy zgłoszeń <b>{operations.submissionGroups.pendingCount} oczekujących{operations.submissionGroups.oldestPendingAt ? ` · najstarsze ${dateLabel(operations.submissionGroups.oldestPendingAt)}` : ""}</b><small>{operations.submissionGroups.byStateAndReason.filter((group) => group.reasonCode && group.status !== "accepted" && group.status !== "cancelled").map((group) => `${group.reasonCode} × ${group.count}`).join(" · ") || "brak powodów oczekiwania"}</small></span></div>}
+            <section id="operations" className="admin-section" hidden={activeAdminSection !== "operations"}>
+            <div className="admin-section-title"><div><p className="eyebrow">BIEŻĄCA PRACA</p><h2>Centrum operacyjne</h2></div><button className="admin-quiet" disabled={loadingOperations} onClick={() => void loadOperations(operationPage, true)}>Odśwież stan</button></div>
+            {operations && <div className="admin-service-strip"><span>API <b>{readableStatus(operations.api)}</b></span><span>Baza <b>{readableStatus(operations.database)}</b></span><span>Redis <b>{readableStatus(operations.redis)}</b></span><span>Proces roboczy <b>{readableStatus(operations.worker)}</b></span><span>Portale <b>{readableStatus(operations.portalMode)} · {readableStatus(operations.portalConfig)}</b></span><span>Dispatcher <b>{operations.dispatch.pendingCount} oczekujących</b></span><span>Zgłoszenia zbiorcze <b>{Object.entries(operations.submissionCounts).map(([status, count]) => `${readableStatus(status)} ${count}`).join(" · ") || "brak"}</b></span><span>Grupy zgłoszeń <b>{operations.submissionGroups.pendingCount} oczekujących{operations.submissionGroups.oldestPendingAt ? ` · najstarsze ${dateLabel(operations.submissionGroups.oldestPendingAt)}` : ""}</b><small>{operations.submissionGroups.byStateAndReason.filter((group) => group.reasonCode && group.status !== "accepted" && group.status !== "cancelled").map((group) => `${group.reasonCode} × ${group.count}`).join(" · ") || "brak powodów oczekiwania"}</small></span></div>}
             {operations?.authMail && <div className="admin-service-strip" aria-label="Stan wysyłki wiadomości odzyskiwania"><span>Odzyskiwanie hasła <b>{operations.authMail.enabled ? "włączone" : "wyłączone"}</b></span><span>Poczta oczekująca <b>{operations.authMail.pendingCount}{operations.authMail.oldestPendingAt ? ` · od ${dateLabel(operations.authMail.oldestPendingAt)}` : ""}</b></span><span>Błędy terminalne <b>{operations.authMail.failedCount}</b></span><span>Przyjęte przez Resend <b>{operations.authMail.submittedCount}</b></span></div>}
             {runtimeInfo && <div className="admin-runtime-manifest" aria-label="Wersja uruchomionego API i schematu"><span>Wersja API <b>{runtimeInfo.build.version}</b></span><span>Commit <b>{runtimeInfo.build.commit ?? "nie przypisano"}</b></span><span>Digest obrazu <b>{runtimeInfo.build.imageDigest ?? "nie podano"}</b></span><span>Schemat <b>{runtimeInfo.schema.latestMigration ?? "brak migracji"} · {runtimeInfo.schema.migrationCount} migracji</b></span></div>}
             {operations && <div className="admin-enrichment-strip" aria-label="Stan wzbogacania NIP do REGON">
-              <span>Worker rejestru <b>{readableStatus(operations.enrichment.worker.worker)} · {operations.enrichment.worker.available ? "API workera dostępne" : "API workera niedostępne"}</b></span>
+              <span>Proces rejestru <b>{readableStatus(operations.enrichment.worker.worker)} · {operations.enrichment.worker.available ? "Usługa dostępna" : "Usługa niedostępna"}</b></span>
               <span>Dostawca <b>{operations.enrichment.worker.providerName ?? readableStatus(operations.enrichment.worker.provider)}</b></span>
               <span>Joby oczekujące <b>{operations.enrichment.jobs.pendingCount}{operations.enrichment.jobs.oldestPendingAt ? ` · najstarszy ${dateLabel(operations.enrichment.jobs.oldestPendingAt)}` : ""}</b></span>
               <span>Budżet dzienny <b>{operations.enrichment.providerBudgets.map((budget) => `${budget.providerName}: ${budget.reservedRequests}/${budget.dailyLimit}${budget.limitReached ? ` · limit · reset ${budget.resetsAt ? `${warsawDateLabel(budget.resetsAt)} (Europe/Warsaw)` : "oczekuje na nowy dzień"}` : ""}`).join(" · ")}</b></span>
               <small>{operations.enrichment.worker.message}</small>
             </div>}
-            <article className="admin-card admin-table-card"><div className="admin-card-head"><div><h3>Ostatnie zadania</h3><p>Strona po 50 rekordów. Filtry są niezależne od ustawień narzędzia i raportów.</p></div><div className="admin-filter-inline"><select aria-label="Narzędzie zadania" value={selectedOperationToolId} onChange={(event) => { setSelectedOperationToolId(event.target.value); setOperationPage(1); }}><option value="">Wszystkie narzędzia</option>{tools.map((tool) => <option key={tool.toolId} value={tool.toolId}>{tool.displayName}</option>)}</select><select aria-label="Status zadania" value={selectedRunStatus} onChange={(event) => { setSelectedRunStatus(event.target.value); setOperationPage(1); }}><option value="">Wszystkie statusy</option>{["queued", "waiting_for_sms", "waiting_for_manual_data", "completed", "no_matching_policies", "failed", "cancelled"].map((status) => <option key={status} value={status}>{readableStatus(status)}</option>)}</select><button className="admin-quiet" disabled={loadingOperations} onClick={() => void loadOperations(1)}>Filtruj zadania</button></div></div><div className="admin-table-wrap" tabIndex={0} role="region" aria-label="Zadania operacyjne; przewiń w poziomie, aby zobaczyć wszystkie kolumny"><table><thead><tr><th>Narzędzie</th><th>Zadanie</th><th>Status</th><th>Krok</th><th>Utworzono</th><th>Błąd</th></tr></thead><tbody>{runRows.map((run, index) => <tr key={String(run.id ?? index)}><td>{String(run.toolId ?? "—")}</td><td className="mono">{String(run.id ?? "").slice(0, 12)}</td><td>{readableStatus(String(run.status ?? "—"))}</td><td>{readableStatus(String(run.currentStep ?? "—"))}</td><td>{dateLabel(String(run.createdAt ?? ""))}</td><td className="mono">{String(run.errorCode ?? "—")}</td></tr>)}</tbody></table>{loadingOperations && <p className="admin-empty" role="status">Wczytywanie zadań…</p>}{runRows.length === 0 && !loadingOperations && <p className="admin-empty">Użyj filtrów, aby pobrać zadania.</p>}</div><nav className="admin-pagination" aria-label="Strony zadań"><button className="admin-quiet" disabled={loadingOperations || operationPage <= 1} onClick={() => void loadOperations(operationPage - 1)}>Poprzednia</button><span>Strona {operationPage}</span><button className="admin-quiet" disabled={loadingOperations || !operationHasMore} onClick={() => void loadOperations(operationPage + 1)}>Następna</button></nav></article>
+             <article className="admin-card admin-table-card"><div className="admin-card-head"><div><h3>Ostatnie zadania</h3><p>Strona po 50 rekordów. Filtry są niezależne od ustawień narzędzia i raportów.</p></div><div className="admin-filter-inline"><select aria-label="Narzędzie zadania" value={selectedOperationToolId} onChange={(event) => { setSelectedOperationToolId(event.target.value); setOperationPage(1); }}><option value="">Wszystkie narzędzia</option>{tools.map((tool) => <option key={tool.toolId} value={tool.toolId}>{tool.displayName}</option>)}</select><select aria-label="Status zadania" value={selectedRunStatus} onChange={(event) => { setSelectedRunStatus(event.target.value); setOperationPage(1); }}><option value="">Wszystkie statusy</option>{["queued", "waiting_for_sms", "waiting_for_manual_data", "completed", "no_matching_policies", "failed", "cancelled"].map((status) => <option key={status} value={status}>{readableStatus(status)}</option>)}</select><button className="admin-quiet" disabled={loadingOperations} onClick={() => void loadOperations(1)}>Filtruj zadania</button></div></div><div className="admin-table-wrap" tabIndex={0} role="region" aria-label="Zadania operacyjne; przewiń w poziomie, aby zobaczyć wszystkie kolumny"><table><thead><tr><th>Narzędzie</th><th>Zadanie</th><th>Status</th><th>Krok</th><th>Utworzono</th><th>Błąd</th></tr></thead><tbody>{runRows.map((run, index) => <tr key={String(run.id ?? index)}><td>{String(run.toolId ?? "—")}</td><td className="mono">{String(run.id ?? "").slice(0, 12)}</td><td>{readableStatus(String(run.status ?? "—"))}</td><td>{readableStatus(String(run.currentStep ?? "—"))}</td><td>{dateLabel(String(run.createdAt ?? ""))}</td><td className="mono">{String(run.errorCode ?? "—")}</td></tr>)}</tbody></table>{loadingOperations && <p className="admin-empty" role="status">Wczytywanie zadań…</p>}{runRows.length === 0 && !loadingOperations && <p className="admin-empty">Użyj filtrów, aby pobrać zadania.</p>}</div><nav className="admin-pagination" aria-label="Strony zadań"><button className="admin-quiet" disabled={loadingOperations || operationPage <= 1} onClick={() => void loadOperations(operationPage - 1)}>Poprzednia</button><span>Strona {operationPage}</span><button className="admin-quiet" disabled={loadingOperations || !operationHasMore} onClick={() => void loadOperations(operationPage + 1)}>Następna</button></nav></article>
+          </section>
+
+          <section id="interventions" className="admin-section" hidden={activeAdminSection !== "interventions"}>
+            <div className="admin-section-title"><div><p className="eyebrow">OBSŁUGA SPRAW</p><h2>Przydział pracy</h2></div><p>Przydział nie zmienia stanu zadania. Zapis jest chroniony kontrolą rewizji.</p></div>
             <div className="admin-card admin-table-card"><div className="admin-card-head"><div><h3>Kolejka interwencji</h3><p>Przydział nie zmienia stanu zadania. Konflikt rewizji trzeba odświeżyć przed kolejną zmianą.</p></div><div className="admin-intervention-controls"><label className="admin-field">Znajdź odbiorcę przydziału<input aria-label="Szukaj odbiorcy przydziału" type="search" maxLength={128} value={assigneeSearch} onChange={(event) => { setAssigneeSearch(event.target.value); setAssigneeCursor(null); setAssigneeUsers([]); }} placeholder="Login lub jego fragment" /></label>{assigneeCursor && <button className="admin-quiet" disabled={loadingAssignees} onClick={() => void loadMoreAssignees()}>{loadingAssignees ? "Wczytywanie…" : "Wczytaj dalszych odbiorców"}</button>}<div className="admin-filter-inline"><select aria-label="Status zgłoszenia" value={selectedStatus} onChange={(event) => { setSelectedStatus(event.target.value); setInterventionPage(1); }}><option value="open">Otwarte</option><option value="resolved">Rozwiązane</option><option value="all">Wszystkie</option></select><select aria-label="Narzędzie zgłoszenia" value={selectedInterventionToolId} onChange={(event) => { setSelectedInterventionToolId(event.target.value); setInterventionPage(1); }}><option value="">Wszystkie narzędzia</option>{tools.map((tool) => <option key={tool.toolId} value={tool.toolId}>{tool.displayName}</option>)}</select><select aria-label="Filtruj po osobie" value={selectedAssigneeId} onChange={(event) => { setSelectedAssigneeId(event.target.value); setInterventionPage(1); }}><option value="">Wszystkie osoby</option>{assigneeOptions.map((user) => <option key={user.userId} value={user.userId}>{user.username} · {user.role}</option>)}</select><select aria-label="Priorytet zgłoszenia" value={selectedPriority} onChange={(event) => { setSelectedPriority(event.target.value); setInterventionPage(1); }}><option value="">Wszystkie priorytety</option><option value="high">Wysoki</option><option value="normal">Normalny</option></select><button className="admin-quiet" disabled={loadingInterventions} onClick={() => void loadInterventions(1)}>Filtruj zgłoszenia</button></div></div></div>
               <div className="admin-table-wrap" tabIndex={0} role="region" aria-label="Kolejka interwencji; przewiń w poziomie, aby zobaczyć wszystkie kolumny"><table><thead><tr><th>Priorytet / zgłoszenie</th><th>Zadanie</th><th>Osoba</th><th>Termin</th><th>Rewizja</th><th>Akcje</th></tr></thead><tbody>{interventions.map((item) => {
                 const draft = assignmentDrafts[item.interventionId] ?? assignmentDraftFor(item);
@@ -603,7 +652,7 @@ export default function AdminPage() {
             </div>
           </section>
 
-          <section id="automation" className="admin-section">
+          <section id="automation" className="admin-section" hidden={activeAdminSection !== "automation"}>
             <div className="admin-section-title"><div><p className="eyebrow">NOWE URUCHOMIENIA</p><h2>Ustawienia automatyzacji</h2></div><p>Zmiany wpływają na tworzenie nowych zadań. Już przyjęte zadania zachowują swój przebieg.</p></div>
             {settings && <form className="admin-card admin-settings" onSubmit={saveSettings}>
               <label className="admin-toggle"><input type="checkbox" checked={settings.enabledForNewRuns} onChange={(event) => setSettings({ ...settings, enabledForNewRuns: event.target.checked })} /><span><strong>Przyjmuj nowe zadania</strong><small>Wyłączenie zatrzymuje nowe starty, nie przerywa zadań w toku.</small></span></label>
@@ -613,15 +662,15 @@ export default function AdminPage() {
             </form>}
           </section>
 
-          <section id="audit" className="admin-section">
+          <section id="audit" className="admin-section" hidden={activeAdminSection !== "audit"}>
             <div className="admin-section-title"><div><p className="eyebrow">ZDARZENIA ORGANIZACJI</p><h2>Audyt z wyszukiwaniem</h2></div><p>Wyniki są stronicowane. Metadane mogące zawierać dane klienta nie są zwracane.</p></div>
             <form className="admin-card admin-filter-form" onSubmit={(event) => { setAudit([]); void searchAudit(event); }}>
               <label className="admin-field">Od<input type="date" value={auditFrom} onChange={(event) => setAuditFrom(event.target.value)} required /></label><label className="admin-field">Do (wyłącznie)<input type="date" value={auditTo} onChange={(event) => setAuditTo(event.target.value)} required /></label><label className="admin-field">Aktor ID<input value={auditFilters.actorId} onChange={(event) => setAuditFilters({ ...auditFilters, actorId: event.target.value })} /></label><label className="admin-field">Czynność<input placeholder="np. run.created" value={auditFilters.action} onChange={(event) => setAuditFilters({ ...auditFilters, action: event.target.value })} /></label><label className="admin-field">Rodzaj zasobu<input value={auditFilters.resourceType} onChange={(event) => setAuditFilters({ ...auditFilters, resourceType: event.target.value })} /></label><label className="admin-field">ID zasobu<input value={auditFilters.resourceId} onChange={(event) => setAuditFilters({ ...auditFilters, resourceId: event.target.value })} /></label><label className="admin-field">Wynik<select value={auditFilters.outcome} onChange={(event) => setAuditFilters({ ...auditFilters, outcome: event.target.value })}><option value="">Dowolny</option><option value="succeeded">Powodzenie</option><option value="failed">Błąd</option><option value="denied">Odmowa</option></select></label><label className="admin-field">Narzędzie<select value={auditFilters.toolId} onChange={(event) => setAuditFilters({ ...auditFilters, toolId: event.target.value })}><option value="">Dowolne</option>{tools.map((tool) => <option key={tool.toolId} value={tool.toolId}>{tool.displayName}</option>)}</select></label><button className="admin-button" disabled={busy}>Szukaj zdarzeń</button>
             </form>
-            <div className="admin-card admin-table-card"><div className="admin-table-wrap" tabIndex={0} role="region" aria-label="Zdarzenia audytu; przewiń w poziomie, aby zobaczyć wszystkie kolumny"><table><thead><tr><th>Czas</th><th>Aktor</th><th>Czynność</th><th>Zasób</th><th>ID zasobu</th><th>Wynik</th></tr></thead><tbody>{audit.map((event) => <tr key={event.eventId}><td>{dateLabel(event.createdAt)}</td><td>{event.actorUsername ?? "System"}</td><td><code>{event.action}</code></td><td>{event.resourceType}</td><td className="mono">{event.resourceId ?? "—"}</td><td>{readableStatus(event.outcome)}</td></tr>)}</tbody></table>{audit.length === 0 && <p className="admin-empty">Ustaw zakres i wyszukaj zdarzenia.</p>}</div>{auditCursor && <button className="admin-quiet admin-load-more" onClick={() => void searchAudit(undefined, auditCursor)}>Wczytaj starsze</button>}</div>
+            <div className="admin-card admin-table-card"><div className="admin-table-wrap" tabIndex={0} role="region" aria-label="Zdarzenia audytu; przewiń w poziomie, aby zobaczyć wszystkie kolumny"><table><thead><tr><th>Czas</th><th>Aktor</th><th>Czynność</th><th>Zasób</th><th>ID zasobu</th><th>Wynik</th></tr></thead><tbody>{audit.map((event) => <tr key={event.eventId}><td>{dateLabel(event.createdAt)}</td><td>{event.actorUsername ?? "System"}</td><td><span>{auditActionLabel(event.action)}</span><details><summary>Kod</summary><code>{event.action}</code></details></td><td>{auditResourceLabel(event.resourceType)}</td><td className="mono"><details><summary>{compactAuditId(event.resourceId)}</summary>{event.resourceId ?? "—"}</details></td><td>{readableStatus(event.outcome)}</td></tr>)}</tbody></table>{audit.length === 0 && <p className="admin-empty">Ustaw zakres i wyszukaj zdarzenia.</p>}</div>{auditCursor && <button className="admin-quiet admin-load-more" onClick={() => void searchAudit(undefined, auditCursor)}>Wczytaj starsze</button>}</div>
           </section>
 
-          <section id="reports" className="admin-section">
+          <section id="reports" className="admin-section" hidden={activeAdminSection !== "reports"}>
             <div className="admin-section-title"><div><p className="eyebrow">WYNIKI I CZAS OBSŁUGI</p><h2>Raporty i jakość pracy</h2></div><p>Miary ukończenia liczą wyniki po czasie zakończenia. „Brak polis” pozostaje osobną kategorią.</p></div>
             <form className="admin-card admin-filter-form report-filter" onSubmit={loadReports}><label className="admin-field">Od<input type="date" value={from} onChange={(event) => setFrom(event.target.value)} required /></label><label className="admin-field">Do (wyłącznie)<input type="date" value={to} onChange={(event) => setTo(event.target.value)} required /></label><label className="admin-field">Narzędzie<select value={selectedToolId} onChange={(event) => setSelectedToolId(event.target.value)}><option value="">Wszystkie</option>{tools.map((tool) => <option key={tool.toolId} value={tool.toolId}>{tool.displayName}</option>)}</select></label><button className="admin-button" disabled={busy}>Przelicz zakres</button></form>
             {report && <>

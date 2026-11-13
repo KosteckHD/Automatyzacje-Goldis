@@ -60,7 +60,10 @@ async function readPayload<T>(response: Response): Promise<T> {
 
 export default function ImportPreparationPanel({ batchId, csrfToken, canStart, canDownload, onUnauthorized, onRunReadyChange }: {
   batchId: string; csrfToken: string; canStart: boolean; canDownload: boolean;
-  onUnauthorized: () => void; onRunReadyChange: (ready: boolean) => void;
+  onUnauthorized: () => void; onRunReadyChange: (state: {
+    batchId: string; preparationId: string; revision: number; sourceFingerprint: string;
+    ready: boolean; status: "working" | "ready" | "attention";
+  } | null) => void;
 }) {
   const [preparations, setPreparations] = useState<Preparation[]>([]);
   const [workflows, setWorkflows] = useState<PreparationWorkflow[]>([]);
@@ -103,8 +106,11 @@ export default function ImportPreparationPanel({ batchId, csrfToken, canStart, c
   }, [batchId, onUnauthorized]);
 
   useEffect(() => {
-    onRunReadyChange(runReady);
-  }, [onRunReadyChange, runReady]);
+    if (!selected) { onRunReadyChange(null); return; }
+    const status = active ? "working" : runReady ? "ready" : "attention";
+    onRunReadyChange({ batchId, preparationId: selected.preparationId, revision: selected.revision,
+      sourceFingerprint: selected.sourceFingerprint, ready: runReady, status });
+  }, [batchId, onRunReadyChange, selected?.preparationId, selected?.revision, selected?.sourceFingerprint, active, runReady]);
 
   useEffect(() => {
     let activeEffect = true;

@@ -14,6 +14,22 @@ test("każdy właściciel profilu przeglądarki otrzymuje osobny, niejawny ident
   assert.notEqual(first.sessionId, second.sessionId);
 });
 
+test("profil ma jednego właściciela także między workerami używającymi różnych baz", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "goldis-profile-owner-"));
+  const first = new BrowserSession({ profileDirectory: directory });
+  const second = new BrowserSession({ profileDirectory: directory });
+  try {
+    await first.reserve();
+    await assert.rejects(second.reserve(), /WORKER_PROFILE_ALREADY_IN_USE/);
+    await first.close();
+    await second.reserve();
+  } finally {
+    await first.close();
+    await second.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test("ustawia sandbox Chromium jawnie dla kontenera produkcyjnego", async () => {
   const directory = await mkdtemp(join(tmpdir(), "goldis-browser-sandbox-"));
   const launchOptions: Array<Record<string, unknown>> = [];

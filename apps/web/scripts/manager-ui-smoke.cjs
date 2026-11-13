@@ -94,7 +94,7 @@ async function main() {
 
     await page.goto(`${base}/tools`);
     await page.getByRole("heading", { name: "Automatyzacje", exact: true }).waitFor();
-    await page.getByRole("link", { name: /Otwórz narzędzie/ }).waitFor();
+    await page.getByRole("link", { name: /Otwórz Sprawdzanie OC/ }).waitFor();
 
     await page.goto(`${base}/imports`);
     await page.getByRole("heading", { name: "Historia importów", exact: true }).waitFor();
@@ -117,7 +117,7 @@ async function main() {
     role = "operator";
     await page.goto(`${base}/tools`);
     await page.getByRole("heading", { name: "Automatyzacje", exact: true }).waitFor();
-    await page.getByRole("link", { name: /Przeglądaj wyniki/ }).waitFor();
+    await page.getByRole("link", { name: /Przeglądaj pulę firm/ }).waitFor();
     await page.goto(`${base}/team`);
     await page.getByRole("heading", { name: "Ta sekcja jest dostępna dla menedżera" }).waitFor();
     assert.equal(await page.getByRole("button", { name: "Utwórz konto" }).count(), 0);

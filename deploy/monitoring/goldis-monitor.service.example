@@ -1,0 +1,11 @@
+[Unit]
+Description=Goldis local runtime and backup check
+After=docker.service network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/goldis
+EnvironmentFile=/etc/goldis/monitor.env
+ExecStart=/bin/bash /opt/goldis/deploy/monitoring/check.sh
+TimeoutStartSec=60
+UMask=0077

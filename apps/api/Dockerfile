@@ -5,7 +5,7 @@ COPY deploy/docker/load-runtime-secrets.sh /usr/local/bin/load-runtime-secrets.s
 RUN chmod 0755 /usr/local/bin/load-runtime-secrets.sh
 RUN npm ci --no-audit --no-fund && npm run build -w @goldis/api
 RUN mkdir -p /var/lib/goldis/exports /var/lib/goldis/deletion-journal \
-  && chown -R node:node /app /var/lib/goldis
+  && chown -R node:node /var/lib/goldis
 EXPOSE 3001
 USER node
 ENTRYPOINT ["/usr/local/bin/load-runtime-secrets.sh"]

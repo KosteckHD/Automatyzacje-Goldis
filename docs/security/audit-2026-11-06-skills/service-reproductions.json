@@ -1,0 +1,40 @@
+{
+  "checkedAt": "2026-11-06T17:04:03.059Z",
+  "liveServicesUsed": false,
+  "results": [
+    {
+      "scenario": "prototype-property",
+      "result": {
+        "mutatedObjectPrototype": true,
+        "unrelatedObjectInheritsRate": true,
+        "saved": 1,
+        "audits": 1,
+        "prototypeRestored": true
+      }
+    },
+    {
+      "scenario": "revision-race",
+      "result": {
+        "requestedRevision": 1,
+        "accepted": 2,
+        "returnedRevisions": [
+          2,
+          2
+        ],
+        "saved": 2,
+        "audits": 2,
+        "evidenceLevel": "real service with in-memory persistence; PostgreSQL race not executed"
+      }
+    },
+    {
+      "scenario": "audit-failure",
+      "result": {
+        "savedBeforeAuditError": true,
+        "saved": 1,
+        "audits": 1,
+        "returnedError": "SYNTHETIC_AUDIT_FAILURE",
+        "evidenceLevel": "real service with in-memory persistence; PostgreSQL rollback not executed"
+      }
+    }
+  ]
+}

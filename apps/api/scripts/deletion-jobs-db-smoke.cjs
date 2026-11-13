@@ -72,6 +72,9 @@ module.exports = async function verifyDeletionJobsDatabase(seed) {
   const { isResourceTombstoned } = require("../dist/contracts/deletion-barrier");
   const { resolvePermissionResource } = require("../dist/features/authorization/index");
   const { HistoryService } = require("../dist/features/reports/history.service");
+  const { HistoryRepository } = require("../dist/features/reports/history.repository");
+  const historyRepository = new HistoryRepository(models.sequelize);
+  const history = new HistoryService(historyRepository);
   const { leadResultSnapshotChecksum } = require("../dist/features/results/lead-result-snapshots");
   const { readDeletionJournal } = require("../dist/features/deletions/deletion-journal");
   const { QueryTypes } = require("sequelize");
@@ -242,7 +245,12 @@ module.exports = async function verifyDeletionJobsDatabase(seed) {
     await assert.rejects(getVerifiedArtifactDownload(artifactOnlyRunId), (error) => error instanceof ArtifactDownloadError && error.code === "ARTIFACT_NOT_FOUND");
     await assert.rejects(finalizeRunExport(artifactOnlyRunId),
       (error) => error instanceof ExportFinalizeError && error.code === "EXPORT_STATE_CONFLICT");
-    const historyWithPendingArtifact = await new HistoryService().results({ tenantId, userId: actorId, role: "admin" }, {});
+    const historyProjection = await historyRepository.runs({
+      actor: { tenantId, userId: actorId, role: "admin" },
+      filters: { limit: 50 }, cursor: null, resultsOnly: true,
+    });
+    assert.ok(Array.isArray(historyProjection), "history repository executes against the seeded PostgreSQL connection");
+    const historyWithPendingArtifact = await history.results({ tenantId, userId: actorId, role: "admin" }, {});
     assert.equal(historyWithPendingArtifact.items.some((item) => item.id === artifactOnlyRunId && item.artifactAvailable === false), true,
       "pending artifact tombstone ukrywa pobieranie, ale pozostawia wynik w historii");
     const runner = new DeletionJobRunner();
@@ -293,7 +301,7 @@ module.exports = async function verifyDeletionJobsDatabase(seed) {
     assert.equal(await isResourceTombstoned("run", runId), true);
     for (const artifact of artifacts) assert.equal(await isResourceTombstoned("artifact", artifact.id), true);
     await assert.rejects(getVerifiedArtifactDownload(runId), (error) => error instanceof ArtifactDownloadError && error.code === "ARTIFACT_NOT_FOUND");
-    const results = await new HistoryService().results({ tenantId, userId: actorId, role: "admin" }, {});
+    const results = await history.results({ tenantId, userId: actorId, role: "admin" }, {});
     assert.equal(results.items.some((item) => item.id === runId), false, "tombstoned runs are hidden from result history");
 
     assert.equal(await runner.processOne(), true, "worker claims a queued deletion job");
@@ -431,7 +439,7 @@ module.exports = async function verifyDeletionJobsDatabase(seed) {
     assert.equal(await isResourceTombstoned("import", importDeleteBatchId), true);
     assert.equal(await isResourceTombstoned("run", importDeleteRunId), true);
     assert.equal(await isResourceTombstoned("artifact", importDeleteArtifactId), true);
-    const pendingImportHistory = await new HistoryService().imports({ tenantId, userId: actorId, role: "admin" }, {});
+    const pendingImportHistory = await history.imports({ tenantId, userId: actorId, role: "admin" }, {});
     assert.equal(pendingImportHistory.items.some((item) => item.id === importDeleteBatchId), false,
       "import tombstone immediately hides source rows from history");
     await assert.rejects(createImportService().get(importDeleteBatchId), (error) => error && error.getStatus?.() === 404,

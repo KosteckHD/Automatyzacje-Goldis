@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-05",
+  "clientScope": "One company, 2-5 employees; daily run volume unknown",
+  "method": [
+    "Read-only source review by independent API, worker, frontend reviewers and parent synthesis",
+    "Earlier same-day build/test results referenced without rerun",
+    "Pure policy date function called on existing build and synthetic inputs"
+  ],
+  "limits": [
+    "No live portal execution",
+    "No customer DB access",
+    "No browser UAT or performance measurement",
+    "Static mechanisms must be reproduced and retested before closure"
+  ],
+  "dateFilterCases": [
+    {
+      "name": "future_start",
+      "coverageFrom": "2026-12-01",
+      "coverageTo": "2027-12-01",
+      "referenceDate": "2026-11-05",
+      "matches": true
+    },
+    {
+      "name": "expired",
+      "coverageFrom": "2025-01-01",
+      "coverageTo": "2026-11-04",
+      "referenceDate": "2026-11-05",
+      "matches": false
+    },
+    {
+      "name": "ends_reference_day",
+      "coverageFrom": "2025-11-05",
+      "coverageTo": "2026-11-05",
+      "referenceDate": "2026-11-05",
+      "matches": true
+    }
+  ],
+  "sourceSha256": {
+    "packages/core/src/index.ts": "e73587a9f107cca9c574168a62f8b30b18654c332dddd7fdbff5002e5bb14c66",
+    "apps/worker/src/features/execution/live-run.ts": "bc1d5aadd3d3f39c3564249ae86891055bb6c2a4c4cc4446d1f0e7503874503a",
+    "apps/worker/src/features/execution/pipeline.ts": "7c191e8ef5ff8a13d09802117e166b0cf16aaecefbc0f55e2be55eee1d1db5f0",
+    "apps/api/src/features/interventions/manual-data.service.ts": "eae0de14e394d888f5326b959da4538b85e160b78586064934ab132d764415f7",
+    "apps/api/src/features/teams/team.service.ts": "703e9923b2f13670c59c4b30979ff5215292fe37538fe81f1b296b0a191c0992",
+    "apps/api/src/features/leads/business-leads.service.ts": "b6c0ccaa9449769e2d55c29cf6f25072780686ae577620d04311653a674f41a5",
+    "apps/web/app/result-set-workspace.tsx": "6a94b0020fdb733cb065973eed01715e2a65a302549693408e84be8357825e35",
+    "apps/web/app/run-submission-launcher.tsx": "87840590b4769bd19542dbe5be49727091f1169b4e4500f916cc1b9911a737b9",
+    "apps/web/app/workspace.tsx": "c2c721d2184cf989172f15c2f21de9568a47206a4f48386af30edefd83d56b8d",
+    "apps/web/app/lib/return-to.ts": "941aa646e3481746f58b56faf0001f7ecf4a5b7bd992e785092340f8dfb92469",
+    "apps/web/app/access/AccessWorkspace.tsx": "5160498117a1c00181331c55e0db8026c4a9e4029da1ad9ae4bc42978f54aefe",
+    "apps/web/app/tools/tool-catalog.tsx": "66f5339369da940cd2037041f2d143a7db87857abd2841426804b563bf0dc91b"
+  }
+}

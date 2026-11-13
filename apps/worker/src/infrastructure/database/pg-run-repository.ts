@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import {
   canTransitionRunStatus,
-  decryptPesel,
+  decryptIdentityPesel,
   encryptIdentityForPersistence,
   validateIdentityMatchV1,
   type AutomationErrorCodeV1,
@@ -24,6 +24,7 @@ type LoadedRow = {
   error_code: AutomationErrorCodeV1 | null;
   input_snapshot: unknown;
   decision_maker_name: string | null;
+  expected_person_name?: string | null;
   nip_raw: string;
   address: string;
   postal_code: string;
@@ -49,7 +50,7 @@ function dateOnly(value: string | Date): string {
   return value.toISOString().slice(0, 10);
 }
 
-function sourceFromRow(row: LoadedRow): SourceRow & { id: string } {
+function sourceFromRow(row: LoadedRow): SourceRow & { id: string; expectedPersonName?: string } {
   const snapshot = typeof row.input_snapshot === "string" ? JSON.parse(row.input_snapshot) as unknown : row.input_snapshot;
   if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) throw new Error("RUN_SOURCE_INVALID");
   const input = snapshot as Record<string, unknown>;
@@ -72,6 +73,7 @@ function sourceFromRow(row: LoadedRow): SourceRow & { id: string } {
     rowNumber: Number(input.rowNumber),
     companyName: input.companyName,
     decisionMakerName: row.decision_maker_name,
+    ...(row.expected_person_name ? { expectedPersonName: row.expected_person_name } : {}),
     mobile: input.schemaVersion === 2 ? input.mobile as string : "",
     phone: input.schemaVersion === 2 ? input.phone as string : "",
     email: input.schemaVersion === 2 ? input.email as string : "",
@@ -113,6 +115,7 @@ export class PgRunRepository implements RunRepository {
       `SELECT r.id, r.batch_id, r.source_row_id, r.reference_date::text AS reference_date, r.tool_id, r.schema_version,
               r.status, r.error_code, r.input_snapshot,
               COALESCE(ov.fields->>'expectedPersonName', r.input_snapshot->>'decisionMakerName') AS decision_maker_name,
+              ov.fields->>'expectedPersonName' AS expected_person_name,
               COALESCE(ov.fields->>'address', r.input_snapshot->>'address') AS address,
               COALESCE(ov.fields->>'postalCode', r.input_snapshot->>'postalCode') AS postal_code,
               COALESCE(ov.fields->>'city', r.input_snapshot->>'city') AS city,
@@ -140,8 +143,8 @@ export class PgRunRepository implements RunRepository {
     const row = result.rows[0];
     let identity: IdentityMatchV1 | null = null;
     if (row.identity_source_row_id) {
-      if (!row.identity_regon || !row.identity_company_name || !row.first_name || !row.last_name
-        || !row.pesel_ciphertext || !row.pesel_key_version || !row.match_method || !row.adapter_version) {
+      if (!row.identity_regon || !row.identity_company_name || row.first_name === null || row.last_name === null
+        || !row.match_method || !row.adapter_version) {
         throw new Error("RUN_IDENTITY_INVALID");
       }
       identity = validateIdentityMatchV1({
@@ -151,8 +154,8 @@ export class PgRunRepository implements RunRepository {
         companyName: row.identity_company_name,
         firstName: row.first_name,
         lastName: row.last_name,
-        pesel: decryptPesel(
-          { ciphertext: row.pesel_ciphertext, keyVersion: row.pesel_key_version },
+        pesel: decryptIdentityPesel(
+          { matchMethod: row.match_method, peselCiphertext: row.pesel_ciphertext, peselKeyVersion: row.pesel_key_version },
           { runId, sourceRowId: row.identity_source_row_id },
         ),
         matchMethod: row.match_method,
@@ -347,13 +350,13 @@ export class PgRunRepository implements RunRepository {
          WHERE r.id = $1 FOR UPDATE OF r`, [runId],
       );
       const run = result.rows[0];
-      if (result.rowCount !== 1 || !this.leaseMatches(run) || run.status !== "everest_search"
+      if (result.rowCount !== 1 || !this.leaseMatches(run) || !["everest_search", "compensa_login"].includes(run.status)
         || run.source_row_id !== identity.sourceRowId || run.effective_regon !== identity.regon) {
         throw new Error("RUN_IDENTITY_STATE_CONFLICT");
       }
       const existing = await client.query<{
         source_row_id: string; regon: string; company_name: string; first_name: string; last_name: string;
-        pesel_ciphertext: string; pesel_key_version: number; match_method: string; adapter_version: string;
+        pesel_ciphertext: string | null; pesel_key_version: number | null; match_method: string; adapter_version: string;
       }>(
         `SELECT source_row_id, regon, company_name, first_name, last_name, pesel_ciphertext,
                 pesel_key_version, match_method, adapter_version
@@ -361,17 +364,25 @@ export class PgRunRepository implements RunRepository {
       );
       if (existing.rowCount) {
         const previous = existing.rows[0];
-        const pesel = decryptPesel(
-          { ciphertext: previous.pesel_ciphertext, keyVersion: previous.pesel_key_version },
+        const pesel = decryptIdentityPesel(
+          { matchMethod: previous.match_method, peselCiphertext: previous.pesel_ciphertext, peselKeyVersion: previous.pesel_key_version },
           { runId, sourceRowId: previous.source_row_id },
         );
         if (previous.source_row_id !== identity.sourceRowId || previous.regon !== identity.regon
-          || previous.company_name !== identity.companyName || previous.first_name !== identity.firstName
-          || previous.last_name !== identity.lastName || pesel !== identity.pesel
-          || previous.match_method !== identity.matchMethod || previous.adapter_version !== identity.adapterVersion) {
+          || previous.company_name !== identity.companyName || pesel !== identity.pesel
+          || previous.adapter_version !== identity.adapterVersion) {
+          throw new Error("RUN_IDENTITY_CONFLICT");
+        }
+        const confirmingName = run.status === "compensa_login" && previous.match_method === "regon_unique_pesel"
+          && previous.first_name === "" && previous.last_name === "" && identity.matchMethod === "unique_business_identity";
+        if (confirmingName) {
+          await client.query("UPDATE run_identities SET first_name=$2,last_name=$3,match_method=$4 WHERE run_id=$1", [runId, identity.firstName, identity.lastName, identity.matchMethod]);
+          await client.query("INSERT INTO run_events (id,run_id,status,step,error_code,created_at) VALUES ($1,$2,'compensa_login','identity_name_confirmed',NULL,$3)", [randomUUID(), runId, new Date()]);
+        } else if (previous.first_name !== identity.firstName || previous.last_name !== identity.lastName || previous.match_method !== identity.matchMethod) {
           throw new Error("RUN_IDENTITY_CONFLICT");
         }
       } else {
+        if (run.status !== "everest_search") throw new Error("RUN_IDENTITY_STATE_CONFLICT");
         await client.query(
           `INSERT INTO run_identities
              (run_id, source_row_id, regon, company_name, first_name, last_name,

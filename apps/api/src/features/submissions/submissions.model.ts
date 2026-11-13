@@ -1,7 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import { registerModel } from "../../infrastructure/database/model-registry";
 
-export type RunSubmissionStatus = "queued" | "running" | "waiting_attention" | "completed" | "cancelled";
+export type RunSubmissionStatus = "queued" | "running" | "waiting_attention" | "paused" | "completed" | "cancelled";
 export type RunSubmissionAdmissionState =
   | "pending"
   | "leased"

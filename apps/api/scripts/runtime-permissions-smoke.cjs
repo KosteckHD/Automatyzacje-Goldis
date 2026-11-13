@@ -7,6 +7,7 @@ const roleUrls = [
   ["goldis_api", process.env.DATABASE_URL],
   ["goldis_worker", process.env.WORKER_DATABASE_URL],
   ["goldis_enrichment", process.env.ENRICHMENT_DATABASE_URL],
+  ["goldis_commission", process.env.COMMISSION_DATABASE_URL],
 ];
 
 async function inspect(name, url) {
@@ -22,6 +23,10 @@ async function inspect(name, url) {
         FROM pg_auth_members membership
         JOIN pg_roles parent ON parent.oid = membership.roleid
         WHERE membership.member = r.oid), ARRAY[]::text[]) AS memberships,
+      has_table_privilege(current_user, 'public.commission_runs', 'UPDATE') AS can_update_commission_runs,
+      has_table_privilege(current_user, 'public.commission_files', 'DELETE') AS can_delete_commission_files,
+      has_table_privilege(current_user, 'public.commission_dictionary_versions', 'UPDATE') AS can_update_commission_dictionary,
+      has_table_privilege(current_user, 'public.commission_run_snapshots', 'INSERT') AS can_insert_commission_snapshots,
       has_table_privilege(current_user, 'public.automation_runs', 'UPDATE') AS can_update_runs,
       has_table_privilege(current_user, 'public.audit_events', 'UPDATE') AS can_update_audit,
       has_table_privilege(current_user, 'public.audit_events', 'SELECT') AS can_read_audit,
@@ -134,7 +139,7 @@ async function main() {
     assert.equal(role.public_usage, true, `${name}: public schema usage`);
   }
   assert.equal(roles.goldis_migrator.public_create, true);
-  for (const name of ["goldis_api", "goldis_worker", "goldis_enrichment"]) {
+  for (const name of ["goldis_api", "goldis_worker", "goldis_enrichment", "goldis_commission"]) {
     assert.equal(roles[name].public_create, false, `${name}: DDL access`);
   }
   assert.equal(roles.goldis_api.can_update_audit, false, "API can mutate audit history");
@@ -181,7 +186,16 @@ async function main() {
       `enrichment worker can mutate authorization data: ${sensitivePrivilege}`);
     assert.equal(roles.goldis_enrichment[lockPrivilege], true, `enrichment worker cannot acquire a row lock: ${lockPrivilege}`);
   }
-  console.log("RUNTIME_DB_PERMISSION_SMOKE_PASS");
+  assert.equal(roles.goldis_commission.can_update_commission_runs, true);
+  assert.equal(roles.goldis_commission.can_insert_commission_snapshots, true);
+  assert.equal(roles.goldis_commission.can_delete_commission_files, false);
+  assert.equal(roles.goldis_commission.can_update_commission_dictionary, false);
+  for (const privilege of ["can_read_password_hash", "can_read_user_status", "can_update_runs", "can_update_source_rows", "can_change_tool_grant", "can_update_audit"]) {
+    assert.equal(roles.goldis_commission[privilege], false, `commission worker has unrelated privilege: ${privilege}`);
+  }
+  assert.equal(roles.goldis_commission.can_append_audit, true);
+  assert.equal(roles.goldis_commission.can_validate_audit_metadata, true);
+  console.log("RUNTIME_DB_PERMISSION_SMOKE_PASS commissionRole=true");
 }
 
 main().catch((error) => {

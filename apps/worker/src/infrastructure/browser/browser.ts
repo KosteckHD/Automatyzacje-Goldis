@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { mkdir } from "node:fs/promises";
-import { isAbsolute, resolve } from "node:path";
+import { mkdir, open, readFile, unlink, type FileHandle } from "node:fs/promises";
+import { isAbsolute, join, resolve } from "node:path";
 import { chromium, type BrowserContext, type Page } from "playwright";
 import { isAllowedPortalNavigation, type PortalNavigationPolicy } from "../../portals/shared/portal-navigation";
 
@@ -21,6 +21,9 @@ export class BrowserSession {
   private context: BrowserContext | null = null;
   private readonly pages = new Map<Portal, Page>();
   private opening: Promise<BrowserContext> | null = null;
+  private profileLockPending: Promise<void> | null = null;
+  private profileLock: FileHandle | null = null;
+  private profileLockPath: string | null = null;
   private navigationPolicy: Readonly<Record<Portal, PortalNavigationPolicy>> | null = null;
   private readonly blockedNavigation = new Set<Portal>();
 
@@ -49,9 +52,63 @@ export class BrowserSession {
     }
   }
 
+  /** Atomically reserves this profile across worker processes, including workers on another database. */
+  async reserve(): Promise<void> {
+    if (this.profileLock) return;
+    if (this.profileLockPending) return this.profileLockPending;
+    const pending = this.acquireReservation();
+    this.profileLockPending = pending;
+    try {
+      await pending;
+    } finally {
+      if (this.profileLockPending === pending) this.profileLockPending = null;
+    }
+  }
+
+  private async acquireReservation(): Promise<void> {
+    const directory = resolve(this.options.profileDirectory);
+    await mkdir(directory, { recursive: true, mode: 0o700 });
+    const lockPath = join(directory, ".goldis-worker.lock");
+    let lock: FileHandle;
+    try {
+      lock = await open(lockPath, "wx", 0o600);
+    } catch (error) {
+      if (error && typeof error === "object" && "code" in error && error.code === "EEXIST") {
+        throw new Error("WORKER_PROFILE_ALREADY_IN_USE");
+      }
+      throw new Error("WORKER_PROFILE_LOCK_UNAVAILABLE");
+    }
+    try {
+      await lock.writeFile(JSON.stringify({ sessionId: this.sessionId, processId: process.pid, startedAt: new Date().toISOString() }));
+      await lock.sync();
+      this.profileLock = lock;
+      this.profileLockPath = lockPath;
+    } catch {
+      await lock.close().catch(() => undefined);
+      await unlink(lockPath).catch(() => undefined);
+      throw new Error("WORKER_PROFILE_LOCK_UNAVAILABLE");
+    }
+  }
+
+  private async releaseReservation(): Promise<void> {
+    const lock = this.profileLock;
+    const lockPath = this.profileLockPath;
+    this.profileLock = null;
+    this.profileLockPath = null;
+    await lock?.close().catch(() => undefined);
+    if (!lockPath) return;
+    try {
+      const owner = JSON.parse(await readFile(lockPath, "utf8")) as { sessionId?: unknown };
+      if (owner.sessionId === this.sessionId) await unlink(lockPath);
+    } catch {
+      // Leave an unreadable or replaced lock in place; a later worker must fail closed.
+    }
+  }
+
   async open(): Promise<BrowserContext> {
     if (this.context) return this.context;
     if (this.opening) return this.opening;
+    await this.reserve();
     this.opening = this.launch();
     try {
       this.context = await this.opening;
@@ -110,10 +167,14 @@ export class BrowserSession {
   }
 
   async close(): Promise<void> {
-    const context = this.context ?? await this.opening;
-    this.context = null;
-    this.opening = null;
-    this.pages.clear();
-    await context?.close();
+    try {
+      const context = this.context ?? await this.opening;
+      await context?.close();
+    } finally {
+      this.context = null;
+      this.opening = null;
+      this.pages.clear();
+      await this.releaseReservation();
+    }
   }
 }

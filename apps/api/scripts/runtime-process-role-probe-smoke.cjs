@@ -14,9 +14,10 @@ async function verify(name, url, expected) {
 
 async function main() {
   await verify("api", process.env.DATABASE_URL, "goldis_api");
+  await verify("commission", process.env.COMMISSION_DATABASE_URL, "goldis_commission");
   await verify("enrichment", process.env.ENRICHMENT_DATABASE_URL, "goldis_enrichment");
   await verify("migrator", process.env.MIGRATOR_DATABASE_URL, "goldis_migrator");
-  console.log("SEQUELIZE_RUNTIME_ROLE_PROBE_PASS processes=api,enrichment,migrator");
+  console.log("SEQUELIZE_RUNTIME_ROLE_PROBE_PASS processes=api,enrichment,commission,migrator");
 }
 
 main().catch((error) => {

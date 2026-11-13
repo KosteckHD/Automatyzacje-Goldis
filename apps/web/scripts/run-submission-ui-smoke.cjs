@@ -86,7 +86,7 @@ async function main() {
         body = { role: "manager", username: "synthetic.manager", csrfToken, mustChangePassword: false,
           tools: [{ toolId: "oc-policy-verification", canDiscover: true, canExecute: true, canViewResults: true, canDownloadResults: true }] };
       } else if (url.pathname === "/api/health/automation") {
-        body = { automationReady: false, servicesReady: true, worker: "offline", portalMode: "off", portalConfig: "disabled", message: "Automatyzacja portali jest wyłączona w teście." };
+        body = { automationReady: true, servicesReady: true, worker: "online", portalMode: "live", portalConfig: "valid", message: "Gotowość potwierdzona przez syntetyczny test UI." };
       } else if (url.pathname === "/api/interventions/summary") {
         body = { openCount: 0, unreadCount: 0, smsCount: 0 };
       } else if (url.pathname === "/api/interventions") {
@@ -226,7 +226,15 @@ async function main() {
       await route.fulfill({ status, contentType: "application/json", headers: { "cache-control": "private, no-store" }, body: JSON.stringify(body) });
     });
 
-    await page.goto(`${base}/tools/oc-policy-verification?import=${batchId}`);
+    await page.goto(`${base}/tools/oc-policy-verification?import=${batchId}&view=legacy`);
+    const healthPanel = page.locator(".automation-health");
+    await healthPanel.getByText(/Możesz rozpocząć sprawdzanie OC/).waitFor({ state: "visible", timeout: 5_000 }).catch(async () => {
+      throw new Error(`HEALTH_COPY url=${page.url()} panel=${(await healthPanel.innerText().catch(() => "missing")).slice(0, 500)} body=${(await page.locator("body").innerText()).slice(0, 900)}`);
+    });
+    assert.equal(await healthPanel.locator("details").evaluate((details) => details.open), false,
+      "diagnostyka usług jest domyślnie zwinięta");
+    await healthPanel.locator("details summary").click();
+    await healthPanel.getByText(/Worker: aktywny/).waitFor({ state: "visible" });
     const preparationPanels = page.locator(".import-preparation");
     const preparation = preparationPanels.last();
     await preparation.getByRole("heading", { name: "Przygotowanie i deduplikacja" }).waitFor({ state: "visible" });
@@ -274,9 +282,15 @@ async function main() {
     assert.notEqual(runResumeRequest?.body.idempotencyKey, runPauseRequest?.body.idempotencyKey);
     await page.getByRole("heading", { name: "Sprawdź wiele wierszy" }).waitFor({ state: "visible" });
     const launcher = page.locator(".submission-launcher");
-    await launcher.getByRole("button", { name: "Pokaż podsumowanie całego importu" }).click();
+    await launcher.getByRole("button", { name: "Pokaż podsumowanie wszystkich firm" }).click();
     await launcher.getByRole("heading", { name: /Rewizja 1/ }).waitFor({ state: "visible" });
     await launcher.getByText("Duplikaty", { exact: true }).waitFor({ state: "visible" });
+    const wholeCompaniesPreview = launcher.locator(".prepared-set-company-review");
+    await wholeCompaniesPreview.locator("summary").click();
+    await wholeCompaniesPreview.getByText("Firma syntetyczna Alfa", { exact: true }).first().waitFor({ state: "visible" });
+    assert.equal(await wholeCompaniesPreview.locator('input[type="checkbox"]').count(), 0,
+      "paginowany podgląd całej rewizji nie wygląda jak wybór częściowy");
+    assert.equal(wholeStartRequest, null, "przeglądanie całej rewizji nie uruchamia zadań");
     const wholeConfirm = launcher.getByLabel(/Potwierdzam uruchomienie wszystkich 2 gotowych wierszy/);
     await wholeConfirm.check();
     await launcher.getByRole("button", { name: "Potwierdź i uruchom cały import" }).click();
@@ -304,6 +318,7 @@ async function main() {
     await launcher.getByText(/Cały import · anulowany/).waitFor({ state: "visible" });
     assert.equal(wholeCancelRequest?.headers["x-csrf-token"], csrfToken);
     assert.deepEqual(wholeCancelRequest?.body, { expectedVersion: 3 });
+    await launcher.getByRole("button", { name: "Zakres lub numery wierszy" }).click();
     await launcher.getByLabel("Od wiersza (zakres partii)").fill("2");
     await launcher.getByLabel("Do wiersza (zakres partii)").fill("4");
     await page.getByRole("button", { name: "Pokaż podsumowanie" }).click();
@@ -326,15 +341,17 @@ async function main() {
     assert.deepEqual(previews[1].body, { rowNumbers: [2, 3, 4] });
     await page.getByLabel(/Rozumiem podsumowanie/).check();
     await confirm.click();
-    await page.getByRole("heading", { name: "Stan zgłoszenia" }).waitFor({ state: "visible" });
+    await page.getByRole("heading", { name: "Stan zgłoszenia" }).waitFor({ state: "visible", timeout: 5_000 }).catch(async () => {
+      throw new Error(`SUBMISSION_AFTER_START url=${page.url()} create=${JSON.stringify(createRequest)} body=${(await page.locator("body").innerText()).slice(-1800)}`);
+    });
     assert.equal(createRequest?.headers["x-csrf-token"], csrfToken);
     assert.deepEqual(createRequest?.body, { rowNumbers: [2, 3, 4], selectionFingerprint: "f".repeat(64), idempotencyKey: createRequest?.body.idempotencyKey });
     assert.match(createRequest?.body.idempotencyKey ?? "", /^[0-9a-f-]{36}$/i);
     await page.getByText("Wymaga uwagi", { exact: true }).first().waitFor({ state: "visible" });
     await page.getByText("Wiersz 2", { exact: true }).waitFor({ state: "visible" });
-    for (const width of [320, 375, 390, 768, 1440, 1920]) {
-      await page.setViewportSize({ width, height: 844 });
-      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false, `widok ${width}px nie przewija całej strony poziomo`);
+    for (const [width, height] of [[320, 844], [375, 844], [390, 844], [768, 844], [1024, 768], [1366, 768], [1440, 900], [1920, 1080]]) {
+      await page.setViewportSize({ width, height });
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false, `widok ${width}×${height} nie przewija całej strony poziomo`);
     }
     page.on("dialog", (dialog) => dialog.accept());
     await page.getByRole("button", { name: "Anuluj oczekujące" }).click();
@@ -343,9 +360,13 @@ async function main() {
     assert.deepEqual(cancelRequest?.body, { expectedVersion: 1 });
     await page.reload();
     await page.getByRole("heading", { name: "Anulowano" }).waitFor({ state: "visible" });
+    await page.goto(`${base}/submissions/${submissionId}`);
+    await page.getByRole("heading", { name: "Stan zgłoszenia" }).waitFor({ state: "visible" });
+    await page.getByRole("heading", { name: "Wiersze zgłoszenia" }).waitFor({ state: "visible" });
+    await page.getByText("Wiersz 2", { exact: true }).waitFor({ state: "visible" });
     assert.deepEqual(errors, [], "brak błędów JavaScript w przeglądarce");
 
-    console.log("RUN_SUBMISSION_UI_SMOKE_PASS managerRole=true preparationWorkflowStart=true preparationExportLink=true workflowCancelCAS=true wholeSetPreview=true wholeSetStart=true wholeSetPauseResume=true wholeSetCancel=true runPauseResumeCAS=true runControlIdempotency=true previewRange=true previewList=true duplicateRejected=true explicitConfirmation=true csrf=true idempotency=true statusItems=true cancelCAS=true reloadPersists=true responsive320_1920=true syntheticOnly=true");
+    console.log("RUN_SUBMISSION_UI_SMOKE_PASS managerRole=true preparationWorkflowStart=true preparationExportLink=true workflowCancelCAS=true wholeSetPreview=true wholeSetStart=true wholeSetPauseResume=true wholeSetCancel=true runPauseResumeCAS=true runControlIdempotency=true previewRange=true previewList=true duplicateRejected=true explicitConfirmation=true csrf=true idempotency=true statusItems=true cancelCAS=true reloadPersists=true standaloneSubmissionRoute=true responsive320_1920=true syntheticOnly=true");
   } finally {
     if (browser) await browser.close();
     if (server.exitCode === null) { server.kill(); await new Promise((resolveExit) => server.once("exit", resolveExit)); }

@@ -7,7 +7,7 @@ const path = require("node:path");
 const test = require("node:test");
 const { createReleaseManifest } = require("./create-release-manifest.cjs");
 
-const keys = ["GOLDIS_POSTGRES_IMAGE", "GOLDIS_REDIS_IMAGE", "GOLDIS_API_IMAGE", "GOLDIS_WORKER_IMAGE", "GOLDIS_WEB_IMAGE"];
+const keys = ["GOLDIS_POSTGRES_IMAGE", "GOLDIS_REDIS_IMAGE", "GOLDIS_API_IMAGE", "GOLDIS_COMMISSION_ENGINE_IMAGE", "GOLDIS_WORKER_IMAGE", "GOLDIS_WEB_IMAGE"];
 
 function environmentFile() {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "goldis-release-manifest-"));

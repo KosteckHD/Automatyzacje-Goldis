@@ -13,10 +13,11 @@ async function validateServices() {
   let redis;
   try {
     await pool.query("SELECT 1");
-    const role = await pool.query(`SELECT current_user AS name, rolsuper, rolcreatedb, rolcreaterole,
-      rolreplication, rolbypassrls, rolinherit,
+    const role = await pool.query(`SELECT current_user AS name, r.rolsuper, r.rolcreatedb, r.rolcreaterole,
+      r.rolreplication, r.rolbypassrls, r.rolinherit,
       has_schema_privilege(current_user, 'public', 'CREATE') AS public_create,
-      EXISTS (SELECT 1 FROM pg_auth_members WHERE member = current_user::regrole) AS inherited_role`);
+      EXISTS (SELECT 1 FROM pg_auth_members WHERE member = r.oid) AS inherited_role
+      FROM pg_roles r WHERE r.rolname = current_user`);
     const row = role.rows[0];
     if (row?.name !== "goldis_api" || row.rolsuper || row.rolcreatedb || row.rolcreaterole
       || row.rolreplication || row.rolbypassrls || row.rolinherit || row.public_create || row.inherited_role) {
@@ -29,14 +30,16 @@ async function validateServices() {
     ["MIGRATOR_DATABASE_URL", process.env.MIGRATOR_DATABASE_URL, "goldis_migrator"],
     ["WORKER_DATABASE_URL", process.env.WORKER_DATABASE_URL, "goldis_worker"],
     ["ENRICHMENT_DATABASE_URL", process.env.ENRICHMENT_DATABASE_URL, "goldis_enrichment"],
+    ["COMMISSION_DATABASE_URL", process.env.COMMISSION_DATABASE_URL, "goldis_commission"],
   ]) {
     let rolePool;
     try {
       rolePool = new Pool({ connectionString: url, max: 1, connectionTimeoutMillis: 2_000 });
-      const role = await rolePool.query(`SELECT current_user AS name, rolsuper, rolcreatedb, rolcreaterole,
-        rolreplication, rolbypassrls, rolinherit,
+      const role = await rolePool.query(`SELECT current_user AS name, r.rolsuper, r.rolcreatedb, r.rolcreaterole,
+        r.rolreplication, r.rolbypassrls, r.rolinherit,
         has_schema_privilege(current_user, 'public', 'CREATE') AS public_create,
-        EXISTS (SELECT 1 FROM pg_auth_members WHERE member = current_user::regrole) AS inherited_role`);
+        EXISTS (SELECT 1 FROM pg_auth_members WHERE member = r.oid) AS inherited_role
+        FROM pg_roles r WHERE r.rolname = current_user`);
       const row = role.rows[0];
       const basicFlagsValid = row && !row.rolsuper && !row.rolcreatedb && !row.rolcreaterole
         && !row.rolreplication && !row.rolbypassrls && !row.rolinherit && !row.inherited_role;
@@ -46,7 +49,7 @@ async function validateServices() {
     finally { await rolePool?.end().catch(() => undefined); }
   }
 
-  for (const [name, url] of [["REDIS_URL", process.env.REDIS_URL], ["WORKER_REDIS_URL", process.env.WORKER_REDIS_URL]]) {
+  for (const [name, url] of [["REDIS_URL", process.env.REDIS_URL], ["WORKER_REDIS_URL", process.env.WORKER_REDIS_URL], ["COMMISSION_REDIS_URL", process.env.COMMISSION_REDIS_URL]]) {
     try {
       redis = new Redis(url, {
         lazyConnect: true, connectTimeout: 2_000, maxRetriesPerRequest: 1, retryStrategy: () => null,

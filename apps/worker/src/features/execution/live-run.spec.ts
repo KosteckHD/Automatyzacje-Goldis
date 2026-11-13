@@ -160,6 +160,22 @@ test("live worker keeps a real identity ambiguity in operator review", async () 
   assert.equal(state.summary().interventions, 1);
 });
 
+for (const safeStep of [null, "compensa_start_intent"] as const) {
+  for (const [kind, reason, code] of [
+    ["skipped", "payer_data_required", "COMPENSA_PAYER_DATA_SKIPPED"],
+    ["blocked", "incomplete_customer_data", "COMPENSA_CUSTOMER_DATA_INCOMPLETE"],
+  ] as const) {
+    test(`live worker settles ${kind} at ${safeStep ?? "fresh start"} without an intervention, save, or result`, async () => {
+      const state = fixture("compensa_login", safeStep);
+      Object.assign(state.processor, { form: { prepareInsuredForm: async () => ({ kind, reason }) } });
+      await state.processor.process(runId, { lease, signal: new AbortController().signal, intent: "create" });
+      const result = state.summary();
+      assert.equal(result.status, "failed"); assert.equal(result.errorCode, code);
+      assert.equal(result.interventions, 0); assert.equal(result.saved, 0); assert.equal(result.delivered, 0);
+    });
+  }
+}
+
 for (const safeStep of ["compensa_start_intent", "compensa_offer_draft_open"]) {
   test(`resume_review przy ${safeStep} wymaga istniejącego formularza`, async () => {
     const state = fixture("compensa_login", safeStep);
@@ -216,6 +232,24 @@ test("scoped PZU login test cannot enter another run", async () => {
   assert.equal(state.summary().saved, 0);
 });
 
+for (const fieldCode of ["ADDRESS", "POSTAL_CODE", "CITY", "COUNTY"] as const) {
+  test(`production form preserves actionable intervention ${fieldCode}`, async () => {
+    const state = fixture("compensa_login");
+    let recordedField: string | undefined;
+    const internals = state.processor as unknown as {
+      repository: { pauseForReview: (id: string, expected: RunStatus, next: RunStatus, input: { reasonCode: string; fieldCode?: string }) => Promise<boolean> };
+    };
+    const original = internals.repository.pauseForReview.bind(internals.repository);
+    internals.repository.pauseForReview = async (...args) => { recordedField = args[3].fieldCode; return original(...args); };
+    Object.assign(state.processor, { form: { prepareInsuredForm: async () => ({ kind: "waiting_for_manual_data", fieldCode }) } });
+    await state.processor.process(runId, { lease, signal: new AbortController().signal, intent: "recovery" });
+    assert.equal(state.summary().status, "waiting_for_manual_data");
+    assert.equal(recordedField, fieldCode);
+    assert.equal(state.summary().saved, 0);
+    assert.equal(state.summary().delivered, 0);
+  });
+}
+
 for (const scenario of ["missing-save", "uncertain-save", "ufg-failure", "missing-details"] as const) {
   test(`Compensa ${scenario} terminates only this row without saving a result or retaining the lease`, async () => {
     const state = fixture(scenario.startsWith("ufg") || scenario === "missing-details" ? "ufg_verification" : "compensa_form");
@@ -227,7 +261,7 @@ for (const scenario of ["missing-save", "uncertain-save", "ufg-failure", "missin
       ufg: { readSnapshot: async () => ({ kind: "portal_error", errorCode: "PORTAL_FAILURE" }) },
     });
     await state.processor.process(runId, { lease, signal: new AbortController().signal, intent: "recovery" });
-    assert.equal(state.summary().status, "failed");
+    assert.equal(state.summary().status, scenario === "uncertain-save" ? "waiting_for_manual_data" : "failed");
     assert.equal(state.summary().delivered, 0);
     assert.equal((state.processor as unknown as { currentLease: unknown }).currentLease, null);
     const next = fixture("compensa_form");

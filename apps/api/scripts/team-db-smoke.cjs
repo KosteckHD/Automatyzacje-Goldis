@@ -23,10 +23,12 @@ module.exports = async function verifyTeamFlows(seed) {
   try {
     const { TeamService } = require("../dist/features/teams/index");
     const { TeamRepository } = require("../dist/features/teams/team.repository");
+    const { PrivilegedActionRepository } = require("../dist/features/privileged-actions/privileged-actions.repository");
     const { recordAuditEvent } = require("../dist/features/audit/public");
     const { PrivilegedActionService } = require("../dist/features/privileged-actions/privileged-actions.service");
     const { BadRequestException, ConflictException, NotFoundException } = require("@nestjs/common");
-    const team = new TeamService({ record: recordAuditEvent }, new TeamRepository(models.sequelize));
+    const privilegedActions = new PrivilegedActionRepository(models.sequelize);
+    const team = new TeamService({ record: recordAuditEvent }, new TeamRepository(models.sequelize), privilegedActions);
     const now = new Date();
     const tenantId = seed.goldisTenantId;
     const manager = await createAccount(tenantId, "manager", "Manager", now);
@@ -42,10 +44,9 @@ module.exports = async function verifyTeamFlows(seed) {
       async consumeReauthAttempt() { return { allowed: true, retryAfterSeconds: 0 }; },
       async clearReauth() {},
       async recordReauthFailure() {},
-    }, { record: recordAuditEvent });
+    }, { record: recordAuditEvent }, privilegedActions);
     const confirmAction = (action, targetId, payload, idempotencyKey) => confirmationService.create(actor,
-      { ip: "127.0.0.1", socket: { remoteAddress: "127.0.0.1" } },
-      { action, targetId, payload, currentPassword: manager.password, idempotencyKey }, { setHeader() {} });
+      { action, targetId, payload, currentPassword: manager.password, idempotencyKey }, "127.0.0.1");
 
     smokeStage = "strict_dto_validation";
     await assert.rejects(team.create(actor, { username: "Synthetic.Unknown.Field", temporaryPassword: "Synthetic-only valid Password!", extra: true }),

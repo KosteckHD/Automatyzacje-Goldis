@@ -1,0 +1,105 @@
+{
+  "runId": "remediation-2026-10-17",
+  "startedFromCommit": "af512e9502218d336b4b73df0c5f612905c6ac7b",
+  "startedFromHistoricalDirtyTree": {
+    "changedPathCount": 83,
+    "diffSha256": "1e0d2c761a13739b1e2d0c4a842354616f5e088e795a78be9aacfbba9a16befa"
+  },
+  "sourceFixesApplied": true,
+  "executionStatus": "IMPLEMENTED_CORE_FIXES_PARTIAL_ENVIRONMENTAL_ACCEPTANCE",
+  "changedFiles": [
+    "apps/api/src/features/authorization/resource-scope.ts",
+    "apps/api/src/features/authorization/resource-scope.spec.ts",
+    "apps/api/src/features/reports/history.spec.ts",
+    "apps/api/src/features/reports/dashboard.repository.ts",
+    "apps/api/src/features/reports/dashboard.repository.spec.ts",
+    "apps/api/scripts/security-resource-scope-db-smoke.cjs",
+    "apps/api/scripts/migration-smoke.cjs",
+    "apps/api/scripts/runtime-role-smoke.cjs",
+    "apps/worker/src/portals/shared/portal-navigation.spec.ts",
+    "docs/PLAN_NAPRAW_LUK_PO_PENTESCIE_2026-10-17.md",
+    "docs/security/remediation-2026-10-17/IMPLEMENTATION_REPORT.md",
+    "docs/security/remediation-2026-10-17/retest-scenarios.json"
+  ],
+  "verification": [
+    {
+      "command": "npm run build -w @goldis/api",
+      "status": "PASS"
+    },
+    {
+      "command": "npm run build -w @goldis/worker",
+      "status": "PASS"
+    },
+    {
+      "command": "npm run test:unit -w @goldis/api",
+      "status": "PASS",
+      "tests": 355
+    },
+    {
+      "command": "npm run test:architecture",
+      "status": "PASS",
+      "tests": 5
+    },
+    {
+      "command": "npm run test:transaction-audit",
+      "status": "PASS",
+      "tests": 4
+    },
+    {
+      "command": "GOLDIS_TEST_NATIVE_POSTGRES=1 npm run test:module:reports",
+      "status": "PASS",
+      "database": "PostgreSQL 18 disposable"
+    },
+    {
+      "command": "GOLDIS_TEST_NATIVE_POSTGRES=1 npm run test:module:runtime-roles",
+      "status": "PASS",
+      "database": "PostgreSQL 18 disposable",
+      "role": "goldis_api"
+    },
+    {
+      "command": "npm run test:module:everest-browser",
+      "status": "PASS",
+      "tests": 27
+    },
+    {
+      "command": "node --test apps/worker/dist/portals/shared/portal-navigation.spec.js (PLAYWRIGHT_INTEGRATION=1)",
+      "status": "PASS",
+      "tests": 4
+    },
+    {
+      "command": "npm run test:module:compensa-browser",
+      "status": "PASS",
+      "tests": 39
+    },
+    {
+      "command": "npm run test:module:ufg-browser",
+      "status": "PASS",
+      "tests": 14
+    }
+  ],
+  "environmentBlockers": [
+    "Docker daemon unavailable; PostgreSQL 17 module run was not possible.",
+    "Redis runtime and HTTPS/proxy integration were not started.",
+    "Container images and backup contents were not inspected."
+  ],
+  "historicalPentestEvidencePreserved": true,
+  "productionOrStagingTested": false,
+  "externalProviderTargetsContacted": false,
+  "currentHead": "af512e9502218d336b4b73df0c5f612905c6ac7b",
+  "currentTrackedDiffSha256": "fa91e7db4aba9ace532ab6de749cee2cfe7cc18d59fd1df2117cdbbfd7bdbac5",
+  "trackedDiffScope": "SHA-256 of git diff --binary; newly added files are covered individually in sourceFileSha256.",
+  "sourceFileSha256": {
+    "apps/api/src/features/authorization/resource-scope.ts": "11f7a85aa055004a1a5e82dc789323c218f288281e1f9f01dce81e856e08cda0",
+    "apps/api/src/features/authorization/resource-scope.spec.ts": "3070a790f6635f9d935537fae1475ecae734bd8e72be1224e4e2ddc0a1116269",
+    "apps/api/src/features/reports/history.spec.ts": "61e2db7eccce952edc05c393075d426384163307ef68cec788ecd8a6318bc72f",
+    "apps/api/src/features/reports/dashboard.repository.ts": "572de73c8d6301330dc37fc67fcbac4b4768ad70cc339fc2bbd7a6477df48802",
+    "apps/api/src/features/reports/dashboard.repository.spec.ts": "170e947e6ac7461b47b5dc32ce04873cf0606af583e46d580072753d88ce6553",
+    "apps/api/scripts/security-resource-scope-db-smoke.cjs": "0404b60da980bcd53ea1bddadf636c2bbddbb7078279aba846bf4ef0dfd1123a",
+    "apps/api/scripts/migration-smoke.cjs": "679d74a988776e75a648429c601f25ad9ea3c3de83f9c081172f6e7d52a87f7c",
+    "apps/api/scripts/runtime-role-smoke.cjs": "873b141fd957f9285267148f678fa6950da013e9c04cbffe56aa8db2d672373d",
+    "apps/worker/src/portals/shared/portal-navigation.spec.ts": "0d747fbe5b6aad6182cbd33a0fa3230a391b7a494c4bd95982d23ed1ee074265",
+    "docs/PLAN_NAPRAW_LUK_PO_PENTESCIE_2026-10-17.md": "362f19f98af3b3ce515b0d912edffb45a5710a4c9e881ac03dba9e323303ffa1",
+    "docs/security/remediation-2026-10-17/IMPLEMENTATION_REPORT.md": "2789e4dbb2d094dd1eb94df0a900fb48a1b02a169edf10d7e31761e62c430e9e",
+    "docs/security/remediation-2026-10-17/retest-scenarios.json": "dbb1f753d32ac2cc9f262fbbb493810966cf8522b02a5d58706128b5aa8cd9ab"
+  }
+}

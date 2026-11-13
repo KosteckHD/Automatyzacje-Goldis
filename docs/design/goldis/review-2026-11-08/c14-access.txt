@@ -1,0 +1,52 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+Przegląd
+Moje firmy
+Pula firm
+Automatyzacje
+Przebiegi
+Historia importów
+Powiadomienia
+2
+
+ORGANIZACJA
+
+Pracownicy
+Dostępy
+Raporty
+Weryfikacja danych
+Dziennik aktywności
+Moje konto
+Zwiń menu
+Menedżer
+GOLDIS / ORGANIZACJA
+Dostępy
+Moje konto
+Dostępy do narzędzi
+
+Przydzielaj pracownikom prawo do uruchomienia automatyzacji.
+
+Zarządzaj pracownikami
+WSPÓLNY ODCZYT
+Wyniki automatyzacji OC
+
+Aktywni pracownicy mogą przeglądać szczegółowe wyniki OC. Pobieranie plików wymaga osobnego uprawnienia, niezależnego od prawa uruchamiania automatyzacji.
+
+Dostęp dla zespołu
+Uruchamianie automatyzacji OC
+
+Zmiany dostępu zapisują się od razu i są przypisane do konkretnego konta.
+
+anna.nowak
+Pracownik · wspólny podgląd OC; pobieranie według osobnego uprawnienia
+Może uruchamiać
+piotr.kowalski
+Pracownik · wspólny podgląd OC; pobieranie według osobnego uprawnienia
+Może uruchamiać
+ewa.zielinska
+Pracownik · wspólny podgląd OC; pobieranie według osobnego uprawnienia
+Może uruchamiać

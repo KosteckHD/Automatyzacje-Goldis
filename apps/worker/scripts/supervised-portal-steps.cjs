@@ -107,17 +107,7 @@ module.exports = async ({ command, runtime, root, state }) => {
     return target;
   };
   if (command === "search-existing-step7-client") {
-    const context = JSON.parse(await fs.readFile(path.join(root, "exports/live-acceptance/context-step7.json"), "utf8"));
-    const { PgRunRepository } = require("../dist/infrastructure/database/pg-run-repository.js");
-    const run = await new PgRunRepository(runtime.pool).load(context.runId);
-    if (!run?.identity || run.source.rowNumber !== 18001 || run.status !== "waiting_for_manual_data") throw new Error("EXISTING_TEST_CONTEXT_REQUIRED");
-    await runtime.browser.assertNavigationAllowed("compensa", true);
-    await (await exact('input[placeholder="PESEL / REGON"]:visible')).fill(run.identity.pesel);
-    await (await exact('button:has-text("Przejdź do Klient 360"):visible')).click();
-    state.identity = run.identity;
-    state.testRunId = context.runId;
-    console.log("EXISTING_CLIENT_LOOKUP_SUBMITTED_NO_OFFER_STARTED");
-    return;
+    throw new Error("CLIENT360_LOOKUP_REMOVED_USE_COMMUNICATION_DIALOG");
   }
   if (command === "open-communication") {
     if (await state.compensa.ensureAuthenticated() !== "authenticated") throw new Error("COMPENSA_AUTH_REQUIRED");

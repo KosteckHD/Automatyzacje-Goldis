@@ -47,6 +47,8 @@ export function assertApiStartupConfiguration(env: StartupEnvironment = process.
   if (!validKeyring(env.ARTIFACT_ENCRYPTION_ACTIVE_KEY_VERSION, env.ARTIFACT_ENCRYPTION_KEYS_BASE64)) errors.push("ARTIFACT_ENCRYPTION_KEYRING");
   if (env.IMPORT_PARSER_URL !== "http://import-parser:3010") errors.push("IMPORT_PARSER_URL");
   if (Buffer.byteLength(env.IMPORT_PARSER_SHARED_SECRET || "") < 32) errors.push("IMPORT_PARSER_SHARED_SECRET");
+  if (env.COMMISSION_ENGINE_URL !== "http://commission-engine:8000") errors.push("COMMISSION_ENGINE_URL");
+  if (!env.COMMISSION_ENGINE_TOKEN_FILE?.startsWith("/run/secrets/")) errors.push("COMMISSION_ENGINE_TOKEN_FILE");
   if (Buffer.byteLength(env.PRIVILEGED_ACTION_BINDING_KEY || "") < 32) errors.push("PRIVILEGED_ACTION_BINDING_KEY");
   try { assertAuthMailProductionConfiguration(env); }
   catch { errors.push("AUTH_MAIL_CONFIGURATION"); }

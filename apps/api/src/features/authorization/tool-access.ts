@@ -24,6 +24,15 @@ export function toolAccessFromRecords(
       canViewResults: true,
       canDownloadResults: true,
     };
+  // Legacy tool grants must not widen the auditor role beyond tenant-scoped audit access.
+  if (principal.role === "auditor")
+    return {
+      toolId: tool.toolId,
+      canDiscover: false,
+      canExecute: false,
+      canViewResults: false,
+      canDownloadResults: false,
+    };
   const sharedOcResults =
     tool.toolId === "oc-policy-verification" && (principal.role === "operator" || principal.role === "manager");
   if (tool.status === "disabled")
@@ -32,7 +41,7 @@ export function toolAccessFromRecords(
       canDiscover: false,
       canExecute: false,
       canViewResults: sharedOcResults,
-      canDownloadResults: sharedOcResults,
+      canDownloadResults: grant?.canDownloadResults ?? false,
     };
   if (!grant)
     return {
@@ -40,14 +49,14 @@ export function toolAccessFromRecords(
       canDiscover: sharedOcResults,
       canExecute: false,
       canViewResults: sharedOcResults,
-      canDownloadResults: sharedOcResults,
+      canDownloadResults: false,
     };
   return {
     toolId: tool.toolId,
     canDiscover: grant.canDiscover || grant.canExecute || sharedOcResults,
     canExecute: grant.canExecute && tool.status === "available",
     canViewResults: sharedOcResults || grant.canViewResults,
-    canDownloadResults: sharedOcResults || grant.canDownloadResults,
+    canDownloadResults: grant.canDownloadResults,
   };
 }
 
@@ -93,6 +102,7 @@ export async function readToolAccess(principal: ToolPrincipal, toolId: string): 
   const tool = await Tool.findByPk(toolId, { attributes: ["toolId", "status"] });
   if (!tool) return null;
   if (principal.role === "admin") return toolAccessFromRecords(principal, tool, null);
+  if (principal.role === "auditor") return toolAccessFromRecords(principal, tool, null);
   const grant = await ToolGrant.findOne({
     where: { tenantId: principal.tenantId, toolId, userId: principal.userId },
     attributes: ["canDiscover", "canExecute", "canViewResults", "canDownloadResults"],

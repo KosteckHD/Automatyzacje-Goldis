@@ -5,6 +5,8 @@ const path = require("node:path");
 const ROW_NUMBERS = Object.freeze(Array.from({ length: 101 }, (_, i) => 18000 + i));
 const TERMINAL = new Set(["completed", "failed", "no_matching_policies", "cancelled", "identity_review", "waiting_for_manual_data"]);
 const REASONS = {
+  COMPENSA_PAYER_DATA_SKIPPED: "Pominięto — dodatkowy formularz ubezpieczającego w Compensie; bez zatwierdzenia danych, zapisu i UFG.",
+  COMPENSA_CUSTOMER_DATA_INCOMPLETE: "Niekompletne dane klienta w Compensie — zablokowany kod pocztowy lub powiat; bez zapisu i UFG.",
   IDENTITY_NOT_FOUND: "Nie znaleziono wymaganej osoby w Everest; wynik wymaga kontroli braku dopasowania.",
   IDENTITY_EXPECTED_PERSON_MISSING: "W wynikach Everest brakuje rekordu osoby fizycznej wymaganego do odczytu PESEL; bez przejścia do Compensy.",
   IDENTITY_PESEL_MISSING: "Znaleziono osobę, ale portal nie udostępnił PESEL; bez przejścia do Compensy.",
@@ -31,6 +33,8 @@ const REASONS = {
 };
 function explain(code) { return REASONS[code] || (code ? `Kod wymagający sprawdzenia: ${code}.` : "Brak szczegółowego kodu przyczyny."); }
 function classify(row) {
+  if (row.status === "failed" && row.errorCode === "COMPENSA_PAYER_DATA_SKIPPED") return "POMINIETY";
+  if (row.status === "failed" && row.errorCode === "COMPENSA_CUSTOMER_DATA_INCOMPLETE") return "NIEKOMPLETNE_DANE_COMPENSY";
   if (row.status === "completed") return row.artifactVerified ? "EKSPORT_ZWERYFIKOWANY" : "WERYFIKACJA_EKSPORTU";
   if (row.status === "no_matching_policies") return "BRAK_POLIS_SPELNIAJACYCH_FILTR";
   if (row.status === "not_started") return "NIEURUCHOMIONY";

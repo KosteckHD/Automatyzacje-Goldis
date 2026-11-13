@@ -1,0 +1,118 @@
+Przejdź do głównej treści
+GOLDIS
+platforma operacyjna
+
+PRACA
+
+Przegląd
+Moje firmy
+Pula firm
+Automatyzacje
+Przebiegi
+Historia importów
+Powiadomienia
+2
+
+ORGANIZACJA
+
+Pracownicy
+Dostępy
+Raporty
+Weryfikacja danych
+Dziennik aktywności
+Moje konto
+Zwiń menu
+Menedżer
+GOLDIS / PRACA
+Przestrzeń operacyjna
+Moje konto
+M
+Pula firm
+
+Gotowe wyniki OC, które możesz przeglądać lub przydzielać zespołowi.
+
+Odczytano: 8 lis 2026, 13:00
+Firmy w tym widoku
+4
+4 w wybranym zakresie
+Do kontaktu w tym widoku
+2
+Nie kontaktowano
+Zainteresowane w tym widoku
+1
+Zaakceptowano ofertę
+
+DYSTRYBUCJA PULI
+
+Przydziel leady osobie z zespołu
+
+Wybierz odbiorcę i liczbę firm. Dostępność obejmuje całą pulę w wybranym zakresie, nie tylko firmy widoczne na bieżącej stronie.
+
+Dostępne do przydziału: 1 · sprawdzono 8.11.2026, 13:00
+
+Odśwież dostępność puli
+Odbiorca
+Wybierz odbiorcę
+anna.nowak
+piotr.kowalski
+ewa.zielinska · menedżer
+Liczba leadów
+Sprawdź przydział
+Firmy z puli OC
+
+Excel obejmie wszystkie firmy pasujące do aktywnych filtrów.
+
+Eksportuj firmy z tego widoku
+↻
+Szukaj firmy
+Status kontaktu
+Wszystkie statusy
+Nie kontaktowano
+Klient zgadza się na ofertę
+Klient nie jest zainteresowany
+Szukaj
+
+Pokazano 4 z 4 firm pasujących do filtrów.
+
+FIRMA	KONTAKT	PRZYDZIAŁ	STATUS KONTAKTU	WYNIK OC	
+Transport i Logistyka Alfa sp. z o.o.
+ul. Przemysłowa 18, Warszawa
+	
+Telefon+48 22 555 01 20E-mailkontakt@transportowa.pl
+	anna.nowak
+10 paź 2026, 17:00
+	Nie kontaktowano	2 zadań firmowych
+4 pozycji · data odniesienia 2026-10-10
+	
+→
+
+Mazovia Cargo S.A.
+ul. Przemysłowa 18, Warszawa
+	
+Telefon+48 22 555 01 20E-mailkontakt@transportowa.pl
+	piotr.kowalski
+10 paź 2026, 17:00
+	Klient zgadza się na ofertę	2 zadań firmowych
+4 pozycji · data odniesienia 2026-10-10
+	
+→
+
+Polskie Drogi Transport sp. z o.o.
+ul. Przemysłowa 18, Warszawa
+	
+Telefon+48 22 555 01 20E-mailkontakt@transportowa.pl
+	W puli	Nie kontaktowano	2 zadań firmowych
+4 pozycji · data odniesienia 2026-10-10
+	
+→
+
+Wschód Freight Group
+ul. Przemysłowa 18, Warszawa
+	
+Telefon+48 22 555 01 20E-mailkontakt@transportowa.pl
+	ewa.zielinska
+10 paź 2026, 17:00
+	Klient nie jest zainteresowany	2 zadań firmowych
+4 pozycji · data odniesienia 2026-10-10
+	
+→

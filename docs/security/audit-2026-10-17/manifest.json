@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-17",
+  "gitHead": "af512e9502218d336b4b73df0c5f612905c6ac7b",
+  "source": "working tree with pre-existing backend refactoring; application source unchanged by this audit",
+  "files": [
+    {
+      "name": "api-tests.log",
+      "sha256": "8efbd1b3378328cda57284a428dc2a8a51ba31ff99d8899d3bd62a2de7b05d46"
+    },
+    {
+      "name": "architecture.log",
+      "sha256": "5bc70c8e2424b0dbedcc296e2f518cbe6de896f827074c8446bd4673fd8761f7"
+    },
+    {
+      "name": "db-smokes.log",
+      "sha256": "6478e3112c0f4d6bc4d55b45a89c911dc91239cc7a17c2499d450213a03c0598"
+    },
+    {
+      "name": "http-boundaries.json",
+      "sha256": "bf857494f1a7452516fa80a6c3e32ab790734102c6c2f43cbda60d5e85305006"
+    },
+    {
+      "name": "http-boundaries.log",
+      "sha256": "320ba60b2040ceb633e656d8d8e5d587c6c75c14285e2159b02957c019f5a7e2"
+    },
+    {
+      "name": "initial-fixture-run.log",
+      "sha256": "daba31cb6e2e40dc2349c7278cbe51012aeb8d2de3cf1b559d30ba29b81ae281"
+    },
+    {
+      "name": "persistence-probes.json",
+      "sha256": "ec8956a8cc128d36db7bc8882503d3f54520e70e8b9dcb683fa495473c551b5b"
+    },
+    {
+      "name": "persistence-probes.log",
+      "sha256": "11c56ee33f14d6e207e64d2643cedb33a540980992bd512b88a55c8a05d665fe"
+    },
+    {
+      "name": "security-db.log",
+      "sha256": "7493ebedf47f80efdf0cd4bcc91e3cef0a75a9b262944b96f7d0c4eeff7b3059"
+    },
+    {
+      "name": "sql-candidates.txt",
+      "sha256": "57494cb37f701d761edd964157c88969834e090d63f93a50434fa44ec7a92591"
+    },
+    {
+      "name": "transactions.log",
+      "sha256": "b8fb8ced4e49653f74b213ec1c1d3f59e0341d7bdda9a240519dd4b4e6ba8f5a"
+    }
+  ]
+}

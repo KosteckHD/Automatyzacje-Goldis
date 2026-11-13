@@ -1,0 +1,128 @@
+[
+  {
+    "id": "REL01", "category": "release", "gate": "G0", "phases": ["A", "B"], "applicability": "common", "title": "Zakres, kompletne źródła i manifest jednego wydania",
+    "steps": ["Zidentyfikuj tracked i untracked pliki potrzebne do wydania; przejrzyj diff bez resetowania zmian użytkownika.", "Zapisz pełny SHA kandydata, lockfile npm/Python, 6 prawdziwych digestów, migration head, konfigurację i wersje kontraktów.", "Zapisz OC/prowizje/mail/MF/LIVE oraz listę usług i zgodną paczkę recovery; porównaj ją z runtime B."],
+    "passCriteria": ["Każdy wynik dotyczy identyfikowalnej paczki; żadnych fikcyjnych digestów ani utraconych plików/migracji.", "Aktualny zakres 066/commission-engine/commission-worker jest jawny; ukrycie UI nie udaje wyłączenia kodu."],
+    "evidence": ["Manifest przebiegu i release, źródłowy SHA i checksumy paczki, bez sekretów", "Efektywna lista obrazów/usług i tożsamość runtime"], "entryPoints": ["npm run release:manifest -- --env <plik> --output <manifest>", "npm run validate:production-compose -- --env <plik>"], "references": ["docs/RELEASE_AND_ROLLBACK.md", "docs/porownywarka-prowizji/IMPLEMENTATION_STATUS.md"]
+  },
+  {
+    "id": "REL02", "category": "release", "gate": "G0", "phases": ["A"], "applicability": "common", "title": "Izolowany stos, seed i działające odbiorniki kontrolne",
+    "steps": ["Przygotuj odrębny Linux/Compose, PostgreSQL17, Redis ACL, HTTPS test CA oraz wszystkie usługi wybranego release.", "Utwórz role i dwa konta A/B, drugi tenant oraz macierz OC-only/prowizje-only/oba/brak i osobnego prawa słownika.", "Potwierdź działanie canary HTTP/DNS/mail i resetu fixture; odetnij przypadkowe wyjście do żywych portali."],
+    "passCriteria": ["Środowisko nie używa produkcyjnych danych/sekretów i ma kontrolę własności przed cleanup.", "Kontrola dodatnia canary dociera; test odmowy bez działającego odbiornika nie może dać PASS."],
+    "evidence": ["Manifest celów, seed/hash i dowód kontroli dodatniej", "Wersje OS/Engine/Compose, schemat sieci i ograniczenia egress"], "entryPoints": ["NOWY HARNESS — izolowany seed i kontrola odbiorników do przygotowania"], "references": ["docs/PLAN_PENTESTOW_CALEJ_APLIKACJI_2026-10-17.md"]
+  },
+  {
+    "id": "REL03", "category": "release", "gate": "G2", "phases": ["A"], "applicability": "common", "title": "Czysty build, testy i CI TypeScript oraz Python",
+    "steps": ["Z czystego checkoutu wykonaj npm ci, kontrolę stylu, build i wymagane testy z wyczyszczonym środowiskiem usług klienta.", "W odrębnym środowisku Python3.12 odtwórz requirements.lock i uruchom testy silnika; zweryfikuj kontrakt Node/Python.", "Dla każdego procesu zapisz timeout, kod zakończenia i podsumowanie; zbadaj nieukończone API i błędy stagingu, a nie tylko uruchom ponownie do sukcesu."],
+    "passCriteria": ["Wymagane suite kończą się wynikiem, bez niewyjaśnionych FAIL/INCOMPLETE.", "Końcowe CI i obrazy odnoszą się do tego samego SHA; testy nie uruchamiają portali live."],
+    "evidence": ["CI URL/SHA, command, exit code, pass/fail/skip, wersje narzędzi", "Raport Python i kontraktu silnika"], "entryPoints": ["npm ci", "npm run check:backend:style", "npm run build", "npm test", "PYTHON: python -m unittest discover -s services/commission-engine/tests -v w przygotowanym venv/PYTHONPATH"], "references": ["package.json", ".github/workflows/backend-checks.yml", "services/commission-engine/requirements.lock"]
+  },
+  {
+    "id": "REL04", "category": "release", "gate": "G2", "phases": ["A"], "applicability": "common", "title": "Migracje fresh i upgrade do całego bieżącego schematu",
+    "steps": ["Wykonaj pełne migracje na pustej izolowanej DB PG17 oraz upgrade ze zdefiniowanego poprzedniego schematu, w tym065→066 dla prowizji.", "Nałóż runtime grants jako migrator; sprawdź narzędzia, ustawienia, tabele, audyt i role rzeczywistych procesów.", "Powtórz start/migrację bez duplikacji danych; sprawdź zgodność kontraktu i wcześniejszych wyników."],
+    "passCriteria": ["Najwyższa migracja i hash grantów zgadzają się z manifestem; brak częściowego upgrade lub runtime DDL.", "Test konkretnego upgrade061→062 nie jest zastępstwem całego aktualnego schematu i migracji066."],
+    "evidence": ["Migration ledger, before/after schema i wyniki allow/deny", "Kontrolne rekordy przed/po upgrade, kody zakończenia"], "entryPoints": ["npm run test:db-integration", "npm run test:module:migrations", "npm run test:module:migrations-upgrade", "NOWY/WERYFIKOWANY HARNESS: commission smoke na dedykowanej bazie; bez produkcyjnego DATABASE_URL"], "references": ["apps/api/scripts/migration-smoke.cjs", "apps/api/src/infrastructure/database/migrations/066-commission-comparison.ts"]
+  },
+  {
+    "id": "REL05", "category": "release", "gate": "G1", "phases": ["A"], "applicability": "common", "title": "Weryfikacja i domknięcie znalezionych rozbieżności",
+    "steps": ["Odtwórz na bieżącym snapshotcie A1–A7, VPS-01–14 i wskazania prowizyjne z głównego planu.", "Zapisz wpływ, priorytet, poprawkę oraz test regresji; porównaj stare źródła z aktualnym kodem przed zmianą.", "Retest wykonaj na kandydacie release i dodaj identyfikator poprawki/dowodu."],
+    "passCriteria": ["Nie ma otwartego błędu blokującego istotny scenariusz, niezbadanej poprawki ani fikcyjnego zamknięcia tylko na podstawie kodu.", "Limit architektury nie jest podnoszony bez przeglądu; znaleziska już zamknięte nie są ponownie deklarowane jako aktywne luki."],
+    "evidence": ["Rejestr usterek i retestów z wersjami", "Diff poprawki i dowód regresji"], "entryPoints": ["npm run test:architecture", "Pakiety i przypadki wskazane przez daną usterkę"], "references": ["docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md", "docs/security/remediation-2026-10-17/IMPLEMENTATION_REPORT.md"]
+  },
+  {
+    "id": "REL06", "category": "release", "gate": "G2", "phases": ["A"], "applicability": "common", "title": "Rozliczenie SKIP i powierzchni bez pokrycia",
+    "steps": ["Zmapuj wymagania i aktualne trasy/aktorów do przypadków i rzeczywistych suites.", "Dla SKIP wskaż fixture suite, zakres N/A albo brakujący test; dla BLOCKED opisz środowisko i sposób odblokowania.", "Zweryfikuj, czy fixture uruchamia produkcyjny procesor, a nie inną orkiestrację."],
+    "passCriteria": ["Każde wymaganie release ma wykonany adekwatny dowód albo zatwierdzone N/A; brak wymaganego testu nie jest PASS.", "Nie sumuje się historycznych PASS różnych snapshotów jako odbioru nowego release."],
+    "evidence": ["Coverage map, rejestr SKIP/N/A z uzasadnieniem", "Powiązania route→rola→case→suite→evidence"], "entryPoints": ["npm run test:e2e:fixture", "docs/production-readiness/skip-register.json jako materiał historyczny, nie nowy wynik"], "references": ["scripts/test-module.cjs"]
+  },
+  {
+    "id": "REL07", "category": "release", "gate": "G6", "phases": ["A", "B"], "applicability": "legacy_migration", "title": "Przeniesienie istniejących danych i odłączenie starej instalacji",
+    "steps": ["Najpierw odtwórz uzgodnioną kopię w A i sprawdź DB, eksporty, staging, stare klucze i najnowszy journal.", "Odbierz przejście Windows/local→Linux; nie zakładaj zgodności formatów archiwów.", "W kontrolowanym oknie przenieś zatwierdzone dane, porównaj rekordy i odłącz stary wykonawca/kolejkę przed otwarciem nowych zadań."],
+    "passCriteria": ["Dane i autoryzowane pliki są czytelne, kasowania zachowane, schemat zgodny; brak równoczesnego wykonania tej samej pracy przez dwa środowiska.", "Jeśli start jest czysty, przypadek ma N/A z jawną decyzją, nie nieudokumentowane pominięcie."],
+    "evidence": ["Protokół migracji z hashami i porównaniem liczników bez danych klientów", "Dowód odłączenia starego runtime i poprawnego journal replay"], "entryPoints": ["Odebrana procedura migracji danych z planu VPS"], "references": ["docs/PLAN_VPS_I_UTRZYMANIA_KLIENTA_2026-11-05.md"]
+  },
+  {
+    "id": "E2E01", "category": "integration", "gate": "G3", "phases": ["A"], "applicability": "oc", "title": "OC od panelu do XLSX przez rzeczywiste komponenty platformy",
+    "steps": ["Pracownik importuje kontrolny XLSX, przygotowuje i potwierdza wybrane grupy w prawdziwym UI/API.", "DB/outbox/Redis dostarcza run do produkcyjnego LiveRunProcessor z lokalnymi adapterami portali fixture.", "Snapshot i artefakt trafiają do API; UI pokazuje wynik i uprawniony pracownik pobiera XLSX."],
+    "passCriteria": ["Cały łańcuch używa rzeczywistych platformowych komponentów, bez mock API zamiast DB/worker.", "Firma/osoba, liczniki, filtr daty i XLSX zgadzają się z referencją; jedna realizacja grupy."],
+    "evidence": ["Trace UI/API + correlation IDs run/submission/outbox, liczniki fixture", "Kontrolny expected, snapshot i porównanie XLSX"], "entryPoints": ["NOWY/WERYFIKOWANY HARNESS — pełny izolowany łańcuch produkcyjny z fixture; same test:e2e:fixture nie zastępują tego przypadku"], "references": ["apps/worker/src/features/execution/live-run.ts"]
+  },
+  {
+    "id": "E2E02", "category": "integration", "gate": "G3", "phases": ["A"], "applicability": "commission", "title": "Prowizje: UI→API→outbox/Redis→worker→Python→wynik",
+    "steps": ["Uprawniony użytkownik wgrywa kontrolne źródła i publikuje zatwierdzony słownik w rzeczywistym UI/API.", "Uruchom analizę przez realny commission-worker i prywatny silnik Python z przypiętymi wersjami.", "Otwórz wynik/historyczne źródła i pobierz raport, porównując dane pozycji oraz agregaty."],
+    "passCriteria": ["Pełny stos wykonuje analizę bez Office/COM/LibreOffice i bez zastąpienia Node/Python mockiem.", "Zgodność z zatwierdzoną referencją, odtworzenie historii i prawidłowe granty."],
+    "evidence": ["IDs zlecenia/attemptu, wersje silnika/kontraktu/słownika, trace UI/API", "Porównanie expected/actual dla pozycji i raportu"], "entryPoints": ["NOWY HARNESS/UAT — pełny lokalny stos prowizyjny"], "references": ["docs/porownywarka-prowizji/08-ODBIOR-I-WDROZENIE-VPS.md"]
+  },
+  {
+    "id": "E2E03", "category": "integration", "gate": "G3", "phases": ["A"], "applicability": "common", "title": "Awarie w granicach zlecenia, skutku i publikacji wyniku",
+    "steps": ["Kontrolowanie przerwij proces po commit DB przed enqueue, po przejęciu lease, po skutku fixture i przed finalizacją pliku.", "Wznów lub dostarcz ponownie wiadomość; podaj też stary lease/attempt/wynik.", "Porównaj trwały stan, outbox i liczbę skutków w obu narzędziach."],
+    "passCriteria": ["Brak utraty trwałego zadania, fałszywego completed lub podwójnego skutku.", "Niepewny skutek ma jawną ścieżkę uzgodnienia, a stary wynik nie nadpisuje aktualnego."],
+    "evidence": ["Oś czasu fault injection, DB/outbox/file diff", "Licznik skutków fixture i wynik ponownej dostawy"], "entryPoints": ["NOWY HARNESS — deterministyczne fault injection", "npm run test:module:worker-lifecycle", "npm run test:module:run-control"], "references": ["docs/PLAN_PELNEGO_ODBIORU_PLATFORMY_2026-11-05.md"]
+  },
+  {
+    "id": "E2E04", "category": "integration", "gate": "G3", "phases": ["A", "UAT"], "applicability": "common", "title": "Współistnienie dwóch narzędzi i odcięcie dostępu",
+    "steps": ["Użyj kont OC-only, prowizje-only, obu i bez grantów; sprawdź katalog, trasy bezpośrednie, historie, powiadomienia i pliki.", "Dla narzędzi dopuszczonych w scope uruchom legalne zadania, po czym cofnij wybrany grant i ponów stare linki/sesję. Dla skutecznie wyłączonych prowizji dodatni wariant może mieć N/A, lecz próba wykonania/odczytu API ma potwierdzić blokadę.", "Sprawdź routing właściwego modułu oraz obowiązkowo wpływ całego release na wspólne migracje, role, sieci i backup."],
+    "passCriteria": ["Każda dopuszczona funkcja trafia do właściwego modułu, a brak grantu lub wyłączenie blokuje API i download niezależnie od menu.", "Polityka współdzielenia OC nie przenosi się automatycznie na prowizje; całe E2E04 common nie otrzymuje N/A z powodu wyłączenia jednego narzędzia."],
+    "evidence": ["Macierz konto×tool×capability i trace powiadomienia/history/download", "Odpowiedzi po cofnięciu grantu i brak niedozwolonych skutków"], "entryPoints": ["NOWY HARNESS/UAT — dwa rzeczywiste moduły", "npm run test:module:security-db"], "references": ["apps/api/src/features/authorization/tool-access.ts"]
+  },
+  {
+    "id": "LIVE01", "category": "live", "gate": "G7", "phases": ["LIVE"], "applicability": "oc_live", "title": "Nowy profil, IP i logowanie/MFA na docelowej instalacji",
+    "steps": ["Operator potwierdza release, selektory, konto, osobę odbierającą SMS i uzgodniony minimalny zakres.", "Przejdź logowanie nowego profilu przez panel, a potem sprawdź użycie zapamiętanej sesji po bezpiecznym restarcie."],
+    "passCriteria": ["Legalna sesja i MFA działają z nowego IP bez publicznego VNC/debug portu.", "Health nie jest jedynym dowodem zalogowania; kod SMS nie trafia do protokołu/logów."],
+    "evidence": ["Bezpieczny protokół operatora: release, zakres, czasy i wynik", "Brak treści SMS/danych portalu w dowodach"], "entryPoints": ["OPERATOR — nadzorowany odbiór LIVE, bez automatycznego uruchamiania w CI"], "references": ["docs/FLOW_LOGOWANIA_PORTALI_2026-10-18.md"]
+  },
+  {
+    "id": "LIVE02", "category": "live", "gate": "G7", "phases": ["LIVE"], "applicability": "oc_live", "title": "Rzeczywisty reprezentatywny wynik OC i porównany XLSX",
+    "steps": ["Z konta pracownika uruchom jeden zatwierdzony przypadek przez panel.", "Porównaj właściwą firmę/osobę, kompletną tabelę i filtr daty z wynikiem API/UI/XLSX.", "Sprawdź przydział i uprawniony odczyt wyniku bez uruchamiania nowego runu."],
+    "passCriteria": ["Jednoznacznie poprawna tożsamość i dokładne dane; błąd/niepełny odczyt nie udaje zera.", "Protokół dotyczy bieżącej instalacji i obrazów, nie historycznej kampanii."],
+    "evidence": ["Zatwierdzenie expected/actual przez uprawnionego odbiorcę", "Identyfikatory techniczne i checksums prywatnych artefaktów; bez treści klienta w Git"], "entryPoints": ["OPERATOR — normalny uprawniony przebieg w uzgodnionym zakresie"], "references": ["docs/ODBIOR_AUTOMATYZACJI_2026-10-17.md"]
+  },
+  {
+    "id": "LIVE03", "category": "live", "gate": "G7", "phases": ["LIVE"], "applicability": "oc_live", "title": "Procedura ręcznego rozstrzygnięcia przerwanej sprawy",
+    "steps": ["Przećwicz na odebranych fixture niepewny zapis i utratę formularza; operator wskazuje procedurę uzgodnienia tej samej sprawy.", "Dla realnego środowiska potwierdź dostęp i odpowiedzialność osoby wykonującej taki przegląd, bez celowego psucia spraw klienta."],
+    "passCriteria": ["Pracownik wie, kiedy zatrzymać pracę i eskalować; brak instrukcji ślepego nowego zapisu.", "Nie twierdzi się, że destrukcyjna awaria została odebrana LIVE, jeśli dowód pochodzi wyłącznie z fixture."],
+    "evidence": ["Protokół instruktażu i powiązanie z A1–A3/E2E03", "Jawny zakres: fixture kontra normalna kontrola LIVE"], "entryPoints": ["OPERATOR + właściciel produktu — odbiór procedury"], "references": ["docs/ODBIOR_AUTOMATYZACJI_2026-10-17.md"]
+  },
+  {
+    "id": "LIVE04", "category": "live", "gate": "G7", "phases": ["LIVE", "UAT"], "applicability": "oc_live", "title": "Mały pilot, tempo i obsługa przez zespół",
+    "steps": ["Przyjmij małą uzgodnioną partię i obserwuj kolejkę, SMS, poprawne zera, pominięcia i wyniki.", "Pracownicy i menedżer kończą pracę z przydziałem/kontaktem; operator mierzy czas automatu oraz minuty pracy ręcznej."],
+    "passCriteria": ["Znana rzeczywista przepustowość i dyspozycyjność startera; brak deklaracji pełnej autonomii bez dowodu.", "Nie ma ukrytych nierozstrzygniętych zapisów ani niekontrolowanego zalegania zadań."],
+    "evidence": ["Dziennik pilota z licznikami i czasem ręcznej obsługi", "Odbiór klienta/menedżera i opis ograniczeń"], "entryPoints": ["OPERATOR + pracownicy — pilot bez nieograniczonego uruchamiania danych"], "references": ["docs/AUDYT_ODBIORU_BIZNESOWEGO_I_ROZWOJU_PLATFORMY_2026-11-05.md"]
+  },
+  {
+    "id": "MAIL01", "category": "external", "gate": "G7", "phases": ["B"], "applicability": "recovery_mail", "title": "Doręczenie recovery i bezpieczny link na prawdziwej domenie",
+    "steps": ["Po odebraniu fixture sprawdź weryfikację domeny/nadawcę i wysyłkę wyłącznie na uzgodnioną skrzynkę testową.", "Przejdź jednorazowy reset, wygaszenie i revokację sesji; sprawdź origin linku, logi i brak trackingu tokenu."],
+    "passCriteria": ["Wiadomość rzeczywiście dociera, a submitted nie jest jedynym dowodem.", "Link działa dla właściwego konta i jednokrotnie; przy funkcji off istnieje odebrany reset administracyjny oraz N/A tego przypadku."],
+    "evidence": ["Potwierdzenie doręczenia bez tokenu, wynik reset/replay i stan sesji", "Konfiguracja niesekretna domeny i sendera"], "entryPoints": ["OPERATOR — kontrolowany odbiór maila, nie pentest dostawcy"], "references": ["apps/api/src/features/account-recovery"]
+  },
+  {
+    "id": "REG01", "category": "external", "gate": "G7", "phases": ["B"], "applicability": "mf_vat", "title": "MF VAT na docelowym IP i rozliczenie limitu",
+    "steps": ["Na minimalnym zatwierdzonym przykładzie potwierdź lookup, cache i pochodzenie REGON.", "Wyczerpanie limitu, Retry-After i błąd dostawcy odegraj na fixture; pokaż użytkownikowi właściwy status."],
+    "passCriteria": ["Lookup nie zmienia niespójnych danych po cichu; brak wyniku nie oznacza nieistnienia firmy.", "Budżet 100 requestów/dobę i batch do 30 są rozliczane jako żądania, nie gwarancja liczby firm; provider jest jawny."],
+    "evidence": ["Bezpieczny zapis wyniku/źródła i licznika requestów", "Fixture limitu i komunikat UI"], "entryPoints": ["npm run test:module:registry", "OPERATOR — minimalny uzgodniony lookup, bez testów ataku na MF"], "references": ["apps/api/src/features/enrichment"]
+  },
+  {
+    "id": "LOAD01", "category": "performance", "gate": "G5", "phases": ["A"], "applicability": "common", "title": "2–5 pracowników i współdzielone zasoby obu narzędzi",
+    "steps": ["Zapisz dane i cele pomiaru; uruchom 5 syntetycznych kont wykonujących zwykłe listy, login, import i download.", "Równolegle wykonuj jedną kolejkę OC fixture oraz jedno obliczenie prowizji, jeżeli jest dopuszczone w scope. Przy wyłączonych prowizjach dodatni wariant obliczeń ma uzasadnione N/A, ale wpływ działających usług i wspólnych zasobów nadal podlega pomiarowi.", "Zapisz rozgrzewkę i co najmniej 3 porównywalne przebiegi p50/p95, RSS/CPU/I/O/tmp/dysk i długość kolejek."],
+    "passCriteria": ["Brak OOM/restartów/niekontrolowanego dysku; wyniki są poprawne, limity dają czytelne odmowy.", "Cele opóźnień i czasu partii są uzgodnione i spełnione; suma limitów RAM ok. 10,5 GiB nie jest pomiarem rzeczywistego zużycia."],
+    "evidence": ["Raport danych/sprzętu i surowych pomiarów", "Cele oraz expected/actual z wpływem na konfigurację VPS"], "entryPoints": ["NOWY BOUNDED HARNESS — obciążenie syntetyczne, bez floodingu i portali live"], "references": ["compose.production.yaml"]
+  },
+  {
+    "id": "LOAD02", "category": "performance", "gate": "G5", "phases": ["A"], "applicability": "common", "title": "Granice plików, list i pełność dużego raportu",
+    "steps": ["Przygotuj normalne i graniczne rozmiary plików/wierszy/tekstów oraz strony list; użyj limitów właściwych danemu dopuszczonemu modułowi.", "Dla dopuszczonych prowizji sprawdź większą analizę i wynik przekraczający limity podglądu 500/200. Jeśli moduł skutecznie wyłączony, wyłącznie ten dodatni wariant może mieć N/A; wspólne granice platformy pozostają obowiązkowe.", "Zasymuluj kontrolowany brak miejsca/timeout w A i wykonaj następną legalną operację po odzyskaniu."],
+    "passCriteria": ["Nie ma cichego ucięcia wyniku; paginacja lub komunikat ograniczenia i pełny eksport są zgodne z kontraktem.", "Granice parsera/zbioru nie są mylone; odmowa nie zostawia pozornego sukcesu ani nie zabija hosta."],
+    "evidence": ["Macierz granic i stan przed/po, raport RAM/tmp/dysku", "Porównanie pełnej referencji z UI/raportem"], "entryPoints": ["NOWY BOUNDED HARNESS — granice i dysk pełny tylko w A"], "references": ["docs/porownywarka-prowizji/08-ODBIOR-I-WDROZENIE-VPS.md"]
+  },
+  {
+    "id": "OPS02", "category": "operations", "gate": "G8", "phases": ["B", "UAT"], "applicability": "common", "title": "Przekazanie, aktualizacje i końcowa decyzja odbiorowa",
+    "steps": ["Zbierz wyniki wszystkich obowiązkowych faz i aktualny rejestr usterek, ryzyk oraz retestów.", "Pracownik/menedżer/operator przechodzą instrukcje normalnej pracy, eskalacji, kopii, aktualizacji i awarii; zastępca ma dostęp recovery.", "Podpisz zakres odbioru i harmonogram utrzymania; odróżnij pełny odbiór od ograniczonego pilota lub portali off."],
+    "passCriteria": ["Nie ma nieprzetestowanego wymaganego zakresu ani nierozstrzygniętej krytycznej/wysokiej osiągalnej luki.", "Operator, okno zmian, alarmy, backup/restore i odpowiedzialności są znane; protokół wskazuje właściwe SHA/digesty/host."],
+    "evidence": ["Wypełniony protokół, rejestr wyników/usterek i indeks dowodów", "Potwierdzenie instruktażu i dostępu awaryjnego bez sekretów"], "entryPoints": ["docs/acceptance/2026-11-05/PROTOKOL_ODBIORU.md"], "references": ["docs/OPERATIONS_AND_INCIDENTS.md", "docs/RELEASE_AND_ROLLBACK.md"]
+  },
+  {
+    "id": "OPS03", "category": "operations", "gate": "G5", "phases": ["A", "B"], "applicability": "common", "title": "Odzyskanie administratora także bez recovery mailowego",
+    "steps": ["W izolowanejA zasymuluj utratę dostępu do administratora i przejrzyj istniejącą procedurę offline-admin-password-reset przed wykonaniem.", "Uprawniony operator resetuje kontrolne konto bez ujawnienia hasła w argumentach/logu; sprawdź nowe logowanie, wymuszoną zmianę hasła, stare sesje/linki oraz ślad audytu.", "W B potwierdź dostęp operatora i zastępcy do właściwej paczki/procedury oraz eskalację; nie resetuj aktywnego konta klienta dla samego testu."],
+    "passCriteria": ["Odzyskanie działa w A bez zależności od dostawy e-maila i nie pozwala osobie nieuprawnionej przejąć konta.", "Stare sesje i linki nie przywracają dawnego dostępu; B ma potwierdzoną wykonalność procedury. MAIL01 N/A wskazuje dowód tego przypadku."],
+    "evidence": ["Protokół kontrolnego resetu w A z loginem/revokacją/audytem, bez hasła i tokenów", "Potwierdzenie uprawnionego dostępu operatora/zastępcy i właściwej paczki w B"], "entryPoints": ["apps/api/scripts/offline-admin-password-reset.cjs — przejrzeć kontrakt i wykonać tylko na kontrolnym koncie w A"], "references": ["apps/api/scripts/offline-admin-password-reset.cjs", "apps/api/src/features/auth/offline-admin-password-reset.spec.ts"]
+  }
+]

@@ -16,7 +16,7 @@ async function buildAcceptancePortalConfig() {
   const field = label => `insured-section div.row:has(> label:text-is("${label}")) input`;
   const config = {
     pzu: { entryUrl: pzuLogin.entryUrl, allowedOrigins: ["https://everest.pzu.pl", "https://zaloguj.pzu.pl", "https://strefa.agentpzu.pl"],
-      adapterVersion: "pilot-20261009", session: { ...pzuLogin.session, ...pzuSms.session,
+      adapterVersion: "pilot-20261009", session: { ...pzuLogin.session, ...pzuSms.session, smsFramePath: pzuSms.framePath,
         authenticated: everest.selectors.searchInput, accessDenied: 'text="Access denied"' }, everest: everest.selectors },
     compensa: { entryUrl: "https://cportal.compensa.pl/Portal", allowedOrigins: compensaLogin.allowedOrigins,
       adapterVersion: "pilot-20261009", parserVersion: "pilot-20261009", registrationNumber: "RST22339",
@@ -30,6 +30,12 @@ async function buildAcceptancePortalConfig() {
         firstNameInput: field("Imię"), lastNameInput: field("Nazwisko"),
         // Both exact labels were observed: person PESEL and business-person Pesel.
         peselInput: `${field("PESEL")}, ${field("Pesel")}`,
+        regonInput: field("REGON"),
+        companyNameInput: field("Nazwa"),
+        payerDataDialog: compensaActions.payerDataDialog,
+        payerIdentifierInput: compensaActions.payerIdentifierInput,
+        payerCancel: compensaActions.payerCancel,
+        incompleteCustomer: compensaActions.incompleteCustomer,
         postalCodeInput: field("Kod pocztowy"), countyInput: 'insured-section div.row:has(> label:text-is("Powiat")) select',
         saveButton: compensaActions.saveButton,
         customerMatches: compensaActions.customerMatches,

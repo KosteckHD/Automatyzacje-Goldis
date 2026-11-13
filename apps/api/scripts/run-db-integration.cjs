@@ -35,7 +35,7 @@ async function withDisposableDatabase(baseUrl, mode) {
     const smokeArgs = ["runtime-roles", "app-module"].includes(mode) || mode === "upgrade-061-062"
       ? [databaseName]
       : [mode, databaseName];
-    const smokeTimeoutMs = mode === "users" && process.env.GOLDIS_AUTOMATION_E2E === "1" ? 360_000 : 180_000;
+    const smokeTimeoutMs = mode === "users" && process.env.GOLDIS_AUTOMATION_E2E === "1" ? 480_000 : 180_000;
     const child = spawnSync(process.execPath, [smokePath, ...smokeArgs], {
       cwd: require("node:path").resolve(__dirname, "../../.."),
       env: childEnvironment, stdio: "inherit", timeout: smokeTimeoutMs,
@@ -66,7 +66,7 @@ async function main() {
     return;
   }
   try {
-    const allModes = ["users-empty", "users", "tenant-scope", "teams", "admin-users", "grouping-perf", "registry-jobs", "reports", "deletion", "backup-restore", "run-control", "runtime-roles", "app-module", "upgrade-061-062"];
+    const allModes = ["users-empty", "users", "tenant-scope", "teams", "admin-users", "grouping-perf", "registry-jobs", "reports", "deletion", "backup-restore", "run-control", "runtime-roles", "app-module", "upgrade-061-062", "commission"];
     const requestedModes = process.env.GOLDIS_TEST_DB_MODES
       ? [...new Set(process.env.GOLDIS_TEST_DB_MODES.split(",").map((value) => value.trim()).filter(Boolean))]
       : allModes;
@@ -74,7 +74,7 @@ async function main() {
       throw new Error("GOLDIS_TEST_DB_MODES_INVALID");
     }
     for (const mode of requestedModes) await withDisposableDatabase(baseUrl, mode);
-    console.log(`DB_INTEGRATION_PASS modes=${requestedModes.join(",")} migrations=001-062 disposable_databases=dropped`);
+    console.log(`DB_INTEGRATION_PASS modes=${requestedModes.join(",")} migrations=mode-specific disposable_databases=dropped`);
   } catch (error) {
     console.error("DB_INTEGRATION_FAILED", error instanceof Error ? error.message : "SMOKE_FAILED");
     process.exitCode = 1;

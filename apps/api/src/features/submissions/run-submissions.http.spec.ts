@@ -11,6 +11,7 @@ const csrf = "synthetic-csrf-token-for-run-submission-http-tests-123456";
 const tenantId = "99999999-9999-4999-8999-999999999999";
 const batchId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const submissionId = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+const executionId = "dddddddd-dddd-4ddd-8ddd-dddddddddddd";
 const foreignId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
 const users = {
   admin: "11111111-1111-4111-8111-111111111111",
@@ -37,10 +38,15 @@ test("run submission API protects preview, creation, tenant scope, pagination, a
   process.env.PUBLIC_APP_ORIGIN = "https://goldis-submission.synthetic";
   let app: Awaited<ReturnType<typeof NestFactory.create>> | undefined;
   const received: Array<{ method: string; args: unknown[] }> = [];
+  const executionCalls: Array<{ method: string; args: unknown[] }> = [];
+  const resultCalls: Array<{ method: string; args: unknown[] }> = [];
   let restoreToolModels: (() => void) | undefined;
   try {
     const { RunSubmissionController } = await import("./run-submissions.controller");
     const { RunSubmissionService } = await import("./run-submissions.service");
+    const { PreparedSetExecutionController } = await import("./prepared-set-executions.controller");
+    const { PreparedSetExecutionService } = await import("./prepared-set-executions.service");
+    const { ResultSetController } = await import("./result-set.controller");
     const { Tool, ToolGrant } = await import("../../infrastructure/database/db");
     const originalToolFindByPk = Tool.findByPk;
     const originalGrantFindOne = ToolGrant.findOne;
@@ -85,9 +91,35 @@ test("run submission API protects preview, creation, tenant scope, pagination, a
         received.push({ method: "cancel", args });
         return { submissionId, status: "cancelled" };
       },
+      async pause(...args: unknown[]) {
+        received.push({ method: "pause", args });
+        return { submissionId, status: "paused" };
+      },
+      async resume(...args: unknown[]) {
+        received.push({ method: "resume", args });
+        return { submissionId, status: "queued" };
+      },
+      async resultSetSummary(...args: unknown[]) {
+        resultCalls.push({ method: "summary", args });
+        return { resultSetId: submissionId, status: "running" };
+      },
+      async resultSetRows(...args: unknown[]) {
+        resultCalls.push({ method: "rows", args });
+        return { items: [], nextCursor: null };
+      },
+    };
+    const preparedSetService = {
+      async pause(...args: unknown[]) {
+        executionCalls.push({ method: "pause", args });
+        return { executionId, status: "pause_requested" };
+      },
+      async resume(...args: unknown[]) {
+        executionCalls.push({ method: "resume", args });
+        return { executionId, status: "queued" };
+      },
     };
     @Module({
-      controllers: [RunSubmissionController],
+      controllers: [RunSubmissionController, PreparedSetExecutionController, ResultSetController],
       providers: [
         SessionGuard,
         PermissionGuard,
@@ -131,6 +163,7 @@ test("run submission API protects preview, creation, tenant scope, pagination, a
           },
         },
         { provide: RunSubmissionService, useValue: service },
+        { provide: PreparedSetExecutionService, useValue: preparedSetService },
       ],
     })
     class RunSubmissionHttpTestModule {}
@@ -208,6 +241,9 @@ test("run submission API protects preview, creation, tenant scope, pagination, a
     assert.equal((await request(`/run-submissions/${submissionId}`, "operator")).status, 200);
     assert.equal((await request(`/run-submissions/${submissionId}`, "manager")).status, 200);
     assert.equal((await request(`/run-submissions/${submissionId}/items?cursor=opaque`, "operator")).status, 200);
+    assert.equal((await request(`/result-sets/${submissionId}/summary`)).status, 401);
+    assert.equal((await request(`/result-sets/${submissionId}/summary`, "operator")).status, 200);
+    assert.equal((await request(`/result-sets/${submissionId}/rows?cursor=opaque`, "manager")).status, 200);
     assert.equal(
       (await request(`/run-submissions/${submissionId}/cancel`, "reviewer", "POST", { expectedVersion: 1 })).status,
       403,
@@ -220,6 +256,80 @@ test("run submission API protects preview, creation, tenant scope, pagination, a
       (await request(`/run-submissions/${submissionId}/cancel`, "operator", "POST", { expectedVersion: 1 })).status,
       201,
     );
+    assert.equal(
+      (await request(`/run-submissions/${submissionId}/pause`, undefined, "POST", { expectedVersion: 1 })).status,
+      401,
+    );
+    assert.equal(
+      (await request(`/run-submissions/${submissionId}/pause`, "reviewer", "POST", { expectedVersion: 1 })).status,
+      403,
+    );
+    assert.equal(
+      (
+        await request(
+          `/run-submissions/${submissionId}/pause`,
+          "operator",
+          "POST",
+          { expectedVersion: 1 },
+          { "x-csrf-token": "wrong" },
+        )
+      ).status,
+      403,
+    );
+    assert.equal(
+      (await request(`/run-submissions/${submissionId}/pause`, "operator", "POST", { expectedVersion: 1 })).status,
+      201,
+    );
+    assert.equal(
+      (await request(`/run-submissions/${submissionId}/resume`, "manager", "POST", { expectedVersion: 2 })).status,
+      201,
+    );
+    assert.deepEqual(
+      received.filter((call) => ["pause", "resume"].includes(call.method)).map((call) => call.method),
+      ["pause", "resume"],
+    );
+    assert.deepEqual(received.find((call) => call.method === "pause")?.args.slice(0, 2), [submissionId, 1]);
+    assert.deepEqual(received.find((call) => call.method === "resume")?.args.slice(0, 2), [submissionId, 2]);
+    assert.equal(resultCalls[0].args[0], submissionId);
+    assert.equal((resultCalls[0].args[1] as { actorUserId: string }).actorUserId, users.operator);
+    assert.equal(resultCalls[1].args[1], "opaque");
+
+    const executionControlPath = `/imports/${batchId}/prepared-set-executions/${executionId}`;
+    assert.equal(
+      (await request(`${executionControlPath}/pause`, undefined, "POST", { expectedVersion: 7 })).status,
+      401,
+    );
+    assert.equal(
+      (await request(`${executionControlPath}/pause`, "reviewer", "POST", { expectedVersion: 7 })).status,
+      403,
+    );
+    assert.equal(
+      (
+        await request(
+          `${executionControlPath}/pause`,
+          "operator",
+          "POST",
+          { expectedVersion: 7 },
+          { "x-csrf-token": "wrong" },
+        )
+      ).status,
+      403,
+    );
+    assert.equal(
+      (await request(`${executionControlPath}/pause`, "operator", "POST", { expectedVersion: 7 })).status,
+      201,
+    );
+    assert.equal(
+      (await request(`${executionControlPath}/resume`, "manager", "POST", { expectedVersion: 8 })).status,
+      201,
+    );
+    assert.deepEqual(
+      executionCalls.map((call) => call.method),
+      ["pause", "resume"],
+    );
+    assert.deepEqual(executionCalls[0].args.slice(0, 3), [batchId, executionId, { expectedVersion: 7 }]);
+    assert.equal((executionCalls[0].args[3] as { userId: string }).userId, users.operator);
+    assert.equal((executionCalls[1].args[3] as { userId: string }).userId, users.manager);
 
     const managerCancellationCount = received.filter(
       (call) =>
@@ -237,6 +347,16 @@ test("run submission API protects preview, creation, tenant scope, pagination, a
       (await request(`/run-submissions/${submissionId}/cancel`, "manager", "POST", { expectedVersion: 1 })).status,
       404,
       "cofnięcie execute blokuje anulowanie na tej samej sesji",
+    );
+    assert.equal(
+      (await request(`/run-submissions/${submissionId}/pause`, "manager", "POST", { expectedVersion: 1 })).status,
+      404,
+      "cofnięcie execute blokuje pauzę zgłoszenia na tej samej sesji",
+    );
+    assert.equal(
+      (await request(`${executionControlPath}/pause`, "manager", "POST", { expectedVersion: 8 })).status,
+      404,
+      "cofnięcie execute blokuje pauzę wykonania na tej samej sesji",
     );
     assert.equal(
       (await request(`/run-submissions/${submissionId}`, "manager")).status,

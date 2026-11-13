@@ -1,0 +1,51 @@
+{
+  "runId": "CYBER-SKILLS-20261106-01",
+  "recordedAt": "2026-11-06T12:38:12.382829+00:00",
+  "findings": [
+    {
+      "id": "CYB-001",
+      "severity": "MEDIUM",
+      "status": "CONFIRMED_SERVICE_REPRODUCTION",
+      "title": "Prototype pollution przez agent w edycji słownika",
+      "source": "apps/api/src/features/commissions/commissions.service.ts",
+      "line": 407,
+      "requires": "Authenticated execute+CSRF and dictionary edit grant, or admin",
+      "evidence": "service-reproductions.json#prototype-property",
+      "caseIds": [
+        "COM02",
+        "SEC09"
+      ],
+      "remediationApplied": false
+    },
+    {
+      "id": "CYB-002",
+      "severity": "MEDIUM_PRELIMINARY",
+      "status": "SERVICE_CONFIRMED_DB_RACE_PENDING",
+      "title": "Rewizja szkicu bez atomowego CAS",
+      "source": "apps/api/src/features/commissions/commissions.service.ts",
+      "line": 402,
+      "requires": "Two edits of the same draft revision",
+      "evidence": "service-reproductions.json#revision-race",
+      "caseIds": [
+        "COM02",
+        "SEC18"
+      ],
+      "remediationApplied": false
+    },
+    {
+      "id": "CYB-003",
+      "severity": "MEDIUM_PRELIMINARY",
+      "status": "SERVICE_CONFIRMED_DB_ROLLBACK_PENDING",
+      "title": "Zapis słownika przed nietransakcyjnym audytem",
+      "source": "apps/api/src/features/commissions/commissions.service.ts",
+      "line": 435,
+      "requires": "Dictionary write accepted and audit failure",
+      "evidence": "service-reproductions.json#audit-failure",
+      "caseIds": [
+        "COM02",
+        "SEC15"
+      ],
+      "remediationApplied": false
+    }
+  ]
+}

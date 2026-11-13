@@ -2,6 +2,8 @@
 
 Data: 15 października 2026. Status: realizacja w toku. Stan wykonania i dowody testów są w [raporcie etapu](backend-refactor/phase-status-2026-10-15.md). Plan nie jest ukończony.
 
+Aktualizacja planowania, 16.10.2026: dalszą kolejność prac i kryteria odbioru określa [plan domknięcia refaktoryzacji](PLAN_DOMKNIECIA_REFAKTORYZACJI_BACKENDU_2026-10-16.md). Powstał po sprawdzeniu commita `af512e9`; uwzględnia pozostały SQL w serwisach, globalną fasadę modeli i otwarte bramki P15. Bieżące wykonanie zmian raportuje [checkpoint 2026-10-16](backend-refactor/execution-checkpoint-2026-10-16.md). Poniższe checkpointy zachowują historyczny kontekst; nowy plan nie oznacza wykonania pozostałych prac.
+
 ## 1. Cel i zakres
 
 Przebudować backend do czytelnej struktury NestJS organizowanej według funkcji biznesowych. Każda funkcja ma własny moduł, jawny interfejs dla innych modułów, kontrolery, serwisy, DTO i testy obok kodu. Przebudowa obejmuje `apps/api`, backendowe procesy pomocnicze w tym pakiecie, `apps/worker`, odpowiednie kontrakty `packages/core` oraz skrypty uruchamiania, testowania i wdrażania.
@@ -37,7 +39,7 @@ Odczyt wykonany podczas przygotowania planu; stan może zmienić się przed real
 | Punkty startowe | `main`, `migrate`, `apply-runtime-grants`, `bootstrap-admin-main`, `import-parser-main`, `import-parser-child`, `enrichment-worker`, `run-worker` | Trzeba zachować wszystkie sposoby uruchomienia, nie tylko HTTP |
 | Git | 427 zmienionych lub nieśledzonych pozycji w momencie odczytu | HEAD nie jest pełnym punktem odniesienia dla obecnej aplikacji |
 
-Źródła: [API AppModule](../apps/api/src/module.ts), [model bazy](../apps/api/src/db.ts), [skrypty API](../apps/api/package.json), [runner modułów](../scripts/test-module.cjs), [lokalny start](../scripts/Start-GoldisLocal.ps1).
+Źródła (linki do aktualnych lokalizacji po relokacji; tabela powyżej opisuje stan historyczny): [API AppModule](../apps/api/src/composition/module.ts), [adapter bazy](../apps/api/src/infrastructure/database/db.ts), [skrypty API](../apps/api/package.json), [runner modułów](../scripts/test-module.cjs), [lokalny start](../scripts/Start-GoldisLocal.ps1).
 
 Istotne ograniczenia dowodów:
 

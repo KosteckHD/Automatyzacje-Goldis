@@ -72,6 +72,16 @@
           </table>
         </section>
       </section>
+      <section id="payer-data-dialog" role="dialog" hidden>
+        <h2>Ubezpieczający</h2>
+        <label>Imię<input id="payer-first-name" /></label>
+        <label>Nazwisko<input id="payer-last-name" /></label>
+        <label>PESEL<input id="payer-identifier" /></label>
+        <label>Kod pocztowy<input id="payer-postal-code" /></label>
+        <button id="cancel-payer" onclick="window.syntheticPayerCancelled=true;document.querySelector('#payer-data-dialog').hidden=true">Anuluj</button>
+        <button id="accept-payer" onclick="window.syntheticPayerAccepted=true">Akceptuj</button>
+      </section>
+      <p id="incomplete-customer" hidden>Dane Klienta są niekompletne.</p>
     </main>
     <script>
       const dialog = document.querySelector('#start-dialog');
@@ -79,7 +89,19 @@
       document.querySelector('#compensa-communication-tile').addEventListener('click', () => { dialog.hidden = false; });
       document.querySelector('#start-communication').addEventListener('click', () => {
         dialog.hidden = true;
+        if (window.syntheticPayerPrompt) {
+          document.querySelector('#payer-identifier').value = window.syntheticWrongPayer ? '90010100023' : document.querySelector('[name=insuredIdentifier]').value;
+          document.querySelector('#payer-data-dialog').hidden = false;
+          return;
+        }
         insuredData.hidden = false;
+        if (window.syntheticIncompleteCustomer) {
+          document.querySelector('#incomplete-customer').hidden = false;
+          for (const name of ['postalCode', 'county']) {
+            const input = document.querySelector(`[name=${name}]`);
+            input.value = ''; input.disabled = true;
+          }
+        }
       });
       document.querySelector('#save-insured').addEventListener('click', () => {
         window.syntheticSaveClickCount = (window.syntheticSaveClickCount || 0) + 1;

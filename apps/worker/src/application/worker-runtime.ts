@@ -299,6 +299,7 @@ export function createProductionRunProcessor(
 
 export async function startRunWorker(options: { startPaused?: boolean } = {}) {
   const runtimeConfig = loadWorkerRuntimeConfig();
+  const startPaused = options.startPaused ?? runtimeConfig.startPaused;
   await assertWorkerApiReady(runtimeConfig.readinessEnvironment);
   // One browser owner for the worker lifetime; portal adapters reuse it across jobs.
   const browser = new BrowserSession({
@@ -318,6 +319,7 @@ export async function startRunWorker(options: { startPaused?: boolean } = {}) {
   let staging: WorkerResultStagingStore | null = null;
   let resultForwarder: WorkerResultForwarder | null = null;
   try {
+    await browser.reserve();
     await assertPoolRuntimeDatabaseRole(pool, "goldis_worker");
     portalOwner = await pool.connect();
     const ownership = await portalOwner.query<{ acquired: boolean }>(
@@ -378,11 +380,11 @@ export async function startRunWorker(options: { startPaused?: boolean } = {}) {
     connection: redisConnection(runtimeConfig.redisUrl),
     concurrency: 1,
     maxStalledCount: 1,
-    autorun: options.startPaused !== true,
+    autorun: startPaused !== true,
   });
   worker.on("failed", () => console.error("RUN_WORKER_JOB_FAILED"));
   worker.on("error", () => console.error("RUN_WORKER_CONNECTION_ERROR"));
-  if (options.startPaused) {
+  if (startPaused) {
     await worker.pause();
     void worker.run().catch(() => console.error("RUN_WORKER_CONNECTION_ERROR"));
   }

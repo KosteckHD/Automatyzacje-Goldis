@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GoldisLogo } from "../../../components/brand/GoldisLogo";
+import { loginHref } from "../../lib/return-to";
+import { polishCount } from "../../lib/ui-labels";
 
 type Session = { role: string; csrfToken: string };
 type Submission = {
@@ -20,11 +22,14 @@ const statusLabels: Record<string, string> = {
   completed: "Zakończono", cancelled: "Anulowano",
 };
 const itemLabels: Record<string, string> = {
+  skipped: "Pominięty",
   review: "Do kontroli", excluded: "Pominięty", waiting: "Oczekuje na przyjęcie", running: "W toku",
   waiting_attention: "Wymaga uwagi", completed: "Zakończono", no_matching_policies: "Brak aktualnych polis",
   failed: "Błąd", cancelled: "Anulowano", blocked: "Zablokowany",
 };
 const reasonLabels: Record<string, string> = {
+  COMPENSA_PAYER_DATA_SKIPPED: "Pominięto — Compensa wymaga dodatkowych danych ubezpieczającego",
+  COMPENSA_CUSTOMER_DATA_INCOMPLETE: "Niekompletne dane klienta w Compensie — zablokowany kod pocztowy lub powiat",
   DUPLICATE_SOURCE_ROW: "Duplikat — pominięty w zestawie roboczym; import źródłowy pozostaje zachowany",
   PENDING_REGON_CORRECTION: "Oczekuje korekta REGON", OPEN_ENTITY_CONFLICT: "Otwarty konflikt grupowania",
   REGON_REQUIRED: "Brak REGON-u", SOURCE_ROW_HAS_ISSUES: "Błąd walidacji danych", INVALID_NIP: "Nieprawidłowy NIP",
@@ -139,12 +144,18 @@ export default function SubmissionDetail({ submissionId }: { submissionId: strin
     setCursorStack(next); setPageIndex(next.length - 1);
   }
 
+  const counts = submission?.counts.items ?? {};
+  const completedItems = (counts.completed ?? 0) + (counts.no_matching_policies ?? 0);
+  const activeItems = (counts.waiting ?? 0) + (counts.running ?? 0);
+  const attentionItems = (counts.review ?? 0) + (counts.waiting_attention ?? 0) + (counts.failed ?? 0) + (counts.blocked ?? 0);
+  const secondaryItems = (counts.excluded ?? 0) + (counts.skipped ?? 0) + (counts.cancelled ?? 0);
+
   return <main className="history-page submission-page">
     <header className="history-topbar"><a className="history-brand" href="/" aria-label="Goldis — katalog"><GoldisLogo variant="header" /><span>Goldis · Platforma automatyzacji</span></a><nav aria-label="Nawigacja"><a href="/">Katalog</a><a href="/imports">Importy</a><a href="/runs">Zadania</a><a href="/account">Moje konto</a></nav></header>
     <section className="history-content">
       <p className="eyebrow">PLATFORMA / ZADANIA</p><h1>Stan zgłoszenia</h1>
       {auth === "loading" && <p className="history-notice" role="status">Sprawdzanie sesji…</p>}
-      {auth === "signed-out" && <p className="history-notice" role="status">Sesja wygasła. <a href={`/?returnTo=${encodeURIComponent(`/submissions/${submissionId}`)}`}>Zaloguj się, aby wrócić do zgłoszenia</a>.</p>}
+      {auth === "signed-out" && <p className="history-notice" role="status">Sesja wygasła. <a href={loginHref(`/submissions/${submissionId}`, window.location.origin)}>Zaloguj się, aby wrócić do zgłoszenia</a>.</p>}
       {auth === "error" && <p className="history-error" role="alert">Nie udało się sprawdzić sesji. Odśwież stronę.</p>}
       {error && <p className="history-error" role="alert">{error}</p>}
       {submission && <>
@@ -155,11 +166,19 @@ export default function SubmissionDetail({ submissionId }: { submissionId: strin
           <div className="submission-actions"><button type="button" onClick={() => void refresh()} disabled={refreshing}>{refreshing ? "Odświeżam…" : "Odśwież stan"}</button>{cancellableGroups > 0 && (session?.role === "admin" || session?.role === "manager" || session?.role === "operator") && <button type="button" onClick={() => void cancelPending()} disabled={cancelBusy}>{cancelBusy ? "Anuluję…" : "Anuluj oczekujące"}</button>}</div>
         </section>;
         })()}
-        <dl className="submission-counts submission-detail-counts"><div><dt>Wybrane wiersze</dt><dd>{submission.counts.selectedRows}</dd></div><div><dt>Unikalne grupy</dt><dd>{submission.counts.uniqueGroups}</dd></div><div><dt>Przyjęte runy</dt><dd>{submission.counts.groups.accepted ?? 0}</dd></div><div><dt>Oczekujące grupy</dt><dd>{(submission.counts.groups.pending ?? 0) + (submission.counts.groups.waiting ?? 0)}</dd></div>{Object.entries(submission.counts.items).map(([key, value]) => <div key={key}><dt>{itemLabels[key] ?? key}</dt><dd>{value}</dd></div>)}</dl>
+        <section className="submission-progress-summary" aria-label="Podsumowanie pozycji zgłoszenia">
+          <article><span>Zakończone</span><strong>{completedItems}</strong><small>z polisami lub bez aktualnych polis</small></article>
+          <article><span>W toku</span><strong>{activeItems}</strong><small>oczekujące lub wykonywane</small></article>
+          <article><span>Wymagają działania</span><strong>{attentionItems}</strong><small>kontrola, błąd albo blokada</small></article>
+          {secondaryItems > 0 && <p className="submission-secondary-counts">Poza głównym postępem: {polishCount(secondaryItems, "pozycja pominięta lub anulowana", "pozycje pominięte lub anulowane", "pozycji pominiętych lub anulowanych")} ({(counts.excluded ?? 0)} pominięte przed uruchomieniem, {(counts.skipped ?? 0)} pominięte przez portal, {(counts.cancelled ?? 0)} anulowane).</p>}
+        </section>
+        <details className="submission-detail-counts"><summary>Szczegóły liczników zgłoszenia</summary>
+          <dl className="submission-counts"><div><dt>Wybrane wiersze</dt><dd>{submission.counts.selectedRows}</dd></div><div><dt>Unikalne grupy</dt><dd>{submission.counts.uniqueGroups}</dd></div><div><dt>Przyjęte zadania grup</dt><dd>{submission.counts.groups.accepted ?? 0}</dd></div><div><dt>Oczekujące grupy</dt><dd>{(submission.counts.groups.pending ?? 0) + (submission.counts.groups.waiting ?? 0)}</dd></div>{Object.entries(submission.counts.items).map(([key, value]) => <div key={key}><dt>{itemLabels[key] ?? key}</dt><dd>{value}</dd></div>)}</dl>
+        </details>
         {submission.status === "waiting_attention" && <p className="submission-notice">Część wierszy wymaga kontroli lub konfiguracji. Możesz odświeżyć stan po rozwiązaniu problemu.</p>}
         <section className="submission-items-section"><div className="section-head"><div><p className="eyebrow">SZCZEGÓŁY</p><h2>Wiersze zgłoszenia</h2></div><span className="history-timezone">Strona {pageIndex + 1}</span></div>
           {items.length === 0 ? <p className="history-notice">Brak wierszy do wyświetlenia.</p> : <div className="submission-items" role="list">{items.map((item) => {
-            const state = item.preparationState !== "ready" ? item.preparationState : item.runStatus === "completed" ? "completed" : item.runStatus === "no_matching_policies" ? "no_matching_policies" : item.runStatus === "failed" ? "failed" : item.runStatus === "cancelled" || item.admissionState === "cancelled" ? "cancelled" : item.runStatus && ["waiting_for_sms", "waiting_for_manual_data", "identity_review"].includes(item.runStatus) ? "waiting_attention" : item.runStatus ? "running" : item.admissionState === "blocked" ? "blocked" : item.admissionState === "waiting_capacity" || item.admissionState === "waiting_window" || item.admissionState === "waiting_paused" ? "waiting" : "waiting";
+            const state = item.preparationState !== "ready" ? item.preparationState : item.runStatus === "completed" ? "completed" : item.runStatus === "no_matching_policies" ? "no_matching_policies" : item.runStatus === "failed" && item.runErrorCode === "COMPENSA_PAYER_DATA_SKIPPED" ? "skipped" : item.runStatus === "failed" ? "failed" : item.runStatus === "cancelled" || item.admissionState === "cancelled" ? "cancelled" : item.runStatus && ["waiting_for_sms", "waiting_for_manual_data", "identity_review"].includes(item.runStatus) ? "waiting_attention" : item.runStatus ? "running" : item.admissionState === "blocked" ? "blocked" : item.admissionState === "waiting_capacity" || item.admissionState === "waiting_window" || item.admissionState === "waiting_paused" ? "waiting" : "waiting";
             const reason = item.reasonCode ?? item.groupReason ?? item.runErrorCode;
             return <article className="submission-item" role="listitem" key={item.itemId}><strong>Wiersz {item.rowNumber}</strong><span>{itemLabels[state] ?? state}</span>{reason && <small>{reasonLabels[reason] ?? reason.replaceAll("_", " ")}</small>}{item.runId && <a className="submission-item-link" href={`/runs/${item.runId}`}>Otwórz powiązane zadanie</a>}</article>;
           })}</div>}

@@ -212,6 +212,7 @@ export class LeadResultSnapshotModel extends Model {
 
   declare companyFields: {
     schemaVersion: 2;
+    subjectKind?: "company";
     companyName: string;
     effectiveRegon: string;
     decisionMakerName: string | null;
@@ -220,9 +221,9 @@ export class LeadResultSnapshotModel extends Model {
     email: string;
   };
 
-  declare peselCiphertext: string;
+  declare peselCiphertext: string | null;
 
-  declare peselKeyVersion: number;
+  declare peselKeyVersion: number | null;
 
   declare policies: Record<string, unknown>[];
 
@@ -254,9 +255,9 @@ registerModel(
 
     companyFields: { type: DataTypes.JSONB, allowNull: false, field: "company_fields" },
 
-    peselCiphertext: { type: DataTypes.TEXT, allowNull: false, field: "pesel_ciphertext" },
+    peselCiphertext: { type: DataTypes.TEXT, allowNull: true, field: "pesel_ciphertext" },
 
-    peselKeyVersion: { type: DataTypes.INTEGER, allowNull: false, field: "pesel_key_version" },
+    peselKeyVersion: { type: DataTypes.INTEGER, allowNull: true, field: "pesel_key_version" },
 
     policies: { type: DataTypes.JSONB, allowNull: false },
 

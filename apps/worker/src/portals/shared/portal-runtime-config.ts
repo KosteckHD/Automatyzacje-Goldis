@@ -81,7 +81,7 @@ export async function loadPortalRuntimeConfig(path: string): Promise<PortalRunti
   if (/^(button|input|form|a|select|textarea)(:[\w-]+)?$/i.test(pzuSession.smsCodeSubmit.trim())) {
     throw new Error("PORTAL_CONFIG_AMBIGUOUS_SMS_SUBMIT");
   }
-  for (const optional of ["smsFrame", "smsRememberDevice", "smsResendCode", "smsCodeRejected", "smsCodeExpired", "postLoginLanding"] as const) {
+  for (const optional of ["smsFrame", "smsFramePath", "smsRememberDevice", "smsResendCode", "smsCodeRejected", "smsCodeExpired", "postLoginLanding"] as const) {
     const configured = object(pzu.session)[optional];
     if (configured !== undefined) pzuSession[optional] = strings(pzu.session, [optional])[optional];
   }
@@ -98,15 +98,22 @@ export async function loadPortalRuntimeConfig(path: string): Promise<PortalRunti
   if (/^(button|input|form|a|select|textarea)(:[\w-]+)?$/i.test(compensaSession.smsCodeSubmit.trim())) {
     throw new Error("PORTAL_CONFIG_AMBIGUOUS_SMS_SUBMIT");
   }
-  for (const optional of ["smsFrame", "smsCodeRejected", "smsCodeExpired", "postLoginLanding"] as const) {
+  for (const optional of ["smsFrame", "smsFramePath", "smsCodeRejected", "smsCodeExpired", "postLoginLanding"] as const) {
     const configured = object(compensa.session)[optional];
     if (configured !== undefined) compensaSession[optional] = strings(compensa.session, [optional])[optional];
+  }
+  for (const session of [pzuSession, compensaSession]) {
+    if (session.smsFramePath !== undefined
+      && (!session.smsFrame || !/^\/(?!\/)[A-Za-z0-9/_-]+$/.test(session.smsFramePath))) {
+      throw new Error("PORTAL_CONFIG_INVALID");
+    }
   }
   const form = strings(compensa.form, ["communicationTile", "startDialog", "identifierInput", "registrationInput", "startCommunication", "insuredDataSection", "roleSelect", "firstNameInput", "lastNameInput", "peselInput", "postalCodeInput", "countyInput", "saveButton"]);
   if (Boolean(object(compensa.form).customerMatches) !== Boolean(object(compensa.form).customerMatchSelect)) {
     throw new Error("PORTAL_CONFIG_INVALID");
   }
-  for (const name of ["addressInput", "cityInput", "vehicleLookupFailure", "customerMatches", "customerMatchSelect", "editInsuredData"]) {
+  if (["payerDataDialog", "payerIdentifierInput", "payerCancel"].filter(name => object(compensa.form)[name] !== undefined).length % 3 !== 0) throw new Error("PORTAL_CONFIG_INVALID");
+  for (const name of ["addressInput", "cityInput", "vehicleLookupFailure", "customerMatches", "customerMatchSelect", "editInsuredData", "regonInput", "companyNameInput", "payerDataDialog", "payerIdentifierInput", "payerCancel", "incompleteCustomer"]) {
     const value = object(compensa.form)[name];
     if (value !== undefined && (typeof value !== "string" || !value.trim())) throw new Error("PORTAL_CONFIG_INVALID");
     if (typeof value === "string") form[name] = value;

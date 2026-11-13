@@ -1,0 +1,93 @@
+{
+  "checkedAt": "2026-11-06T17:03:10.903Z",
+  "endpoint": "https://api.osv.dev/v1/querybatch",
+  "lockSha256": "9bb786ed9c190a750b2c68d296e8bc4b0b87178850c5209247d6ae12e5573d6d",
+  "scope": "Pinned Python lock entries only; no pip resolver, image scan or installed-environment equivalence check",
+  "results": [
+    {
+      "name": "annotated-doc",
+      "version": "0.0.5",
+      "advisories": []
+    },
+    {
+      "name": "annotated-types",
+      "version": "0.7.0",
+      "advisories": []
+    },
+    {
+      "name": "anyio",
+      "version": "4.14.2",
+      "advisories": []
+    },
+    {
+      "name": "click",
+      "version": "8.3.2",
+      "advisories": []
+    },
+    {
+      "name": "colorama",
+      "version": "0.4.6",
+      "advisories": []
+    },
+    {
+      "name": "et_xmlfile",
+      "version": "2.0.0",
+      "advisories": []
+    },
+    {
+      "name": "fastapi",
+      "version": "0.162.0",
+      "advisories": []
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0",
+      "advisories": []
+    },
+    {
+      "name": "idna",
+      "version": "3.15",
+      "advisories": []
+    },
+    {
+      "name": "openpyxl",
+      "version": "3.1.5",
+      "advisories": []
+    },
+    {
+      "name": "opentelemetry-api",
+      "version": "1.45.2",
+      "advisories": []
+    },
+    {
+      "name": "pydantic",
+      "version": "2.13.0",
+      "advisories": []
+    },
+    {
+      "name": "pydantic_core",
+      "version": "2.46.0",
+      "advisories": []
+    },
+    {
+      "name": "starlette",
+      "version": "1.3.1",
+      "advisories": []
+    },
+    {
+      "name": "typing-inspection",
+      "version": "0.4.2",
+      "advisories": []
+    },
+    {
+      "name": "typing_extensions",
+      "version": "4.15.0",
+      "advisories": []
+    },
+    {
+      "name": "uvicorn",
+      "version": "0.35.0",
+      "advisories": []
+    }
+  ]
+}

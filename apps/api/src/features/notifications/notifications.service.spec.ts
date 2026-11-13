@@ -100,6 +100,24 @@ test("NotificationService binds event links to the result set type and hides mis
   const eventCall = calls.find((call) => call.name === "recordResultSetEvent");
   assert.ok(eventCall);
   assert.equal((eventCall.args[2] as { href: string }).href, "/submissions/submission%2F1");
+  await service.recordResultSetEvent(
+    {
+      resultSetId: "set/2",
+      tenantId: "tenant-1",
+      actorUserId: "user-1",
+      sourceType: "run_submission",
+      sourceId: "submission/2",
+      batchId: null,
+    } as never,
+    "result_ready",
+    {} as never,
+  );
+  const resultReadyCall = calls.filter((call) => call.name === "recordResultSetEvent").at(-1);
+  assert.ok(resultReadyCall);
+  assert.equal(
+    (resultReadyCall.args[2] as { href: string }).href,
+    "/tools/oc-policy-verification?resultSetId=set%2F2&step=results",
+  );
   await assert.rejects(
     () => service.markRead({ tenantId: "tenant-1", userId: "user-1" }, "aab17d94-386e-4f7b-9721-e92f55c4b37d"),
     NotFoundException,

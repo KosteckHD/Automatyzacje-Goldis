@@ -141,6 +141,7 @@ export class ImportService {
     });
     return {
       id: batch.id,
+      fileName: sanitizePublicFileName(batch.fileName),
       totalRows: rows.length,
       invalidRows,
       readyRows: rows.length - invalidRows,
@@ -187,6 +188,58 @@ export class ImportService {
         issues: row.issues.map(sanitizePublicText),
       };
     });
+  }
+
+  async searchRows(id: string, page: number, state: "all" | "ready" | "review", search: string, issueCode?: string) {
+    if (!uuidPattern.test(id) || !Number.isInteger(page) || page < 1 || page > 100000)
+      throw new BadRequestException("Nieprawidłowy import lub strona");
+    const query = search.trim();
+    if (
+      query.length > 120 ||
+      Array.from(query).some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)
+    )
+      throw new BadRequestException("Wyszukiwana fraza może mieć maksymalnie 120 znaków");
+    if (issueCode !== undefined && !/^[A-Z0-9_]{1,64}$/.test(issueCode))
+      throw new BadRequestException("Nieprawidłowy kod problemu");
+    const batch = await this.get(id);
+    const [rows, total, matching, ready, review] = await Promise.all([
+      this.repository.findRows(id, page, state, query, issueCode),
+      this.repository.countRows(id, state, query, issueCode),
+      this.repository.countRows(id, "all", query, issueCode),
+      this.repository.countRows(id, "ready", query, issueCode),
+      this.repository.countRows(id, "review", query, issueCode),
+    ]);
+    return {
+      page,
+      pageSize: 50,
+      total,
+      pageCount: Math.ceil(total / 50),
+      state,
+      search: query,
+      issueCode: issueCode ?? null,
+      counts: { matching, ready, review, all: batch.totalRows },
+      rows: rows.map((row) => {
+        const enrichment = assessRegonEnrichmentEligibility({
+          regonRaw: row.regonRaw,
+          effectiveRegon: row.effectiveRegon,
+          nipRaw: row.nipRaw,
+        });
+        return {
+          rowNumber: row.rowNumber,
+          companyName: sanitizePublicText(row.companyName),
+          decisionMakerName: row.decisionMakerName ? sanitizePublicText(row.decisionMakerName) : null,
+          mobile: sanitizePublicPhone(row.mobile),
+          phone: sanitizePublicPhone(row.phone),
+          email: sanitizePublicText(row.email),
+          regon: sanitizePublicText(row.regonRaw),
+          regonRaw: sanitizePublicText(row.regonRaw),
+          effectiveRegon: row.effectiveRegon ? sanitizePublicText(row.effectiveRegon) : null,
+          rowVersion: row.rowVersion,
+          regonLookupEligibility: enrichment.eligible ? "eligible" : enrichment.reasonCode,
+          issues: row.issues.map(sanitizePublicText),
+        };
+      }),
+    };
   }
 
   async enrichmentReview(id: string, page: number) {

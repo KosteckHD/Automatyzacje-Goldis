@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
 import type { AuditService } from "../audit/public";
 import type { SessionPrincipal } from "../auth";
+import type { CommissionsService } from "../commissions/public";
 import type { AdminMutationsService } from "./admin-mutations.service";
 import { parseAdminCreateUserInput } from "./admin-users.dto";
 import type { AdminUserListRow, AdminUsersRepository } from "./admin-users.repository";
@@ -15,7 +16,13 @@ const actor = {
 } as SessionPrincipal;
 
 function makeService(repository: AdminUsersRepository): AdminUsersService {
-  return new AdminUsersService(repository, {} as AdminMutationsService, {} as AuditService);
+  return new AdminUsersService(
+    repository,
+    {} as AdminMutationsService,
+    {} as AuditService,
+    {} as never,
+    {} as CommissionsService,
+  );
 }
 
 test("AdminUsersService scopes pages to the active tenant and signs the next page cursor to its filter", async () => {
@@ -176,4 +183,113 @@ test("AdminUsersService rejects invalid create-user credentials before persisten
     ),
     BadRequestException,
   );
+});
+
+test("zmiana roli na auditor usuwa granty narzędziowe w tej samej transakcji i audytuje korektę", async () => {
+  const transaction = {};
+  const member = { role: "operator", status: "active" };
+  const previousBindingKey = process.env.PRIVILEGED_ACTION_BINDING_KEY;
+  process.env.PRIVILEGED_ACTION_BINDING_KEY = "synthetic-privileged-binding-key-32-bytes";
+  let deletedGrants = 0;
+  let auditedMetadata: unknown;
+  let completed = false;
+  try {
+    const repository = {
+      transaction: async <T>(work: (tx: unknown) => Promise<T>) => work(transaction),
+      findMembershipForUpdate: async (tenant: string, user: string, tx: unknown) => {
+        assert.equal(tenant, actor.tenantId);
+        assert.equal(user, "22222222-2222-4222-8222-222222222222");
+        assert.equal(tx, transaction);
+        return member;
+      },
+      deleteAllToolGrants: async (_tenant: string, _user: string, tx: unknown) => {
+        assert.equal(tx, transaction);
+        deletedGrants += 2;
+        return 2;
+      },
+      saveMembershipRole: async (row: typeof member, role: string, _now: Date, tx: unknown) => {
+        assert.equal(tx, transaction);
+        row.role = role;
+      },
+      revokeTenantSessions: async () => 0,
+    } as unknown as AdminUsersRepository;
+    const service = new AdminUsersService(
+      repository,
+      {
+        lockTenantAdminChanges: async () => undefined,
+        clearDeletionGrantForMembership: async () => undefined,
+        unassignIneligibleInterventions: async () => 0,
+      } as unknown as AdminMutationsService,
+      { record: async (event: { metadata?: unknown }, tx: unknown) => {
+        assert.equal(tx, transaction);
+        auditedMetadata = event.metadata;
+      } } as unknown as AuditService,
+      {
+        consume: async () => ({ kind: "execute", confirmationId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" }),
+        complete: async (_confirmationId: string, _idempotencyKey: string, _response: unknown, tx: unknown) => {
+          assert.equal(tx, transaction);
+          completed = true;
+        },
+      },
+      {} as CommissionsService,
+    );
+    const result = await service.updateRole(
+      { ...actor, sessionId: "dddddddd-dddd-4ddd-8ddd-dddddddddddd" },
+      {
+        userId: "22222222-2222-4222-8222-222222222222",
+        role: "auditor",
+        confirmationToken: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa." + "x".repeat(40),
+        idempotencyKey: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      },
+    );
+    assert.equal(result.revokedToolGrants, 2);
+    assert.equal(member.role, "auditor");
+    assert.equal(deletedGrants, 2);
+    assert.deepEqual(auditedMetadata, {
+      oldRole: "operator",
+      role: "auditor",
+      unassignedInterventions: 0,
+      revokedToolGrants: 2,
+    });
+    assert.equal(completed, true);
+  } finally {
+    if (previousBindingKey === undefined) delete process.env.PRIVILEGED_ACTION_BINDING_KEY;
+    else process.env.PRIVILEGED_ACTION_BINDING_KEY = previousBindingKey;
+  }
+});
+
+test("granty narzędziowe odrzucane są dla auditor", async () => {
+  const previousBindingKey = process.env.PRIVILEGED_ACTION_BINDING_KEY;
+  process.env.PRIVILEGED_ACTION_BINDING_KEY = "synthetic-privileged-binding-key-32-bytes";
+  let grantLookup = false;
+  try {
+    const service = new AdminUsersService(
+      {
+        transaction: async <T>(work: (tx: unknown) => Promise<T>) => work({}),
+        findMembershipForUpdate: async () => ({ role: "auditor", status: "active" }),
+        findTool: async () => ({ toolId: "commission-comparison" }),
+        findToolGrantForUpdate: async () => { grantLookup = true; return null; },
+      } as unknown as AdminUsersRepository,
+      { lockTenantAdminChanges: async () => undefined } as unknown as AdminMutationsService,
+      {} as AuditService,
+      { consume: async () => ({ kind: "execute", confirmationId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" }), complete: async () => undefined },
+      {} as CommissionsService,
+    );
+    await assert.rejects(
+      service.setToolGrant({ ...actor, sessionId: "dddddddd-dddd-4ddd-8ddd-dddddddddddd" }, "22222222-2222-4222-8222-222222222222", "commission-comparison", {
+        canDiscover: true,
+        canExecute: true,
+        canViewResults: true,
+        canDownloadResults: true,
+        expectedVersion: 0,
+        confirmationToken: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa." + "x".repeat(40),
+        idempotencyKey: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      }),
+      ForbiddenException,
+    );
+    assert.equal(grantLookup, false);
+  } finally {
+    if (previousBindingKey === undefined) delete process.env.PRIVILEGED_ACTION_BINDING_KEY;
+    else process.env.PRIVILEGED_ACTION_BINDING_KEY = previousBindingKey;
+  }
 });
