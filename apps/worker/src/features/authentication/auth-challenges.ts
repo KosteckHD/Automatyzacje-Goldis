@@ -1,7 +1,7 @@
 import { createHmac, randomUUID } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
 import type { Portal } from "../../infrastructure/browser/browser";
-import type { RunExecutionLease } from "../execution/execution-lease";
+import { assertLockedRunExecution, type RunExecutionLease } from "../execution/execution-lease";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const accountKeyPattern = /^[0-9a-f]{64}$/;
@@ -17,6 +17,7 @@ export type AuthChallengeInput = Readonly<{
   expiresAt: Date;
   now?: Date;
   attemptLimit?: number;
+  lease?: RunExecutionLease;
 }>;
 
 export type AuthChallengeMetadata = Readonly<{
@@ -118,6 +119,7 @@ export async function createAuthChallenge(pool: Pool, input: AuthChallengeInput)
     const runStatuses = await lockRunRowsInOrder(client, [input.runId, ...staleRunIds.rows.map(({ run_id }) => run_id)]);
     const runLock = runStatuses.get(input.runId);
     if (!runLock) throw new AuthChallengeError("RUN_NOT_FOUND");
+    if (input.lease) await assertLockedRunExecution(client, input.runId, input.lease);
     const runStatus = runLock.status;
 
     await expirePreviousChallenges(client, input, now);
@@ -240,6 +242,7 @@ export async function createAuthChallenge(pool: Pool, input: AuthChallengeInput)
     };
   } catch (error) {
     await client.query("ROLLBACK");
+    if (error instanceof Error && error.message === "RUN_EXECUTION_LEASE_LOST") throw error;
     if (error instanceof AuthChallengeError) throw error;
     if ((error as { code?: string })?.code === "23505") throw new AuthChallengeError("AUTH_CHALLENGE_ALREADY_ACTIVE");
     throw new AuthChallengeError("RUN_STATE_CONFLICT", { cause: error });
@@ -295,7 +298,7 @@ export async function reconcileAuthenticatedPortal(pool: Pool, input: {
 }
 
 /** Expires an unused code and leaves an actionable SMS incident for an administrator. */
-export async function pauseExpiredAuthChallenge(pool: Pool, challengeId: string, now = new Date()): Promise<boolean> {
+export async function pauseExpiredAuthChallenge(pool: Pool, challengeId: string, now = new Date(), lease?: RunExecutionLease): Promise<boolean> {
   if (!uuidPattern.test(challengeId) || !Number.isFinite(now.getTime())) throw new AuthChallengeError("AUTH_CHALLENGE_INPUT_INVALID");
   const client = await pool.connect();
   try {
@@ -313,6 +316,7 @@ export async function pauseExpiredAuthChallenge(pool: Pool, challengeId: string,
       await client.query("COMMIT");
       return false;
     }
+    if (lease) await assertLockedRunExecution(client, reference.rows[0].run_id, lease);
     const challenge = await client.query<{ run_id: string; portal: Portal; status: string; expires_at: Date }>(
       "SELECT run_id, portal, status, expires_at FROM auth_challenges WHERE challenge_id = $1 FOR UPDATE", [challengeId],
     );
@@ -341,13 +345,14 @@ export async function pauseExpiredAuthChallenge(pool: Pool, challengeId: string,
     return true;
   } catch (error) {
     await client.query("ROLLBACK");
+    if (error instanceof Error && error.message === "RUN_EXECUTION_LEASE_LOST") throw error;
     if (error instanceof AuthChallengeError) throw error;
     throw new AuthChallengeError("RUN_STATE_CONFLICT", { cause: error });
   } finally { client.release(); }
 }
 
 /** Closes an uncertain attempt so a later run cannot reuse or claim its code. */
-export async function invalidateUncertainAuthChallenge(pool: Pool, challengeId: string, now = new Date()): Promise<void> {
+export async function invalidateUncertainAuthChallenge(pool: Pool, challengeId: string, now = new Date(), lease?: RunExecutionLease): Promise<void> {
   if (!uuidPattern.test(challengeId) || !Number.isFinite(now.getTime())) throw new AuthChallengeError("AUTH_CHALLENGE_INPUT_INVALID");
   const client = await pool.connect();
   try {
@@ -364,6 +369,7 @@ export async function invalidateUncertainAuthChallenge(pool: Pool, challengeId: 
       await client.query("COMMIT");
       return;
     }
+    if (lease) await assertLockedRunExecution(client, reference.rows[0].run_id, lease);
     const challenge = await client.query<{ portal: Portal; status: string; run_id: string }>(
       "SELECT portal, status, run_id FROM auth_challenges WHERE challenge_id = $1 FOR UPDATE", [challengeId],
     );
@@ -389,8 +395,9 @@ export async function invalidateUncertainAuthChallenge(pool: Pool, challengeId: 
       );
     }
     await client.query("COMMIT");
-  } catch {
+  } catch (error) {
     await client.query("ROLLBACK");
+    if (error instanceof Error && error.message === "RUN_EXECUTION_LEASE_LOST") throw error;
     throw new AuthChallengeError("RUN_STATE_CONFLICT");
   } finally {
     client.release();
@@ -412,6 +419,7 @@ export async function recordAuthChallengeOutcome(
   challengeId: string,
   outcome: AuthChallengeOutcome,
   now = new Date(),
+  lease?: RunExecutionLease,
 ): Promise<AuthChallengeOutcomeResult> {
   if (!uuidPattern.test(challengeId) || !["accepted", "rejected", "expired"].includes(outcome) || !Number.isFinite(now.getTime())) {
     throw new AuthChallengeError("AUTH_CHALLENGE_INPUT_INVALID");
@@ -430,6 +438,7 @@ export async function recordAuthChallengeOutcome(
     if (runResult.rowCount !== 1 || runResult.rows[0].current_auth_challenge_id !== challengeId) {
       throw new AuthChallengeError("RUN_STATE_CONFLICT", { cause: new Error("OUTCOME_RUN_CHALLENGE_NOT_CURRENT") });
     }
+    if (lease) await assertLockedRunExecution(client, reference.rows[0].run_id, lease);
     const challengeResult = await client.query<{
       run_id: string; portal: Portal; return_step: "pzu_login" | "compensa_login"; status: string;
       attempt_count: number; attempt_limit: number;
@@ -502,6 +511,7 @@ export async function recordAuthChallengeOutcome(
     };
   } catch (error) {
     await client.query("ROLLBACK");
+    if (error instanceof Error && error.message === "RUN_EXECUTION_LEASE_LOST") throw error;
     if (error instanceof AuthChallengeError) throw error;
     throw new AuthChallengeError("RUN_STATE_CONFLICT", { cause: error });
   } finally {

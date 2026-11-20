@@ -112,7 +112,7 @@ export function normalizeLeadQuery(input: LeadScopeInput): NormalizedLeadQuery {
 /** Shared ACL and scope predicate used by list, summary, export and queue navigation. */
 export function leadScopePredicate(filters: "scope" | "all" = "all"): string {
   const scoped = `lead.tenant_id = :tenantId AND lead.tool_id = :toolId
-    AND result_set.status = 'completed' AND lead.result_status = 'ready'
+    AND lead.result_status = 'ready'
     AND (result_set.batch_id IS NULL OR NOT EXISTS (
       SELECT 1 FROM resource_tombstones deletion
       WHERE deletion.tenant_id = result_set.tenant_id AND deletion.resource_type = 'import'

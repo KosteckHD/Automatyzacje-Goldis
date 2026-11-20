@@ -8,6 +8,7 @@ import {
   sequelize,
 } from "../../infrastructure/database/db";
 import { type AuditActorContext, recordAuditEvent } from "../audit/public";
+import { canCancelAbandonedSms } from "./run-cancellation-policy";
 
 export type RunCancellationPersistenceResult = Readonly<{
   run: AutomationRun;
@@ -21,12 +22,13 @@ export class RunCancellationRepository {
       const run = await AutomationRun.findByPk(runId, { transaction, lock: transaction.LOCK.UPDATE });
       if (!run) throw new NotFoundException("Nie znaleziono zadania");
       if (run.status === "cancelled") return { run, invalidatedChallengeId: null };
-      if (run.status !== "queued" && run.status !== "awaiting_portal_adapter" && run.status !== "waiting_for_sms") {
+      const abandonedSms = canCancelAbandonedSms(run);
+      if (run.status !== "queued" && run.status !== "awaiting_portal_adapter" && run.status !== "waiting_for_sms" && !abandonedSms) {
         throw new ConflictException("Nie można anulować zadania w tym kroku");
       }
 
       let invalidatedChallengeId: string | null = null;
-      if (run.status === "waiting_for_sms") {
+      if (run.status === "waiting_for_sms" || abandonedSms) {
         const challenge = run.currentAuthChallengeId
           ? await AuthChallenge.findByPk(run.currentAuthChallengeId, { transaction, lock: transaction.LOCK.UPDATE })
           : null;
@@ -61,6 +63,13 @@ export class RunCancellationRepository {
       }
 
       const now = new Date();
+      if (abandonedSms) {
+        await ManualIntervention.update(
+          { status: "cancelled", resolvedAt: now, reasonCode: "RUN_CANCELLED", updatedAt: now,
+            revision: sequelize.literal("revision + 1") },
+          { where: { runId: run.id, status: "open" }, transaction },
+        );
+      }
       run.status = "cancelled";
       run.currentStep = "cancelled";
       run.finishedAt = now;

@@ -137,6 +137,7 @@ module.exports = async function verifyWorkerResults() {
     assert.equal(hookCalled, true);
     assert.equal(await models.RunIdentity.count({ where: { runId: interrupted.runId } }), 0);
     assert.equal(await models.OcPolicyRecord.count({ where: { runId: interrupted.runId } }), 0);
+    await require("./worker-execution-fence-smoke.cjs")(seeded);
     console.log("WORKER_RESULT_DB_HTTP_SMOKE_PASS guard=true stale=blocked expired=blocked cancelled=blocked midWrite=rollback xlsx=verified company=verified pendingName=blocked replay=one_artifact");
   } finally {
     if (app) await app.close();

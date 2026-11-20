@@ -1,12 +1,9 @@
 const { spawnSync } = require("node:child_process");
-const { readdirSync } = require("node:fs");
 const { join } = require("node:path");
+const { discoverNodeTests } = require("../../../scripts/run-node-tests.cjs");
 
 const testsDirectory = join(__dirname, "..", "dist");
-const testFiles = readdirSync(testsDirectory)
-  .filter((name) => name.endsWith(".test.js"))
-  .sort()
-  .map((name) => join(testsDirectory, name));
+const testFiles = discoverNodeTests(testsDirectory);
 
 if (testFiles.length === 0) {
   console.error("PLAYWRIGHT_TESTS_NOT_BUILT");

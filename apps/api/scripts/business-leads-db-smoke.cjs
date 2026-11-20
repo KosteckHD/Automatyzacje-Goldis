@@ -82,7 +82,7 @@ module.exports = async function verifyBusinessLeadFlows(seed) {
   const sourceId = randomUUID();
   await models.ResultSet.create({ resultSetId, tenantId, batchId: seed.goldis.batchId, toolId: "oc-policy-verification",
     actorUserId: manager.userId, sourceType: "prepared_set_execution", sourceId, referenceDate: "2026-10-11",
-    status: "completed", createdAt: now, updatedAt: now, finishedAt: now });
+    status: "waiting_attention", createdAt: now, updatedAt: now, finishedAt: null });
   const entities = [];
   for (let index = 0; index < 3; index += 1) {
     const canonicalEntityId = randomUUID();
@@ -221,6 +221,13 @@ module.exports = async function verifyBusinessLeadFlows(seed) {
   assert.deepEqual(reassigned.leadIds, [allocation.leadIds[0]], "the released lead is reassigned to another employee");
   await assert.rejects(leadService.releaseAssignment(employeeActor, allocation.leadIds[0], { expectedVersion: released.assignmentVersion }),
     (error) => error instanceof NotFoundException, "employee cannot release a different lead's assignment");
+  smokeStage = "partial_results_cancel_preserves_published";
+  await models.sequelize.transaction((transaction) => leadService.completeResultSet(resultSetId, "cancelled", transaction));
+  assert.equal((await models.BusinessLead.findByPk(allocation.leadIds[0])).resultStatus, "ready",
+    "cancelling the remaining work must preserve published assigned results");
+  assert.equal((await leadService.get(employeeActor, allocation.leadIds[0])).assignedToUserId, otherEmployee.userId,
+    "published result remains readable after cancelling the remainder");
+  await require("./partial-leads-db-smoke.cjs")({ seed, leadService, tenantId, actorUserId: manager.userId });
   console.log("BUSINESS_LEADS_DB_PASS managerCreatesOperator=true executeIndependent=true exactAllocation=true replayIdempotent=true insufficientPoolAtomic=true ownerOnlyStatus=true ownerOnlyAssignmentRelease=true releasePreservesLead=true sharedRead=true contactReport=true roleDashboards=true personalNotification=true teamCounts=true");
   } catch (error) {
     const query = error?.sql ?? error?.parent?.sql;

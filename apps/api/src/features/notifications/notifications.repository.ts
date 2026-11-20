@@ -24,9 +24,8 @@ export class NotificationsRepository {
     transaction: Transaction,
   ) {
     const eventKey = `${resultSet.resultSetId}:${eventType}`;
-    await UserNotification.findOrCreate({
-      where: { tenantId: resultSet.tenantId, recipientUserId: resultSet.actorUserId, eventKey },
-      defaults: {
+    await UserNotification.bulkCreate(
+      [{
         notificationId: randomUUID(),
         tenantId: resultSet.tenantId,
         recipientUserId: resultSet.actorUserId,
@@ -36,9 +35,9 @@ export class NotificationsRepository {
         ...config,
         createdAt: new Date(),
         readAt: null,
-      },
-      transaction,
-    });
+      }],
+      { transaction, ignoreDuplicates: true },
+    );
   }
 
   async list(input: { tenantId: string; userId: string; limit: number; unreadOnly: boolean }) {

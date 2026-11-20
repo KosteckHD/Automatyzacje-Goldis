@@ -83,7 +83,7 @@ export default function AuthRecoveryForm({ mode }: { mode: RecoveryMode }) {
 
   const title = mode === "request" ? "Odzyskaj dostęp" : mode === "reset" ? "Ustaw nowe hasło" : "Potwierdź adres";
   const description = mode === "request"
-    ? "Podaj firmowy adres przypisany do Twojego konta. Wyślemy link, jeśli adres jest zweryfikowany."
+    ? serviceState === "disabled" ? "Odzyskiwanie hasła jest obecnie niedostępne." : "Podaj firmowy adres przypisany do Twojego konta. Wyślemy link, jeśli adres jest zweryfikowany."
     : mode === "reset" ? "Ustaw nowe hasło. Link jest jednorazowy i ważny przez 15 minut."
       : "Potwierdzenie aktywuje ten adres jako sposób odzyskiwania konta.";
 
@@ -92,7 +92,7 @@ export default function AuthRecoveryForm({ mode }: { mode: RecoveryMode }) {
       <a className="auth-recovery-logo" href="/"><GoldisLogo variant="header" /><span>GOLDIS</span></a>
       <p className="eyebrow">KONTO I BEZPIECZEŃSTWO</p>
       <h1>{mode === "verify" ? <>Adres,<br /><em>który należy do Ciebie.</em></> : <>Bezpieczny powrót<br /><em>do Twojego konta.</em></>}</h1>
-      <p>Link działa tylko raz. Po zmianie hasła trzeba zalogować się ponownie.</p>
+      <p>{mode === "verify" ? "Potwierdź adres, aby móc używać go do odzyskiwania konta." : "Link działa tylko raz. Po zmianie hasła trzeba zalogować się ponownie."}</p>
       <div className="auth-recovery-rule"><span aria-hidden="true">G</span><small>GOLDIS · DOSTĘP DO PLATFORMY</small></div>
     </section>
     <section className="auth-recovery-panel">
@@ -113,7 +113,7 @@ export default function AuthRecoveryForm({ mode }: { mode: RecoveryMode }) {
         <small>Minimum 15 znaków. Po zmianie zaloguj się ponownie.</small>
         <button type="submit" disabled={busy}>{busy ? "Zapisuję hasło…" : "Ustaw nowe hasło"}</button>
       </form>}
-      {mode === "reset" && !token && !notice && <p className="auth-recovery-muted" role="status">Link nie zawiera tokenu albo strona została odświeżona. Otwórz ponownie oryginalny link z wiadomości.</p>}
+      {mode === "reset" && !token && !notice && <p className="auth-recovery-muted" role="status">Link jest niepełny lub został już użyty. Otwórz oryginalną wiadomość albo <a href="/odzyskaj-haslo">poproś o nowy link</a>.</p>}
       {mode === "verify" && token && <div className="auth-recovery-form"><button type="button" disabled={busy} onClick={() => void verifyEmail()}>{busy ? "Potwierdzam…" : "Potwierdź adres e-mail"}</button><small>Wiadomość została otwarta bez zmiany konta. Kliknij, aby potwierdzić adres.</small></div>}
       {mode === "verify" && !token && !notice && <p className="auth-recovery-muted" role="status">Link nie zawiera tokenu albo strona została odświeżona. Otwórz ponownie oryginalny link z wiadomości.</p>}
       <p className="auth-recovery-back"><a href={notice && mode === "reset" ? "/" : "/"}>Wróć do logowania <span aria-hidden="true">→</span></a></p>

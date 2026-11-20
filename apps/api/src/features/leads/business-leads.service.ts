@@ -65,7 +65,6 @@ function allocationCandidateWhere(): string {
   return `lead.tenant_id = :tenantId AND lead.tool_id = :toolId
     AND lead.result_status = 'ready' AND lead.assigned_to_user_id IS NULL
     AND result_set.batch_id IS NOT NULL
-    AND result_set.status = 'completed'
     AND NOT EXISTS (SELECT 1 FROM resource_tombstones deletion WHERE deletion.tenant_id = result_set.tenant_id
       AND deletion.resource_type = 'import' AND deletion.resource_id = result_set.batch_id AND deletion.state <> 'completed')
     AND (:resultSetId IS NULL OR lead.result_set_id = CAST(:resultSetId AS uuid))`;
@@ -185,26 +184,25 @@ export class BusinessLeadService {
         lead.updatedAt = createdAt;
         await lead.save({ transaction });
       }
-      for (const group of companyGroups) {
-        await LeadRunLink.findOrCreate({
-          where: { groupId: group.groupId },
-          defaults: {
-            linkId: randomUUID(),
-            tenantId: resultSet.tenantId,
-            leadId: lead.leadId,
-            groupId: group.groupId,
-            createdAt,
-          },
-          transaction,
-        });
-      }
+      // ON CONFLICT keeps retries idempotent without Sequelize's pg_temp helper,
+      // which requires TEMPORARY privileges that the API role must not have.
+      await LeadRunLink.bulkCreate(
+        companyGroups.map((group) => ({
+          linkId: randomUUID(),
+          tenantId: resultSet.tenantId,
+          leadId: lead.leadId,
+          groupId: group.groupId,
+          createdAt,
+        })),
+        { transaction, ignoreDuplicates: true },
+      );
     }
     resultSet.status = "running";
     resultSet.updatedAt = createdAt;
     await resultSet.save({ transaction });
   }
 
-  /** A set becomes assignable only after the user-level operation is durable and terminal. */
+  /** Close the operation and settle its remaining unpublished companies. */
   async completeResultSet(
     resultSetId: string,
     terminal: "completed" | "cancelled" | "failed",
@@ -221,10 +219,14 @@ export class BusinessLeadService {
     await resultSet.save({ transaction });
     const leads = await BusinessLead.findAll({ where: { resultSetId }, transaction, lock: transaction.LOCK.UPDATE });
     if (terminal !== "completed") {
-      await BusinessLead.update({ resultStatus: "failed", updatedAt: now }, { where: { resultSetId }, transaction });
+      // Published results and assignments survive cancellation of the remainder.
+      await BusinessLead.update({ resultStatus: "failed", updatedAt: now }, {
+        where: { resultSetId, resultStatus: "processing" }, transaction,
+      });
       return;
     }
     for (const lead of leads) {
+      if (lead.resultStatus === "ready") continue;
       const runStates = await sequelize.query<{ status: string | null }>(
         `SELECT run.status
            FROM lead_run_links link
@@ -262,6 +264,65 @@ export class BusinessLeadService {
       ))
     ) {
       throw new ForbiddenException("Brak prawa do odczytu wyników automatyzacji OC");
+    }
+    await this.publishReadyResults(actor.tenantId);
+  }
+
+  /** Publish complete companies independently, without closing their parent operation. */
+  async publishReadyResults(tenantId: string): Promise<void> {
+    const candidates = await sequelize.query<{ resultSetId: string }>(
+      `SELECT DISTINCT result_set.result_set_id AS "resultSetId"
+         FROM result_sets result_set JOIN business_leads lead
+           ON lead.result_set_id = result_set.result_set_id AND lead.tenant_id = result_set.tenant_id
+        WHERE result_set.tenant_id = :tenantId AND result_set.tool_id = :toolId
+          AND result_set.status IN ('queued', 'running', 'waiting_attention')
+          AND lead.result_status = 'processing'
+        ORDER BY result_set.result_set_id`,
+      { replacements: { tenantId, toolId }, type: QueryTypes.SELECT },
+    );
+    for (const { resultSetId } of candidates) {
+      await sequelize.transaction(async (transaction) => {
+        // Same lock order as admission/finalization: parent first, then companies.
+        const resultSet = await this.records.getResultSet(resultSetId, transaction);
+        if (!resultSet || resultSet.tenantId !== tenantId
+          || !["queued", "running", "waiting_attention"].includes(resultSet.status) || !resultSet.batchId
+          || await isResourceTombstoned("import", resultSet.batchId, transaction)) return;
+        const eligible = await sequelize.query<{ leadId: string }>(
+          `SELECT lead.lead_id AS "leadId" FROM business_leads lead
+            WHERE lead.result_set_id = :resultSetId AND lead.tenant_id = :tenantId
+              AND lead.result_status = 'processing'
+              AND EXISTS (SELECT 1 FROM lead_run_links link
+                JOIN run_submission_groups grp ON grp.group_id = link.group_id AND grp.tenant_id = link.tenant_id
+                JOIN automation_runs run ON run.id = grp.run_id
+                WHERE link.lead_id = lead.lead_id AND link.tenant_id = lead.tenant_id AND run.status = 'completed')
+              AND NOT EXISTS (SELECT 1 FROM lead_run_links link
+                JOIN run_submission_groups grp ON grp.group_id = link.group_id AND grp.tenant_id = link.tenant_id
+                LEFT JOIN automation_runs run ON run.id = grp.run_id
+                WHERE link.lead_id = lead.lead_id AND link.tenant_id = lead.tenant_id
+                  AND (grp.admission_state <> 'accepted' OR run.status IS NULL
+                    OR run.status NOT IN ('completed','failed','no_matching_policies','cancelled')))
+              AND NOT EXISTS (SELECT 1 FROM prepared_set_chunks chunk
+                JOIN source_rows src ON src.batch_id = :batchId AND chunk.row_numbers @> jsonb_build_array(src.row_number)
+                JOIN source_entity_links entity ON entity.source_row_id = src.id
+                  AND entity.tenant_id = lead.tenant_id AND entity.canonical_entity_id = lead.canonical_entity_id
+                WHERE chunk.execution_id = :sourceId AND chunk.child_submission_id IS NULL
+                  AND chunk.status NOT IN ('cancelled','failed'))
+            ORDER BY lead.lead_id FOR UPDATE OF lead`,
+          { replacements: { resultSetId, tenantId, batchId: resultSet.batchId, sourceId: resultSet.sourceId },
+            type: QueryTypes.SELECT, transaction },
+        );
+        for (const { leadId } of eligible) {
+          const lead = await BusinessLead.findByPk(leadId, { transaction });
+          if (!lead) continue;
+          lead.resultStatus = "ready";
+          lead.updatedAt = new Date();
+          await lead.save({ transaction });
+          // An invalid/incomplete snapshot rolls back publication of the company.
+          await materializeLeadResultSnapshots(lead, resultSet, transaction);
+          if (await LeadResultSnapshot.count({ where: { leadId, tenantId }, transaction }) === 0)
+            throw new ConflictException("Nie można udostępnić leada bez zabezpieczonego wyniku");
+        }
+      });
     }
   }
 
@@ -574,7 +635,7 @@ export class BusinessLeadService {
                    WHERE link.lead_id = lead.lead_id AND link.tenant_id = lead.tenant_id) END AS run_ids
          ) run_stats ON TRUE
         WHERE lead.lead_id = :leadId AND lead.tenant_id = :tenantId AND lead.tool_id = :toolId
-          AND result_set.status = 'completed'`,
+          AND lead.result_status = 'ready'`,
       { replacements: { leadId, tenantId: actor.tenantId, toolId, userId: actor.userId }, type: QueryTypes.SELECT },
     );
     const row = rows[0];
@@ -1072,7 +1133,7 @@ export class BusinessLeadService {
         transaction,
       });
       if (
-        resultSet?.status !== "completed" ||
+        !resultSet ||
         lead.resultStatus !== "ready" ||
         (resultSet.batchId && (await isResourceTombstoned("import", resultSet.batchId, transaction)))
       ) {

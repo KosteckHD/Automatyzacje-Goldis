@@ -307,6 +307,30 @@
 .oc-step-panel-content .row-pagination { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:8px; margin:10px 0 16px; color:var(--oc-muted); font-size:.75rem; }
 .oc-step-panel-content .row-pagination span { margin-right:auto; }
 .oc-step-panel-content .row-pagination button { min-height:44px; padding:8px 12px; border:1px solid var(--oc-control-border); border-radius:5px; background:#18181e; color:var(--oc-text); font:inherit; cursor:pointer; }
+
+/* Light operational surfaces: text and background must change together. */
+.oc-automation { --oc-bg: #f7f6f2; --oc-panel: #fff; --oc-raised: #f4f2ed; --oc-line: #d5d0c6; --oc-control-border: #9b9488; --oc-text: #25231e; --oc-muted: #5f5b52; --oc-gold: #d9b65f; --oc-gold-bright: #755319; color: var(--oc-text); }
+.oc-automation .oc-automation-heading h1 { color: var(--oc-text); }
+.oc-automation :is(.oc-import-context, .oc-step-rail, .oc-step-panel, .oc-step-footer) { background: var(--oc-panel); border-color: var(--oc-line); }
+.oc-automation .oc-step-rail { background: var(--oc-raised); }
+.oc-automation .oc-step-link[data-current="true"] { background: #fff; border-color: #b9953c; }
+.oc-automation .oc-step-panel-heading { background: var(--oc-raised); }
+.oc-automation .oc-step-counter, .oc-automation .oc-step-panel-content .eyebrow { color: #755319; }
+.oc-automation .oc-step-panel-content :is(.table-wrap, .review-table-wrap, .company-selection-list, .submission-preview-list) { background: #fff; }
+.oc-automation .oc-step-panel-content table { background: #fff; }
+.oc-automation .oc-step-panel-content th { background: var(--oc-raised); color: #514c43; }
+.oc-automation .oc-step-panel-content td { background: #fff; color: var(--oc-text); }
+.oc-automation .oc-step-panel-content :is(.submission-selection, .submission-counts, .company-selection, .oc-interventions, .oc-run-list, .oc-run-detail, .oc-result-detail, .oc-health, .oc-upload-file) { background: var(--oc-raised); color: var(--oc-text); }
+.oc-automation .oc-step-panel-content :is(.enrichment-runtime-status[data-state="ready"], .enrichment-runtime-status[data-state="warning"], .enrichment-runtime-status[data-state="disabled"]) { background: #f7f6f2; color: var(--oc-text); }
+.oc-automation .oc-step-panel-content .upload-card .oc-upload-dropzone { background: #faf9f6; }
+.oc-automation .oc-step-panel-content .upload-card .oc-upload-browse,
+.oc-automation .oc-step-panel-content :is(.row-tools button, .row-pagination button, .review-button, .review-actions button, .review-pagination button, .enrichment-job-history button, .company-selection-pages button, .company-selection-error button, .oc-interventions button) { background: #fff; color: var(--oc-text); }
+.oc-automation .oc-step-panel-content .review-actions button[type="submit"] { background: var(--oc-gold); color: #17130b; }
+.oc-automation .oc-step-panel-content .review-conflict { color: #a4312a; }
+.oc-automation .oc-step-link[data-state="attention"] .oc-step-link-copy small { color: #805510; }
+.oc-automation .oc-automation-heading h1, .oc-automation .oc-step-panel-heading h2 { font-family: var(--font-body), Arial, sans-serif; font-weight: 700; letter-spacing: -.02em; }
+.oc-automation .oc-upload-file-ready { color: #286044; }
+.oc-automation .oc-step-footer-next { color: #755319 !important; }
 .oc-step-panel-content .row-pagination button:disabled { opacity:.5; cursor:not-allowed; }
 .oc-step-panel-content .row-pagination button:focus-visible { outline:2px solid var(--oc-gold); outline-offset:2px; }
 @media(max-width:600px){.oc-step-panel-content .row-pagination{justify-content:stretch}.oc-step-panel-content .row-pagination span{flex-basis:100%}.oc-step-panel-content .row-pagination button{flex:1}}

@@ -74,6 +74,86 @@ test("manual login or a closed MFA tab cannot be recorded as an accepted platfor
   } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
 });
 
+test("PZU recognizes an HTTP 403 page even when its configured denied selector is absent", {
+  skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
+}, async () => {
+  const directory = await mkdtemp(join(tmpdir(), "goldis-pzu-forbidden-"));
+  const browser = new BrowserSession({ profileDirectory: directory });
+  try {
+    const page = await browser.page("pzu");
+    let requests = 0;
+    await page.route("https://goldis.test/**", route => {
+      requests++;
+      return route.fulfill({ status: 403, contentType: "text/html", body: "<h1>403 Forbidden</h1>" });
+    });
+    await page.goto(url);
+    const session = new PzuEverestSession(browser, options);
+    assert.equal(await session.ensureAuthenticated(), "access_denied");
+    assert.equal(await session.signIn({ username: "fixture-user", password: "fixture-password" }), "access_denied");
+    const code = Buffer.from("123456");
+    assert.equal(await session.submitSmsCode(code), "session_lost");
+    assert.deepEqual([...code], [0, 0, 0, 0, 0, 0]);
+    assert.equal(requests, 1, "no credential/code retry or navigation on the forbidden page");
+  } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
+});
+
+test("PZU SMS retry replaces the stale outer document and waits for the new MFA screen", {
+  skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
+}, async () => {
+  const directory = await mkdtemp(join(tmpdir(), "goldis-pzu-fresh-parent-"));
+  const browser = new BrowserSession({ profileDirectory: directory });
+  try {
+    const page = await browser.page("pzu");
+    let entryRequests = 0;
+    await page.route("https://goldis.test/**", route => {
+      if (route.request().url().endsWith("/sms")) return route.fulfill({ contentType: "text/html", body: '<input name="code"><button data-action="submit-sms">Confirm</button>' });
+      entryRequests++;
+      return route.fulfill({ contentType: "text/html", body: `<script>setTimeout(()=>{document.body.innerHTML='<iframe id="new-sms" src="/sms"></iframe>'},150)</script>` });
+    });
+    await page.goto(url);
+    await page.setContent('<main id="stale-parent">Expired F5 session</main>');
+    const session = new PzuEverestSession(browser, {
+      ...options, selectors: { ...options.selectors, smsChallenge: "#new-sms", smsFrame: "#new-sms" },
+    });
+    assert.equal(await session.reopenAfterSmsTimeout(), "waiting_for_sms");
+    assert.equal(entryRequests, 2, "retry enters the application again instead of only refreshing the old iframe");
+    assert.equal(await page.locator("#stale-parent").count(), 0);
+    assert.equal(await page.frameLocator("#new-sms").locator('input[name="code"]').inputValue(), "");
+  } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
+});
+
+test("explicit PZU retry clears only stalled F5 cookies and preserves remembered devices", {
+  skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
+}, async () => {
+  const directory = await mkdtemp(join(tmpdir(), "goldis-pzu-f5-recovery-"));
+  const browser = new BrowserSession({ profileDirectory: directory });
+  try {
+    const context = await browser.open();
+    await context.addCookies([
+      { name: "MRHSession", value: "synthetic-stalled", domain: ".pzu.pl", path: "/" },
+      { name: "LastMRH_Session", value: "synthetic-stalled", domain: ".pzu.pl", path: "/" },
+      { name: "proxyauth_fprint_zalogujpzu", value: "synthetic-device", domain: ".zaloguj.pzu.pl", path: "/" },
+      { name: "other-session", value: "synthetic-other", domain: ".compensa.test", path: "/" },
+    ]);
+    const page = await browser.page("pzu");
+    let requests = 0;
+    await page.route("https://goldis.test/**", async route => {
+      requests++;
+      const stalled = (await context.cookies()).some(cookie => cookie.name === "MRHSession");
+      await route.fulfill({ contentType: "text/html; charset=utf-8", body: stalled
+        ? '<h1> Przetwarzanie w toku dla Twojej bieżącej sesji. </h1>'
+        : '<main data-screen="login">Login</main>' });
+    });
+    const session = new PzuEverestSession(browser, { ...options, transitionTimeoutMs: 100 });
+    const recovered = await session.reopenAfterSmsTimeout();
+    assert.equal(recovered, "login_required", JSON.stringify({ requests,
+      headings: await page.locator("h1").allTextContents(), names: (await context.cookies()).map(cookie => cookie.name) }));
+    assert.equal(requests, 2, "only one fresh F5 session is started per explicit retry");
+    const names = (await context.cookies()).map(cookie => cookie.name).sort();
+    assert.deepEqual(names, ["other-session", "proxyauth_fprint_zalogujpzu"]);
+  } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
+});
+
 test("observed PZU selectors submit through the SMS frame and remember the device", {
   skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
 }, async () => {

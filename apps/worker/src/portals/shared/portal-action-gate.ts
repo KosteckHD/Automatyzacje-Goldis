@@ -1,9 +1,14 @@
 import { randomUUID } from "node:crypto";
 import type { Pool } from "pg";
+import { assertLockedRunExecution, type RunExecutionLease } from "../../features/execution/execution-lease";
 
 /** Durable, one-shot intents before Compensa can create a draft or start UFG. */
 export class PgPortalActionGate {
-  constructor(private readonly pool: Pool, private readonly beforeAction?: () => Promise<void>) {}
+  constructor(
+    private readonly pool: Pool,
+    private readonly beforeAction?: () => Promise<void>,
+    private readonly activeLease?: () => RunExecutionLease | null,
+  ) {}
 
   async authorizeStart(input: Readonly<{ runId: string; sourceRowId: string; identitySourceRowId: string; adapterVersion: string }>): Promise<boolean> {
     if (input.sourceRowId !== input.identitySourceRowId) return false;
@@ -15,6 +20,7 @@ export class PgPortalActionGate {
         "SELECT status, source_row_id, last_safe_step FROM automation_runs WHERE id = $1 FOR UPDATE", [input.runId],
       );
       const run = result.rows[0];
+      if (this.activeLease) await assertLockedRunExecution(client, input.runId, this.activeLease());
       if (result.rowCount !== 1 || run.status !== "compensa_login" || run.source_row_id !== input.sourceRowId
         || run.last_safe_step !== null) {
         await client.query("COMMIT");
@@ -32,8 +38,9 @@ export class PgPortalActionGate {
       );
       await client.query("COMMIT");
       return true;
-    } catch {
+    } catch (error) {
       await client.query("ROLLBACK");
+      if (error instanceof Error && error.message === "RUN_EXECUTION_LEASE_LOST") throw error;
       throw new Error("COMPENSA_START_CHECKPOINT_FAILED");
     } finally {
       client.release();
@@ -49,6 +56,7 @@ export class PgPortalActionGate {
         "SELECT status, last_safe_step, external_case_ref FROM automation_runs WHERE id = $1 FOR UPDATE", [input.runId],
       );
       const run = result.rows[0];
+      if (this.activeLease) await assertLockedRunExecution(client, input.runId, this.activeLease());
       if (result.rowCount !== 1 || run.status !== "ufg_verification"
         || run.last_safe_step !== "compensa_insured_data_saved"
         || run.external_case_ref !== input.caseReference) {
@@ -67,8 +75,9 @@ export class PgPortalActionGate {
       );
       await client.query("COMMIT");
       return true;
-    } catch {
+    } catch (error) {
       await client.query("ROLLBACK");
+      if (error instanceof Error && error.message === "RUN_EXECUTION_LEASE_LOST") throw error;
       throw new Error("UFG_CHECKPOINT_FAILED");
     } finally {
       client.release();

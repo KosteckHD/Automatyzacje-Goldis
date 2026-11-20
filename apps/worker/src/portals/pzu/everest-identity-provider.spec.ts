@@ -149,6 +149,10 @@ test("Firma uses the exact returned REGON and name ordering does not create a fa
     if (company.kind === "matched") { assert.equal(company.identity.matchMethod, "regon_company"); assert.equal(company.identity.pesel, ""); assert.equal(company.identity.regon, "012345678"); }
     await setRows([{ kindLabel: "Firma", personName: "Fikcyjna Firma Testowa", pesel: "987654321" }]);
     assert.equal((await provider.findIdentity(context("Ala Testowa"))).kind, "identity_review");
+    await setRows([{ kindLabel: "Firma", personName: "Ala Testowa Fikcyjna Firma Testowa", pesel: "90010100016" }]);
+    assert.deepEqual(await provider.findIdentity(context("Ala Testowa")), {
+      kind: "identity_review", reason: "unsupported_entity_type", candidateCount: 1,
+    }, "wiersz Firma nie może zastępować osoby fizycznej nawet z poprawnym PESEL-em");
     await setRows([
       { kindLabel: "Osoba fizyczna", personName: "Fikcyjna Firma Testowa Ala Testowa", pesel: "90010100016" },
       { kindLabel: "Osoba fizyczna prowadząca działalność gospodarczą", personName: "Fikcyjna Firma Testowa Ala Testowa", pesel: "90010100016" },
@@ -176,6 +180,38 @@ test("the observed no-result marker accepts the searched identifier suffix and a
     assert.deepEqual(await provider.findIdentity(context(null)), { kind: "not_found" });
     await page.evaluate(rows => { document.querySelector("#fixture")!.textContent = JSON.stringify(rows); }, fixtureRows([candidate("person")]));
     assert.equal((await provider.findIdentity(context("Ala Testowa"))).kind, "matched");
+  } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
+});
+
+test("consecutive unchanged empty searches require an acknowledgement for the exact submitted REGON", {
+  skip: process.env.PLAYWRIGHT_INTEGRATION !== "1",
+}, async () => {
+  const directory = await mkdtemp(join(tmpdir(), "goldis-everest-empty-ack-"));
+  const browser = new BrowserSession({ profileDirectory: directory });
+  try {
+    const page = await browser.page("pzu");
+    const field = "DesktopClientsAccountsPzu-DesktopClientsAccountsScreen-smartsearch";
+    const html = `<main data-screen="home">Fixture</main><div id="no-results">Brak wynikow</div>
+      <table><tbody id="results"></tbody></table><input id="search-regon" name="${field}" aria-invalid="false">
+      <script>document.querySelector('input').onkeydown=async event=>{
+        if(event.key!=='Enter')return;const input=event.target;
+        await fetch('/everest',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({
+          [input.name]:window.wrongRegon?'000000000':input.value,eventSource:input.name+'_Button_act'})});
+        input.value='';
+      };</script>`;
+    await page.route("https://goldis.test/**", route => route.request().method() === "POST"
+      ? route.fulfill({ contentType: "application/json", body: JSON.stringify({ targets: [{ id: field, content: "<input>" }] }) })
+      : route.fulfill({ contentType: "text/html; charset=utf-8", body: html }));
+    await page.goto(entryUrl);
+    const provider = new EverestIdentityProvider(browser, new PzuEverestSession(browser, sessionOptions), {
+      selectors: { ...resultSelectors, searchNavigation: undefined }, adapterVersion: "empty-ack-fixture", resultTimeoutMs: 900,
+    });
+    assert.deepEqual(await provider.findIdentity(context(null)), { kind: "not_found" });
+    const next = context(null);
+    assert.deepEqual(await provider.findIdentity({ ...next, source: { ...next.source, effectiveRegon: "987654321" } }), { kind: "not_found" });
+    await page.evaluate(() => { (window as Window & { wrongRegon?: boolean }).wrongRegon = true; });
+    await assert.rejects(provider.findIdentity(context(null)), /EVEREST_SEARCH_RESULTS_UNAVAILABLE/,
+      "a response for a different identifier must not legitimize the old empty result");
   } finally { await browser.close(); await rm(directory, { recursive: true, force: true }); }
 });
 
@@ -336,7 +372,24 @@ test("Everest pobiera PESEL z wiersza osoby fizycznej po wyszukaniu REGON", {
     assert.deepEqual(await runScenario([candidate("unknown"), candidate("unknown", { personName: "Inna firma" })]), {
       kind: "identity_review", reason: "unsupported_entity_type", candidateCount: 2,
     });
-    assert.equal((await runScenario([candidate("sole_proprietor")])).kind, "matched");
+    const businessFallback = await runScenario([candidate("sole_proprietor")]);
+    assert.equal(businessFallback.kind, "matched", "przy braku osoby fizycznej można użyć wiersza działalności");
+    if (businessFallback.kind === "matched") assert.equal(businessFallback.identity.pesel, "90010100016");
+    assert.deepEqual(await runScenario([candidate("sole_proprietor", { pesel: null })]), {
+      kind: "identity_review", reason: "missing_pesel", candidateCount: 1,
+    });
+    assert.deepEqual(await runScenario([candidate("sole_proprietor", { pesel: "90010100024" })]), {
+      kind: "identity_review", reason: "invalid_pesel", candidateCount: 1,
+    });
+    assert.deepEqual(await runScenario([candidate("sole_proprietor", { personName: "Inna Osoba Inna Firma" })]), {
+      kind: "identity_review", reason: "name_mismatch", candidateCount: 1,
+    });
+    assert.deepEqual(await runScenario([
+      candidate("sole_proprietor"), candidate("sole_proprietor", { pesel: "90010100023" }),
+    ], null), { kind: "ambiguous", candidateCount: 2 });
+    assert.deepEqual(await runScenario([candidate("person", { pesel: null }), candidate("sole_proprietor")]), {
+      kind: "identity_review", reason: "missing_pesel", candidateCount: 2,
+    }, "działalność jest ścieżką przy braku wiersza osoby fizycznej, nie obejściem błędów obecnego wiersza");
 
     const syntheticPesel = "98765432109";
     const capturedLogs: string[] = [];

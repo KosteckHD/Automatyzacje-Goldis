@@ -71,16 +71,16 @@ test("a lost execution lease stops SMS observation and removes the pending code 
 });
 
 /** Unit regression for the production state loop. Portal/DB integration is a separate gate. */
-function fixture(initial: RunStatus, safeStep: string | null = null) {
+function fixture(initial: RunStatus, safeStep: string | null = null, initialErrorCode = "SMS_RETRY_QUEUED") {
   let status = initial;
-  let errorCode: string | null = "SMS_RETRY_QUEUED";
-  let delivered = 0; let saved = 0; let resent = 0; let sms = 0; let searches = 0; let interventions = 0;
+  let errorCode: string | null = initialErrorCode;
+  let delivered = 0; let saved = 0; let resent = 0; let reopened = 0; let sms = 0; let searches = 0; let interventions = 0;
   const transitions: RunStatus[] = [];
   const identity = { sourceRowId: "55555555-5555-4555-8555-555555555555" };
   const session = {
     resendSmsCodeIfAvailable: async () => { resent++; return "resent"; },
     signIn: async () => "authenticated",
-    reopenAfterSmsTimeout: async () => "authenticated",
+    reopenAfterSmsTimeout: async () => { reopened++; return "authenticated"; },
   };
   const processor = Object.create(LiveRunProcessor.prototype) as LiveRunProcessor;
   Object.assign(processor, {
@@ -127,7 +127,7 @@ function fixture(initial: RunStatus, safeStep: string | null = null) {
       } },
     },
   });
-  return { processor, summary: () => ({ status, errorCode, delivered, saved, resent, sms, searches, interventions, transitions }) };
+  return { processor, summary: () => ({ status, errorCode, delivered, saved, resent, reopened, sms, searches, interventions, transitions }) };
 }
 
 for (const [name, identityResult, errorCode] of [
@@ -190,9 +190,47 @@ for (const initial of ["pzu_login", "compensa_login"] as const) {
     const state = fixture(initial);
     await state.processor.process(runId, { lease, signal: new AbortController().signal, intent: "resume_auth" });
     const result = state.summary();
-    assert.equal(result.status, "completed"); assert.equal(result.delivered, 1); assert.equal(result.saved, 1); assert.equal(result.resent, initial === "pzu_login" ? 1 : 0);
+    assert.equal(result.status, "completed"); assert.equal(result.delivered, 1); assert.equal(result.saved, 1);
+    assert.equal(result.resent, 0); assert.equal(result.reopened, 1);
     assert.ok(result.transitions.includes("compensa_form")); assert.ok(result.transitions.includes("ufg_verification"));
     assert.equal(result.sms, initial === "pzu_login" ? 1 : 0);
+  });
+}
+
+test("admin PZU session recheck opens a fresh application entry before continuing the same run", async () => {
+  const state = fixture("pzu_login", null, "REVIEW_RETRY_QUEUED");
+  const internals = state.processor as unknown as { repository: { clearErrorCode: () => Promise<void> } };
+  internals.repository.clearErrorCode = async () => { throw new Error("REVIEW_CODE_IS_NOT_AN_SMS_RETRY_CODE"); };
+  await state.processor.process(runId, { lease, signal: new AbortController().signal, intent: "resume_review" });
+  assert.equal(state.summary().reopened, 1);
+  assert.equal(state.summary().resent, 0);
+  assert.equal(state.summary().status, "completed");
+});
+
+test("PZU auth retry accepts MFA on a fresh parent page without resending in the old iframe", async () => {
+  const state = fixture("pzu_login");
+  let reopened = 0;
+  Object.assign(state.processor, { pzuSession: {
+    reopenAfterSmsTimeout: async () => { reopened++; return "waiting_for_sms"; },
+    resendSmsCodeIfAvailable: async () => { throw new Error("STALE_PARENT_MUST_NOT_RECEIVE_RESEND"); },
+  } });
+  await state.processor.process(runId, { lease, signal: new AbortController().signal, intent: "resume_auth" });
+  assert.equal(reopened, 1);
+  assert.equal(state.summary().status, "completed");
+  assert.equal(state.summary().sms, 1);
+  assert.equal(state.summary().delivered, 1);
+});
+
+for (const outcome of ["access_denied", "navigation_error", "unknown"] as const) {
+  test(`PZU auth retry stops before SMS or business actions when the fresh page is ${outcome}`, async () => {
+    const state = fixture("pzu_login");
+    Object.assign(state.processor, { pzuSession: { reopenAfterSmsTimeout: async () => outcome } });
+    await state.processor.process(runId, { lease, signal: new AbortController().signal, intent: "resume_auth" });
+    assert.equal(state.summary().status, "waiting_for_manual_data");
+    assert.equal(state.summary().interventions, 1);
+    assert.equal(state.summary().sms, 0);
+    assert.equal(state.summary().searches, 0);
+    assert.equal(state.summary().saved, 0);
   });
 }
 

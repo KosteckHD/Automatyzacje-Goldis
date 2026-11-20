@@ -61,10 +61,11 @@ module.exports = async function automationFlowSmoke() {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   const inbox = new OneTimeCodeInbox();
   const shutdown = new AbortController();
-  let app, receiver, worker, queue, browser, webServer, webBrowser, webPage;
+  let app, receiver, worker, queue, browser, webServer, webBrowser, webPage, fixtureHeartbeat;
   let currentScenario = "authenticated";
   let observedSmsSubmissions = 0;
   let observedResends = 0;
+  let observedPzuEntries = 0;
   const counts = { starts: 0, saves: 0, ufg: 0 };
   const failures = [];
   pool.on("connect", (client) => {
@@ -160,6 +161,7 @@ module.exports = async function automationFlowSmoke() {
     await context.route("**/*", async (route) => {
       const url = new URL(route.request().url());
       if (url.hostname === "pzu-fixture.test") {
+        if (route.request().isNavigationRequest() && url.pathname === "/everest") observedPzuEntries++;
         let html = home(currentScenario === "not_found");
         if (currentScenario.startsWith("sms")) html = `<main data-screen="sms"><input name="code"><input id="remember" type="checkbox"><span id="expired" hidden>Expired</span><span id="rejected" hidden>Invalid code</span><button id="resend" hidden onclick="window.fixtureResend();document.querySelector('#expired').hidden=true;document.querySelector('#rejected').hidden=true;this.hidden=true">Resend once</button><button data-submit-sms onclick="window.fixtureSmsSubmitted();if(document.querySelector('[name=code]').value==='000000'){document.querySelector('#rejected').hidden=false;document.querySelector('#resend').hidden=false;return;}window.wasRemembered=document.querySelector('#remember').checked;document.body.innerHTML=${JSON.stringify(home(false)).replace(/&/g, "&amp;").replace(/"/g, "&quot;")}">Submit</button></main>`;
         return route.fulfill({ status: 200, contentType: "text/html", body: html });
@@ -176,6 +178,14 @@ module.exports = async function automationFlowSmoke() {
       failures.push(/^[A-Z][A-Z0-9_:-]+$/.test(error?.message ?? "") ? error.message : "JOB");
     });
     queue = new Queue("oc-verification", { connection }); await worker.waitUntilReady();
+    // This DB belongs to the disposable fixture. Its production processor is
+    // active against intercepted portal pages; publish that fixture's heartbeat.
+    const publishFixtureHeartbeat = () => pool.query(`INSERT INTO worker_runtime_status
+      (worker_id, mode, portal_config_valid, observed_at) VALUES ('portal-worker','live',true,clock_timestamp())
+      ON CONFLICT (worker_id) DO UPDATE SET mode='live',portal_config_valid=true,observed_at=clock_timestamp()`);
+    await publishFixtureHeartbeat();
+    fixtureHeartbeat = setInterval(() => { void publishFixtureHeartbeat().catch(() => failures.push("HEARTBEAT")); }, 5000);
+    fixtureHeartbeat.unref();
     const webRoot = resolve(__dirname, "../../web");
     const webRequire = createRequire(resolve(webRoot, "package.json"));
     const workerRequire = createRequire(resolve(__dirname, "../../worker/package.json"));
@@ -231,7 +241,7 @@ module.exports = async function automationFlowSmoke() {
     assert.equal(uiLoginResponse.status(), 201, "real UI login should use the API");
     await webPage.waitForURL((url) => url.pathname === "/dashboard", { timeout: 30_000 });
     await webPage.goto(`${webOrigin}/tools/oc-policy-verification`, { waitUntil: "domcontentloaded" });
-    await webPage.getByRole("heading", { name: "Weryfikacja danych transportowych" }).waitFor({ timeout: 30_000 });
+    await webPage.getByRole("heading", { name: "Sprawdzanie OC", exact: true }).waitFor({ timeout: 30_000 });
     const ExcelJS = require("exceljs");
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Realizacja");
@@ -248,7 +258,8 @@ module.exports = async function automationFlowSmoke() {
     if (uploadResponse.status() !== 201) throw new Error(`REAL_UI_UPLOAD_FAILED_${uploadResponse.status()}_${await uploadResponse.text()}`);
     const imported = await uploadResponse.json();
     assert.equal(imported.totalRows, 1);
-    await webPage.locator("#workspace-result").waitFor({ timeout: 30_000 });
+    console.log("AUTOMATION_UI_IMPORT_PASS currentWorkspace=true multipart=parsed realAPI=true");
+    await webPage.goto(`${webOrigin}/tools/oc-policy-verification?import=${imported.id}&step=deduplication`, { waitUntil: "domcontentloaded" });
     const preparationResponsePromise = webPage.waitForResponse((response) => new URL(response.url()).pathname === `/api/imports/${imported.id}/preparations`
       && response.request().method() === "POST", { timeout: 30_000 });
     await webPage.getByRole("button", { name: "Sprawdź i przygotuj import" }).click();
@@ -256,15 +267,23 @@ module.exports = async function automationFlowSmoke() {
     if (preparationResponse.status() !== 201) throw new Error(`REAL_UI_PREPARATION_FAILED_${preparationResponse.status()}_${await preparationResponse.text()}`);
     const preparation = await preparationResponse.json();
     await webPage.getByText("Ta rewizja jest zamknięta.", { exact: false }).waitFor({ timeout: 60_000 });
-    const uiRunResponsePromise = webPage.waitForResponse((response) => new URL(response.url()).pathname === "/api/runs"
+    await webPage.locator(".oc-step-rail").getByRole("link", { name: /Wybór wierszy/ }).click();
+    await webPage.getByRole("checkbox", { name: "Wybierz firmę Synthetic Company, wiersz 2", exact: true }).check();
+    await webPage.getByRole("button", { name: "Przejdź do podsumowania (1)", exact: true }).click();
+    await webPage.getByLabel(/Rozumiem podsumowanie/).check();
+    const uiRunResponsePromise = webPage.waitForResponse((response) => new URL(response.url()).pathname === `/api/imports/${imported.id}/run-submissions`
       && response.request().method() === "POST", { timeout: 30_000 });
-    await webPage.getByLabel("Numer wiersza w Excelu").fill("2");
-    await webPage.getByRole("button", { name: "Sprawdź gotowość wiersza" }).click();
+    await webPage.getByRole("button", { name: "Potwierdź i uruchom gotowe wiersze", exact: true }).click();
     const uiRunResponse = await uiRunResponsePromise;
     if (uiRunResponse.status() !== 201) throw new Error(`REAL_UI_RUN_FAILED_${uiRunResponse.status()}_${await uiRunResponse.text()}`);
-    const uiRun = await uiRunResponse.json();
-    await webPage.getByRole("button", { name: "Wpisz kod SMS dla wiersza 2" }).waitFor({ timeout: 60_000 });
-    await webPage.getByRole("button", { name: "Wpisz kod SMS dla wiersza 2" }).click();
+    const uiSubmission = await uiRunResponse.json();
+    assert.ok(uiSubmission.submissionId, "the current workspace persists a submission before accepting its runs");
+    const uiRun = await waitUntil(async () => {
+      const run = await models.AutomationRun.findOne({ where: { batchId: imported.id } });
+      return run ? { id: run.id } : null;
+    }, "UI_SUBMISSION_RUN");
+    await webPage.getByRole("button", { name: "Wpisz kod", exact: true }).waitFor({ timeout: 60_000 });
+    await webPage.getByRole("button", { name: "Wpisz kod", exact: true }).click();
     const smsDialog = webPage.getByRole("dialog", { name: "Wprowadź kod SMS" });
     await smsDialog.getByLabel("Kod weryfikacyjny").fill("654321");
     const uiSmsResponsePromise = webPage.waitForResponse((response) => new URL(response.url()).pathname.startsWith("/api/auth-challenges/")
@@ -272,18 +291,21 @@ module.exports = async function automationFlowSmoke() {
     await smsDialog.getByRole("button", { name: "Przekaż kod" }).click();
     const uiSmsResponse = await uiSmsResponsePromise;
     assert.equal(uiSmsResponse.status(), 202, "real UI SMS handoff should reach the API");
-    await webPage.getByRole("heading", { name: /Wiersz 2: Zakończono/ }).waitFor({ timeout: 120_000 });
+    await webPage.getByRole("heading", { name: /Wiersz 2.*Zakończono/ }).waitFor({ timeout: 120_000 });
     const downloadPromise = webPage.waitForEvent("download", { timeout: 30_000 });
-    await webPage.getByRole("link", { name: "Pobierz wynik Excel" }).click();
+    await webPage.getByRole("link", { name: "Pobierz wynik tego zadania", exact: true }).click();
     const uiDownload = await downloadPromise;
     const downloadedPath = await uiDownload.path();
     assert.ok(downloadedPath && uiDownload.suggestedFilename().toLowerCase().endsWith(".xlsx"), "real UI should download the completed workbook");
     const downloadedWorkbook = new ExcelJS.Workbook();
     await downloadedWorkbook.xlsx.load(await readFile(downloadedPath));
     assert.ok(downloadedWorkbook.worksheets.length > 0, "download should be a readable Excel workbook");
+    console.log("AUTOMATION_UI_WORKER_XLSX_PASS currentWorkspace=true submission=true sms=true realQueue=true realDB=true artifact=readable");
     await webPage.getByRole("link", { name: "Administracja" }).click();
     await webPage.getByRole("heading", { name: /Dostęp i jakość pracy/ }).waitFor({ timeout: 30_000 });
-    await webPage.waitForResponse((response) => new URL(response.url()).pathname === "/api/admin/operations/summary" && response.status() === 200, { timeout: 30_000 });
+    const operationsResponse = webPage.waitForResponse((response) => new URL(response.url()).pathname === "/api/admin/operations/summary" && response.status() === 200, { timeout: 30_000 });
+    await webPage.getByRole("link", { name: "Centrum operacyjne", exact: true }).click();
+    await operationsResponse;
     await webPage.goto(`${webOrigin}/tools/oc-policy-verification?import=${imported.id}`, { waitUntil: "domcontentloaded" });
     const uiLogoutStatus = await webPage.evaluate(async () => {
       const meResponse = await fetch("/api/auth/me", { credentials: "same-origin" });
@@ -304,7 +326,9 @@ module.exports = async function automationFlowSmoke() {
     await webPage.getByRole("button", { name: "Przejdź do panelu" }).click();
     const operatorLoginResponse = await operatorLoginPromise;
     assert.equal(operatorLoginResponse.status(), 201, "real UI should authenticate the synthetic operator");
-    await webPage.locator(".topbar-user").filter({ hasText: "Operator" }).waitFor({ state: "attached", timeout: 30_000 });
+    await webPage.getByRole("heading", { name: "Zaloguj się" }).waitFor({ state: "hidden", timeout: 30_000 });
+    await webPage.goto(`${webOrigin}/dashboard`, { waitUntil: "domcontentloaded" });
+    await webPage.locator(".lead-role-pill").filter({ hasText: "Pracownik" }).first().waitFor({ state: "visible", timeout: 30_000 });
     const operatorSession = await webPage.evaluate(async () => (await (await fetch("/api/auth/me", { credentials: "same-origin" })).json()));
     assert.equal(operatorSession.role, "operator", "real UI session should carry the operator role");
     assert.equal(await webPage.getByRole("link", { name: "Administracja" }).count(), 0,
@@ -346,6 +370,7 @@ module.exports = async function automationFlowSmoke() {
     await webPage.getByRole("alert").filter({ hasText: "Twoja rola nie ma dostępu do dziennika audytu." }).waitFor({ timeout: 30_000 });
     const roleLabels = { manager: "Menedżer", reviewer: "Recenzent", auditor: "Audytor" };
     for (const account of additionalRoleAccounts) {
+      currentScenario = `browser-role-${account.role}`;
       const uiRoleLogoutStatus = await webPage.evaluate(async () => {
         const me = await (await fetch("/api/auth/me", { credentials: "same-origin" })).json();
         return (await fetch("/api/auth/logout", {
@@ -358,9 +383,14 @@ module.exports = async function automationFlowSmoke() {
       await webPage.getByLabel("Użytkownik").fill(account.username);
       await webPage.getByLabel("Hasło").fill(account.password);
       const roleLoginPromise = webPage.waitForResponse((response) => new URL(response.url()).pathname === "/api/auth/login", { timeout: 30_000 });
+      const landingAuditResponse = account.role === "auditor"
+        ? webPage.waitForResponse((response) => new URL(response.url()).pathname === "/api/audit/events" && response.status() === 200, { timeout: 30_000 })
+        : null;
       await webPage.getByRole("button", { name: "Przejdź do panelu" }).click();
       const roleLoginResponse = await roleLoginPromise;
       assert.equal(roleLoginResponse.status(), 201, `real UI should authenticate ${account.role}`);
+      const landingPath = account.role === "auditor" ? "/audit" : account.role === "reviewer" ? "/review" : "/dashboard";
+      await webPage.waitForURL((url) => url.pathname === landingPath, { waitUntil: "domcontentloaded", timeout: 30_000 });
       await webPage.locator(".lead-role-pill").filter({ hasText: roleLabels[account.role] }).first().waitFor({ state: "attached", timeout: 30_000 });
       const roleSession = await webPage.evaluate(async () => (await (await fetch("/api/auth/me", { credentials: "same-origin" })).json()));
       assert.equal(roleSession.role, account.role, `real UI session should carry the ${account.role} role`);
@@ -368,8 +398,8 @@ module.exports = async function automationFlowSmoke() {
         `${account.role} navigation must not expose the admin link`);
       assert.ok(await webPage.getByRole("link", { name: "Dziennik aktywności" }).count() >= 1,
         `${account.role} navigation should expose its permitted audit link`);
-      const auditResponsePromise = webPage.waitForResponse((response) => new URL(response.url()).pathname === "/api/audit/events", { timeout: 30_000 });
-      await webPage.getByRole("link", { name: "Dziennik aktywności" }).first().click();
+      const auditResponsePromise = landingAuditResponse ?? webPage.waitForResponse((response) => new URL(response.url()).pathname === "/api/audit/events", { timeout: 30_000 });
+      if (!landingAuditResponse) await webPage.getByRole("link", { name: "Dziennik aktywności" }).first().click();
       await webPage.getByRole("heading", { name: "Dziennik audytu" }).waitFor({ timeout: 30_000 });
       const auditResponse = await auditResponsePromise;
       assert.equal(auditResponse.status(), 200, `${account.role} must be allowed to read audit events`);
@@ -418,6 +448,7 @@ module.exports = async function automationFlowSmoke() {
       currentScenario = scenario;
       const priorCounts = { ...counts };
       const priorSms = observedSmsSubmissions; const priorResends = observedResends;
+      const priorPzuEntries = observedPzuEntries;
       for (const portal of ["pzu", "compensa"]) await (await browser.page(portal)).goto(config[portal].entryUrl);
       const batchId = randomUUID(); const sourceRowId = randomUUID(); const createdAt = new Date();
       await models.ImportBatch.create({ id: batchId, tenantId: tenant.tenantId, ownerUserId: userId, toolId: "oc-policy-verification",
@@ -480,7 +511,8 @@ module.exports = async function automationFlowSmoke() {
               const next = await readChallenge(); return next && next.challengeId !== oldId ? next : null;
             }, "SMS_REJECTED_RESEND_HANDOFF");
             assert.equal(challenge.reasonCode, "SMS_REQUIRED");
-            assert.equal(observedResends - priorResends, 1);
+            assert.equal(observedResends - priorResends, 0, "explicit retry must not resend through the stale MFA document");
+            assert.equal(observedPzuEntries - priorPzuEntries, 2, "initial entry plus one fresh outer session");
             assert.equal((await fetch(`${origin}/api/auth-challenges/${oldId}/code`, { method: "POST", headers, body: JSON.stringify({ runId, code: "654321" }) })).status, 409);
           }
         }
@@ -500,7 +532,8 @@ module.exports = async function automationFlowSmoke() {
           const resumed = await fetch(`${origin}/api/runs/${runId}/resume-auth`, { method: "POST", headers, body: "{}" });
           assert.equal(resumed.status, 201);
           challenge = await waitUntil(readChallenge, "SMS_RETRY_CHALLENGE"); assert.notEqual(challenge.challengeId, expiredId);
-          assert.equal(observedResends - priorResends, 1);
+          assert.equal(observedResends - priorResends, 0);
+          assert.equal(observedPzuEntries - priorPzuEntries, 2);
           const stale = await fetch(`${origin}/api/auth-challenges/${expiredId}/code`, { method: "POST", headers, body: JSON.stringify({ runId, code: "654321" }) });
           assert.ok([409, 410].includes(stale.status));
           if (scenario === "sms_retry_limit") {
@@ -510,11 +543,13 @@ module.exports = async function automationFlowSmoke() {
             assert.equal(secondRetry.status, 201);
             challenge = await waitUntil(readChallenge, "SMS_SECOND_RETRY_CHALLENGE");
             assert.notEqual(challenge.challengeId, secondExpiredId);
-            assert.equal(observedResends - priorResends, 2);
+            assert.equal(observedResends - priorResends, 0);
+            assert.equal(observedPzuEntries - priorPzuEntries, 3);
             await expireChallenge(challenge);
             const overLimit = await fetch(`${origin}/api/runs/${runId}/resume-auth`, { method: "POST", headers, body: "{}" });
             assert.equal(overLimit.status, 409);
-            assert.equal(observedResends - priorResends, 2);
+            assert.equal(observedResends - priorResends, 0);
+            assert.equal(observedPzuEntries - priorPzuEntries, 3, "over-limit retry cannot open another session");
           }
         }
         if (scenario !== "sms_retry_limit") {
@@ -562,7 +597,7 @@ module.exports = async function automationFlowSmoke() {
           try {
             const skippedPage = await skippedContext.newPage();
             await skippedPage.goto(`${webOrigin}/runs/${runId}`);
-            await skippedPage.getByRole("heading", { name: "Wiersz 2: Pominięto", exact: true }).waitFor({ timeout: 30000 });
+            await skippedPage.getByRole("heading", { name: /Wiersz 2.*Pominięto/ }).waitFor({ timeout: 30000 });
             await skippedPage.getByText("Data odniesienia:", { exact: false }).filter({ hasText: "Pominięto — Compensa wymaga dodatkowych danych ubezpieczającego" }).waitFor();
           } finally { await skippedContext.close(); }
         }
@@ -596,11 +631,16 @@ module.exports = async function automationFlowSmoke() {
       }
       console.log(`AUTOMATION_FLOW_SCENARIO_PASS scenario=${scenario} realHTTP=true realQueue=true productionProcessor=true realDB=true browser=fixture`);
     }
-    console.log("AUTOMATION_FLOW_SMOKE_PASS payerSkipContinues=true incompleteCustomerStopsRow=true skippedUI=true authenticated=true smsPlatformHandoff=true rejectedReentry=true rejectedResend=true concurrentResendFenced=true timeoutResume=true resendLimit=one knownAd=true notFoundStopsCompensa=true xlsx=true livePortals=false modalUI=true realFrontendApi=true");
+    console.log("AUTOMATION_FLOW_SMOKE_PASS payerSkipContinues=true incompleteCustomerStopsRow=true skippedUI=true authenticated=true smsPlatformHandoff=true rejectedReentry=true freshMfaRetry=true concurrentRetryFenced=true timeoutResume=true retryLimit=two staleIframeResends=zero knownAd=true notFoundStopsCompensa=true xlsx=true livePortals=false modalUI=true realFrontendApi=true");
   } catch (error) {
     console.error("AUTOMATION_FLOW_CASE_FAILED", currentScenario, error.message);
+    if (webPage && !webPage.isClosed()) console.error("AUTOMATION_FIXTURE_UI_STATE", JSON.stringify({
+      url: webPage.url(), headings: await webPage.locator("h1,h2,h3").allTextContents().catch(() => []),
+      alerts: await webPage.getByRole("alert").allTextContents().catch(() => []),
+    }));
     throw error;
   } finally {
+    if (fixtureHeartbeat) clearInterval(fixtureHeartbeat);
     shutdown.abort();
     if (webBrowser) await webBrowser.close();
     if (webServer && webServer.exitCode === null) {

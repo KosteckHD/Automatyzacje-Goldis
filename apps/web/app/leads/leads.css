@@ -79,7 +79,7 @@
 .lead-panel>p:not(.lead-overline), .lead-allocation>div>p:last-child { margin: 0; color: var(--lead-muted); font-size: .79rem; line-height: 1.5; }
 .lead-allocation { display: grid; grid-template-columns: minmax(230px, .8fr) minmax(480px, 1.2fr); align-items: center; gap: 30px; margin: 0 0 20px; border-color: #51472e; background: linear-gradient(110deg, #17150f, var(--lead-panel) 46%); }
 .lead-allocation .lead-overline { color: var(--lead-gold); }
-.lead-allocation form { display: flex; align-items: flex-end; gap: 10px; }
+.lead-allocation form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(90px, .5fr) auto; align-items: end; gap: 10px; }
 .lead-allocation-availability { margin: 12px 0 5px !important; color: var(--lead-gold-bright) !important; font-size: .72rem !important; font-variant-numeric: tabular-nums; }
 .lead-allocation-refresh { min-height: 32px; padding: 5px 0; border: 0; background: transparent; color: var(--lead-muted); font: inherit; font-size: .7rem; text-align: left; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .lead-allocation-refresh:disabled { opacity: .55; cursor: wait; }
@@ -183,10 +183,13 @@
 .lead-source-list strong { color: var(--lead-text); font-size: .79rem; }
 .lead-source-list p, .lead-source-list small { margin: 0; color: var(--lead-muted); font-size: .7rem; line-height: 1.45; overflow-wrap: anywhere; }
 .lead-row-number { color: var(--lead-gold); font: 500 .61rem var(--font-data), monospace; letter-spacing: .08em; }
-.lead-auth-required { display: grid; min-height: 100vh; align-content: center; justify-items: center; gap: 12px; padding: 24px; background: #09090d; color: #f2eee5; text-align: center; }
+.lead-auth-required { --lead-gold: #d9b65f; --lead-gold-bright: #f2d889; display: grid; min-height: 100vh; align-content: center; justify-items: center; gap: 12px; padding: 24px; background: #09090d; color: #f2eee5; text-align: center; }
 .lead-auth-required .lead-brand { margin: 0; padding: 0; border: 0; color: #f2eee5; font-size: .9rem; font-weight: 750; letter-spacing: .12em; }
 .lead-auth-required h1 { max-width: 15ch; margin: 10px 0 0; font: 450 2.3rem/1.1 var(--font-display), Georgia, serif; }
 .lead-auth-required p { margin: 0 0 8px; color: #aaa69c; font-size: .84rem; }
+.lead-auth-required .lead-primary { max-width: 100%; min-height: 48px; padding: 12px 18px; border-color: #d9b65f; background: #d9b65f; color: #17130b; font-size: 1rem; line-height: 1.35; }
+.lead-auth-required .lead-primary:hover { border-color: #f2d889; background: #f2d889; color: #17130b; }
+.lead-auth-required .lead-primary:focus-visible { outline: 2px solid #f2d889; outline-offset: 3px; }
 
 @media (max-width: 1050px) {
   .lead-app-shell { grid-template-columns: 258px minmax(0, 1fr); }

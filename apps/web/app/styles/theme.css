@@ -1,5 +1,5 @@
 /* Goldis visual system. Imported after the legacy screen styles to keep this layer authoritative. */
-html { color-scheme: dark; background: var(--color-bg); scroll-behavior: smooth; }
+html { color-scheme: light; background: var(--color-bg); scroll-behavior: smooth; }
 body {
   min-height: 100vh;
   margin: 0;
@@ -178,19 +178,22 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--color-gold); }
 .manual-data-form { border-top-color: #66532e; }
 
 /* Login and SMS modal */
-.login-shell { min-height: 100svh; grid-template-columns: minmax(0, 1.22fr) minmax(340px, .78fr); background: var(--color-bg); }
-.login-intro { min-width: 0; border-right: 1px solid var(--color-border); background: var(--color-brand-bg); color: var(--color-text); padding: clamp(28px, 5vw, 76px); }
-.login-intro .goldis-logo { margin-bottom: 24px; }
+.login-shell { min-height: 100svh; grid-template-columns: minmax(0, 1.1fr) minmax(380px, .9fr); background: #0b0b10; }
+.login-intro { min-width: 0; border-right: 1px solid #323037; background: #101015; color: var(--color-text); padding: clamp(32px, 6vw, 96px); }
+.login-intro .goldis-logo { margin-bottom: 18px; background: transparent; }
+.login-intro .goldis-logo img { mix-blend-mode: lighten; }
 .login-intro .eyebrow { color: var(--color-gold); }
-.login-intro h1 { max-width: 690px; font-size: clamp(2.65rem, 5vw, 5rem); }
-.login-intro>p:not(.eyebrow) { max-width: 540px; color: var(--color-text-muted); line-height: 1.7; }
+.login-intro h1 { max-width: 580px; font-family: var(--font-body), Arial, sans-serif; font-size: clamp(2.3rem, 3.7vw, 3.6rem); font-weight: 700; line-height: 1.12; letter-spacing: -.025em; }
+.login-intro>p:not(.eyebrow) { max-width: 540px; color: #bdb9b0; font-size: 1.05rem; line-height: 1.6; }
 .login-rail { gap: 12px 21px; color: var(--color-text-muted); font-family: var(--font-data), Consolas, monospace; }
-.login-card { width: min(430px, calc(100% - 48px)); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); padding: clamp(25px, 3vw, 38px); }
+.login-card { width: min(450px, calc(100% - 48px)); border: 1px solid #3f3c42; border-radius: 12px; background: #15151b; padding: clamp(28px, 3.5vw, 44px); box-shadow: 0 16px 48px #0003; }
 .login-card h2 { margin-bottom: 25px; font-size: 2rem; }
-.login-card label { color: var(--color-text); }
+.login-card label { color: var(--color-text); font-size: .95rem; }
+.login-card input { min-height: 48px; font-size: 1rem; }
 .login-card form { gap: 18px; }
 .login-card button { min-height: 46px; margin-top: 5px; }
-.login-help { margin: 0; color: var(--color-text-muted); font-size: .875rem; line-height: 1.5; }
+.login-help { margin: 0; color: #bdb9b0; font-size: .875rem; line-height: 1.5; }
+.login-help a { color: #f2d889; }
 .sms-modal-backdrop { background: #03010de0; backdrop-filter: blur(5px); }
 .sms-modal { border: 1px solid #66532e; border-radius: var(--radius-modal); background: var(--color-surface); color: var(--color-text); box-shadow: 0 24px 70px #000a; }
 .sms-modal-close { color: var(--color-text-muted); }

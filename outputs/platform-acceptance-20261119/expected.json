@@ -1,0 +1,16 @@
+{
+  "period": [
+    "2026-11-01",
+    "2026-11-30"
+  ],
+  "uniqueCrmPoliciesInPeriod": 5,
+  "duplicateCrmRows": 1,
+  "excludedCrmDate": "2026-10-31",
+  "correctRatePolicy": "22014-0001001",
+  "wrongRatePolicy": "22014-0001002",
+  "missingReportPolicy": "22014-0001003",
+  "unknownRiskPolicy": "22014-0001004",
+  "wartaRequiresRateReview": true,
+  "reportOnlyPolicy": "0001999",
+  "allRatesSynthetic": 15
+}

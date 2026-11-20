@@ -190,14 +190,26 @@ export class RunResumeService {
         );
       }
       const now = new Date();
+      const pzuSessionRecheck = portalRecheck && incident.portal !== "compensa";
       const next =
         incident.fieldCode === "EXPECTED_PERSON"
           ? "everest_search"
-          : incident.portal === "pzu"
+          : incident.portal === "pzu" || pzuSessionRecheck
             ? "pzu_login"
             : "compensa_login";
       if (incident.fieldCode === "EXPECTED_PERSON" && (current.lastSafeStep || current.externalCaseRef)) {
         throw new ConflictException("Nie można zmienić osoby po rozpoczęciu oferty");
+      }
+      if (pzuSessionRecheck) {
+        if (current.executionId || current.leaseExpiresAt
+          || await this.repository.findActiveAuthChallenge(runId, transaction)) {
+          throw new ConflictException("Najpierw musi zakończyć się poprzednia próba logowania i przekazywania kodu");
+        }
+        current.currentAuthChallengeId = null;
+        current.authCycleId = null;
+        current.authCyclePortal = null;
+        current.authCycleStartedAt = null;
+        current.authCycleExpiresAt = null;
       }
       current.status = next;
       current.currentStep = next;

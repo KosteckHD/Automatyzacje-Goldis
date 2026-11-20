@@ -169,7 +169,17 @@ export class PortalSession {
     try {
       await this.options.beforeAction?.();
       await page.goto(this.options.entryUrl, { waitUntil: "domcontentloaded" });
-      return this.readState(page);
+      const state = await this.ensureAuthenticated();
+      if (this.portal === "pzu" && state === "unknown"
+        && await page.getByRole("heading", { name: "Przetwarzanie w toku dla Twojej bieżącej sesji.", exact: true }).isVisible()) {
+        // This is the portal's stalled access-policy page, not a pending SMS.
+        // A single explicit retry gets a fresh F5 session and keeps the device token.
+        await this.options.beforeAction?.();
+        await this.browser.clearStalledPzuAccessSession();
+        await page.goto(this.options.entryUrl, { waitUntil: "domcontentloaded" });
+        return this.ensureAuthenticated();
+      }
+      return state;
     } catch { return "navigation_error"; }
   }
 
@@ -205,42 +215,52 @@ export class PortalSession {
   async submitSmsCode(code: Buffer, expiresAt?: Date): Promise<SmsSubmissionResult> {
     const selectors = this.options.selectors;
     let filledInput: Locator | null = null;
+    let phase = "validate_code";
+    let outcome: SmsSubmissionResult = "uncertain";
+    const finish = (value: SmsSubmissionResult) => { outcome = value; return value; };
     try {
-      if (!Buffer.isBuffer(code) || !/^\d{4,10}$/.test(code.toString("ascii"))) return "uncertain";
-      if (expiresAt && (!Number.isFinite(expiresAt.getTime()) || Date.now() >= expiresAt.getTime())) return "expired";
+      if (!Buffer.isBuffer(code) || !/^\d{4,10}$/.test(code.toString("ascii"))) return finish("uncertain");
+      if (expiresAt && (!Number.isFinite(expiresAt.getTime()) || Date.now() >= expiresAt.getTime())) return finish("expired");
+      phase = "read_session";
       const state = await this.ensureAuthenticated();
-      if (state === "access_denied" || state === "navigation_error" || state === "login_required") return "session_lost";
-      if (state !== "waiting_for_sms") return "uncertain";
-      if (!selectors.smsCodeInput || !selectors.smsCodeSubmit) return "uncertain";
+      if (state === "access_denied" || state === "navigation_error" || state === "login_required") return finish("session_lost");
+      if (state !== "waiting_for_sms") return finish("uncertain");
+      if (!selectors.smsCodeInput || !selectors.smsCodeSubmit) return finish("uncertain");
 
       const page = await this.browser.page(this.portal);
-      if (selectors.smsCodeExpired && await this.isVisibleInSmsFrame(page, selectors.smsCodeExpired)) return "expired";
+      if (selectors.smsCodeExpired && await this.isVisibleInSmsFrame(page, selectors.smsCodeExpired)) return finish("expired");
       if (this.portal === "pzu" && selectors.smsRememberDevice) {
         const rememberMatches = this.smsLocators(page, selectors.smsRememberDevice);
-        if (await rememberMatches.count() > 1) return "uncertain";
+        if (await rememberMatches.count() > 1) return finish("uncertain");
         const remember = rememberMatches.first();
         if (await remember.isVisible()) {
           if (await remember.evaluate((element) => element.tagName.toLowerCase()) !== "input"
-            || await remember.getAttribute("type") !== "checkbox") return "uncertain";
+            || await remember.getAttribute("type") !== "checkbox") return finish("uncertain");
           await this.options.beforeAction?.();
+          phase = "remember_device";
           await remember.check();
         }
       }
       const input = this.smsLocators(page, selectors.smsCodeInput);
-      if (await input.count() !== 1 || !await input.isVisible() || !await input.isEnabled()) return "uncertain";
+      if (await input.count() !== 1 || !await input.isVisible() || !await input.isEnabled()) return finish("uncertain");
       await this.options.beforeAction?.();
-      if (expiresAt && Date.now() >= expiresAt.getTime()) return "expired";
+      if (expiresAt && Date.now() >= expiresAt.getTime()) return finish("expired");
+      phase = "fill_code";
       await input.fill(code.toString("ascii"));
       filledInput = input;
       const submit = this.smsLocators(page, selectors.smsCodeSubmit);
-      if (await submit.count() !== 1 || !await submit.first().isVisible() || !await submit.isEnabled()) return "uncertain";
+      if (await submit.count() !== 1 || !await submit.first().isVisible() || !await submit.isEnabled()) return finish("uncertain");
       await this.options.beforeAction?.();
-      if (expiresAt && Date.now() >= expiresAt.getTime()) return "expired";
+      if (expiresAt && Date.now() >= expiresAt.getTime()) return finish("expired");
+      phase = "submit_code";
       await submit.click();
-      return await this.waitForSmsSubmission(page);
+      phase = "wait_for_outcome";
+      return finish(await this.waitForSmsSubmission(page));
     } catch {
-      return "uncertain";
+      return finish("uncertain");
     } finally {
+      console.warn("PORTAL_SMS_SUBMISSION", JSON.stringify({ portal: this.portal, phase, outcome,
+        navigation: this.browser.navigationDiagnostics?.(this.portal) }));
       if (Buffer.isBuffer(code)) code.fill(0);
       if (filledInput) {
         try {
@@ -331,7 +351,10 @@ export class PortalSession {
     } catch {
       return "navigation_error";
     }
-    if (await this.isVisible(page, this.options.selectors.accessDenied)) return "access_denied";
+    // Some SSO/proxy errors use this standard heading instead of the portal's
+    // configured "Access denied" marker. Never treat that page as a login form.
+    if (await page.getByRole("heading", { name: "403 Forbidden", exact: true }).isVisible().catch(() => false)
+      || await this.isVisible(page, this.options.selectors.accessDenied)) return "access_denied";
     await this.dismissKnownNotice(page);
     if (allowLandingRedirect && this.options.selectors.postLoginLanding
       && await this.isVisible(page, this.options.selectors.postLoginLanding)) {

@@ -26,6 +26,30 @@ export class BrowserSession {
   private profileLockPath: string | null = null;
   private navigationPolicy: Readonly<Record<Portal, PortalNavigationPolicy>> | null = null;
   private readonly blockedNavigation = new Set<Portal>();
+  private readonly navigationTrace = new Map<Portal, Array<{ kind: string; origin: string; path: string; status?: number }>>();
+
+  /** Bounded authentication diagnostics: no query strings, headers, bodies or identifiers. */
+  navigationDiagnostics(portal: Portal) {
+    return { blocked: this.blockedNavigation.has(portal), events: [...(this.navigationTrace.get(portal) ?? [])] };
+  }
+
+  /** Refresh only the stalled F5 access-policy session; retain remembered MFA devices. */
+  async clearStalledPzuAccessSession(): Promise<void> {
+    const context = await this.open();
+    await context.clearCookies({ name: /^(MRHSession|LastMRH_Session)$/,
+      domain: /^\.?(?:zaloguj\.)?pzu\.pl$/ });
+  }
+
+  private traceNavigation(portal: Portal, kind: string, target: string, status?: number): void {
+    try {
+      const url = new URL(target);
+      const knownPaths = ["/my.policy", "/pc/PolicyCenter.do", "/internalauth/authenticate/sms", "/", "/my.logout.php3"];
+      const events = this.navigationTrace.get(portal) ?? [];
+      events.push({ kind, origin: url.origin, path: knownPaths.includes(url.pathname) ? url.pathname : "<other>",
+        ...(status === undefined ? {} : { status }) });
+      this.navigationTrace.set(portal, events.slice(-12));
+    } catch { /* Invalid URLs never enter diagnostics. */ }
+  }
 
   configureNavigationPolicy(policy: Readonly<Record<Portal, PortalNavigationPolicy>>): void {
     if (this.context || this.opening || this.navigationPolicy) throw new Error("PORTAL_NAVIGATION_POLICY_ALREADY_SET");
@@ -144,9 +168,10 @@ export class BrowserSession {
         } catch { return route.abort("blockedbyclient"); }
         const owner = [...this.pages].find(([, page]) => page === targetPage)?.[0];
         if (!owner || !isAllowedPortalNavigation(this.navigationPolicy![owner], request.url())) {
-          if (owner) this.blockedNavigation.add(owner);
+          if (owner) { this.blockedNavigation.add(owner); this.traceNavigation(owner, "blocked", request.url()); }
           return route.abort("blockedbyclient");
         }
+        this.traceNavigation(owner, "navigation", request.url());
         return route.fallback();
       });
     }
@@ -159,6 +184,13 @@ export class BrowserSession {
     if (previous && !previous.isClosed()) return previous;
     const page = await context.newPage();
     this.pages.set(portal, page);
+    page.on("response", response => {
+      try {
+        if (response.request().isNavigationRequest() && response.frame() === page.mainFrame()) {
+          this.traceNavigation(portal, "response", response.url(), response.status());
+        }
+      } catch { /* Detached frames have no useful diagnostic. */ }
+    });
     if (this.navigationPolicy) page.on("popup", popup => {
       this.blockedNavigation.add(portal);
       void popup.close().catch(() => undefined);

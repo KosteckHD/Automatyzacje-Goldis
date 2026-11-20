@@ -37,7 +37,8 @@ Pierwsze i późniejsze kody operator wpisuje do centrum interwencji. Platforma 
 
 ## Zatwierdzona pozytywna ścieżka
 
-- W Everest wyszukiwany jest `effectiveRegon`; PESEL pochodzi bezpośrednio z kolumny PESEL/REGON w wierszu typu **„Osoba fizyczna”**. Nie wybierać PESEL-u z wiersza działalności i nie otwierać szczegółów konta jako zastępstwa. Niejednoznaczność osoby/fimy zatrzymuje zadanie przed Compensą.
+- W Everest wyszukiwany jest `effectiveRegon`; pierwszeństwo ma PESEL z kolumny PESEL/REGON w wierszu typu **„Osoba fizyczna”**. Gdy takiego wiersza nie ma, dopuszczony jest PESEL z wiersza **„Osoba fizyczna prowadząca działalność gospodarczą”**, po tych samych kontrolach poprawności PESEL-u, zgodności danych i jednoznaczności. To doprecyzowanie użytkownika z 13 listopada 2026 zastępuje wcześniejszy zakaz używania wiersza działalności. Nie otwierać szczegółów konta jako zastępstwa. Niejednoznaczność osoby/firmy zatrzymuje zadanie przed Compensą.
+- Osobna ścieżka **Firma** wymaga zgodnego REGON-u w zwróconym wierszu i zgodnej nazwy firmy; przekazuje do Compensy REGON, bez PESEL-u i danych osoby.
 - W Compensie automatyzacja otwiera z homepage kafelek **Compensa Komunikacja**, wybiera **Ubezpieczający**, przekazuje PESEL z tego samego runu i skonfigurowany numer wyszukiwania **RST22339**.
 - Po uzgodnieniu danych zapisuje ten sam szkic/ofertę, weryfikuje ją w UFG, otwiera **Szczegóły** i odczytuje kompletną tabelę polis OC. Eksport powstaje z trwałego snapshotu DB i zapisanej `referenceDate`.
 

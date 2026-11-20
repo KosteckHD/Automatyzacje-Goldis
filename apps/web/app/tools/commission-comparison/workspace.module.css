@@ -28,8 +28,8 @@
 .sectionHeading p { max-width: 76ch; margin: 0; color: var(--lead-muted); font-size: .78rem; line-height: 1.5; }
 .sectionHeading>span { flex: 0 0 auto; padding-top: 3px; color: var(--lead-muted); font-size: .72rem; font-variant-numeric: tabular-nums; }
 .uploadGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
-.uploadSlot { position: relative; display: grid; min-height: 118px; align-content: center; gap: 7px; padding: 16px; border: 1px dashed #77716b; border-radius: 6px; background: #101014; cursor: pointer; }
-.uploadSlot:hover { border-color: var(--lead-gold); background: #16140f; }
+.uploadSlot { position: relative; display: grid; min-height: 118px; align-content: center; gap: 7px; padding: 16px; border: 1px dashed #9b9488; border-radius: 6px; background: #faf9f6; cursor: pointer; }
+.uploadSlot:hover { border-color: #936b20; background: #f4f2ed; }
 .uploadSlot strong { color: var(--lead-text); font-size: .84rem; }
 .uploadSlot>span { color: var(--lead-muted); font-size: .72rem; }
 .uploadSlot input, .importButton input { position: absolute; width: 1px; height: 1px; opacity: 0; }

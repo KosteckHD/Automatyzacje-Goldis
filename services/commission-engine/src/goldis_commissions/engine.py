@@ -176,7 +176,7 @@ def reverse_audit(crm, records, confirmed, begin, end):
         output.append(g)
     return {'crm_policies_all_dates':len(crm),'report_record_status_counts':dict(counts),
         'rows':sorted(output,key=lambda g:(g['insurer'],g['kind'],g['source_type'],g['number'])),
-        'note':'Sprawdzono cały dostarczony CRM, również poza 01.06–30.09.2026. Data umowy ASF nie jest datą wystawienia CRM; Warta nie podaje daty wystawienia. Grupy: TU, źródło i numer po normalizacji.'}
+        'note':f'Sprawdzono cały dostarczony CRM, również poza okresem {begin.isoformat()}–{end.isoformat()}. Data umowy ASF nie jest datą wystawienia CRM; Warta nie podaje daty wystawienia. Grupy: TU, źródło i numer po normalizacji.'}
 
 def create_preset(base):
     source = base/'TABELA PROWIZJI'/'PROPOZYCJA PROWIZJI.xlsx'

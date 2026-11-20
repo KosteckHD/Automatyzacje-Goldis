@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Pool, PoolClient } from "pg";
-import { AuthChallengeError, createAuthChallenge, fingerprintPortalAccount, invalidateStaleAuthChallenges, pauseExpiredAuthChallenge, recordAuthChallengeOutcome, reconcileAuthenticatedPortal, type AuthChallengeInput } from "./auth-challenges";
+import { AuthChallengeError, createAuthChallenge, fingerprintPortalAccount, invalidateStaleAuthChallenges, invalidateUncertainAuthChallenge, pauseExpiredAuthChallenge, recordAuthChallengeOutcome, reconcileAuthenticatedPortal, type AuthChallengeInput } from "./auth-challenges";
+import type { RunExecutionLease } from "../execution/execution-lease";
 
 const initial: AuthChallengeInput = {
   runId: "11111111-1111-4111-8111-111111111111",
@@ -12,6 +13,61 @@ const initial: AuthChallengeInput = {
   now: new Date("2026-09-30T10:00:00.000Z"),
   expiresAt: new Date("2026-09-30T10:05:00.000Z"),
 };
+
+for (const mutation of ["create", "expire", "uncertain", "accepted"] as const) {
+  for (const ownsLease of [false, true]) {
+    test(`SMS ${mutation} checks the locked execution before writes (owner=${ownsLease})`, async () => {
+      const challengeId = "33333333-3333-4333-8333-333333333333";
+      const lease: RunExecutionLease = {
+        runId: initial.runId, executionId: "44444444-4444-4444-8444-444444444444",
+        workerSessionId: initial.browserSessionId, dispatchId: "55555555-5555-4555-8555-555555555555",
+        intentType: "create", leaseExpiresAt: initial.expiresAt.toISOString(),
+      };
+      const statements: string[] = [];
+      let checked = false;
+      const client = {
+        query: async (sql: string, values?: unknown[]) => {
+          statements.push(sql);
+          if (sql.startsWith("SELECT status, current_auth_challenge_id FROM automation_runs")) {
+            return { rowCount: 1, rows: [{ status: mutation === "create" ? "pzu_login" : "waiting_for_sms", current_auth_challenge_id: challengeId }] };
+          }
+          if (sql.startsWith("SELECT id FROM automation_runs")) {
+            assert.match(sql, /execution_id = \$2 AND worker_session_id = \$3/);
+            assert.match(sql, /lease_expires_at > clock_timestamp\(\)/);
+            assert.match(sql, /control_state <> 'paused' FOR UPDATE/);
+            assert.deepEqual(values, [initial.runId, lease.executionId, lease.workerSessionId]);
+            checked = true;
+            return { rowCount: ownsLease ? 1 : 0, rows: ownsLease ? [{ id: initial.runId }] : [] };
+          }
+          if (/^(UPDATE|INSERT)/.test(sql)) assert.equal(checked, true, "no mutation before the transactional ownership check");
+          if (sql.startsWith("SELECT run_id FROM auth_challenges")) return { rowCount: 1, rows: [{ run_id: initial.runId }] };
+          if (sql.startsWith("SELECT COALESCE(MAX(attempt_count)")) return { rowCount: 1, rows: [{ attempt_count: 0 }] };
+          if (sql.includes("FROM auth_challenges WHERE challenge_id = $1 FOR UPDATE")) return {
+            rowCount: 1, rows: [{ run_id: initial.runId, portal: "pzu", return_step: "pzu_login",
+              status: mutation === "accepted" ? "submitted" : "active", attempt_count: 1, attempt_limit: 5,
+              expires_at: new Date(initial.now!.getTime() - 1000) }],
+          };
+          if (sql.startsWith("SELECT")) return { rowCount: 0, rows: [] };
+          return { rowCount: 1, rows: [] };
+        }, release() {},
+      };
+      const pool = { connect: async () => client } as unknown as Pool;
+      const execute = () => mutation === "create" ? createAuthChallenge(pool, { ...initial, lease })
+        : mutation === "expire" ? pauseExpiredAuthChallenge(pool, challengeId, initial.now, lease)
+        : mutation === "uncertain" ? invalidateUncertainAuthChallenge(pool, challengeId, initial.now, lease)
+        : recordAuthChallengeOutcome(pool, challengeId, "accepted", initial.now, lease);
+      if (ownsLease) {
+        await execute();
+        assert.equal(statements.at(-1), "COMMIT");
+        assert.equal(statements.some(sql => /^(UPDATE|INSERT)/.test(sql)), true);
+      } else {
+        await assert.rejects(execute, /RUN_EXECUTION_LEASE_LOST/);
+        assert.equal(statements.at(-1), "ROLLBACK");
+        assert.equal(statements.some(sql => /^(UPDATE|INSERT)/.test(sql)), false);
+      }
+    });
+  }
+}
 
 function makePool(options: { initialStatus?: string; rejectRunUpdate?: boolean; existing?: Record<string, unknown>; previousAttempts?: number } = {}) {
   let status = options.initialStatus ?? "pzu_login";

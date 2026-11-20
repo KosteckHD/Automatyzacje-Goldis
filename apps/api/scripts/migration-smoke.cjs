@@ -24,7 +24,7 @@ const databaseUrl = parsedUrl.toString();
 process.env.DATABASE_URL = databaseUrl;
 const currentSourceModes = ["snapshot", "evaluation", "export", "finalize", "download", "mfa", "registry", "corrections"];
 const tenantScopeModes = ["registry", "corrections", "enrichment", "groups", "grouping-perf", "users", "users-empty", "tenant-scope", "teams", "admin-users", "registry-jobs", "reports", "deletion", "backup-restore", "run-control", "commission"];
-const latestMigration = mode === "commission" ? 67 : tenantScopeModes.includes(mode) ? 66 : currentSourceModes.includes(mode) ? 12 : ["empty", "artifacts"].includes(mode) ? 9 : ["policies", "pesel"].includes(mode) ? 8 : 7;
+const latestMigration = tenantScopeModes.includes(mode) ? 67 : currentSourceModes.includes(mode) ? 12 : ["empty", "artifacts"].includes(mode) ? 9 : ["policies", "pesel"].includes(mode) ? 8 : 7;
 
 function createImportService() {
   const { ImportService } = require("../dist/features/imports/import.service");

@@ -231,6 +231,27 @@ module.exports = async function verifyRunControlDatabase(seed) {
     assert.equal(cancelled.status, "cancelled", "cancel can be retried after delivery has a durable outcome");
     assert.equal((await AuthChallenge.findByPk(challengeId)).status, "invalidated");
     assert.deepEqual(invalidatedChallenges, [resumeChallengeId, challengeId]);
+    // Closing an old login must release its source row, but never an active
+    // execution or a run that already owns a portal case.
+    await AutomationRun.update({ status: "waiting_for_manual_data", currentStep: "waiting_for_manual_data",
+      errorCode: "SMS_DELIVERY_UNCERTAIN", lastSafeStep: null, externalCaseRef: null,
+      executionId, workerSessionId, leaseExpiresAt: new Date(Date.now() + 60_000) }, { where: { id: runId } });
+    await assert.rejects(service.cancel(runId, actor), (error) => error?.getStatus?.() === 409);
+    await AutomationRun.update({ executionId: null, workerSessionId: null, leaseExpiresAt: null,
+      externalCaseRef: "synthetic-case" }, { where: { id: runId } });
+    await assert.rejects(service.cancel(runId, actor), (error) => error?.getStatus?.() === 409);
+    await AutomationRun.update({ externalCaseRef: null, lastSafeStep: "compensa_offer_draft_open" }, { where: { id: runId } });
+    await assert.rejects(service.cancel(runId, actor), (error) => error?.getStatus?.() === 409);
+    await AutomationRun.update({ lastSafeStep: null }, { where: { id: runId } });
+    await AuthChallenge.update({ status: "claimed" }, { where: { challengeId } });
+    await assert.rejects(service.cancel(runId, actor), (error) => error?.getStatus?.() === 409);
+    await AuthChallenge.update({ status: "expired" }, { where: { challengeId } });
+    await ManualIntervention.create({ interventionId: randomUUID(), tenantId: actor.tenantId, runId,
+      toolId: "oc-verification", kind: "sms", portal: "pzu", reasonCode: "SMS_DELIVERY_UNCERTAIN",
+      status: "open", createdAt: new Date(), updatedAt: new Date() });
+    assert.equal((await service.cancel(runId, actor)).status, "cancelled");
+    assert.equal(await ManualIntervention.count({ where: { runId, status: "open" } }), 0);
+    assert.equal((await service.cancel(runId, actor)).status, "cancelled", "closing old login is idempotent");
     console.log("RUN_CONTROL_DB_PASS apiRequest=true staleRevisionRejected=true idempotentReplay=true workerSafeAck=true leaseRelease=true sameRunResume=true smsRetryResume=true manualReviewResume=true noWorkerPause=true outboxCancelled=true orphanRecovery=true orphanRecoveryIdempotent=true orphanEscalation=true smsCancelRaceSafe=true terminalStagingReconcile=true");
   } finally {
     finishDelivery?.();

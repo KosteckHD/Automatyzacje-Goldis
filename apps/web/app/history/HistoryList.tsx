@@ -277,6 +277,12 @@ export default function HistoryList({ kind }: { kind: HistoryKind }) {
     writeUrl({ toolId, dataState, status, fromDay, toDay, cursor: null }, [null], 0);
   }
 
+  function clearFilters() {
+    setToolId(""); setDataState("all"); setStatus(""); setFromDay(""); setToDay("");
+    setCursor(null); setCursorStack([null]); cursorStackRef.current = [null]; setPageIndex(0);
+    writeUrl({ toolId: "", dataState: "all", status: "", fromDay: "", toDay: "", cursor: null }, [null], 0);
+  }
+
   function nextPage() {
     if (!nextCursor) return;
     const next = [...cursorStack.slice(0, pageIndex + 1), nextCursor];
@@ -427,7 +433,7 @@ export default function HistoryList({ kind }: { kind: HistoryKind }) {
         </section>}
         {error && <p className="history-error" role="alert">{error}</p>}
         {loading && <p className="history-notice" role="status">Ładowanie historii…</p>}
-        {!loading && !error && empty && <section className="history-empty"><h2>Brak pozycji dla tych filtrów</h2><p>Wyczyść filtr lub wykonaj nowy import w narzędziu OC.</p><a href="/tools/oc-policy-verification">Otwórz narzędzie OC</a></section>}
+        {!loading && !error && empty && <section className="history-empty"><h2>Brak pozycji dla tych filtrów</h2><p>Zmień zakres dat lub wyczyść filtry, aby sprawdzić inne pozycje.</p><button type="button" className="history-clear" onClick={clearFilters}>Wyczyść filtry</button> <a href="/tools/oc-policy-verification">Otwórz narzędzie OC</a></section>}
         {!loading && !error && items.length > 0 && <div className="history-list" aria-live="polite">{items.map((item) => {
           const moduleAvailable = item.toolId === "oc-policy-verification";
           const workspace = `/tools/oc-policy-verification?${new URLSearchParams({ ...(item.batchId ? { import: item.batchId } : { import: item.id }), ...(kind !== "imports" ? { run: item.id } : {}) })}`;

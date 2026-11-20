@@ -1,10 +1,16 @@
 from decimal import Decimal
+import datetime as dt
 import unittest
 
-from goldis_commissions.engine import alternative_keys, agent, brand, normalized_number, rate_status
+from goldis_commissions.engine import alternative_keys, agent, brand, normalized_number, rate_status, reverse_audit
 
 
 class EngineRulesTests(unittest.TestCase):
+    def test_reverse_audit_describes_the_selected_period(self):
+        result = reverse_audit([], [], {}, dt.date(2026, 11, 1), dt.date(2026, 11, 30))
+        self.assertIn("2026-11-01–2026-11-30", result["note"])
+        self.assertNotIn("01.06", result["note"])
+
     def test_policy_number_rules_preserve_leading_zeroes(self):
         self.assertEqual(normalized_number("AGRO", "1002N01740628"), "01740628")
         self.assertEqual(normalized_number("COMPENSA", "22014-1849756"), "1849756")

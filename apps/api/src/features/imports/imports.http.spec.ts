@@ -207,6 +207,10 @@ test("PATCH /api/imports/:id/rows/:rowNumber wymaga CSRF i przekazuje autora z s
     });
     assert.equal(receivedCreate?.[1], tenantId);
     assert.equal(receivedCreate?.[2], userIds.operator);
+    const uploadedFile = receivedCreate?.[0] as Express.Multer.File | undefined;
+    assert.ok(uploadedFile, "multipart upload must reach the service as a file, not only return a mocked 201");
+    assert.equal(uploadedFile.originalname, "synthetic.xlsx");
+    assert.deepEqual(uploadedFile.buffer, Buffer.from("synthetic-only"));
 
     const importListUnauthenticated = await fetch(`http://127.0.0.1:${address.port}/api/imports`);
     assert.equal(importListUnauthenticated.status, 401);

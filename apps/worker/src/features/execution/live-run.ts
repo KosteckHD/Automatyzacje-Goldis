@@ -73,7 +73,7 @@ export class LiveRunProcessor {
       selectors: config.compensa.session,
       beforeAction: () => this.beforePortalAction("compensa"),
     });
-    const gates = new PgPortalActionGate(pool, () => this.beforePortalAction("compensa", true));
+    const gates = new PgPortalActionGate(pool, () => this.beforePortalAction("compensa", true), () => this.currentLease);
     const checkpoints = new PgCompensaOfferCheckpointStore(pool, () => new Date(), () => this.currentLease);
     this.everest = new EverestIdentityProvider(browser, this.pzuSession, {
       selectors: config.pzu.everest,
@@ -185,9 +185,11 @@ export class LiveRunProcessor {
         browserSessionId: this.dependencies.browser.sessionId,
         returnStep: portal === "pzu" ? "pzu_login" : "compensa_login",
         expiresAt,
+        lease: this.currentLease!,
       });
-    } catch {
+    } catch (error) {
       this.dependencies.inbox.invalidate(candidateId);
+      if (error instanceof Error && error.message === "RUN_EXECUTION_LEASE_LOST") throw error;
       throw new Error("AUTH_CHALLENGE_CREATE_FAILED");
     }
     if (challenge.challengeId !== candidateId) {
@@ -209,12 +211,12 @@ export class LiveRunProcessor {
         return false;
       }
       await this.assertLease();
-      if (await pauseExpiredAuthChallenge(this.dependencies.pool, challenge.challengeId)) return false;
+      if (await pauseExpiredAuthChallenge(this.dependencies.pool, challenge.challengeId, new Date(), this.currentLease!)) return false;
       const pending = await this.dependencies.pool.query<{ status: string }>(
         "SELECT status FROM automation_runs WHERE id = $1", [runId],
       );
       if (pending.rows[0]?.status === "waiting_for_sms") {
-        await invalidateUncertainAuthChallenge(this.dependencies.pool, challenge.challengeId);
+        await invalidateUncertainAuthChallenge(this.dependencies.pool, challenge.challengeId, new Date(), this.currentLease!);
       }
       return false;
     }
@@ -222,23 +224,23 @@ export class LiveRunProcessor {
       if (!await this.waitForSubmitted(challenge.challengeId, new Date(challenge.expiresAt), signal)) {
         if (signal?.aborted) return false;
         this.dependencies.inbox.invalidate(challenge.challengeId);
-        if (await pauseExpiredAuthChallenge(this.dependencies.pool, challenge.challengeId)) return false;
+        if (await pauseExpiredAuthChallenge(this.dependencies.pool, challenge.challengeId, new Date(), this.currentLease!)) return false;
         const pending = await this.dependencies.pool.query<{ status: string }>(
           "SELECT status FROM automation_runs WHERE id = $1", [runId],
         );
         if (pending.rows[0]?.status !== "waiting_for_sms") return false;
-        await invalidateUncertainAuthChallenge(this.dependencies.pool, challenge.challengeId);
+        await invalidateUncertainAuthChallenge(this.dependencies.pool, challenge.challengeId, new Date(), this.currentLease!);
         return false;
       }
       const session = portal === "pzu" ? this.pzuSession : this.compensaSession;
       await this.assertLease();
       const state = await session.submitSmsCode(code, new Date(challenge.expiresAt));
       if (state === "uncertain" || state === "session_lost") {
-        await invalidateUncertainAuthChallenge(this.dependencies.pool, challenge.challengeId);
+        await invalidateUncertainAuthChallenge(this.dependencies.pool, challenge.challengeId, new Date(), this.currentLease!);
         return false;
       }
       const outcome = await recordAuthChallengeOutcome(
-        this.dependencies.pool, challenge.challengeId, state,
+        this.dependencies.pool, challenge.challengeId, state, new Date(), this.currentLease!,
       );
       if (outcome.outcome === "attempt_limit_reached" || outcome.outcome === "expired") return false;
       // A recognized rejection opens a fresh one-time handoff inside the same MFA cycle.
@@ -319,14 +321,17 @@ export class LiveRunProcessor {
       // The intent limits entry, not subsequent stages of the same authenticated run.
       if (stage === 0 && intent === "resume_auth" && status !== "pzu_login" && status !== "compensa_login") return;
       if (["completed", "cancelled", "failed", "no_matching_policies", "identity_review", "waiting_for_manual_data"].includes(status)) return;
-      if (intent === "resume_auth" && (status === "pzu_login" || status === "compensa_login")
-        && (context.errorCode === "SMS_RETRY_QUEUED" || context.errorCode === "SMS_RETRY_REQUIRED")) {
+      if (stage === 0 && ((intent === "resume_auth" && (status === "pzu_login" || status === "compensa_login")
+        && (context.errorCode === "SMS_RETRY_QUEUED" || context.errorCode === "SMS_RETRY_REQUIRED"))
+        || (intent === "resume_review" && status === "pzu_login" && context.errorCode === "REVIEW_RETRY_QUEUED"))) {
         const portal: Portal = status === "pzu_login" ? "pzu" : "compensa";
         const session = portal === "pzu" ? this.pzuSession : this.compensaSession;
         await this.assertLease();
-        const resend = portal === "pzu" ? await session.resendSmsCodeIfAvailable() : "unavailable";
-        const reopened = resend === "unavailable" ? await session.reopenAfterSmsTimeout() : null;
-        if (resend === "error" || reopened === "waiting_for_sms" || reopened === "navigation_error"
+        // An expired MFA iframe can outlive the outer PZU/F5 login session.
+        // Restart the application entry before any new challenge so a code
+        // cannot be posted back through the stale parent document.
+        const reopened = await session.reopenAfterSmsTimeout();
+        if (reopened === "navigation_error"
           || reopened === "access_denied" || reopened === "unknown") {
           await this.repository.pauseForReview(runId, status, "waiting_for_manual_data", {
             portal, kind: "portal_error", reasonCode: "PORTAL_SESSION_EXPIRED",
@@ -334,7 +339,9 @@ export class LiveRunProcessor {
           return;
         }
         if (reopened === "login_required") session.resetLoginAttempt();
-        await this.repository.clearErrorCode(runId, status);
+        // The repository operation is fenced specifically to SMS retry codes.
+        // REVIEW_RETRY_QUEUED is cleared by the next normal state transition.
+        if (intent === "resume_auth") await this.repository.clearErrorCode(runId, status);
       }
       if (status === "awaiting_portal_adapter") {
         await this.move(runId, status, "pzu_login");

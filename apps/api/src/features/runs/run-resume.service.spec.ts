@@ -171,3 +171,76 @@ test("resumeReview requires the current manual correction and resumes at the ide
   assert.equal(calls.includes("event:manual_review_resumed"), true);
   assert.equal(calls.includes("publish-outbox"), true);
 });
+
+test("PZU session review starts a fresh login without reusing the invalidated MFA cycle", async () => {
+  const run = createRun({ status: "waiting_for_manual_data", errorCode: "SMS_DELIVERY_UNCERTAIN" });
+  const incident = { interventionId: "66666666-6666-4666-8666-666666666666",
+    kind: "sms", portal: "pzu", reasonCode: "SMS_DELIVERY_UNCERTAIN", fieldCode: null,
+    status: "open", revision: 1, assigneeUserId: null, priority: "normal" };
+  const { service, calls } = createService(run, incident);
+  const result = await service.resumeReview(runId, actor);
+  assert.equal(result.status, "pzu_login");
+  assert.equal(run.currentAuthChallengeId, null);
+  assert.equal(run.authCycleId, null);
+  assert.equal(run.authCycleExpiresAt, null);
+  assert.equal(run.pzuSmsRetryCount, 0, "session recheck does not request an additional SMS");
+  assert.equal(calls.includes(`dispatch:${runId}:resume_review`), true);
+  assert.equal(calls.some(call => call.startsWith("invalidate:")), false);
+});
+
+for (const status of ["active", "claimed", "submitted"] as const) {
+  test(`PZU session review refuses to replace a ${status} code handoff`, async () => {
+    const run = createRun({ status: "waiting_for_manual_data", errorCode: "SMS_DELIVERY_UNCERTAIN" });
+    const incident = { kind: "sms", portal: "pzu", reasonCode: "SMS_DELIVERY_UNCERTAIN", fieldCode: null };
+    const { service, calls } = createService(run, incident, { challengeId, status });
+    await assert.rejects(service.resumeReview(runId, actor));
+    assert.equal(calls.includes("save-run"), false);
+    assert.equal(calls.includes("publish-outbox"), false);
+  });
+}
+
+test("PZU session review cannot replace a worker execution or act for another run starter", async () => {
+  const incident = { kind: "sms", portal: "pzu", reasonCode: "SMS_DELIVERY_UNCERTAIN", fieldCode: null };
+  for (const patch of [
+    { executionId: "77777777-7777-4777-8777-777777777777" },
+    { leaseExpiresAt: new Date(Date.now() + 60_000) },
+    { startedByUserId: "88888888-8888-4888-8888-888888888888" },
+  ]) {
+    const run = createRun({ status: "waiting_for_manual_data", errorCode: "SMS_DELIVERY_UNCERTAIN", ...patch });
+    const { service, calls } = createService(run, incident);
+    await assert.rejects(service.resumeReview(runId, actor));
+    assert.equal(calls.includes("save-run"), false);
+  }
+});
+
+test("a reviewed technical failure without a case restarts PZU rather than guessing a Compensa checkpoint", async () => {
+  const run = createRun({ status: "waiting_for_manual_data", errorCode: "PORTAL_FAILURE" });
+  const incident = { interventionId: "66666666-6666-4666-8666-666666666666",
+    kind: "portal_error", portal: null, reasonCode: "PORTAL_FAILURE", fieldCode: null,
+    status: "open", revision: 1, assigneeUserId: null, priority: "normal" };
+  const { service, calls } = createService(run, incident);
+  const result = await service.resumeReview(runId, actor);
+  assert.equal(result.status, "pzu_login");
+  assert.equal(run.currentAuthChallengeId, null);
+  assert.equal(calls.includes(`dispatch:${runId}:resume_review`), true);
+});
+
+for (const reasonCode of ["PORTAL_FAILURE", "PORTAL_SESSION_EXPIRED", "PORTAL_SCHEMA_CHANGED"]) {
+  test(`reviewed PZU ${reasonCode} can start a fresh entry after the previous worker has stopped`, async () => {
+    const incident = { interventionId: "66666666-6666-4666-8666-666666666666", kind: "portal_error",
+      portal: "pzu", reasonCode, fieldCode: null, status: "open", revision: 1, assigneeUserId: null, priority: "normal" };
+    const run = createRun({ status: "waiting_for_manual_data", errorCode: reasonCode });
+    const { service, calls } = createService(run, incident);
+    const result = await service.resumeReview(runId, actor);
+    assert.equal(result.status, "pzu_login");
+    assert.equal(run.currentAuthChallengeId, null);
+    assert.equal(run.authCycleId, null);
+    assert.equal(calls.includes(`dispatch:${runId}:resume_review`), true);
+    for (const activeChallenge of [{ challengeId, status: "active" }, { challengeId, status: "submitted" }]) {
+      const blockedRun = createRun({ status: "waiting_for_manual_data", errorCode: reasonCode });
+      const blocked = createService(blockedRun, { ...incident, status: "open" }, activeChallenge);
+      await assert.rejects(blocked.service.resumeReview(runId, actor));
+      assert.equal(blocked.calls.includes("save-run"), false);
+    }
+  });
+}

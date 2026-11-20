@@ -1,6 +1,6 @@
 import { isValidPesel, type IdentityMatchV1 } from "@goldis/core";
 import { randomUUID } from "node:crypto";
-import type { Page } from "playwright";
+import type { Page, Response } from "playwright";
 import type { BrowserSession } from "../../infrastructure/browser/browser";
 import { PzuEverestSession, type PzuCredentials } from "./pzu-session";
 import type { IdentityLookupResult, IdentityProvider, WorkerRunContext } from "../../features/execution/ports";
@@ -85,6 +85,7 @@ export class EverestIdentityProvider implements IdentityProvider {
     const selectors = this.options.selectors;
     await this.dismissKnownOverlay(page);
     const searchToken = `__goldisSearch_${randomUUID().replace(/-/g, "")}`;
+    let responseListener: ((response: Response) => void) | undefined;
     try {
       if (selectors.searchNavigation) {
         await this.options.beforeAction?.();
@@ -114,7 +115,30 @@ export class EverestIdentityProvider implements IdentityProvider {
       await page.locator(selectors.noResults).evaluateAll((elements, token) => {
         (window as unknown as Record<string, { empty: Element[] }>)[token].empty = elements;
       }, searchToken);
+      // Guidewire can acknowledge a second empty search without changing the
+      // already-visible empty-result element. Correlate its exact button action
+      // and submitted REGON; an unrelated response cannot refresh old results.
+      const searchName = await search.getAttribute("name");
+      const searchUrl = new URL(page.url());
+      let emptyAcknowledgedAt = 0;
+      let submitted = false;
+      responseListener = response => {
+        void (async () => {
+          if (!submitted || !searchName || response.status() !== 200) return;
+          const request = response.request();
+          const target = new URL(response.url());
+          if (request.method() !== "POST" || target.origin !== searchUrl.origin || target.pathname !== searchUrl.pathname) return;
+          const body = request.postDataJSON() as Record<string, unknown>;
+          if (body?.[searchName] !== regon || body.eventSource !== `${searchName}_Button_act`) return;
+          const reply = await response.json() as { targets?: Array<{ id?: unknown; content?: unknown }> };
+          if (Array.isArray(reply.targets) && reply.targets.some(item => item.id === searchName && typeof item.content === "string")) {
+            emptyAcknowledgedAt = Date.now();
+          }
+        })().catch(() => undefined);
+      };
+      page.on("response", responseListener);
       await this.options.beforeAction?.();
+      submitted = true;
       await search.press("Enter");
       const timeout = this.options.resultTimeoutMs ?? 15_000;
       const freshRender = (elements: Element[], input: { token: string; kind: "rows" | "empty" }) => {
@@ -131,7 +155,11 @@ export class EverestIdentityProvider implements IdentityProvider {
           page.locator(selectors.noResults).evaluateAll(freshRender, { token: searchToken, kind: "empty" as const }),
         ]);
         const loading = selectors.searchLoading && await page.locator(selectors.searchLoading).first().isVisible();
-        if ((newRows || newEmpty) && !loading) { completed = true; break; }
+        const acknowledgedEmpty = emptyAcknowledgedAt > 0 && Date.now() - emptyAcknowledgedAt >= 200
+          && await page.locator(selectors.noResults).first().isVisible().catch(() => false)
+          && await page.locator(selectors.resultRows).filter({ visible: true }).count() === 0
+          && await search.getAttribute("aria-invalid") === "false" && await search.inputValue() === "";
+        if ((newRows || newEmpty || acknowledgedEmpty) && !loading) { completed = true; break; }
         await page.waitForTimeout(100);
       }
       if (!completed) throw new Error("EVEREST_SEARCH_RESULTS_UNAVAILABLE");
@@ -140,6 +168,7 @@ export class EverestIdentityProvider implements IdentityProvider {
       if (error instanceof Error && error.message === "EVEREST_OVERLAY_UNHANDLED") throw error;
       throw new Error("EVEREST_SEARCH_RESULTS_UNAVAILABLE");
     } finally {
+      if (responseListener) page.off("response", responseListener);
       await page.evaluate((token) => {
         const state = (window as unknown as Record<string, { observer?: MutationObserver }>)[token];
         state?.observer?.disconnect();
@@ -184,7 +213,9 @@ export class EverestIdentityProvider implements IdentityProvider {
         schemaVersion: 1, sourceRowId: context.source.id, regon, companyName: context.source.companyName,
         firstName: "", lastName: "", pesel: "", matchMethod: "regon_company", adapterVersion: this.options.adapterVersion,
       } };
-      persons = candidates.filter(candidate => candidate.kind === "business" || (candidate.kind === "company" && candidate.pesel));
+      // Prefer physical-person rows. With none present, an entrepreneur row
+      // can supply the PESEL subject to the same identity checks below.
+      persons = candidates.filter(candidate => candidate.kind === "business");
     }
     if (persons.length === 0 && candidates.every(candidate => candidate.kind === "other" || candidate.kind === "company")) {
       return { kind: "identity_review", reason: "unsupported_entity_type", candidateCount: candidates.length };

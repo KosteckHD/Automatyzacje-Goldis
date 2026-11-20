@@ -30,3 +30,20 @@
 .auth-recovery-back a:hover{text-decoration:underline}
 @media(max-width:760px){.auth-recovery-shell{grid-template-columns:1fr}.auth-recovery-brand{min-height:auto;padding:27px 25px 34px}.auth-recovery-brand:after{right:-150px;bottom:-210px;width:360px;height:360px}.auth-recovery-logo{margin-bottom:42px}.auth-recovery-brand h1{font-size:clamp(2.6rem,10vw,4.2rem)}.auth-recovery-brand>p:not(.eyebrow){margin-top:15px}.auth-recovery-rule{margin-top:33px}.auth-recovery-panel{width:min(460px,calc(100% - 42px));padding:38px 0 52px}}
 @media(prefers-reduced-motion:reduce){.auth-recovery-shell *{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Align account recovery with the Goldis operational interface. */
+.auth-recovery-shell { --recovery-ink: #111116; --recovery-paper: #f7f6f2; --recovery-rule: #d5d0c6; color: #25231e; }
+.auth-recovery-brand { background: #111116; }
+.auth-recovery-brand .eyebrow { color: #e5c578; }
+.auth-recovery-brand h1 em { color: #e5c578; }
+.auth-recovery-brand>p:not(.eyebrow), .auth-recovery-rule { color: #dedad1; }
+.auth-recovery-logo .goldis-logo { width: 72px; height: 72px; border-radius: 6px; background: #03010d; }
+.auth-recovery-logo .goldis-logo img { position: static; width: 72px; height: 72px; object-fit: cover; }
+.auth-recovery-panel h2 { color: #25231e; font-family: var(--font-body), Arial, sans-serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; }
+.auth-recovery-description, .auth-recovery-form small, .auth-recovery-muted { color: #5f5b52; }
+.auth-recovery-muted { background: #f4f2ed; border-color: #b9953c; }
+.auth-recovery-form label { color: #443f36; }
+.auth-recovery-form input { border-color: #9b9488; color: #25231e; }
+.auth-recovery-form button { background: #d9b65f; border-color: #b9953c; color: #17130b; }
+.auth-recovery-form button:hover:not(:disabled) { background: #e6c987; }
+.auth-recovery-back a, .auth-recovery-muted a { color: #755319; }

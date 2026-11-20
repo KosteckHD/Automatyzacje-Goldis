@@ -52,13 +52,18 @@ const reasons: Record<string, string> = {
   NAME_MISMATCH: "nazwa firmy wymaga sprawdzenia",
   SOURCE_LINK_MISMATCH: "powiązanie firmy wymaga sprawdzenia",
   ACTIVE_RUN_REFERENCE_DATE_MISMATCH: "aktywne zadanie ma inną datę odniesienia",
+  IDENTITY_NOT_FOUND: "brak dopasowania w PZU",
+  IDENTITY_PESEL_MISSING: "w PZU brakuje numeru PESEL",
+  COMPENSA_CUSTOMER_DATA_INCOMPLETE: "dane klienta w Compensie są niekompletne",
+  COMPENSA_PAYER_DATA_SKIPPED: "brak wymaganych danych płatnika — sprawdzanie pominięte",
+  MANUAL_DATA_REQUIRED: "sprawdź otwarte zgłoszenie przed wznowieniem",
 };
 const chunkStatusLabels: Record<string, string> = {
   queued: "w kolejce", submitting: "przekazywana", running: "w toku", waiting_attention: "wymaga uwagi",
   pause_requested: "wstrzymywanie", paused: "wstrzymana", completed: "zakończona", cancelled: "anulowana", failed: "błąd",
 };
 const submissionCountLabels: Record<string, string> = {
-  review: "Do kontroli", excluded: "Pominięte", waiting: "W kolejce", running: "W toku",
+  review: "Do kontroli", excluded: "Pominięte", skipped: "Pominięte: dane płatnika", waiting: "W kolejce", running: "W toku",
   waiting_attention: "Wymaga uwagi", completed: "Zakończone", no_matching_policies: "Bez pasujących polis",
   failed: "Błędy", cancelled: "Anulowane", blocked: "Zablokowane",
 };
@@ -67,6 +72,9 @@ const submissionItemStatusLabels: Record<string, string> = {
   waiting: "W kolejce", queued: "W kolejce", validating: "Sprawdzanie danych", running: "W toku",
   waiting_attention: "Wymaga uwagi", waiting_for_sms: "Oczekuje na kod SMS", completed: "Zakończono",
   no_matching_policies: "Brak pasujących polis", cancelled: "Anulowano", failed: "Błąd", blocked: "Zablokowany",
+  awaiting_portal_adapter: "Oczekuje na portale", pzu_login: "Logowanie do PZU", everest_search: "Wyszukiwanie w PZU",
+  compensa_login: "Logowanie do Compensy", compensa_form: "Formularz Compensy", ufg_verification: "Weryfikacja UFG",
+  reading_oc: "Odczyt polis", export_ready: "Przygotowanie Excela", waiting_for_manual_data: "Wymaga uwagi", identity_review: "Sprawdź dopasowanie",
 };
 
 function parseRows(value: string): number[] {
@@ -597,7 +605,7 @@ export default function RunSubmissionLauncher({
           {submission && <><p>Data odniesienia: {submission.referenceDate} · {submission.counts.selectedRows} wierszy · {submission.counts.uniqueGroups} osobnych zadań</p>
             {submission.status === "paused" && <p className="submission-notice">Wstrzymano przyjmowanie nowych zadań. Zadania już przyjęte są kontynuowane; wznowienie obejmie tylko pozostałe rekordy.</p>}
             <dl className="submission-counts">{Object.entries(submission.counts.items).map(([key, count]) => <div key={key}><dt>{submissionCountLabels[key] ?? "Pozostałe"}</dt><dd>{count}</dd></div>)}</dl>
-            <div className="submission-preview-list" role="region" aria-label="Postęp dla wybranych wierszy" tabIndex={0}><ul>{submissionItems.map((item) => <li key={item.rowNumber}><strong>Wiersz {item.rowNumber}</strong><span>{submissionItemStatusLabels[item.runStatus ?? item.preparationState] ?? "Stan wymaga sprawdzenia"}</span><small>{reasons[item.runErrorCode ?? item.reasonCode ?? ""] ?? (item.runId ? "zadanie zapisane" : "oczekuje na przyjęcie")}</small>{item.runId && onOpenRun && <button type="button" onClick={() => onOpenRun(item.runId!)}>Otwórz zadanie</button>}</li>)}</ul></div>
+            <div className="submission-preview-list" role="region" aria-label="Postęp dla wybranych wierszy" tabIndex={0}><ul>{submissionItems.map((item) => <li key={item.rowNumber}><strong>Wiersz {item.rowNumber}</strong><span>{item.runErrorCode === "COMPENSA_PAYER_DATA_SKIPPED" ? "Pominięto: dane płatnika" : submissionItemStatusLabels[item.runStatus ?? item.preparationState] ?? "Stan wymaga sprawdzenia"}</span><small>{reasons[item.runErrorCode ?? item.reasonCode ?? ""] ?? (item.runId ? "zadanie zapisane" : "oczekuje na przyjęcie")}</small>{item.runId && onOpenRun && <button type="button" onClick={() => onOpenRun(item.runId!)}>Otwórz zadanie</button>}</li>)}</ul></div>
             {submissionCursor && <button type="button" onClick={() => void loadMoreSubmissionItems()}>Pokaż kolejne wiersze</button>}
           </>}
           {submissionError && <p className="error" role="alert">{submissionError}</p>}
@@ -616,7 +624,7 @@ export default function RunSubmissionLauncher({
       <div><h3 id="prepared-set-title">Wszystkie gotowe firmy</h3>
         <p>System użyje najnowszej zakończonej rewizji, zachowa rozliczenie duplikatów i podzieli wszystkie wiersze na porcje do 500. Przed startem pokaże podsumowanie gotowości. Pauza czeka na bezpieczny koniec przyjętej porcji; anulowanie kończy dalsze porcje.</p></div>
       {(!wholeExecution || wholeExecutionTerminal) && <button className="submission-primary" type="button" onClick={() => void previewWholeImport()} disabled={wholeBusy || !csrfToken}>
-        {wholeBusy ? "Sprawdzam przygotowanie…” : wholeExecution ? "Przygotuj nowe wykonanie" : "Przejdź do podsumowania całego importu"}
+        {wholeBusy ? "Sprawdzam przygotowanie…" : wholeExecution ? "Przygotuj nowe wykonanie" : "Przejdź do podsumowania całego importu"}
       </button>}
       {wholeError && <p className="error" role="alert">{wholeError}</p>}
       {wholeNotice && !wholeError && <p className="submission-notice" role="status">{wholeNotice}</p>}

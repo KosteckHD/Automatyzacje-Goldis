@@ -62,3 +62,39 @@ test("starsza interwencja zapisu bez fieldCode nadal wymaga checkpointu i numeru
   assert.equal(canRecheckPortalIntervention({ ...base, fieldCode: null }), true);
   assert.equal(canRecheckPortalIntervention({ ...base, fieldCode: null, lastSafeStep: null }), false);
 });
+
+test("admin PZU session recheck never permits replaying an uncertain code or resuming an external case", () => {
+  const pzu = { ...base, portal: "pzu", kind: "sms", reasonCode: "SMS_DELIVERY_UNCERTAIN",
+    fieldCode: null, lastSafeStep: null, externalCaseRef: null };
+  assert.equal(canRecheckPortalIntervention(pzu), true);
+  for (const patch of [
+    { role: "operator" }, { role: "auditor" }, { runStatus: "waiting_for_sms" },
+    { reasonCode: "SMS_CODE_REJECTED" }, { reasonCode: "SMS_TIMEOUT" },
+    { kind: "portal_error" }, { fieldCode: "EXPECTED_PERSON" },
+    { lastSafeStep: "compensa_start_intent" }, { externalCaseRef: "SYNTH-CASE" },
+  ]) assert.equal(canRecheckPortalIntervention({ ...pzu, ...patch }), false, JSON.stringify(patch));
+});
+
+test("technical failure recheck restarts only before an external case and only for administrative roles", () => {
+  const failure = { ...base, portal: null, kind: "portal_error", reasonCode: "PORTAL_FAILURE",
+    fieldCode: null, lastSafeStep: null, externalCaseRef: null };
+  assert.equal(canRecheckPortalIntervention(failure), true);
+  for (const patch of [{ role: "operator" }, { lastSafeStep: "compensa_start_intent" },
+    { externalCaseRef: "SYNTH-CASE" }, { reasonCode: "OFFER_SAVE_UNCONFIRMED" }, { kind: "sms" }]) {
+    assert.equal(canRecheckPortalIntervention({ ...failure, ...patch }), false);
+  }
+});
+
+test("a reviewed PZU portal failure can retry entry only before an external case", () => {
+  const failure = { ...base, portal: "pzu", kind: "portal_error",
+    fieldCode: null, lastSafeStep: null, externalCaseRef: null };
+  for (const reasonCode of ["PORTAL_FAILURE", "PORTAL_SESSION_EXPIRED", "PORTAL_SCHEMA_CHANGED"]) {
+    for (const role of ["admin", "manager"]) {
+      assert.equal(canRecheckPortalIntervention({ ...failure, reasonCode, role }), true);
+    }
+    for (const patch of [{ role: "operator" }, { runStatus: "pzu_login" }, { fieldCode: "EXPECTED_PERSON" },
+      { lastSafeStep: "compensa_start_intent" }, { externalCaseRef: "CASE/1" }]) {
+      assert.equal(canRecheckPortalIntervention({ ...failure, reasonCode, ...patch }), false);
+    }
+  }
+});

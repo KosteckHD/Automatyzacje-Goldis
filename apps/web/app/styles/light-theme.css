@@ -1,0 +1,119 @@
+/* Shared light surfaces for the operational workspace. */
+:root { color-scheme: light; }
+::selection { background: #ead7a4; color: #25231e; }
+a { color: #775314; }
+a:hover { color: #543900; }
+td { color: #25231e; }
+.topbar, .admin-topbar { background: #fff; }
+.file-input, .sms-form input, .manual-data-form input, .manual-data-form textarea,
+.login-card input, .run-form input, .admin-field input, .admin-field select,
+.admin-filter-inline select, .admin-table-wrap select, .admin-table-wrap input { background: #fff; color: #25231e; color-scheme: light; }
+.error, .admin-alert { background: #fff0ee; color: #8e3028; border-color: #d8aaa5; }
+.sms-challenge { background: #fcf5e5; color: #25231e; }
+.lead-app-shell { --lead-bg: #f7f6f2; --lead-panel: #fff; --lead-panel-raised: #f4f2ed; --lead-line: #d5d0c6; --lead-control-border: #9b9488; --lead-text: #25231e; --lead-muted: #5f5b52; --lead-gold: #d9b65f; --lead-gold-bright: #755319; }
+.lead-topbar, .lead-mobile-bar { background: #fff; }
+.lead-sidebar, .lead-mobile-drawer { --lead-line: #48464b; --lead-muted: #bdb9b0; --lead-text: #f2eee5; --lead-gold-bright: #f2d889; background: #0b0b10; color: #f2eee5; }
+.lead-sidebar-nav { scrollbar-color: #77717b #0b0b10; }
+.lead-sidebar .lead-brand strong, .lead-mobile-drawer .lead-brand strong { color: #f2d889; }
+:is(.lead-sidebar, .lead-mobile-drawer) .lead-nav a, .lead-sidebar .lead-pin-control { color: #dedad1; }
+:is(.lead-sidebar, .lead-mobile-drawer) .lead-nav a .lead-nav-icon { color: #aaa69c; }
+:is(.lead-sidebar, .lead-mobile-drawer) .lead-nav a.active { background: #2b2619; border-color: #6c5a2e; color: #f2d889; }
+:is(.lead-sidebar, .lead-mobile-drawer) .lead-nav a.active span { color: #f2d889; }
+:is(.lead-sidebar, .lead-mobile-drawer) .lead-nav a:hover { background: #27231b; border-color: #645433; color: #f2d889; }
+:is(.lead-sidebar, .lead-mobile-drawer) .lead-nav-label { color: #bdb9b0; }
+.lead-topbar-name { color: #39362f; }
+.lead-overline { color: #6b655b; }
+.lead-topbar-actions>a, .lead-topbar .lead-topbar-account { color: #5f5b52; }
+.lead-auth-required { background: #f7f6f2; color: #25231e; }
+.lead-auth-required p { color: #5f5b52; }
+.lead-auth-required .lead-primary { background: #d9b65f; color: #17130b; }
+.lead-panel, .lead-metrics, .lead-table-wrap, .platform-dashboard-error { background: #fff; color: #25231e; border-color: #d5d0c6; }
+.lead-app-shell :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea) { background: #fff; color: #25231e; border-color: #9b9488; color-scheme: light; }
+.lead-app-shell :is(th, td) { border-color: #e4dfd5; color: #25231e; }
+.lead-app-shell th { background: #f4f2ed; color: #5f5b52; }
+.lead-app-shell :is(.lead-ready-tag, .lead-live-tag, .lead-count-tag, .lead-assigned-tag, .lead-unassigned-tag) { color: #514a3d; }
+.lead-app-shell :is(.lead-inline-link, .tool-catalog-card h2, .tool-catalog-empty h2) { color: #755319; }
+.tool-catalog-card>p:not(.lead-overline), .tool-catalog-empty p, .tool-catalog-capabilities span { color: #5f5b52; }
+.tool-catalog-mark, .tool-catalog-status { color: #755319; }
+.oc-automation { --oc-bg: #f7f6f2; --oc-panel: #fff; --oc-raised: #f4f2ed; --oc-line: #d5d0c6; --oc-control-border: #9b9488; --oc-text: #25231e; --oc-muted: #5f5b52; --oc-gold: #d9b65f; --oc-gold-bright: #755319; }
+.oc-step-panel-heading, .oc-step-panel-content :is(.enrichment-job-panel, .enrichment-job-items li, .review-metrics, .enrichment-runtime-status, .prepared-set-control, .prepared-set-preview, .prepared-set-progress) { background: #f7f6f2; color: #25231e; }
+.oc-step-panel-content :is(.file-input, input:not([type="checkbox"]), select, textarea) { background: #fff; color: #25231e; }
+.oc-step-panel-content :is(.review-button, .review-actions button, .review-pagination button, .enrichment-job-history button, .submission-mode button, .run-control-actions button, .cancel-run) { background: #fff; color: #25231e; }
+.oc-step-panel-content .submission-notice, .oc-step-link[data-state="attention"] .oc-step-link-copy small { color: #805510; }
+.oc-step-panel-content .review-conflict { color: #a4312a; }
+.oc-step-panel-content .review-success { color: #286044; }
+.legacy-platform-frame :is(.history-page, .account-shell, .admin-shell, .legacy-main>.shell, .legacy-main>.shell .content) { color: #25231e; }
+.legacy-platform-frame :is(.history-content h1, .account-content h1, .account-card h2, .admin-section-title h2, .admin-card h2, .admin-card h3, .admin-definition-list dd, .legacy-main>.shell .card h2, .legacy-main>.shell .result-section h2) { color: #25231e; }
+.legacy-platform-frame :is(.history-lede, .history-timezone, .account-content p, .admin-field, .admin-muted, .admin-card>p, .admin-card-head p, .admin-section-title>p, .admin-kpis small, .admin-report-kpis small, .admin-definition-list dt) { color: #5f5b52; }
+.legacy-platform-frame :is(.history-filters, .account-card, .deletion-job-list, .history-empty, .admin-card, .admin-kpis article, .admin-report-kpis article, .admin-service-strip, .admin-confirm-dialog, .legacy-main>.shell .card, .legacy-main>.shell .result-section) { background: #fff; border-color: #d5d0c6; color: #25231e; }
+.legacy-platform-frame :is(.admin-rail, .admin-hero, .admin-counter, .admin-runtime-manifest, .admin-enrichment-strip, .admin-grant, .admin-selected-user, .admin-toggle) { background: #f4f2ed; border-color: #d5d0c6; color: #25231e; }
+.legacy-platform-frame :is(.admin-hero h1, .admin-hero h2, .admin-hero .eyebrow, .admin-runtime-manifest b, .admin-enrichment-strip b, .admin-grant legend, .admin-checks label, .admin-form-row) { color: #25231e; }
+.legacy-platform-frame :is(.admin-hero>div:first-child>p:last-child, .admin-rail nav a, .admin-empty, .admin-settings-foot span) { color: #5f5b52; }
+.legacy-platform-frame :is(.admin-table-wrap th, .history-filters input, .history-filters select, .account-card input, .legacy-main input:not([type="file"]):not([type="checkbox"]), .legacy-main select) { background: #fff; border-color: #9b9488; color: #25231e; color-scheme: light; }
+.legacy-platform-frame .admin-table-wrap td { color: #25231e; border-color: #e4dfd5; }
+.legacy-platform-frame :is(.history-content a, .account-content a) { color: #755319; }
+.login-shell { background: #f7f6f2; }
+.login-intro { background: #f4f2ed; color: #25231e; border-color: #ddd8ce; }
+.login-intro h1 { color: #25231e; }
+.login-intro>p:not(.eyebrow) { color: #5f5b52; }
+.login-intro .goldis-logo { background: #03010d; border-radius: 10px; }
+.login-intro .goldis-logo img { mix-blend-mode: normal; }
+.login-card { background: #fff; border-color: #ddd8ce; box-shadow: 0 16px 48px #4b40240d; }
+.login-card label, .login-card h2 { color: #25231e; }
+.login-help { color: #5f5b52; }
+.login-help a { color: #755319; }
+
+/* Keep operational labels and data readable across the workspace. */
+.lead-page-heading h1, .lead-section-heading h2, .lead-panel h2,
+.platform-dashboard-error h2, .platform-empty-state h2,
+.oc-automation h1, .oc-step-panel-heading h2,
+.legacy-platform-frame :is(.history-content h1, .account-content h1) {
+  font-family: var(--font-body), Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+.lead-page-heading>div>p:last-child, .lead-panel p, .lead-field-label,
+.lead-identity dt, .lead-identity dd, .lead-panel dt, .lead-panel dd,
+.lead-contact span, .lead-contact a, .platform-empty-line,
+.platform-empty-state p, .notification-copy p { font-size: .9rem; line-height: 1.5; }
+.lead-nav a { font-size: .9rem; }
+.lead-nav-label { font-family: var(--font-body), Arial, sans-serif; font-size: .75rem; font-weight: 700; letter-spacing: .07em; }
+.lead-table-wrap :is(th, td), .oc-step-panel-content :is(th, td) { font-size: .875rem; line-height: 1.4; }
+.lead-primary, .lead-secondary, .lead-inline-link, .lead-back-link,
+.notification-read-button { font-size: .875rem; line-height: 1.35; }
+.notification-copy p, .operation-counts { color: #514d45; }
+.notification-copy>small, .operation-primary small, .platform-operation-row time { color: #5f5b52; font-size: .8125rem; }
+.notification-title-row h3, .operation-primary strong { font-size: .9375rem; font-weight: 700; }
+.notification-mark.result_ready, .platform-status-text.status-completed, .platform-automation-status.is-ready, .lead-notice { color: #286044; }
+.notification-mark.action_required, .platform-status-text.status-waiting_attention, .platform-status-text.status-failed, .platform-automation-status.is-waiting { color: #805510; }
+.platform-status-text.status-running, .platform-status-text.status-queued { color: #245579; }
+.platform-loading-metrics>span, .platform-loading-panels>span, .platform-primary-placeholder { background: #f4f2ed; }
+.oc-step-link-copy strong { font-size: .875rem; }
+.oc-step-link-copy small, .oc-step-rail-note { font-size: .8125rem; }
+
+/* Shared light-theme corrections for labels, navigation and empty states. */
+.legacy-platform-frame .history-filters label { color: #514c43; }
+.legacy-platform-frame .history-content .eyebrow { color: #755319; }
+.legacy-platform-frame .admin-rail nav a.admin-nav-active { background: #2b2619; color: #f2d889; }
+.legacy-platform-frame .admin-hero h1 em { color: #755319; }
+.legacy-platform-frame .admin-nav-hint { color: #5f5b52; }
+.legacy-platform-frame .history-empty { padding: 32px 24px; text-align: center; }
+.legacy-platform-frame .history-clear { min-height: 44px; margin: 8px 12px 0 0; padding: 8px 14px; border: 1px solid #9b9488; border-radius: 6px; background: #fff; color: #25231e; font: inherit; font-weight: 650; cursor: pointer; }
+.legacy-platform-frame .history-clear:focus-visible { outline: 2px solid #936b20; outline-offset: 2px; }
+.access-scope-note p, .access-row small, .team-create-form small, .team-table td small,
+.team-edit-panel p, .team-empty, .reports-filter > p, .reports-table-panel p, .reports-footnote { color: #5f5b52; }
+.access-note-label { color: #755319; }
+.team-table-wrap { border-color: #d5d0c6; background: #fff; }
+.team-table th:last-child { background: #f4f2ed; }
+.team-table td:last-child, .team-edit-cell { background: #fff; }
+.team-table th, .team-table td { border-color: #e4dfd5; }
+.review-hero { min-height: 0; padding: 0; border: 0; background: transparent; }
+.review-hero:after, .review-hero-mark { display: none; }
+.review-hero h1 { color: #25231e; font: 700 2rem/1.2 var(--font-body), Arial, sans-serif; letter-spacing: -.02em; }
+.review-hero p:last-child { color: #5f5b52; }
+@media (max-width: 760px) {
+  .team-table tbody tr:not(:has(.team-edit-cell)), .team-table tbody tr:has(.team-edit-cell) { background: #fff; border-color: #d5d0c6; }
+  .team-table tbody tr:has(td[colspan]) td:first-child { position: static; padding: 20px 12px; }
+  .team-table tbody tr:not(:has(.team-edit-cell)) td:not(:first-child):not(:last-child)::before { color: #5f5b52; }
+  .lead-section-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
+}

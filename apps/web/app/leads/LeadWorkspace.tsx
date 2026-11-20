@@ -162,7 +162,7 @@ export default function LeadWorkspace({ mode, leadId }: Props) {
     }).then((payload) => {
       if (!active || !payload) return;
       const summary = payload.summary;
-      if (!summary || !Number.isFinite(summary.scopeTotal) || !Number.isFinite(summary.matchingTotal)) throw new Error("Odpowiedź nie zawiera podsumowania tego widoku.");
+      if (!summary || !Number.isFinite(summary.scopeTotal) || !Number.isFinite(summary.matchingTotal)) throw new Error("Nie udało się pobrać podsumowania firm. Spróbuj ponownie.");
       setItemsData({ key: listUrl, items: Array.isArray(payload.items) ? payload.items : [], nextCursor: payload.nextCursor ?? null, previousCursor: payload.previousCursor ?? null, summary });
     }).catch((cause) => { if (active && !controller.signal.aborted) setError(cause instanceof Error ? cause.message : "Nie udało się pobrać firm."); })
       .finally(() => { if (active) setLoading(false); });
@@ -369,7 +369,7 @@ export default function LeadWorkspace({ mode, leadId }: Props) {
               </tbody></table></div>
               <div className="lead-mobile-list">{items.map((item) => <LeadMobileCard key={item.id} lead={item} detailHref={detailHref(item)} busy={busyLeadId === item.id} onStatusChange={(status) => void saveStatus(item, status)} />)}</div>
             </> : loading ? <div className="lead-loading" role="status">Odświeżam listę firm…</div> : emptyState ?? (error
-              ? <div className="lead-empty"><h2>Nie udało się wczytać firm</h2><p>Sprawdź połączenie i ponów odczyt tego samego widoku.</p></div>
+              ? null
               : <div className="lead-loading" role="status">Ładuję podsumowanie widoku…</div>)}
             {!error && listData && (listData.previousCursor || listData.nextCursor) && <nav className="lead-pagination" aria-label="Strony listy firm">
               {listData.previousCursor ? <button className="lead-secondary" type="button" disabled={loading} onClick={() => router.push(buildLeadListHref(pathname, { ...viewQuery, cursor: listData.previousCursor, direction: "previous" }), { scroll: false })}>Poprzednia</button> : <span />}

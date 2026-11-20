@@ -233,14 +233,14 @@ export default function ReviewPage() {
   }
 
   const rows = page?.items ?? [];
-  const title = session?.role === "operator" ? "Moje propozycje korekt" : tab === "corrections" ? "Korekty REGON" : "Konflikty encji";
+  const title = session?.role === "operator" ? "Moje propozycje korekt" : "Weryfikacja danych";
 
   return <div className="admin-shell review-shell">
     <main className="admin-main">
       <div className="admin-content review-content">
         <section className="review-hero"><div><p className="eyebrow">{session?.role === "operator" ? "STATUS ZGŁOSZEŃ" : "KOLEJKI DECYZYJNE"}</p><h1>{title}</h1><p>{session?.role === "operator"
           ? "Sprawdź, które propozycje REGON oczekują na weryfikację i jakie decyzje podjął zespół. Korekta zaczyna obowiązywać dopiero po zatwierdzeniu."
-          : "Rozstrzygaj zgłoszenia z kontrolą wersji i aktualnych uprawnień. Każda decyzja jest zapisywana w dzienniku audytu."}</p></div><div className="review-hero-mark" aria-hidden="true"><span>R</span><i /></div></section>
+          : "Rozpatruj propozycje korekt REGON i sprawdzaj niezgodności danych firm. Każda decyzja jest zapisywana w dzienniku aktywności."}</p></div><div className="review-hero-mark" aria-hidden="true"><span>R</span><i /></div></section>
         {sessionState === "loading" && <section className="admin-card" role="status">Sprawdzam sesję i uprawnienia…</section>}
         {sessionState === "signed-out" && <section className="admin-card"><h2>Sesja wygasła</h2><p>Zaloguj się ponownie, aby otworzyć kolejkę.</p><a className="admin-button" href={loginHref(`${window.location.pathname}${window.location.search}`, window.location.origin)}>Zaloguj się i wróć do kolejki</a></section>}
         {sessionState === "error" && <section className="admin-card" role="alert"><h2>Nie można sprawdzić sesji</h2><p>Odśwież stronę. Jeśli problem się powtarza, sprawdź dostępność API.</p><button className="admin-quiet" type="button" onClick={() => window.location.reload()}>Odśwież stronę</button></section>}
@@ -249,7 +249,7 @@ export default function ReviewPage() {
         {session && session.role !== "auditor" && <>
           {session.role !== "operator" && <div className="review-tabs" role="tablist" aria-label="Typ kolejki">
             <button role="tab" aria-selected={tab === "corrections"} className={tab === "corrections" ? "is-active" : ""} onClick={() => changeTab("corrections")}>Korekty REGON</button>
-            <button role="tab" aria-selected={tab === "conflicts"} className={tab === "conflicts" ? "is-active" : ""} onClick={() => changeTab("conflicts")}>Konflikty encji</button>
+            <button role="tab" aria-selected={tab === "conflicts"} className={tab === "conflicts" ? "is-active" : ""} onClick={() => changeTab("conflicts")}>Konflikty danych firm</button>
           </div>}
           <form className="review-filters" onSubmit={applyFilters}>
             <label>Status<select value={draft.status} onChange={(event) => setDraft({ ...draft, status: event.target.value })}>

@@ -14,6 +14,7 @@ import "./enrichment-jobs.css";
 import "./run-submissions.css";
 import "./import-preparations.css";
 import "./legacy-platform-frame.css";
+import "./styles/light-theme.css";
 
 const newsreader = localFont({
   src: "./fonts/Newsreader.ttf",

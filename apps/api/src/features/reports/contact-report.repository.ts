@@ -54,7 +54,7 @@ export class ContactReportRepository {
                 count(*) FILTER (WHERE lead.contact_status = 'not_interested')::int AS "notInterested"
            FROM business_leads lead
            JOIN result_sets result_set ON result_set.result_set_id = lead.result_set_id AND result_set.tenant_id = lead.tenant_id
-          WHERE lead.tenant_id = :tenantId AND lead.tool_id = :toolId AND result_set.status = 'completed'
+          WHERE lead.tenant_id = :tenantId AND lead.tool_id = :toolId
             AND lead.result_status = 'ready' AND lead.created_at >= :from AND lead.created_at < :to
             AND NOT EXISTS (SELECT 1 FROM resource_tombstones deletion WHERE deletion.tenant_id = result_set.tenant_id
               AND deletion.resource_type = 'import' AND deletion.resource_id = result_set.batch_id AND deletion.state <> 'completed')
@@ -71,7 +71,7 @@ export class ContactReportRepository {
            JOIN result_sets result_set ON result_set.result_set_id = lead.result_set_id AND result_set.tenant_id = lead.tenant_id
            JOIN tenant_memberships membership ON membership.tenant_id = lead.tenant_id AND membership.user_id = lead.assigned_to_user_id
            JOIN users account ON account.user_id = membership.user_id
-          WHERE lead.tenant_id = :tenantId AND lead.tool_id = :toolId AND result_set.status = 'completed'
+          WHERE lead.tenant_id = :tenantId AND lead.tool_id = :toolId
             AND lead.result_status = 'ready' AND lead.assigned_to_user_id IS NOT NULL
             AND lead.created_at >= :from AND lead.created_at < :to
             AND NOT EXISTS (SELECT 1 FROM resource_tombstones deletion WHERE deletion.tenant_id = result_set.tenant_id

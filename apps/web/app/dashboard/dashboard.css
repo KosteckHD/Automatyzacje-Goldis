@@ -1,0 +1,67 @@
+.gold-dashboard { min-width: 0; background: #f7f6f2; color: #25231e; font-family: var(--font-body), Arial, sans-serif; }
+.gold-dashboard a { color: inherit; text-decoration: none; }
+.gold-toolbar { height: 66px; padding: 0 42px; display: flex; align-items: center; justify-content: flex-end; gap: 18px; background: #fff; border-bottom: 1px solid #ddd8ce; }
+.gold-avatar { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #ddd8ce; border-radius: 50%; font-weight: 700; }
+.gold-notifications { position: relative; }
+.gold-bell { min-height: 44px; display: flex; align-items: center; gap: 8px; border: 0; background: transparent; color: #25231e; font: inherit; font-weight: 700; cursor: pointer; }
+.gold-bell svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.gold-bell b { padding: 3px 7px; border-radius: 12px; background: #f1e6cb; color: #644714; font-size: 12px; }
+.gold-notification-panel { position: absolute; z-index: 30; right: 0; top: 48px; width: min(400px, calc(100vw - 24px)); background: #fff; border: 1px solid #d5d0c7; border-radius: 10px; box-shadow: 0 8px 24px #0002; }
+.gold-notification-panel h2 { margin: 0; padding: 16px; font-size: 19px; border-bottom: 1px solid #e6e2d9; }
+.gold-notification-scroll { max-height: min(420px, calc(100vh - 190px)); overflow-y: auto; overscroll-behavior: contain; }
+.gold-notification-scroll > p { padding: 16px; }
+.gold-notification-scroll article { padding: 14px 16px; border-bottom: 1px solid #e6e2d9; }
+.gold-notification-scroll article.unread { background: #fbf5e7; }
+.gold-notification-scroll article p { margin: 5px 0; line-height: 1.4; }
+.gold-notification-scroll time { color: #5f5b52; font-size: 13px; }
+.gold-notification-scroll article div { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; }
+.gold-notification-scroll article a, .gold-notification-scroll article button { padding: 0; border: 0; background: none; color: #704c0d; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.gold-notification-footer { display: block; padding: 14px 16px; font-weight: 700; }
+.gold-content { max-width: 1370px; margin: auto; padding: 38px 42px; }
+.gold-heading, .gold-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.gold-heading { margin-bottom: 28px; }
+.gold-heading h1 { margin: 0; font-size: 38px; line-height: 1.15; font-weight: 750; }
+.gold-heading p { margin: 8px 0 0; color: #5f5b52; }
+.gold-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 14px; border: 1px solid #cfc8b9; border-radius: 7px; background: #fff; font-weight: 700; }
+.gold-button.primary { background: #e1bd6a; border-color: #d4ae58; }
+.gold-flow { display: flex; border: 1px solid #ddd8ce; border-radius: 10px; background: #fff; }
+.gold-flow a { flex: 1; padding: 18px; }
+.gold-flow a + a { border-left: 1px solid #ddd8ce; }
+.gold-flow strong, .gold-flow span { display: block; }
+.gold-flow strong { font-size: 17px; }
+.gold-flow span { margin: 5px 0 0 23px; color: #5f5b52; font-size: 14px; }
+.gold-operations { margin-top: 32px; }
+.gold-section-heading { margin-bottom: 14px; }
+.gold-section-heading h2, .gold-tools h2 { margin: 0; font-size: 23px; }
+.gold-section-heading a { font-weight: 700; font-size: 14px; }
+.gold-workspace { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr); border: 1px solid #ddd8ce; border-radius: 10px; background: #fff; overflow: hidden; }
+.gold-list { min-width: 0; }
+.gold-filters { display: flex; gap: 16px; overflow-x: auto; padding: 0 18px; border-bottom: 1px solid #e6e2d9; }
+.gold-filters button { flex: none; min-height: 52px; padding: 0; border: 0; border-bottom: 2px solid transparent; background: transparent; color: #5f5b52; font: inherit; font-size: 14px; cursor: pointer; }
+.gold-filters button[aria-pressed="true"] { border-color: #a87926; color: #473215; font-weight: 700; }
+.gold-table-scroll { overflow-x: auto; }
+.gold-list table { width: 100%; min-width: 450px; border-collapse: collapse; text-align: left; }
+.gold-list th { background: #f9f8f5; color: #5f5b52; font-size: 13px; }
+.gold-list th, .gold-list td { padding: 10px 18px; border-bottom: 1px solid #e6e2d9; }
+.gold-list tr.selected { background: #f7f0df; }
+.gold-list td button { border: 0; padding: 0; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.gold-list td small { display: block; margin-top: 4px; color: #5f5b52; }
+.gold-status { white-space: nowrap; color: #286044; font-size: 14px; font-weight: 700; }
+.gold-status.waiting_attention, .gold-status.failed { color: #8a5017; }
+.gold-status.running, .gold-status.queued { color: #245579; }
+.gold-status.cancelled { color: #5f5b52; }
+.gold-empty { padding: 16px; }
+.gold-details { padding: 20px; border-left: 1px solid #ddd8ce; background: #fdfcf9; }
+.gold-details > p, .gold-details > small { color: #5f5b52; }
+.gold-details > p { margin: 0 0 6px; }
+.gold-details h3 { margin: 0 0 6px; font-size: 21px; overflow-wrap: anywhere; }
+.gold-summary { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin: 16px 0; padding: 12px 0; border-block: 1px solid #ddd8ce; }
+.gold-allocation p { color: #5f5b52; }
+.gold-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.gold-tools { margin-top: 28px; }
+.gold-tools nav { display: flex; margin-top: 10px; border-block: 1px solid #ddd8ce; }
+.gold-tools nav a { flex: 1; padding: 18px; font-weight: 700; }
+.gold-tools nav a + a { border-left: 1px solid #ddd8ce; }
+.gold-dashboard a:focus-visible, .gold-dashboard button:focus-visible { outline: 2px solid #835f20; outline-offset: 2px; }
+@media (max-width: 1150px) { .gold-workspace { grid-template-columns: 1fr; } .gold-details { border-left: 0; border-top: 1px solid #ddd8ce; } }
+@media (max-width: 700px) { .gold-content, .gold-toolbar { padding-inline: 18px; } .gold-heading { align-items: flex-start; flex-direction: column; } .gold-flow, .gold-tools nav { flex-direction: column; } .gold-flow a + a, .gold-tools nav a + a { border-left: 0; border-top: 1px solid #ddd8ce; } .gold-section-heading { align-items: flex-start; flex-direction: column; } .gold-bell span { display: none; } }

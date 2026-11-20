@@ -103,7 +103,7 @@ async function main() {
     });
 
     await page.goto(`${baseUrl}/review`);
-    await page.getByRole("heading", { name: "Korekty REGON" }).waitFor({ state: "visible" });
+    await page.getByRole("heading", { name: "Weryfikacja danych" }).waitFor({ state: "visible" });
     await page.locator(".lead-sidebar").waitFor({ state: "visible" });
     assert.equal(await page.locator(".lead-sidebar").count(), 1, "review route uses the shared role navigation once");
     assert.equal(await page.locator(".admin-rail").count(), 0, "review content does not render a second global navigation");
@@ -120,13 +120,13 @@ async function main() {
     assert.deepEqual(requests[1].body, { decision: "approved", expectedRowVersion: 5, reasonCode: "REGISTRY_MATCH_VERIFIED" });
     assert.equal(requests[0].csrf, csrfToken);
 
-    await page.getByRole("tab", { name: "Konflikty encji" }).click();
-    await page.getByRole("heading", { name: "Konflikty encji" }).waitFor({ state: "visible" });
+    await page.getByRole("tab", { name: "Konflikty danych firm" }).click();
+    assert.equal(await page.getByRole("tab", { name: "Konflikty danych firm" }).getAttribute("aria-selected"), "true");
     await page.getByRole("button", { name: "Rozpatrz konflikt" }).click();
     await page.getByLabel("Encja do połączenia").selectOption(candidateId);
     await page.getByRole("button", { name: "Połącz z wybraną encją" }).click();
     await page.getByRole("status").getByText("Decyzja zapisana").waitFor({ state: "visible" });
-    await page.getByRole("heading", { name: "Konflikty encji" }).waitFor({ state: "visible" });
+    assert.equal(await page.getByRole("tab", { name: "Konflikty danych firm" }).getAttribute("aria-selected"), "true");
     assert.equal(conflictResolutions, 1);
     assert.deepEqual(requests.at(-1).body, { action: "link_existing", expectedRowVersion: 8, reasonCode: "IDENTIFIERS_VERIFIED", canonicalEntityId: candidateId });
 

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { isRunDispatchIntentV1, type RunDispatchIntentV1 } from "@goldis/core";
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export type DispatchIntent = RunDispatchIntentV1;
@@ -12,6 +12,19 @@ export type RunExecutionLease = Readonly<{
   intentType: DispatchIntent;
   leaseExpiresAt: string;
 }>;
+
+/** Check ownership inside the mutation transaction, after locking the run. */
+export async function assertLockedRunExecution(client: PoolClient, runId: string, lease: RunExecutionLease | null): Promise<void> {
+  if (!lease || lease.runId !== runId) throw new Error("RUN_EXECUTION_LEASE_LOST");
+  const result = await client.query(
+    `SELECT id FROM automation_runs WHERE id = $1 AND execution_id = $2 AND worker_session_id = $3
+     AND lease_expires_at > clock_timestamp()
+     AND status NOT IN ('cancelled', 'failed', 'completed', 'no_matching_policies')
+     AND control_state <> 'paused' FOR UPDATE`,
+    [runId, lease.executionId, lease.workerSessionId],
+  );
+  if (result.rowCount !== 1) throw new Error("RUN_EXECUTION_LEASE_LOST");
+}
 
 /** Atomically consumes a durable dispatch and takes the run's single fenced execution lease. */
 export async function acquireRunExecution(

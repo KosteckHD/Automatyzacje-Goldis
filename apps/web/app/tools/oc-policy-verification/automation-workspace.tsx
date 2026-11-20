@@ -30,7 +30,7 @@ const steps: StepDefinition[] = [
   { key: "deduplication", label: "Deduplikacja", completeLabel: "Zestaw przygotowany", emptyLabel: "Oczekuje na dane" },
   { key: "selection", label: "Wybór wierszy", completeLabel: "Wybór zapisany", emptyLabel: "Oczekuje na zestaw" },
   { key: "launch", label: "Podsumowanie i start", completeLabel: "Gotowe do sprawdzenia", emptyLabel: "Oczekuje na wybór" },
-  { key: "progress", label: "Postęp zadań", completeLabel: "Zadania dostępne", emptyLabel: "Brak uruchomienia" },
+  { key: "progress", label: "Przebieg zadań", completeLabel: "Zadania dostępne", emptyLabel: "Brak uruchomienia" },
   { key: "results", label: "Wyniki i eksport", completeLabel: "Wyniki dostępne", emptyLabel: "Brak wyników" },
 ];
 
